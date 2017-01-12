@@ -382,7 +382,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                     if (in_array($fd, $this->dispatchClientFds)) {
                         continue;
                     }
-                    $serv->send($fd, $message['data']);
+                    $this->send($fd, $message['data']);
                 }
                 return null;
             case SwooleMarco::MSG_TYPE_SEND_GROUP://群组

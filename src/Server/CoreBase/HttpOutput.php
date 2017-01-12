@@ -15,6 +15,12 @@ class HttpOutput
      * @var \swoole_http_response
      */
     public $response;
+
+    /**
+     * http request
+     * @var \swoole_http_request
+     */
+    public $request;
     /**
      * @var Controller
      */
@@ -31,10 +37,12 @@ class HttpOutput
 
     /**
      * 设置
+     * @param $request
      * @param $response
      */
-    public function set($response)
+    public function set($request, $response)
     {
+        $this->request = $request;
         $this->response = $response;
     }
 
@@ -44,6 +52,7 @@ class HttpOutput
     public function reset()
     {
         unset($this->response);
+        unset($this->request);
     }
 
     /**
@@ -127,11 +136,11 @@ class HttpOutput
      * 输出文件（会自动销毁）
      * @param $root_file
      * @param $file_name
-     * @return bool
+     * @return mixed
      */
     public function endFile($root_file, $file_name)
     {
-        $result = httpEndFile($root_file . '/' . $file_name, $this->response);
+        $result = httpEndFile($root_file . '/' . $file_name, $this->request, $this->response);
         return $result;
     }
 }

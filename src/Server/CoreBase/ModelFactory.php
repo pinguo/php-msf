@@ -43,6 +43,7 @@ class ModelFactory
      */
     public function getModel($model)
     {
+        $model = str_replace('/', '\\', $model);
         if (!key_exists($model, $this->pool)) {
             $this->pool[$model] = [];
         }

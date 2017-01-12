@@ -55,6 +55,7 @@ class Loader
         if (empty($task)) {
             return null;
         }
+        $task = str_replace('/', '\\', $task);
         $task_class = "\\app\\Tasks\\" . $task;
         if (!class_exists($task_class)) {
             $task_class = "\\Server\\Tasks\\" . $task;

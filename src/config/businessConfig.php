@@ -27,4 +27,16 @@ $config['http']['index'] = 'index.html';
 //是否服务器启动时自动清除群组信息
 $config['autoClearGroup'] = false;
 
+/**
+ * 设置域名和Root之间的映射关系
+ */
+
+$config['http']['root'] = [
+    'localhost' =>
+        [
+            'root' => 'localhost',
+            'index' => 'index.html'
+        ]
+];
+
 return $config;
