@@ -1,0 +1,47 @@
+package youwo;
+import "php.proto";
+import "descriptor.proto";
+option (php.package) = "app.Protobuf";
+
+enum CMD_SERVICE{
+    Account = 0x00000001;
+}
+
+enum CMD_METHOD {
+    Login = 0x00000001;
+}
+
+message Message
+{
+    required CMD_SERVICE cmd_service = 1;
+    required CMD_METHOD cmd_method = 2;
+    required int32 token = 3;
+    optional Request request = 4;
+    optional Response response = 5;
+}
+
+message Request
+{// 包含所有的Request消息
+    optional Login_Request mLoginRequest = 1;
+}
+
+message Response
+{// 包含所有的Response消息
+    optional Login_Response mLoginResponse = 1;
+}
+
+message Login_Request
+{
+    optional CMD_SERVICE cmd_service = 100 [default = Account];
+    optional CMD_METHOD cmd_method = 101 [default = Login];
+    required string username = 1;
+    required string password = 2;
+}
+
+message Login_Response
+{
+    optional CMD_SERVICE cmd_service = 100 [default = Account];
+    optional CMD_METHOD cmd_method = 101 [default = Login];
+    required string username = 1;
+    required string password = 2;
+}
