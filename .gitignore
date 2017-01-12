@@ -1,0 +1,9 @@
+src/_home_SwooleDistributed_start_swoole_dispatch.php.pid
+*.pid
+*.log
+vendor
+.idea
+.vscode
+*.lock
+ideHelper
+screenshots

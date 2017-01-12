@@ -1,0 +1,1 @@
+php ./vendor/bin/protobuf --include-descriptors -i . -o ./src/ ./protobuf.proto
