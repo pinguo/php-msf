@@ -123,7 +123,7 @@ class Controller extends CoreBase
         $this->request = $request;
         $this->response = $response;
         $this->http_input->set($request);
-        $this->http_output->set($response);
+        $this->http_output->set($request, $response);
         $this->request_type = SwooleMarco::HTTP_REQUEST;
         $this->initialization($controller_name, $method_name);
     }

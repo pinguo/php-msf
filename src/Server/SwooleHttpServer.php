@@ -125,16 +125,18 @@ abstract class SwooleHttpServer extends SwooleServer
     public function onSwooleRequest($request, $response)
     {
         $error_404 = false;
+        $controller_instance = null;
         $this->route->handleClientRequest($request);
+        list($host, $port) = explode(':', $request->header['host']);
         if ($this->route->getPath() == '/') {
-            $www_path = WWW_DIR . '/' . $this->config->get('http.index', 'index.html');
-            $result = httpEndFile($www_path, $response);
+            $www_path = $this->getHostRoot($host) . $this->getHostIndex($host);
+            $result = httpEndFile($www_path, $request, $response);
             if (!$result) {
                 $error_404 = true;
             } else {
                 return;
             }
-        }  else {
+        } else {
             $controller_name = $this->route->getControllerName();
             $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
             if ($controller_instance != null) {
@@ -163,8 +165,8 @@ abstract class SwooleHttpServer extends SwooleServer
                 $controller_instance->destroy();
             }
             //先根据path找下www目录
-            $www_path = WWW_DIR . $this->route->getPath();
-            $result = httpEndFile($www_path, $response);
+            $www_path = $this->getHostRoot($host) . $this->route->getPath();
+            $result = httpEndFile($www_path, $request, $response);
             if (!$result) {
                 $response->header('HTTP/1.1', '404 Not Found');
                 if (!isset($this->cache404)) {//内存缓存404页面
@@ -174,5 +176,32 @@ abstract class SwooleHttpServer extends SwooleServer
                 $response->end($this->cache404);
             }
         }
+    }
+
+    /**
+     * 获得host对应的根目录
+     * @param $host
+     * @return string
+     */
+    public function getHostRoot($host)
+    {
+        $root_path = $this->config['http']['root'][$host]['root']??'';
+        if (!empty($root_path)) {
+            $root_path = WWW_DIR . "/$root_path/";
+        } else {
+            $root_path = WWW_DIR . "/";
+        }
+        return $root_path;
+    }
+
+    /**
+     * 返回host对应的默认文件
+     * @param $host
+     * @return mixed|null
+     */
+    public function getHostIndex($host)
+    {
+        $index = $this->config['http']['root'][$host]['index']??'index.html';
+        return $index;
     }
 }

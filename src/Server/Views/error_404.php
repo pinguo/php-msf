@@ -26,7 +26,7 @@
             padding: 230px 0 0;
             overflow: hidden;
             xxxxborder: 1px solid;
-            background-image: url(<?=$this->get_www('image/Main.jpg')?>);
+            background-image: url(<?='image/Main.jpg'?>);
             background-repeat: no-repeat;
         }
 

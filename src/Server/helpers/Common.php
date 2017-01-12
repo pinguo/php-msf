@@ -43,10 +43,18 @@ function shell_read()
  * @param $response
  * @return mixed
  */
-function httpEndFile($path, $response)
+function httpEndFile($path, $request, $response)
 {
+    $path = urldecode($path);
     if (!file_exists($path)) {
         return false;
+    }
+    $lastModified = gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT';
+    //缓存
+    if (isset($request->header['if-modified-since']) && $request->header['if-modified-since'] == $lastModified) {
+        $response->status(304);
+        $response->end();
+        return true;
     }
     $extension = get_extension($path);
     $normalHeaders = get_instance()->config->get("fileHeader.normal", ['Content-Type: application/octet-stream']);
@@ -55,6 +63,7 @@ function httpEndFile($path, $response)
         list($hk, $hv) = explode(': ', $value);
         $response->header($hk, $hv);
     }
+    $response->header('Last-Modified', $lastModified);
     $response->sendfile($path);
     return true;
 }
