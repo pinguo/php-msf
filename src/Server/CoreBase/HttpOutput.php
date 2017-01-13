@@ -62,7 +62,7 @@ class HttpOutput
      * @param    string
      * @return HttpOutPut
      */
-    public function set_status_header($code = 200)
+    public function setStatusHeader($code = 200)
     {
         $this->response->status($code);
         return $this;
@@ -74,9 +74,9 @@ class HttpOutput
      * @param    string $mime_type Extension of the file we're outputting
      * @return    HttpOutPut
      */
-    public function set_content_type($mime_type)
+    public function setContentType($mime_type)
     {
-        $this->set_header('Content-Type', $mime_type);
+        $this->setHeader('Content-Type', $mime_type);
         return $this;
     }
 
@@ -86,7 +86,7 @@ class HttpOutput
      * @param $value
      * @return $this
      */
-    public function set_header($key, $value)
+    public function setHeader($key, $value)
     {
         $this->response->header($key, $value);
         return $this;
@@ -133,14 +133,18 @@ class HttpOutput
     }
 
     /**
-     * 输出文件（会自动销毁）
+     * 输出文件
      * @param $root_file
      * @param $file_name
+     * @param bool $destory
      * @return mixed
      */
-    public function endFile($root_file, $file_name)
+    public function endFile($root_file, $file_name, $destory = true)
     {
         $result = httpEndFile($root_file . '/' . $file_name, $this->request, $this->response);
+        if ($destory) {
+            $this->controller->destroy();
+        }
         return $result;
     }
 }

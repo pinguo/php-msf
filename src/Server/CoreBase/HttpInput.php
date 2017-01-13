@@ -34,12 +34,12 @@ class HttpInput
     }
 
     /**
-     * post_get
+     * postGet
      * @param $index
      * @param $xss_clean
      * @return string
      */
-    public function post_get($index, $xss_clean = true)
+    public function postGet($index, $xss_clean = true)
     {
         return isset($this->request->post[$index])
             ? $this->post($index, $xss_clean)
@@ -77,12 +77,12 @@ class HttpInput
     }
 
     /**
-     * get_post
+     * getPost
      * @param $index
      * @param $xss_clean
      * @return string
      */
-    public function get_post($index, $xss_clean = true)
+    public function getPost($index, $xss_clean = true)
     {
         return isset($this->request->get[$index])
             ? $this->get($index, $xss_clean)
@@ -110,7 +110,7 @@ class HttpInput
      * 获取原始的POST包体
      * @return mixed
      */
-    public function get_rawContent()
+    public function getRawContent()
     {
         return $this->request->rawContent();
     }
@@ -131,12 +131,12 @@ class HttpInput
     }
 
     /**
-     * get_request_header
+     * getRequestHeader
      * @param $index
      * @param $xss_clean
      * @return string
      */
-    public function get_request_header($index, $xss_clean = true)
+    public function getRequestHeader($index, $xss_clean = true)
     {
         if ($xss_clean) {
             return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
