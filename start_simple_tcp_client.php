@@ -38,7 +38,7 @@ while ($i < 1) {
     if (!socket_write($socket, $data . "\n")) {
         echo "Write failed\n";
     }
-    while ($buffer = socket_read($socket, 1024)) {
+    while ($buffer = socket_read($socket, 65535)) {
         $ret = substr($buffer, $GLOBALS['package_length_type_len']) . "\n";
         break;
     }
