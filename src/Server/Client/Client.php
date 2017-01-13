@@ -32,6 +32,7 @@ class Client
         swoole_async_dns_lookup($url_host, function ($host, $ip) use (&$data) {
             $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
             $http_client = new HttpClient($client);
+            $http_client->setHeaders(['Host' => $host]);
             call_user_func($data['callBack'], $http_client);
         });
     }
