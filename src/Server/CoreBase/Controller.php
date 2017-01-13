@@ -202,7 +202,7 @@ class Controller extends CoreBase
     public function defaultMethod()
     {
         if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $this->http_output->set_header('HTTP/1.1', '404 Not Found');
+            $this->http_output->setHeader('HTTP/1.1', '404 Not Found');
             $template = $this->loader->view('server::error_404');
             $this->http_output->end($template->render());
         } else {
