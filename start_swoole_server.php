@@ -7,7 +7,7 @@
  */
 
 define('ROOT_PATH', __DIR__);
-define('ENV', $_ENV['MAPI_ENV'] ?? 'develop');
+define('ENV', $_ENV['MSF_ENV'] ?? 'develop');
 
 require_once __DIR__ . '/vendor/autoload.php';
 $worker = new \app\AppServer();
