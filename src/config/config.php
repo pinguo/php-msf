@@ -29,7 +29,7 @@ $config['tcp']['port'] = 9090;
 /**
  * 服务器设置
  */
-$config['server']['process_title'] = 'mapi';
+$config['server']['process_title'] = 'msf';
 $config['server']['dispatch_port'] = 9991;
 $config['server']['send_use_task_num'] = 20;
 $config['server']['runtime_path'] = ROOT_PATH . '/runtime/';
