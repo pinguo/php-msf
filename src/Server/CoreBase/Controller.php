@@ -136,7 +136,7 @@ class Controller extends CoreBase
     {
         switch ($this->request_type) {
             case SwooleMarco::HTTP_REQUEST:
-                $this->http_output->set_status_header(500);
+                $this->http_output->setStatusHeader(500);
                 $this->http_output->end($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
                 break;
             case SwooleMarco::TCP_REQUEST:
