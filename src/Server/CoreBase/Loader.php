@@ -30,17 +30,31 @@ class Loader
      * @param $model
      * @param Child $parent
      * @return mixed|null
+     * @throws SwooleException
      */
     public function model($model, Child $parent)
     {
+        if (!$parent->isConstruct) {
+            $parentName = get_class($parent);
+            throw new SwooleException("class:$parentName,error:loader model 方法不允许在__construct内使用！");
+        }
         if (empty($model)) {
             return null;
         }
-        if ($parent->hasChild($model)) {
-            return $parent->getChild($model);
+        if ($model == $parent->core_name) {
+            return $parent;
         }
-        $model_instance = $this->_model_factory->getModel($model);
+        $root = $parent;
+        while (isset($root)) {
+            if ($root->hasChild($model)) {
+                return $root->getChild($model);
+            }
+            $root = $root->parent??null;
+        }
+
+        $model_instance = $this->_model_factory->getModel($model, $parent);
         $parent->addChild($model_instance);
+        $model_instance->initialization();
         return $model_instance;
     }
 

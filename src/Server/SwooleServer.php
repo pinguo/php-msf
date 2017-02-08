@@ -20,7 +20,7 @@ use Server\Route\IRoute;
  */
 abstract class SwooleServer extends Child
 {
-    const version = "1.7.4";
+    const version = "1.7.5";
     /**
      * Daemonize.
      *

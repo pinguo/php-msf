@@ -108,9 +108,9 @@ class CoroutineTask
     /**
      * 销毁
      */
-    public function destory()
+    public function destroy()
     {
-        $this->generatorContext->destory();
+        $this->generatorContext->destroy();
         unset($this->generatorContext);
         unset($this->stack);
         unset($this->routine);

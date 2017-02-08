@@ -100,7 +100,7 @@ class GeneratorContext
     /**
      * 销毁
      */
-    public function destory()
+    public function destroy()
     {
         unset($this->controller);
         unset($this->stack);

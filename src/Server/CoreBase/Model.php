@@ -24,12 +24,20 @@ class Model extends CoreBase
      */
     public $client;
 
-    public function __construct()
+    final public function __construct()
     {
         parent::__construct();
         $this->redis_pool = get_instance()->redis_pool;
         $this->mysql_pool = get_instance()->mysql_pool;
         $this->client = get_instance()->client;
+    }
+
+    /**
+     * 当被loader时会调用这个方法进行初始化
+     */
+    public function initialization()
+    {
+
     }
 
     /**
