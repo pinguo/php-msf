@@ -17,28 +17,23 @@ class App extends Controller
      */
     public $AppModel;
 
-    /**
-     * http测试
-     */
-    public function http_test()
+    public function httpTest()
     {
+        $t1 = microtime(true);
         $this->AppModel = $this->loader->model('AppModel', $this);
-        $this->http_output->end($this->AppModel->test());
+        $data = $this->AppModel->test();
+        $t2 = microtime(true) - $t1;
+        $data[] = $t2;
+        $this->http_output->end(json_encode($data));
     }
 
-    public function http_hello()
+    public function httpTestCoroutine()
     {
-//        $this->logger->info('info');
-//        $this->logger->error('error');
-        $this->http_output->end('hello world');
-    }
-
-    public function http_test_task()
-    {
-        $AppTask = $this->loader->task('AppTask');
-        $AppTask->testTask();
-        $AppTask->startTask(function ($serv, $task_id, $data) {
-            $this->http_output->end($data);
-        });
+        $t1 = microtime(true);
+        $this->AppModel = $this->loader->model('AppModel', $this);
+        $data = yield $this->AppModel->testCoroutine();
+        $t2 = microtime(true) - $t1;
+        $data[] = $t2;
+        $this->http_output->end(json_encode($data));
     }
 }

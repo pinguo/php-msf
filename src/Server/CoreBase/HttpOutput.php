@@ -100,8 +100,9 @@ class HttpOutput
      */
     public function end($output = '', $gzip = true, $destroy = true)
     {
+        $acceptEncoding = strtolower($this->request->header['accept-encoding'] ?? '');
         //低版本swoole的gzip方法存在效率问题
-        if ($gzip) {
+        if ($gzip && strpos($acceptEncoding, 'gzip') !== false) {
             $this->response->gzip(1);
         }
         //压缩备用方案
