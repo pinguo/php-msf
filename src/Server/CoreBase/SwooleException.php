@@ -11,6 +11,7 @@ class SwooleException extends \Exception
     public function __construct($message, $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
+        print_r($message . "\n");
         get_instance()->log->error($message . "\n" . $this->getTraceAsString());
     }
 
