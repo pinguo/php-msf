@@ -10,7 +10,6 @@ namespace app\Models;
 
 
 use Server\CoreBase\Model;
-use Tutorial\AddressBookProtos\Person;
 
 class AppModel extends Model
 {
