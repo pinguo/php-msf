@@ -12,7 +12,7 @@ $config['tcp']['method_prefix'] = '';
 /**
  * http访问时方法的前缀
  */
-$config['http']['method_prefix'] = 'http_';
+$config['http']['method_prefix'] = 'http';
 /**
  * websocket访问时方法的前缀
  */
