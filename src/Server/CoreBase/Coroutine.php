@@ -28,21 +28,6 @@ class Coroutine
         $this->startTick();
     }
 
-    public function start(\Generator $routine, GeneratorContext $generatorContext)
-    {
-        $task = new CoroutineTask($routine, $generatorContext);
-        $this->routineList[] = $task;
-    }
-
-    /**
-     * 服务器运行到现在的毫秒数
-     * @return int
-     */
-    public function getTickTime()
-    {
-        return $this->tickTime*self::TICK_INTERVAL;
-    }
-
     private function startTick()
     {
         swoole_timer_tick(self::TICK_INTERVAL, function ($timerId) {
@@ -63,10 +48,25 @@ class Coroutine
             $task->run();
 
             if ($task->isFinished()) {
-                $task->destory();
+                $task->destroy();
                 unset($this->routineList[$k]);
             }
         }
+    }
+
+    /**
+     * 服务器运行到现在的毫秒数
+     * @return int
+     */
+    public function getTickTime()
+    {
+        return $this->tickTime * self::TICK_INTERVAL;
+    }
+
+    public function start(\Generator $routine, GeneratorContext $generatorContext)
+    {
+        $task = new CoroutineTask($routine, $generatorContext);
+        $this->routineList[] = $task;
     }
 
     public function stop(\Generator $routine)

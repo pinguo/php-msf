@@ -28,7 +28,7 @@ class HttpClient
      */
     public function setCookies($cookies)
     {
-        $this->client - setCookies($cookies);
+        $this->client->setCookies($cookies);
     }
 
     /**

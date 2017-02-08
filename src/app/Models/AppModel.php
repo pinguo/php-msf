@@ -16,7 +16,6 @@ class AppModel extends Model
 {
     public function test()
     {
-        $person = new Person();
         return 123456;
     }
 }

@@ -74,7 +74,7 @@ class Controller extends CoreBase
     /**
      * Controller constructor.
      */
-    public function __construct()
+    final public function __construct()
     {
         parent::__construct();
         $this->http_input = new HttpInput();
@@ -150,13 +150,13 @@ class Controller extends CoreBase
     /**
      * 向当前客户端发送消息
      * @param $data
-     * @param $destory
+     * @param $destroy
      * @throws SwooleException
      */
-    protected function send($data, $destory = true)
+    protected function send($data, $destroy = true)
     {
         if ($this->is_destroy) {
-            throw new SwooleException('controller is destory can not send data');
+            throw new SwooleException('controller is destroy can not send data');
         }
         $data = get_instance()->encode($this->pack->pack($data));
         if (SwooleServer::$testUnity) {
@@ -164,7 +164,7 @@ class Controller extends CoreBase
         } else {
             get_instance()->send($this->fd, $data);
         }
-        if ($destory) {
+        if ($destroy) {
             $this->destroy();
         }
     }
@@ -216,17 +216,17 @@ class Controller extends CoreBase
      * @param $data
      * @throws SwooleException
      */
-    protected function sendToUid($uid, $data, $destory = true)
+    protected function sendToUid($uid, $data, $destroy = true)
     {
         if ($this->is_destroy) {
-            throw new SwooleException('controller is destory can not send data');
+            throw new SwooleException('controller is destroy can not send data');
         }
         if (SwooleServer::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToUid', 'uid' => $this->uid, 'data' => $data];
         } else {
             get_instance()->sendToUid($uid, $data);
         }
-        if ($destory) {
+        if ($destroy) {
             $this->destroy();
         }
     }
@@ -235,20 +235,20 @@ class Controller extends CoreBase
      * sendToUids
      * @param $uids
      * @param $data
-     * @param $destory
+     * @param $destroy
      * @throws SwooleException
      */
-    protected function sendToUids($uids, $data, $destory = true)
+    protected function sendToUids($uids, $data, $destroy = true)
     {
         if ($this->is_destroy) {
-            throw new SwooleException('controller is destory can not send data');
+            throw new SwooleException('controller is destroy can not send data');
         }
         if (SwooleServer::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToUids', 'uids' => $uids, 'data' => $data];
         } else {
             get_instance()->sendToUids($uids, $data);
         }
-        if ($destory) {
+        if ($destroy) {
             $this->destroy();
         }
     }
@@ -256,20 +256,20 @@ class Controller extends CoreBase
     /**
      * sendToAll
      * @param $data
-     * @param $destory
+     * @param $destroy
      * @throws SwooleException
      */
-    protected function sendToAll($data, $destory = true)
+    protected function sendToAll($data, $destroy = true)
     {
         if ($this->is_destroy) {
-            throw new SwooleException('controller is destory can not send data');
+            throw new SwooleException('controller is destroy can not send data');
         }
         if (SwooleServer::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToAll', 'data' => $data];
         } else {
             get_instance()->sendToAll($data);
         }
-        if ($destory) {
+        if ($destroy) {
             $this->destroy();
         }
     }
@@ -278,20 +278,20 @@ class Controller extends CoreBase
      * 发送给群
      * @param $groupId
      * @param $data
-     * @param bool $destory
+     * @param bool $destroy
      * @throws SwooleException
      */
-    protected function sendToGroup($groupId, $data, $destory = true)
+    protected function sendToGroup($groupId, $data, $destroy = true)
     {
         if ($this->is_destroy) {
-            throw new SwooleException('controller is destory can not send data');
+            throw new SwooleException('controller is destroy can not send data');
         }
         if (SwooleServer::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToGroup', 'groupId' => $groupId, 'data' => $data];
         } else {
             get_instance()->sendToGroup($groupId, $data);
         }
-        if ($destory) {
+        if ($destroy) {
             $this->destroy();
         }
     }
@@ -340,16 +340,16 @@ class Controller extends CoreBase
     /**
      * 断开链接
      * @param $fd
-     * @param bool $autoDestory
+     * @param bool $autoDestroy
      */
-    protected function close($fd, $autoDestory = true)
+    protected function close($fd, $autoDestroy = true)
     {
         if (SwooleServer::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'close', 'fd' => $fd];
         } else {
             get_instance()->close($fd);
         }
-        if ($autoDestory) {
+        if ($autoDestroy) {
             $this->destroy();
         }
     }

@@ -408,7 +408,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                         while (1) {
                             if ($corotineTask->isFinished()) {
                                 $result = $result->getReturn();
-                                $corotineTask->destory();
+                                $corotineTask->destroy();
                                 break;
                             }
                             $corotineTask->run();

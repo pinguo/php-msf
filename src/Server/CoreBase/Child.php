@@ -29,6 +29,20 @@ class Child
     public $child_list = [];
 
     /**
+     * 判断是否执行了__construct
+     */
+    public $isConstruct = false;
+
+    /**
+     * after constructor
+     */
+    public function afterConstruct()
+    {
+        $this->isConstruct = true;
+    }
+
+
+    /**
      * 加入一个插件
      * @param $child Child
      */
