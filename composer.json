@@ -15,7 +15,7 @@
       "test\\": "src/test"
     },
     "files": [
-      "src/Server/helpers/Common.php"
+      "src/Server/Helpers/Common.php"
     ]
   },
   "authors": [

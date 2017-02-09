@@ -6,7 +6,7 @@
  * Time: 下午5:04
  */
 
-namespace app\Helpers;
+namespace Server\Helpers\Log;
 
 use Monolog\Logger;
 use Monolog\Formatter\LineFormatter;
