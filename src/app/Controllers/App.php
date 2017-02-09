@@ -36,4 +36,11 @@ class App extends Controller
         $data[] = $t2;
         $this->http_output->end(json_encode($data));
     }
+
+    public function httpTestLog()
+    {
+        $this->logger->error('this is an error log');
+        $this->logger->notice('this is a notice log');
+        $this->http_output->end('ok');
+    }
 }
