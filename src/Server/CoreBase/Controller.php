@@ -103,8 +103,8 @@ class Controller extends CoreBase
 
     /**
      * 初始化每次执行方法之前都会执行initialization
-     * @param $controller_name 准备执行的controller名称
-     * @param $method_name 准备执行的method名称
+     * @param string $controller_name 准备执行的controller名称
+     * @param string $method_name 准备执行的method名称
      */
     public function initialization($controller_name, $method_name)
     {

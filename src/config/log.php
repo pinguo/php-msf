@@ -18,8 +18,9 @@ $config['server']['log'] = [
                 \Monolog\Logger::WARNING
             ],
             'dateFormat' => "Y/m/d H:i:s",
-            'format' => "%datetime% [%level_name%] [%channel%] %message% %context% %extra%\n",
-            'stream' => ROOT_PATH . '/runtime/logs/application.log'
+            'format' => "%datetime% [%level_name%] [%channel%] [logid:%logId%] %context% %message% %extra%\n",
+            'stream' => ROOT_PATH . '/runtime/logs/application.log',
+            'buffer' => 0
         ],
         'notice' => [
             'levelList' => [
@@ -28,8 +29,9 @@ $config['server']['log'] = [
                 \Monolog\Logger::DEBUG
             ],
             'dateFormat' => "Y/m/d H:i:s",
-            'format' => "%datetime% [%level_name%] [%channel%] %message% %context% %extra%\n",
-            'stream' => ROOT_PATH . '/runtime/logs/notice.log'
+            'format' => "%datetime% [%level_name%] [%channel%] [logid:%logId%] %context% %message%  %extra%\n",
+            'stream' => ROOT_PATH . '/runtime/logs/notice.log',
+            'buffer' => 1
         ]
     ]
 ];

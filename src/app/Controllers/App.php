@@ -2,7 +2,7 @@
 namespace app\Controllers;
 
 use app\Models\AppModel;
-use Server\CoreBase\Controller;
+use Server\Controllers\BaseController;
 
 /**
  * Created by PhpStorm.
@@ -10,7 +10,7 @@ use Server\CoreBase\Controller;
  * Date: 16-7-15
  * Time: 下午3:51
  */
-class App extends Controller
+class App extends BaseController
 {
     /**
      * @var AppModel
