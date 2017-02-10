@@ -84,4 +84,11 @@ class App extends Controller
 
         $this->http_output->end(json_encode($result));
     }
+
+    public function httpTestLog()
+    {
+        $this->logger->error('this is an error log');
+        $this->logger->notice('this is a notice log');
+        $this->http_output->end('ok');
+    }
 }
