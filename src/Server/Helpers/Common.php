@@ -76,7 +76,7 @@ function httpEndFile($path, $request, $response)
 function get_extension($file)
 {
     $info = pathinfo($file);
-    return strtolower($info['extension']);
+    return strtolower($info['extension']??'');
 }
 
 /**

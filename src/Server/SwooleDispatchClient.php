@@ -100,15 +100,29 @@ class SwooleDispatchClient extends SwooleServer
      */
     public function beforeSwooleStart()
     {
-        //创建redis，mysql异步连接池进程
-        if ($this->config['asyn_process_enable']) {//代表启动单独进程进行管理
+        //创建异步连接池进程
+        if ($this->config->get('asyn_process_enable', false)) {//代表启动单独进程进行管理
             $this->pool_process = new \swoole_process(function ($process) {
+                $process->name($this->config['server.process_title'] . '-ASYN');
                 $this->asnyPoolManager = new AsynPoolManager($process, $this);
                 $this->asnyPoolManager->event_add();
-                $this->asnyPoolManager->registAsyn(new RedisAsynPool());
+                $this->initAsynPools();
+                foreach ($this->asynPools as $pool) {
+                    $this->asnyPoolManager->registAsyn($pool);
+                }
             }, false, 2);
             $this->server->addProcess($this->pool_process);
         }
+    }
+
+    /**
+     * 初始化各种连接池
+     */
+    public function initAsynPools()
+    {
+        $this->asynPools = [
+            'redisPool' => new RedisAsynPool($this->config, 'dispatch')
+        ];
     }
 
     /**
@@ -124,16 +138,18 @@ class SwooleDispatchClient extends SwooleServer
     public function onSwooleWorkerStart($serv, $workerId)
     {
         parent::onSwooleWorkerStart($serv, $workerId);
+        $this->initAsynPools();
+        $this->redis_pool = $this->asynPools['redisPool'];
         if (!$serv->taskworker) {
-            //异步redis连接池
-            $this->redis_pool = new RedisAsynPool($this->config['dispatch_server']['redis_slave']);
-            $this->redis_pool->worker_init($workerId);
             //注册
             $this->asnyPoolManager = new AsynPoolManager($this->pool_process, $this);
             if (!$this->config['asyn_process_enable']) {
                 $this->asnyPoolManager->no_event_add();
             }
-            $this->asnyPoolManager->registAsyn($this->redis_pool);
+            foreach ($this->asynPools as $pool) {
+                $pool->worker_init($workerId);
+                $this->asnyPoolManager->registAsyn($pool);
+            }
         }
     }
 
@@ -191,7 +207,7 @@ class SwooleDispatchClient extends SwooleServer
                 $address = $data['message'];
                 $this->addServerClient($address);
                 break;
-            case SwooleMarco::MSG_TYPE_REDIS_MESSAGE:
+            case SwooleMarco::MSG_TYPR_ASYN:
                 $this->asnyPoolManager->distribute($data['message']);
                 break;
         }

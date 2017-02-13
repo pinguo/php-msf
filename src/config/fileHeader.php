@@ -10,6 +10,7 @@ $config['fileHeader']['normal'] = ['Content-Type: application/octet-stream', 'Co
 $config['fileHeader']['jpg'] = ['Content-Type: image/jpeg'];
 $config['fileHeader']['jpeg'] = ['Content-Type: image/jpeg'];
 $config['fileHeader']['png'] = ['Content-Type: image/jpeg'];
+$config['fileHeader']['svg'] = ['Content-Type: image/svg+xml'];
 $config['fileHeader']['txt'] = ['Content-type: text/plain'];
 $config['fileHeader']['css'] = ['Content-type: text/css'];
 $config['fileHeader']['js'] = ['Content-type: application/javascript'];

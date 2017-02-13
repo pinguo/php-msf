@@ -11,7 +11,6 @@ namespace Server\DataBase;
 
 
 use Server\CoreBase\SwooleException;
-use Server\SwooleMarco;
 
 class RedisAsynPool extends AsynPool
 {
@@ -24,17 +23,18 @@ class RedisAsynPool extends AsynPool
     protected $redis_max_count = 0;
     private $active;
     private $coroutineRedisHelp;
-    public function __construct($connect = null)
+    private $redis_client;
+
+    public function __construct($config, $active)
     {
-        parent::__construct();
-        $this->connect = $connect;
+        parent::__construct($config);
+        $this->active = $active;
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
     }
 
     public function server_init($swoole_server, $asyn_manager)
     {
         parent::server_init($swoole_server, $asyn_manager);
-        $this->active = $this->config['redis']['active'];
     }
 
     /**
@@ -63,10 +63,34 @@ class RedisAsynPool extends AsynPool
     public function coroutineSend($name, ...$arg)
     {
         if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            return call_user_func_array([get_instance()->getRedis(), $name], $arg);
+            return call_user_func_array([$this->getSync(), $name], $arg);
         } else {
             return new RedisCoroutine($this, $name, $arg);
         }
+    }
+
+    /**
+     * 获取同步
+     * @return \Redis
+     * @throws SwooleException
+     */
+    public function getSync()
+    {
+        if (isset($this->redis_client)) return $this->redis_client;
+        //同步redis连接，给task使用
+        $this->redis_client = new \Redis();
+        if ($this->redis_client->connect($this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']) == false) {
+            throw new SwooleException($this->redis_client->getLastError());
+        }
+        if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
+            if ($this->redis_client->auth($this->config['redis'][$this->active]['password']) == false) {
+                throw new SwooleException($this->redis_client->getLastError());
+            }
+        }
+        if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
+            $this->redis_client->select($this->config['redis'][$this->active]['select']);
+        }
+        return $this->redis_client;
     }
 
     /**
@@ -409,9 +433,7 @@ class RedisAsynPool extends AsynPool
             }
         };
 
-        if ($this->connect == null) {
-            $this->connect = [$this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']];
-        }
+        $this->connect = [$this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']];
         $client->on('Close',[$this,'onClose']);
         $client->connect($this->connect[0], $this->connect[1], $callback);
     }
@@ -429,14 +451,6 @@ class RedisAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMessageType()
-    {
-        return SwooleMarco::MSG_TYPE_REDIS_MESSAGE;
+        return self::AsynName . ":" . $this->active;
     }
 }

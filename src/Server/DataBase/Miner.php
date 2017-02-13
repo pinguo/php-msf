@@ -1820,21 +1820,21 @@ class Miner
             $sql = $this->getStatement(false);
         }
         if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            $this->mergeInto(get_instance()->getMysql());
+            $this->mergeInto($this->mysql_pool->getSync());
             $this->clear();
             $data = array();
             switch ($sql) {
                 case 'commit':
-                    get_instance()->getMysql()->pdoCommitTrans();
+                    $this->mysql_pool->getSync()->pdoCommitTrans();
                     break;
                 case 'begin':
-                    get_instance()->getMysql()->pdoBeginTrans();
+                    $this->mysql_pool->getSync()->pdoBeginTrans();
                     break;
                 case 'rollback':
-                    get_instance()->getMysql()->pdoRollBackTrans();
+                    $this->mysql_pool->getSync()->pdoRollBackTrans();
                     break;
                 default:
-                    $data = get_instance()->getMysql()->pdoQuery($sql);
+                    $data = $this->mysql_pool->getSync()->pdoQuery($sql);
             }
             return $data;
         } else {

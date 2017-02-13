@@ -127,7 +127,7 @@ abstract class SwooleHttpServer extends SwooleServer
         $error_404 = false;
         $controller_instance = null;
         $this->route->handleClientRequest($request);
-        list($host) = explode(':', $request->header['host']);
+        list($host) = explode(':', $request->header['host']??'');
         if ($this->route->getPath() == '/') {
             $www_path = $this->getHostRoot($host) . $this->getHostIndex($host);
             $result = httpEndFile($www_path, $request, $response);
