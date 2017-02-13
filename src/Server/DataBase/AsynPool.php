@@ -15,29 +15,30 @@ use Noodlehaus\Config;
 abstract class AsynPool implements IAsynPool
 {
     const MAX_TOKEN = 655360;
+    /**
+     * @var Config
+     */
+    public $config;
     protected $commands;
     protected $pool;
     protected $callBacks;
     protected $worker_id;
     protected $server;
     protected $swoole_server;
-    protected $token = 0;
     //避免爆发连接的锁
+    protected $token = 0;
     protected $waitConnetNum = 0;
     /**
      * @var AsynPoolManager
      */
     protected $asyn_manager;
-    /**
-     * @var Config
-     */
-    protected $config;
 
-    public function __construct()
+    public function __construct($config)
     {
         $this->callBacks = new \SplFixedArray(self::MAX_TOKEN);
         $this->commands = new \SplQueue();
         $this->pool = new \SplQueue();
+        $this->config = $config;
     }
 
     public function addTokenCallback($callback)
@@ -70,7 +71,6 @@ abstract class AsynPool implements IAsynPool
      */
     public function server_init($swoole_server, $asyn_manager)
     {
-        $this->config = $swoole_server->config;
         $this->swoole_server = $swoole_server;
         $this->server = $swoole_server->server;
         $this->asyn_manager = $asyn_manager;
@@ -95,4 +95,10 @@ abstract class AsynPool implements IAsynPool
             $this->execute($command);
         }
     }
+
+    /**
+     * 获取同步
+     * @return mixed
+     */
+    abstract public function getSync();
 }

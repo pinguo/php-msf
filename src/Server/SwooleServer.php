@@ -20,7 +20,7 @@ use Server\Helpers\Log\PGLog;
  */
 abstract class SwooleServer extends Child
 {
-    const version = "1.7.5";
+    const version = "1.7.6";
     /**
      * Daemonize.
      *
@@ -178,6 +178,7 @@ abstract class SwooleServer extends Child
 
     public function __construct()
     {
+        $this->afterConstruct();
         $this->onErrorHandel = [$this, 'onErrorHandel'];
         self::$_worker = $this;
         // 加载配置 支持加载环境子目录配置

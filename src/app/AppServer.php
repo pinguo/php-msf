@@ -29,4 +29,14 @@ class AppServer extends SwooleDistributedServer
     {
         // TODO: Implement onUidCloseClear() method.
     }
+
+    /**
+     * 这里可以进行额外的异步连接池，比如另一组redis/mysql连接
+     * @return array
+     */
+    public function initAsynPools()
+    {
+        parent::initAsynPools();
+        //$this->addAsynPool('redis2', new RedisAsynPool($this->config, 'test2'));
+    }
 }

@@ -11,7 +11,6 @@ namespace Server\DataBase;
 
 
 use Server\CoreBase\SwooleException;
-use Server\SwooleMarco;
 
 class MysqlAsynPool extends AsynPool
 {
@@ -25,21 +24,15 @@ class MysqlAsynPool extends AsynPool
      */
     public $bind_pool;
     protected $mysql_max_count = 0;
+    private $active;
+    private $mysql_client;
 
-    public function __construct()
+    public function __construct($config, $active)
     {
-        parent::__construct();
+        parent::__construct($config);
+        $this->active = $active;
         $this->bind_pool = [];
         $this->dbQueryBuilder = new Miner();
-    }
-
-    /**
-     * 作为客户端的初始化
-     * @param $worker_id
-     */
-    public function worker_init($worker_id)
-    {
-        parent::worker_init($worker_id);
         $this->dbQueryBuilder->mysql_pool = $this;
     }
 
@@ -141,7 +134,7 @@ class MysqlAsynPool extends AsynPool
         if ($client == null) {
             $client = new \swoole_mysql();
         }
-        $set = $this->config['database'][$this->config['database']['active']];
+        $set = $this->config['database'][$this->active];
         $client->connect($set, function ($client, $result) {
             $this->waitConnetNum--;
             if (!$result) {
@@ -185,15 +178,7 @@ class MysqlAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMessageType()
-    {
-        return SwooleMarco::MSG_TYPE_MYSQL_MESSAGE;
+        return self::AsynName . ":" . $this->active;
     }
 
     /**
@@ -298,5 +283,18 @@ class MysqlAsynPool extends AsynPool
     public function coroutineRollback($id)
     {
         return $this->dbQueryBuilder->coroutineSend($id, 'rollback');
+    }
+
+    /**
+     * 获取同步
+     * @return Miner
+     */
+    public function getSync()
+    {
+        if (isset($this->mysql_client)) return $this->mysql_client;
+        $activeConfig = $this->config['database'][$this->active];
+        $this->mysql_client = new Miner();
+        $this->mysql_client->pdoConnect($activeConfig);
+        return $this->mysql_client;
     }
 }

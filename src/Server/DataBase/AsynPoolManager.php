@@ -10,6 +10,7 @@
 namespace Server\DataBase;
 
 
+use Server\SwooleMarco;
 use Server\SwooleServer;
 
 class AsynPoolManager
@@ -80,7 +81,7 @@ class AsynPoolManager
 
     /**
      * 写入管道
-     * @param $asyn_name
+     * @param IAsynPool $asyn
      * @param $data
      * @param $worker_id
      */
@@ -106,7 +107,7 @@ class AsynPoolManager
             call_user_func([$asyn, 'distribute'], $data);
         } else {
             $workerID = $data['worker_id'];
-            $message = $this->swoole_server->packSerevrMessageBody($asyn->getMessageType(), $data);
+            $message = $this->swoole_server->packSerevrMessageBody(SwooleMarco::MSG_TYPR_ASYN, $data);
             $this->swoole_server->server->sendMessage($message, $workerID);
         }
 

@@ -19,8 +19,6 @@ interface IAsynPool
 
     function server_init($swoole_server, $asyn_manager);
 
-    function getMessageType();
-
     function worker_init($workerid);
 
     function pushToPool($client);
@@ -28,4 +26,6 @@ interface IAsynPool
     function prepareOne();
 
     function addTokenCallback($callback);
+
+    function getSync();
 }

@@ -2,6 +2,7 @@
 namespace Server\Controllers;
 
 use Server\CoreBase\Controller;
+use Server\CoreBase\SelectCoroutine;
 use Server\Models\TestModel;
 use Server\Tasks\TestTask;
 
@@ -154,6 +155,24 @@ class TestController extends Controller
     {
         $httpClient = yield $this->client->coroutineGetHttpClient('http://localhost:8081');
         $result = yield $httpClient->coroutineGet("/TestController/test_request", ['id' => 123]);
+        $this->http_output->end($result);
+    }
+
+    /**
+     * select方法测试
+     * @return \Generator
+     */
+    public function http_test_select()
+    {
+        yield $this->redis_pool->getCoroutine()->set('test', 1);
+        $c1 = $this->redis_pool->getCoroutine()->get('test');
+        $c2 = $this->redis_pool->getCoroutine()->get('test1');
+        $result = yield SelectCoroutine::Select(function ($result) {
+            if ($result != null) {
+                return true;
+            }
+            return false;
+        }, $c2, $c1);
         $this->http_output->end($result);
     }
 

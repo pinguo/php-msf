@@ -39,16 +39,10 @@ class SwooleMarco
      * 踢uid下线
      */
     const MSG_TYPE_KICK_UID = 4;
-
     /**
-     * REDIS 异步回调消息
+     * ASYN
      */
-    const MSG_TYPE_REDIS_MESSAGE = 6000;
-    /**
-     * MYSQL 异步回调消息
-     */
-    const MSG_TYPE_MYSQL_MESSAGE = 6001;
-
+    const MSG_TYPR_ASYN = 9000;
     /**
      * 添加server
      */
