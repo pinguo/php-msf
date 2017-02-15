@@ -69,9 +69,9 @@ class Loader
             return null;
         }
         $task = str_replace('/', '\\', $task);
-        $task_class = "\\app\\Tasks\\" . $task;
+        $task_class = "\\App\\Tasks\\" . $task;
         if (!class_exists($task_class)) {
-            $task_class = "\\Server\\Tasks\\" . $task;
+            $task_class = "\\PG\\MSF\\Server\\Tasks\\" . $task;
             if (!class_exists($task_class)) {
                 throw new SwooleException("class task_class not exists");
             }

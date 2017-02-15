@@ -53,14 +53,14 @@ class ControllerFactory
             $controller_instance->reUse();
             return $controller_instance;
         }
-        $class_name = "\\app\\Controllers\\$controller";
+        $class_name = "\\App\\Controllers\\$controller";
         if (class_exists($class_name)) {
             $controller_instance = new $class_name;
             $controller_instance->core_name = $controller;
             $controller_instance->afterConstruct();
             return $controller_instance;
         } else {
-            $class_name = "\\Server\\Controllers\\$controller";
+            $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
             if (class_exists($class_name)) {
                 $controller_instance = new $class_name;
                 $controller_instance->core_name = $controller;
