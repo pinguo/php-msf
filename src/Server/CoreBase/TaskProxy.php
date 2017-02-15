@@ -12,6 +12,7 @@ use PG\MSF\Server\SwooleMarco;
 
 class TaskProxy extends CoreBase
 {
+    protected $task_id;
     /**
      * task代理数据
      * @var mixed
@@ -27,13 +28,25 @@ class TaskProxy extends CoreBase
         $this->afterConstruct();
     }
 
+    public function initialization($task_id, $worker_pid, $task_name, $method_name)
+    {
+
+    }
+
     /**
      * 代理
      * @param $name
      * @param $arguments
+     * @return int
      */
     public function __call($name, $arguments)
     {
+        $this->task_id = get_instance()->task_atomic->add();
+        //这里设置重置标识，id=65536,便设置回1
+        $reset = get_instance()->task_atomic->cmpset(65536, 1);
+        if ($reset) {
+            $this->task_id = 1;
+        }
         $this->task_proxy_data =
             [
                 'type' => SwooleMarco::SERVER_TYPE_TASK,
@@ -41,34 +54,36 @@ class TaskProxy extends CoreBase
                     [
                         'task_name' => $this->core_name,
                         'task_fuc_name' => $name,
-                        'task_fuc_data' => $arguments
+                        'task_fuc_data' => $arguments,
+                        'task_id' => $this->task_id
                     ]
             ];
+        return $this->task_id;
     }
 
     /**
      * 开始异步任务
+     * @param null $callback
      */
-    public function startTask($callback, $id = -1)
+    public function startTask($callback = null)
     {
-        get_instance()->server->task($this->task_proxy_data, $id, $callback);
+        get_instance()->server->task($this->task_proxy_data, -1, $callback);
     }
 
     /**
      * 异步的协程模式
-     * @param int $id
      * @return TaskCoroutine
      */
-    public function coroutineSend($id = -1)
+    public function coroutineSend()
     {
-        return new TaskCoroutine($this->task_proxy_data, $id);
+        return new TaskCoroutine($this->task_proxy_data, -1);
     }
 
     /**
      * 开始同步任务
      */
-    public function startTaskWait($timeOurt = 0.5, $id = -1)
+    public function startTaskWait($timeOut = 0.5)
     {
-        return get_instance()->server->taskwait($this->task_proxy_data, $timeOurt, $id);
+        return get_instance()->server->taskwait($this->task_proxy_data, $timeOut, -1);
     }
 }

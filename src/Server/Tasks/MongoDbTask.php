@@ -42,7 +42,7 @@ class MongoDbTask extends Task
             throw new \MongoConnectionException('No $mongoConf in this class');
         }
 
-        $this->initialization($this->mongoConf[0], $this->mongoConf[1], $this->mongoConf[2]);
+        $this->prepare($this->mongoConf[0], $this->mongoConf[1], $this->mongoConf[2]);
         parent::afterConstruct();
     }
 
@@ -53,7 +53,7 @@ class MongoDbTask extends Task
      * @param string $collection
      * @throws \MongoConnectionException
      */
-    public function initialization(string $confKey, string $db, string $collection)
+    public function prepare(string $confKey, string $db, string $collection)
     {
         $this->config = get_instance()->config['mongodb'] ?? [];
         if (!isset($this->config[$confKey])) {
