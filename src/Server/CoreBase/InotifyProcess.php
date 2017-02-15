@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-19
- * Time: 上午9:17
+ * InotifyProcess
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
-
+namespace PG\MSF\Server\CoreBase;
 
 class InotifyProcess
 {
@@ -22,7 +21,7 @@ class InotifyProcess
     {
         echo "启动了autoReload\n";
         $this->server = $server;
-        $this->monitor_dir = realpath(__DIR__ . '/../..');
+        $this->monitor_dir = realpath(ROOT_PATH . '/');
         if (!extension_loaded('inotify')) {
             swoole_timer_after(1000, [$this, 'unUseInotify']);
         } else {

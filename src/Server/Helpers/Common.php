@@ -1,17 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 上午11:38
+ * common函数
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 /**
  * 获取实例
- * @return \Server\SwooleDistributedServer
+ * @return \PG\MSF\Server\SwooleDistributedServer
  */
 function &get_instance()
 {
-    return \Server\SwooleDistributedServer::get_instance();
+    return \PG\MSF\Server\SwooleDistributedServer::get_instance();
 }
 
 /**
@@ -20,7 +21,7 @@ function &get_instance()
  */
 function getTickTime()
 {
-    return \Server\SwooleDistributedServer::get_instance()->tickTime;
+    return \PG\MSF\Server\SwooleDistributedServer::get_instance()->tickTime;
 }
 
 function getMillisecond() {

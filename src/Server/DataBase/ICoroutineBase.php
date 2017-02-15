@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-1
- * Time: 下午4:20
+ * ICoroutineBase
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\DataBase;
-
+namespace PG\MSF\Server\DataBase;
 
 interface ICoroutineBase
 {

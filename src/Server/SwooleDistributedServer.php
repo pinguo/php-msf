@@ -1,28 +1,25 @@
 <?php
-namespace Server;
-
-use Server\Client\Client;
-use Server\CoreBase\CoroutineTask;
-use Server\CoreBase\GeneratorContext;
-use Server\CoreBase\InotifyProcess;
-use Server\CoreBase\SwooleException;
-use Server\DataBase\AsynPool;
-use Server\DataBase\AsynPoolManager;
-use Server\DataBase\Miner;
-use Server\DataBase\MysqlAsynPool;
-use Server\DataBase\RedisAsynPool;
-use Server\Test\TestModule;
-
-define("SERVER_DIR", __DIR__);
-define("APP_DIR", __DIR__ . "/../app");
-define("WWW_DIR", __DIR__ . "/../www");
-
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-14
- * Time: 上午9:18
+ * SwooleDistributedServer
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server;
+
+use PG\MSF\Server\Client\Client;
+use PG\MSF\Server\CoreBase\CoroutineTask;
+use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\InotifyProcess;
+use PG\MSF\Server\CoreBase\SwooleException;
+use PG\MSF\Server\DataBase\AsynPool;
+use PG\MSF\Server\DataBase\AsynPoolManager;
+use PG\MSF\Server\DataBase\Miner;
+use PG\MSF\Server\DataBase\MysqlAsynPool;
+use PG\MSF\Server\DataBase\RedisAsynPool;
+use PG\MSF\Server\Test\TestModule;
+
 abstract class SwooleDistributedServer extends SwooleWebSocketServer
 {
     const SERVER_NAME = "SERVER";
@@ -567,7 +564,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         //最后一个worker处理启动定时器
         if ($workerId == $this->worker_num - 1) {
             //重新读入timerTask配置
-            $timerTaskConfig = $this->config->load(__DIR__ . '/../config/timerTask.php');
+            $timerTaskConfig = $this->config->load(ROOT_PATH . '/config/timerTask.php');
             $timer_tasks = $timerTaskConfig->get('timerTask');
             $this->timer_tasks_used = array();
 

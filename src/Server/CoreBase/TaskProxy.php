@@ -1,15 +1,15 @@
 <?php
-namespace Server\CoreBase;
-
-use Server\SwooleMarco;
-
 /**
  * Task的代理
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:11
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
+use PG\MSF\Server\SwooleMarco;
+
 class TaskProxy extends CoreBase
 {
     /**

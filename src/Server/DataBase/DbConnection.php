@@ -1,14 +1,17 @@
 <?php
-namespace Server\DataBase;
+/**
+ * 数据库连接类，依赖PDO_MYSQL扩展
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+
+namespace PG\MSF\Server\DataBase;
 
 use Exception;
 use PDO;
 use PDOException;
 
-/**
- * 数据库连接类，依赖 PDO_MYSQL 扩展
- * 在 https://github.com/auraphp/Aura.SqlQuery 的基础上修改而成
- */
 class DbConnection
 {
     /**

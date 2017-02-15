@@ -1,17 +1,18 @@
 <?php
-namespace Server\Controllers;
-
-use Server\CoreBase\Controller;
-use Server\CoreBase\SelectCoroutine;
-use Server\Models\TestModel;
-use Server\Tasks\TestTask;
-
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午3:51
+ * TestController
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\Controllers;
+
+use PG\MSF\Server\CoreBase\Controller;
+use PG\MSF\Server\CoreBase\SelectCoroutine;
+use PG\MSF\Server\Models\TestModel;
+use PG\MSF\Server\Tasks\TestTask;
+
 class TestController extends Controller
 {
     /**

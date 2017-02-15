@@ -1,15 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 17-1-3
- * Time: 上午9:35
+ * ServerRedisTest
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace test;
+namespace PG\MSF\Test;
 
-use Server\Test\SwooleTestException;
-use Server\Test\TestCase;
+use PG\MSF\Server\Test\SwooleTestException;
+use PG\MSF\Server\Test\TestCase;
 
 /**
  * 服务器框架Redis测试用例

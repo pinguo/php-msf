@@ -1,15 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 17-1-4
- * Time: 上午11:11
+ * ServerMysqlTest
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace test;
+namespace PG\MSF\Test;
 
-
-use Server\Test\TestCase;
+use PG\MSF\Server\Test\TestCase;
 
 /**
  * 服务器框架mysql测试用例

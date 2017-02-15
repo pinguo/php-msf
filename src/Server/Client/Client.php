@@ -1,11 +1,12 @@
 <?php
-namespace Server\Client;
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-2
- * Time: 下午2:54
+ * http客户端,支持协程
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+namespace PG\MSF\Server\Client;
+
 class Client
 {
     /**

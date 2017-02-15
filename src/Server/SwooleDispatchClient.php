@@ -1,16 +1,17 @@
 <?php
-namespace Server;
+/**
+ * SwooleDispatchClient
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+
+namespace PG\MSF\Server;
 
 use Noodlehaus\Exception;
-use Server\DataBase\AsynPoolManager;
-use Server\DataBase\RedisAsynPool;
+use PG\MSF\Server\DataBase\AsynPoolManager;
+use PG\MSF\Server\DataBase\RedisAsynPool;
 
-/**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-14
- * Time: 上午9:18
- */
 class SwooleDispatchClient extends SwooleServer
 {
     const SERVER_NAME = 'Dispatch';

@@ -1,16 +1,13 @@
 <?php
 /**
  * redis 异步客户端连接池
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-22
- * Time: 上午10:19
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+namespace PG\MSF\Server\DataBase;
 
-namespace Server\DataBase;
-
-
-use Server\CoreBase\SwooleException;
+use PG\MSF\Server\CoreBase\SwooleException;
 
 class RedisAsynPool extends AsynPool
 {

@@ -1,12 +1,13 @@
 <?php
-namespace Server\CoreBase;
 /**
  * Model工厂模式
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:03
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class ModelFactory
 {
     /**
@@ -52,13 +53,13 @@ class ModelFactory
             $model_instance->reUse();
             return $model_instance;
         }
-        $class_name = "\\app\\Models\\$model";
+        $class_name = "\\App\\Models\\$model";
         if (class_exists($class_name)) {
             $model_instance = new $class_name;
             $model_instance->core_name = $model;
             $model_instance->afterConstruct();
         } else {
-            $class_name = "\\Server\\Models\\$model";
+            $class_name = "\\PG\\MSF\\Server\\Models\\$model";
             if (class_exists($class_name)) {
                 $model_instance = new $class_name;
                 $model_instance->core_name = $model;

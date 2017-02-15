@@ -1,23 +1,24 @@
 <?php
-namespace Server;
+/**
+ * SwooleServer
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+
+namespace PG\MSF\Server;
 
 use Noodlehaus\Config;
-use Server\CoreBase\Child;
-use Server\CoreBase\ControllerFactory;
-use Server\CoreBase\Coroutine;
-use Server\CoreBase\GeneratorContext;
-use Server\CoreBase\Loader;
-use Server\CoreBase\SwooleException;
-use Server\Pack\IPack;
-use Server\Route\IRoute;
-use Server\Helpers\Log\PGLog;
+use PG\MSF\Server\CoreBase\Child;
+use PG\MSF\Server\CoreBase\ControllerFactory;
+use PG\MSF\Server\CoreBase\Coroutine;
+use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\Loader;
+use PG\MSF\Server\CoreBase\SwooleException;
+use PG\MSF\Server\Pack\IPack;
+use PG\MSF\Server\Route\IRoute;
+use PG\MSF\Server\Helpers\Log\PGLog;
 
-/**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-6-28
- * Time: 上午11:37
- */
 abstract class SwooleServer extends Child
 {
     const version = "1.7.6";
@@ -182,7 +183,7 @@ abstract class SwooleServer extends Child
         $this->onErrorHandel = [$this, 'onErrorHandel'];
         self::$_worker = $this;
         // 加载配置 支持加载环境子目录配置
-        $this->config = new Config([__DIR__ . '/../config', __DIR__ . '/../config/' . ENV]);
+        $this->config = new Config([ROOT_PATH . '/config', ROOT_PATH . '/config/' . ENV]);
         $this->probuf_set = $this->config->get('server.probuf_set', $this->probuf_set);
         $this->package_length_type = $this->probuf_set['package_length_type'];
         $this->package_length_type_length = strlen(pack($this->package_length_type, 1));
@@ -195,11 +196,11 @@ abstract class SwooleServer extends Child
         register_shutdown_function(array($this, 'checkErrors'));
         set_error_handler(array($this, 'displayErrorHandler'));
         //pack class
-        $pack_class_name = "\\app\\Pack\\" . $this->config['server']['pack_tool'];
+        $pack_class_name = "\\App\\Pack\\" . $this->config['server']['pack_tool'];
         if (class_exists($pack_class_name)) {
             $this->pack = new $pack_class_name;
         } else {
-            $pack_class_name = "\\Server\\Pack\\" . $this->config['server']['pack_tool'];
+            $pack_class_name = "\\PG\\MSF\\Server\\Pack\\" . $this->config['server']['pack_tool'];
             if (class_exists($pack_class_name)) {
                 $this->pack = new $pack_class_name;
             } else {
@@ -207,11 +208,11 @@ abstract class SwooleServer extends Child
             }
         }
         //route class
-        $route_class_name = "\\app\\Route\\" . $this->config['server']['route_tool'];
+        $route_class_name = "\\App\\Route\\" . $this->config['server']['route_tool'];
         if (class_exists($route_class_name)) {
             $this->route = new $route_class_name;
         } else {
-            $route_class_name = "\\Server\\Route\\" . $this->config['server']['route_tool'];
+            $route_class_name = "\\PG\\MSF\\Server\\Route\\" . $this->config['server']['route_tool'];
             if (class_exists($route_class_name)) {
                 $this->route = new $route_class_name;
             } else {
@@ -276,6 +277,9 @@ abstract class SwooleServer extends Child
         // Pid file.
         if (empty(self::$pidFile)) {
             self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_', self::$_startFile) . ".pid";
+            if (!is_dir(self::$_worker->config->get('server.pid_path'))) {
+                mkdir(self::$_worker->config->get('server.pid_path'), 0777, true);
+            }
         }
 
         // Process title.

@@ -1,21 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-12-30
- * Time: 下午4:37
+ * TestTcpCoroutine
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Test;
+namespace PG\MSF\Server\Test;
 
-
-use Server\CoreBase\CoroutineBase;
-use Server\CoreBase\CoroutineNull;
+use PG\MSF\Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\CoreBase\CoroutineNull;
 
 class TestTcpCoroutine extends CoroutineBase
 {
     /**
-     * @var \Server\CoreBase\Controller|void
+     * @var PG\MSF\Server\CoreBase\Controller|void
      */
     private $controller;
 

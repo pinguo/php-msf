@@ -1,15 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-1
- * Time: 下午4:25
+ * RedisCoroutine
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+namespace PG\MSF\Server\DataBase;
 
-namespace Server\DataBase;
-
-
-use Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\CoreBase\CoroutineBase;
 
 class RedisCoroutine extends CoroutineBase
 {

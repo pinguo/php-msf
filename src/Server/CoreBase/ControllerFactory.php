@@ -1,13 +1,13 @@
 <?php
-namespace Server\CoreBase;
-
 /**
  * 控制器工厂模式
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:03
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class ControllerFactory
 {
     /**
@@ -53,14 +53,14 @@ class ControllerFactory
             $controller_instance->reUse();
             return $controller_instance;
         }
-        $class_name = "\\app\\Controllers\\$controller";
+        $class_name = "\\App\\Controllers\\$controller";
         if (class_exists($class_name)) {
             $controller_instance = new $class_name;
             $controller_instance->core_name = $controller;
             $controller_instance->afterConstruct();
             return $controller_instance;
         } else {
-            $class_name = "\\Server\\Controllers\\$controller";
+            $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
             if (class_exists($class_name)) {
                 $controller_instance = new $class_name;
                 $controller_instance->core_name = $controller;

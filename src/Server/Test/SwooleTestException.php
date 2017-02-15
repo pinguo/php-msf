@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-12-30
- * Time: 下午2:33
+ * SwooleTestException
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Test;
-
+namespace PG\MSF\Server\Test;
 
 class SwooleTestException extends \Exception
 {

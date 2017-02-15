@@ -1,17 +1,21 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 17-1-5
- * Time: 上午10:46
+ * ServerControllerTest
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace test;
+namespace PG\MSF\Test;
 
+use PG\MSF\Server\Test\TestCase;
+use PG\MSF\Server\Test\TestRequest;
 
-use Server\Test\TestCase;
-
-class ServerUnitTest extends TestCase
+/**
+ * 服务器控制器测试用例
+ * @package test
+ */
+class ServerControllerTest extends TestCase
 {
 
     /**
@@ -47,37 +51,27 @@ class ServerUnitTest extends TestCase
     }
 
     /**
-     * 依赖的测试
-     * @return int
+     * http controller
+     * @return \Generator
      */
-    public function testDepend()
+    public function testHttpController()
     {
-        return 3;
+        $testRequest = new TestRequest('/TestController/test');
+        $testResponse = yield $this->coroutineRequestHttpController($testRequest);
+        $this->assertEquals($testResponse->data, 'helloworld');
     }
 
     /**
-     * 数据供给器
-     * @return array
+     * tcp controller
+     * @return \Generator
      */
-    public function dataProvider()
+    public function testTcpController()
     {
-        return ['test1' => [1, 2],
-            'test2' => [0, 3],
-            'test3' => [1, 2],
-            'test4' => [0, 3],
-            'test5' => [1, 2],
-            'test6' => [0, 3]];
-    }
-
-    /**
-     * 测试数据供给器与依赖
-     * @dataProvider dataProvider
-     * @depends      testDepend
-     * @param   $data1
-     * @param   $data2
-     */
-    public function testDataProvider($data1, $data2, $data3)
-    {
-        $this->assertEquals($data1 + $data2 + $data3, 6);
+        if ($this->config['server']['pack_tool'] != 'JsonPack') {
+            $this->markTestSkipped('协议解包不是JsonPack');
+        }
+        $data = ['controller_name' => 'TestController', 'method_name' => 'testTcp', 'data' => 'helloWorld'];
+        $reusult = yield $this->coroutineRequestTcpController($data);
+        $this->assertCount(1, $reusult);
     }
 }

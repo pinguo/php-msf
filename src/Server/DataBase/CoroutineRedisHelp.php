@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 17-1-4
- * Time: 上午9:38
+ * CoroutineRedisHelp
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\DataBase;
-
+namespace PG\MSF\Server\DataBase;
 
 class CoroutineRedisHelp
 {

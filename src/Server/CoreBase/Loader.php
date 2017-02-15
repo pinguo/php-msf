@@ -1,13 +1,12 @@
 <?php
 /**
- * Loader 加载器
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:21
+ * 自动加载器
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
+namespace PG\MSF\Server\CoreBase;
 
 class Loader
 {
@@ -70,9 +69,9 @@ class Loader
             return null;
         }
         $task = str_replace('/', '\\', $task);
-        $task_class = "\\app\\Tasks\\" . $task;
+        $task_class = "\\App\\Tasks\\" . $task;
         if (!class_exists($task_class)) {
-            $task_class = "\\Server\\Tasks\\" . $task;
+            $task_class = "\\PG\\MSF\\Server\\Tasks\\" . $task;
             if (!class_exists($task_class)) {
                 throw new SwooleException("class task_class not exists");
             }

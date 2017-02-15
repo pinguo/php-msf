@@ -1,16 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午1:44
+ * TestModel
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Models;
+namespace PG\MSF\Server\Models;
 
 
-use Server\CoreBase\Model;
-use Server\CoreBase\SwooleException;
+use PG\MSF\Server\CoreBase\Model;
+use PG\MSF\Server\CoreBase\SwooleException;
 
 class TestModel extends Model
 {

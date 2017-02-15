@@ -1,14 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午2:43
+ * JsonPack
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Pack;
+namespace PG\MSF\Server\Pack;
 
-use Server\CoreBase\SwooleException;
+use PG\MSF\Server\CoreBase\SwooleException;
 
 class JsonPack implements IPack
 {

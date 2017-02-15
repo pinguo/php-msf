@@ -1,12 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-1
- * Time: 下午4:20
+ * 协程任务接口
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
+namespace PG\MSF\Server\CoreBase;
 
 
 interface ICoroutineBase

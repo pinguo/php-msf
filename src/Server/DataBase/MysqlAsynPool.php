@@ -1,16 +1,14 @@
 <?php
 /**
- * mysql 异步客户端连接池
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-22
- * Time: 上午10:19
+ * mysql异步客户端连接池
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\DataBase;
+namespace PG\MSF\Server\DataBase;
 
-
-use Server\CoreBase\SwooleException;
+use PG\MSF\Server\CoreBase\SwooleException;
 
 class MysqlAsynPool extends AsynPool
 {
