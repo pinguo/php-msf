@@ -277,6 +277,9 @@ abstract class SwooleServer extends Child
         // Pid file.
         if (empty(self::$pidFile)) {
             self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_', self::$_startFile) . ".pid";
+            if (!is_dir(self::$_worker->config->get('server.pid_path'))) {
+                mkdir(self::$_worker->config->get('server.pid_path'), 0777, true);
+            }
         }
 
         // Process title.
