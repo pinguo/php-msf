@@ -1,13 +1,13 @@
 <?php
-
-namespace Server\CoreBase;
-
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-29
- * Time: 上午11:22
+ * HttpInput
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class HttpOutput
 {
     /**

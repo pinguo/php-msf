@@ -1,21 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 17-1-4
- * Time: 下午3:09
+ * ServerUnitTest
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace test;
+namespace PG\MSF\Test;
 
-use Server\Test\TestCase;
-use Server\Test\TestRequest;
 
-/**
- * 服务器控制器测试用例
- * @package test
- */
-class ServerControllerTest extends TestCase
+use PG\MSF\Server\Test\TestCase;
+
+class ServerUnitTest extends TestCase
 {
 
     /**
@@ -51,27 +47,37 @@ class ServerControllerTest extends TestCase
     }
 
     /**
-     * http controller
-     * @return \Generator
+     * 依赖的测试
+     * @return int
      */
-    public function testHttpController()
+    public function testDepend()
     {
-        $testRequest = new TestRequest('/TestController/test');
-        $testResponse = yield $this->coroutineRequestHttpController($testRequest);
-        $this->assertEquals($testResponse->data, 'helloworld');
+        return 3;
     }
 
     /**
-     * tcp controller
-     * @return \Generator
+     * 数据供给器
+     * @return array
      */
-    public function testTcpController()
+    public function dataProvider()
     {
-        if ($this->config['server']['pack_tool'] != 'JsonPack') {
-            $this->markTestSkipped('协议解包不是JsonPack');
-        }
-        $data = ['controller_name' => 'TestController', 'method_name' => 'testTcp', 'data' => 'helloWorld'];
-        $reusult = yield $this->coroutineRequestTcpController($data);
-        $this->assertCount(1, $reusult);
+        return ['test1' => [1, 2],
+            'test2' => [0, 3],
+            'test3' => [1, 2],
+            'test4' => [0, 3],
+            'test5' => [1, 2],
+            'test6' => [0, 3]];
+    }
+
+    /**
+     * 测试数据供给器与依赖
+     * @dataProvider dataProvider
+     * @depends      testDepend
+     * @param   $data1
+     * @param   $data2
+     */
+    public function testDataProvider($data1, $data2, $data3)
+    {
+        $this->assertEquals($data1 + $data2 + $data3, 6);
     }
 }

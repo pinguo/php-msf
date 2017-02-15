@@ -1,15 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-12-30
- * Time: 下午3:33
+ * TestResponse
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Test;
+namespace PG\MSF\Server\Test;
 
 
-use Server\CoreBase\CoroutineNull;
+use PG\MSF\Server\CoreBase\CoroutineNull;
 
 class TestResponse
 {

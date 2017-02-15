@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-29
- * Time: 下午12:55
+ * XssClean
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
-
+namespace PG\MSF\Server\CoreBase;
 
 use voku\helper\AntiXSS;
 

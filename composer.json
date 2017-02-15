@@ -1,5 +1,10 @@
 {
+  "name": "PGWireless/php-base",
+  "description": "PGWireless Micro Service Framework For PHP",
+  "type": "library",
+  "homepage": "https://github.com/PGWireless/php-msf",
   "require": {
+    "php": ">=7.0",
     "monolog/monolog": "2.0.x-dev",
     "hassankhan/config": "~0.10",
     "voku/anti-xss": "2.0.1",
@@ -10,20 +15,14 @@
   },
   "autoload": {
     "psr-4": {
-      "Server\\": "src/Server",
-      "app\\": "src/app",
-      "test\\": "src/test"
+      "PG\\MSF\\Server\\": "src/Server",
+      "PG\\MSF\\Test\\": "src/test"
     },
     "files": [
       "src/Server/Helpers/Common.php"
     ]
   },
-  "authors": [
-    {
-      "name": "tmtbe",
-      "email": "896369042@qq.com",
-      "homepage": "https://github.com/tmtbe",
-      "role": "Developer"
-    }
-  ]
+  "prefer-stable": true,
+  "extra": {
+  }
 }

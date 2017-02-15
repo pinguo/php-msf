@@ -1,11 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 上午11:35
+ * SwooleException
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
-namespace Server\CoreBase;
+
+namespace PG\MSF\Server\CoreBase;
+
 class SwooleException extends \Exception
 {
     public function __construct($message, $code = 0, \Exception $previous = null)

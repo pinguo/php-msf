@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-18
- * Time: 下午3:28
+ * 协程任务基类
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
-
+namespace PG\MSF\Server\CoreBase;
 
 abstract class CoroutineBase implements ICoroutineBase
 {

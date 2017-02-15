@@ -1,7 +1,14 @@
 <?php
-namespace Server\DataBase;
+/**
+ * DbQueryBuilder
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
 
-use Server\CoreBase\SwooleException;
+namespace PG\MSF\Server\DataBase;
+
+use PG\MSF\Server\CoreBase\SwooleException;
 
 class DbQueryBuilder
 {

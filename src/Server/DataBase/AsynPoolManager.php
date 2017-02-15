@@ -1,13 +1,12 @@
 <?php
 /**
  * 异步连接池管理器
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-25
- * Time: 上午10:25
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\DataBase;
+namespace PG\MSF\Server\DataBase;
 
 
 use Server\SwooleMarco;

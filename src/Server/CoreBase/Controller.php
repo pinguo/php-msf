@@ -1,17 +1,17 @@
 <?php
-namespace Server\CoreBase;
-
-use Server\SwooleMarco;
-use Server\SwooleServer;
-
 /**
  * Controller 控制器
  * 对象池模式，实例会被反复使用，成员变量缓存数据记得在销毁时清理
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 上午11:59
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
+use PG\MSF\Server\SwooleMarco;
+use PG\MSF\Server\SwooleServer;
+
 class Controller extends CoreBase
 {
     /**

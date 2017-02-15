@@ -3,14 +3,13 @@
  * @desc: 控制器基类
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/2/9
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Controllers;
+namespace PG\MSF\Server\Controllers;
 
-
-use Server\CoreBase\Controller;
-use Server\SwooleMarco;
+use PG\MSF\Server\CoreBase\Controller;
+use PG\MSF\Server\SwooleMarco;
 
 class BaseController extends Controller
 {

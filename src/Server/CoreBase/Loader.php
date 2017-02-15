@@ -1,13 +1,12 @@
 <?php
 /**
- * Loader 加载器
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:21
+ * 自动加载器
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
+namespace PG\MSF\Server\CoreBase;
 
 class Loader
 {

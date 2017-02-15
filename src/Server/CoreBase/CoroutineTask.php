@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-1
- * Time: 下午5:08
+ * 协程任务
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
-
+namespace PG\MSF\Server\CoreBase;
 
 class CoroutineTask
 {

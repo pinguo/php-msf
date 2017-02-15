@@ -1,15 +1,15 @@
 <?php
-namespace Server\Tasks;
-
-use Server\CoreBase\Task;
-
 /**
- * dispatch 的udp广播，用于通知dispatch
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午1:06
+ * UdpDispatchTask
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\Tasks;
+
+use PG\MSF\Server\CoreBase\Task;
+
 class UdpDispatchTask extends Task
 {
     public function send()

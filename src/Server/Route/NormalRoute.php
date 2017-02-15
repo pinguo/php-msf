@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午3:11
+ * NormalRoute
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Route;
-
+namespace PG\MSF\Server\Route;
 
 class NormalRoute implements IRoute
 {

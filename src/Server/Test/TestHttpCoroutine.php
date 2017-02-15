@@ -1,15 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-12-30
- * Time: 下午4:37
+ * TestHttpCoroutine
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Test;
+namespace PG\MSF\Server\Test;
 
 
-use Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\CoreBase\CoroutineBase;
 
 class TestHttpCoroutine extends CoroutineBase
 {

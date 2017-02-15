@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-20
- * Time: 下午1:39
+ * SwooleMarco
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server;
-
+namespace PG\MSF\Server;
 
 class SwooleMarco
 {

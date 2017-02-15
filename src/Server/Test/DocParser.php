@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-12-30
- * Time: 下午1:39
+ * DocParser
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Test;
-
+namespace PG\MSF\Server\Test;
 
 class DocParser
 {

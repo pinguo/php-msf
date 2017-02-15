@@ -1,23 +1,24 @@
 <?php
-namespace Server;
+/**
+ * SwooleServer
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+
+namespace PG\MSF\Server;
 
 use Noodlehaus\Config;
-use Server\CoreBase\Child;
-use Server\CoreBase\ControllerFactory;
-use Server\CoreBase\Coroutine;
-use Server\CoreBase\GeneratorContext;
-use Server\CoreBase\Loader;
-use Server\CoreBase\SwooleException;
-use Server\Pack\IPack;
-use Server\Route\IRoute;
-use Server\Helpers\Log\PGLog;
+use PG\MSF\Server\CoreBase\Child;
+use PG\MSF\Server\CoreBase\ControllerFactory;
+use PG\MSF\Server\CoreBase\Coroutine;
+use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\Loader;
+use PG\MSF\Server\CoreBase\SwooleException;
+use PG\MSF\Server\Pack\IPack;
+use PG\MSF\Server\Route\IRoute;
+use PG\MSF\Server\Helpers\Log\PGLog;
 
-/**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-6-28
- * Time: 上午11:37
- */
 abstract class SwooleServer extends Child
 {
     const version = "1.7.6";

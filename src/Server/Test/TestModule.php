@@ -1,22 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-12-30
- * Time: 下午1:00
- */
-
-namespace Server\Test;
-
-use Server\CoreBase\Coroutine;
-use Server\CoreBase\CoroutineTask;
-use Server\CoreBase\GeneratorContext;
-
-/**
  * 单元测试组件
- * Class TestModule
- * @package Server\test
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\Test;
+
+use PG\MSF\Server\CoreBase\Coroutine;
+use PG\MSF\Server\CoreBase\CoroutineTask;
+use PG\MSF\Server\CoreBase\GeneratorContext;
+
 class TestModule
 {
     private $failCount = 0;

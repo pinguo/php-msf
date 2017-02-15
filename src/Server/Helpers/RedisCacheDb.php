@@ -1,15 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-6-7
- * Time: 上午10:08
+ * redis
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 /**
  * 将一个二维数组以field字段为索引序列化到redis的hash表中
  * @param string $key hash表的key
  * @param array $array 二维数组
- * @param string $field 索引字段不传默认0-N,一般为数据库字段名
+ * @param string $field_name_db 索引字段不传默认0-N,一般为数据库字段名
+ * @return array
  */
 function redis_putToRedisHash($key, $array, $field_name_db = '')
 {

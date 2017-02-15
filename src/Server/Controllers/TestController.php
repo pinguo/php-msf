@@ -1,10 +1,10 @@
 <?php
-namespace Server\Controllers;
+namespace PG\MSF\Server\Controllers;
 
-use Server\CoreBase\Controller;
-use Server\CoreBase\SelectCoroutine;
-use Server\Models\TestModel;
-use Server\Tasks\TestTask;
+use PG\MSF\Server\CoreBase\Controller;
+use PG\MSF\Server\CoreBase\SelectCoroutine;
+use PG\MSF\Server\Models\TestModel;
+use PG\MSF\Server\Tasks\TestTask;
 
 /**
  * Created by PhpStorm.

@@ -1,12 +1,13 @@
 <?php
-namespace Server\CoreBase;
 /**
  * Model工厂模式
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:03
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class ModelFactory
 {
     /**

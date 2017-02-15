@@ -1,11 +1,13 @@
 <?php
-namespace Server\Pack;
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午2:41
+ * IPack接口
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\Pack;
+
 interface IPack
 {
     function pack($data);

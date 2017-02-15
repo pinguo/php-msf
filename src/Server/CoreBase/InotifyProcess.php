@@ -1,13 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-19
- * Time: 上午9:17
+ * InotifyProcess
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
-
+namespace PG\MSF\Server\CoreBase;
 
 class InotifyProcess
 {

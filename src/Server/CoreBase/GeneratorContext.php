@@ -1,18 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: zhangjincheng
- * Date: 16-10-25
- * Time: 上午9:01
- */
-
-namespace Server\CoreBase;
-
-/**
  * 生成器的上下文,记录协程运行过程
- * Class GeneratorContext
- * @package Server\CoreBase
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class GeneratorContext
 {
     /**

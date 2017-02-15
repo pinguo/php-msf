@@ -1,18 +1,16 @@
 <?php
 /**
- * 包含http服务器
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-29
- * Time: 上午9:42
+ * http服务器
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server;
-
+namespace PG\MSF\Server;
 
 use League\Plates\Engine;
-use Server\CoreBase\ControllerFactory;
-use Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\ControllerFactory;
+use PG\MSF\Server\CoreBase\GeneratorContext;
 
 abstract class SwooleHttpServer extends SwooleServer
 {

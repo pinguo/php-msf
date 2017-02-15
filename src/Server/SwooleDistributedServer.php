@@ -1,17 +1,24 @@
 <?php
-namespace Server;
+/**
+ * SwooleDistributedServer
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
 
-use Server\Client\Client;
-use Server\CoreBase\CoroutineTask;
-use Server\CoreBase\GeneratorContext;
-use Server\CoreBase\InotifyProcess;
-use Server\CoreBase\SwooleException;
-use Server\DataBase\AsynPool;
-use Server\DataBase\AsynPoolManager;
-use Server\DataBase\Miner;
-use Server\DataBase\MysqlAsynPool;
-use Server\DataBase\RedisAsynPool;
-use Server\Test\TestModule;
+namespace PG\MSF\Server;
+
+use PG\MSF\Server\Client\Client;
+use PG\MSF\Server\CoreBase\CoroutineTask;
+use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\InotifyProcess;
+use PG\MSF\Server\CoreBase\SwooleException;
+use PG\MSF\Server\DataBase\AsynPool;
+use PG\MSF\Server\DataBase\AsynPoolManager;
+use PG\MSF\Server\DataBase\Miner;
+use PG\MSF\Server\DataBase\MysqlAsynPool;
+use PG\MSF\Server\DataBase\RedisAsynPool;
+use PG\MSF\Server\Test\TestModule;
 
 define("SERVER_DIR", __DIR__);
 define("APP_DIR", __DIR__ . "/../app");

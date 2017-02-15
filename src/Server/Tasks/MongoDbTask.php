@@ -3,12 +3,12 @@
  * @desc: MongoDB Task 基类
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/2/13
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Tasks;
+namespace PG\MSF\Server\Tasks;
 
-use Server\CoreBase\Task;
+use PG\MSF\Server\CoreBase\Task;
 
 class MongoDbTask extends Task
 {

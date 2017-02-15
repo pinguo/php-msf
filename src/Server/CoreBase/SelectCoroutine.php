@@ -1,19 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-9-1
- * Time: 下午4:25
- */
-
-namespace Server\CoreBase;
-
-
-/**
  * 用于并发选择1个结果，相当于go的select
- * Class SelectCoroutine
- * @package Server\CoreBase
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class SelectCoroutine extends CoroutineBase
 {
 

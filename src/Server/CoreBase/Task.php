@@ -1,14 +1,15 @@
 <?php
-namespace Server\CoreBase;
 /**
  * Task 异步任务
  * 在worker中的Task会被构建成TaskProxy。这个实例是单例的，
  * 所以发起task请求时每次都要使用loader给TaskProxy赋值，不能缓存重复使用，以免数据错乱。
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午12:00
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\CoreBase;
+
 class Task extends TaskProxy
 {
 

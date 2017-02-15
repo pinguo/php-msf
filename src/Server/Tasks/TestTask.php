@@ -1,14 +1,15 @@
 <?php
-namespace Server\Tasks;
-
-use Server\CoreBase\Task;
-
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午1:06
+ * TestTask
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\Tasks;
+
+use PG\MSF\Server\CoreBase\Task;
+
 class TestTask extends Task
 {
     public function testTimer()

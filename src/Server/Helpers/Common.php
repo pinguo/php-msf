@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 上午11:38
+ * common函数
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 /**
  * 获取实例

@@ -1,17 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午1:24
+ * 内核基类
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
-
+namespace PG\MSF\Server\CoreBase;
 
 use Monolog\Logger;
 use Noodlehaus\Config;
-use Server\Pack\IPack;
+use PG\MSF\Server\Pack\IPack;
 
 class CoreBase extends Child
 {

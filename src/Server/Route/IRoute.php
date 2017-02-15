@@ -1,11 +1,13 @@
 <?php
-namespace Server\Route;
 /**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午3:09
+ * IRoute接口
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
+namespace PG\MSF\Server\Route;
+
 interface IRoute
 {
     function handleClientData($data);

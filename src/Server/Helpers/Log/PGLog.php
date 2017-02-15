@@ -1,12 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: niulingyun
- * Date: 17-1-11
- * Time: 下午5:04
+ * RedisCoroutine
+ *
+ * @author niulingyun@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\Helpers\Log;
+namespace PG\MSF\Server\Helpers\Log;
 
 use Monolog\Handler\BufferHandler;
 use Monolog\Logger;

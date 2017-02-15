@@ -1,12 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2016/9/9
- * Time: 17:33
+ * 协程NULL结果
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace Server\CoreBase;
+namespace PG\MSF\Server\CoreBase;
 
 class CoroutineNull
 {

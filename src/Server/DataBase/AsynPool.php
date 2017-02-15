@@ -1,14 +1,11 @@
 <?php
 /**
  * 异步连接池基类
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-25
- * Time: 上午11:40
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
-
-namespace Server\DataBase;
-
+namespace PG\MSF\Server\DataBase;
 
 use Noodlehaus\Config;
 
