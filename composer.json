@@ -1,6 +1,7 @@
 {
-  "name": "PGWireless/php-base",
+  "name": "PGWireless/php-msf",
   "description": "PGWireless Micro Service Framework For PHP",
+  "license": "BSD-3-Clause",
   "type": "library",
   "homepage": "https://github.com/PGWireless/php-msf",
   "require": {
