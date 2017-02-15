@@ -5,13 +5,14 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 /**
  * 获取实例
- * @return \Server\SwooleDistributedServer
+ * @return \PG\MSF\Server\SwooleDistributedServer
  */
 function &get_instance()
 {
-    return \Server\SwooleDistributedServer::get_instance();
+    return \PG\MSF\Server\SwooleDistributedServer::get_instance();
 }
 
 /**
@@ -20,7 +21,7 @@ function &get_instance()
  */
 function getTickTime()
 {
-    return \Server\SwooleDistributedServer::get_instance()->tickTime;
+    return \PG\MSF\Server\SwooleDistributedServer::get_instance()->tickTime;
 }
 
 function getMillisecond() {

@@ -6,6 +6,7 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 namespace PG\MSF\Server\DataBase;
 
 class Miner

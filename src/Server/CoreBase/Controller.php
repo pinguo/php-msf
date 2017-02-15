@@ -15,11 +15,11 @@ use PG\MSF\Server\SwooleServer;
 class Controller extends CoreBase
 {
     /**
-     * @var \Server\DataBase\RedisAsynPool
+     * @var \PG\MSF\Server\DataBase\RedisAsynPool
      */
     public $redis_pool;
     /**
-     * @var \Server\DataBase\MysqlAsynPool
+     * @var \PG\MSF\Server\DataBase\MysqlAsynPool
      */
     public $mysql_pool;
     /**

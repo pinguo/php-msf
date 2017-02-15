@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Server\Test;
 
-
 use PG\MSF\Server\CoreBase\CoroutineBase;
 use PG\MSF\Server\CoreBase\CoroutineNull;
 

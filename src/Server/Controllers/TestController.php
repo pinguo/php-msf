@@ -1,4 +1,11 @@
 <?php
+/**
+ * TestController
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+
 namespace PG\MSF\Server\Controllers;
 
 use PG\MSF\Server\CoreBase\Controller;
@@ -6,12 +13,6 @@ use PG\MSF\Server\CoreBase\SelectCoroutine;
 use PG\MSF\Server\Models\TestModel;
 use PG\MSF\Server\Tasks\TestTask;
 
-/**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-15
- * Time: 下午3:51
- */
 class TestController extends Controller
 {
     /**
