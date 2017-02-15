@@ -20,16 +20,6 @@ use PG\MSF\Server\DataBase\MysqlAsynPool;
 use PG\MSF\Server\DataBase\RedisAsynPool;
 use PG\MSF\Server\Test\TestModule;
 
-define("SERVER_DIR", __DIR__);
-define("APP_DIR", __DIR__ . "/../app");
-define("WWW_DIR", __DIR__ . "/../www");
-
-/**
- * Created by PhpStorm.
- * User: tmtbe
- * Date: 16-7-14
- * Time: 上午9:18
- */
 abstract class SwooleDistributedServer extends SwooleWebSocketServer
 {
     const SERVER_NAME = "SERVER";
