@@ -564,7 +564,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         //最后一个worker处理启动定时器
         if ($workerId == $this->worker_num - 1) {
             //重新读入timerTask配置
-            $timerTaskConfig = $this->config->load(__DIR__ . '/../config/timerTask.php');
+            $timerTaskConfig = $this->config->load(ROOT_PATH . '/config/timerTask.php');
             $timer_tasks = $timerTaskConfig->get('timerTask');
             $this->timer_tasks_used = array();
 

@@ -26,7 +26,7 @@ class TestModule
     {
         $this->dir = $dir;
         if (empty($dir)) {
-            $dir = __DIR__ . "/../../test";
+            $dir = ROOT_PATH . "/test";
         }
         if ($coroutine != null) {
             $this->asyn = true;
