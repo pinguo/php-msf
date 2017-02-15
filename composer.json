@@ -23,6 +23,7 @@
       "src/Server/Helpers/Common.php"
     ]
   },
+  "minimum-stability": "dev",
   "prefer-stable": true,
   "extra": {
   }
