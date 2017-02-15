@@ -183,7 +183,7 @@ abstract class SwooleServer extends Child
         $this->onErrorHandel = [$this, 'onErrorHandel'];
         self::$_worker = $this;
         // 加载配置 支持加载环境子目录配置
-        $this->config = new Config([__DIR__ . '/../config', __DIR__ . '/../config/' . ENV]);
+        $this->config = new Config([ROOT_PATH . '/config', ROOT_PATH . '/config/' . ENV]);
         $this->probuf_set = $this->config->get('server.probuf_set', $this->probuf_set);
         $this->package_length_type = $this->probuf_set['package_length_type'];
         $this->package_length_type_length = strlen(pack($this->package_length_type, 1));
