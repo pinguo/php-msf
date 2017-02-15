@@ -91,4 +91,12 @@ class App extends BaseController
         $this->logger->notice('this is a notice log');
         $this->http_output->end('ok');
     }
+
+    public function httpTestMongo()
+    {
+        $test = $this->loader->task('AppTask');
+        $test->testMongo();
+        $result = yield $test->coroutineSend();
+        $this->http_output->end(json_encode($result));
+    }
 }
