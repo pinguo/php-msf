@@ -177,6 +177,26 @@ class TestController extends Controller
         $this->http_output->end($result);
     }
 
+    public function http_startInterruptedTask()
+    {
+        $testTask = $this->loader->task('TestTask');
+        $task_id = $testTask->testInterrupted();
+        $testTask->startTask(null);
+        $this->http_output->end("task_id = $task_id");
+    }
+
+    public function http_interruptedTask()
+    {
+        $task_id = $this->http_input->getPost('task_id');
+        get_instance()->interruptedTask($task_id);
+        $this->http_output->end("ok");
+    }
+
+    public function http_getAllTask()
+    {
+        $messages = get_instance()->getServerAllTaskMessage();
+        $this->http_output->end(json_encode($messages));
+    }
     /**
      * @return boolean
      */
