@@ -106,6 +106,15 @@ class HttpInput
     }
 
     /**
+     * getAllServer
+     * @return array
+     */
+    public function getAllServer()
+    {
+        return $this->request->server;
+    }
+
+    /**
      * 获取原始的POST包体
      * @return mixed
      */
