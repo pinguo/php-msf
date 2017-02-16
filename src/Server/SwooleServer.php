@@ -315,7 +315,8 @@ abstract class SwooleServer extends Child
         // Check argv;
         $start_file = $argv[0];
         if (!isset($argv[1])) {
-            exit("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
+            $argv[1] = 'start';
+            echo ("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
         }
 
         // Get command.
