@@ -142,7 +142,8 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
 
     public function start()
     {
-        $this->clearState();
+        // @todo 更好的实现方式 by xudianyang
+        // $this->clearState();
         return parent::start();
     }
 
