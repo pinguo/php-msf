@@ -137,10 +137,17 @@ abstract class SwooleHttpServer extends SwooleServer
         } else {
             $controller_name = $this->route->getControllerName();
             $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
+            if ($controller_instance == null) {
+                $controller_name = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
+                $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
+                $this->route->setControllerName($controller_name);
+            }
+
             if ($controller_instance != null) {
                 $method_name = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
                 if (!method_exists($controller_instance, $method_name)) {
-                    $method_name = 'defaultMethod';
+                    $method_name = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+                    $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
                 try {
                     $controller_instance->setRequestResponse($request, $response, $controller_name, $method_name);

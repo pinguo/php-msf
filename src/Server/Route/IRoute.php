@@ -21,4 +21,8 @@ interface IRoute
     function getParams();
 
     function getPath();
+
+    function setControllerName($name);
+
+    function setMethodName($name);
 }
