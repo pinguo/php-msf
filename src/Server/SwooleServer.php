@@ -229,7 +229,7 @@ abstract class SwooleServer extends Child
     public function setConfig()
     {
         $this->socket_type = SWOOLE_SOCK_TCP;
-        $this->tcp_enable = $this->config->get('tcp.enable', true);
+        $this->tcp_enable = $this->config->get('tcp.enable', false);
         $this->socket_name = $this->config['tcp']['socket'];
         $this->port = $this->config['tcp']['port'];
         $this->user = $this->config->get('server.set.user', '');
