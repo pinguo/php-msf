@@ -145,7 +145,7 @@ class TestController extends Controller
      */
     public function http_html_file_test()
     {
-        $this->http_output->endFile(SERVER_DIR, 'Views/test.html');
+        $this->http_output->endFile(ROOT_PATH, 'Views/test.html');
     }
 
 

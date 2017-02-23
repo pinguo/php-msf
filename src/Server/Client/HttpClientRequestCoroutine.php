@@ -28,7 +28,7 @@ class HttpClientRequestCoroutine extends CoroutineBase
         $this->method = $method;
         $this->data = $data;
         $this->send(function ($client) {
-            $this->result = $client->body;
+            $this->result = (array)$client;
         });
     }
 
