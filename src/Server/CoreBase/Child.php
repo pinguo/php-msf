@@ -31,6 +31,11 @@ class Child
      * 判断是否执行了__construct
      */
     public $isConstruct = false;
+    /**
+     * 上下文
+     * @var array
+     */
+    protected $context;
 
     /**
      * after constructor
@@ -81,6 +86,24 @@ class Child
     }
 
     /**
+     * 获取上下文
+     * @return array
+     */
+    public function &getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * 设置上下文
+     * @param $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+    /**
      * 销毁，解除引用
      */
     public function destroy()
@@ -90,6 +113,7 @@ class Child
         }
         $this->child_list = [];
         unset($this->parent);
+        unset($this->context);
     }
 
 }

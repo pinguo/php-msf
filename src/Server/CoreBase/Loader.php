@@ -53,17 +53,18 @@ class Loader
 
         $model_instance = $this->_model_factory->getModel($model, $parent);
         $parent->addChild($model_instance);
-        $model_instance->initialization();
+        $model_instance->initialization($parent->getContext());
         return $model_instance;
     }
 
     /**
      * 获取一个task
      * @param $task
+     * @param Child $parent
      * @return mixed|null|TaskProxy
      * @throws SwooleException
      */
-    public function task($task)
+    public function task($task, Child $parent = null)
     {
         if (empty($task)) {
             return null;
@@ -78,6 +79,9 @@ class Loader
         }
         if (!get_instance()->server->taskworker) {//工作进程返回taskproxy
             $this->_task_proxy->core_name = $task;
+            if ($parent != null) {
+                $this->_task_proxy->setContext($parent->getContext());
+            }
             return $this->_task_proxy;
         }
         if (key_exists($task, $this->_tasks)) {

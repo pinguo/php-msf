@@ -10,18 +10,34 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\MSF\Server\Helpers\Log\PGLog;
+
 class Task extends TaskProxy
 {
+    /**
+     * @var PGLog
+     */
+    public $PGLog;
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function initialization($task_id, $worker_pid, $task_name, $method_name)
+    public function initialization($task_id, $worker_pid, $task_name, $method_name, $context)
     {
         $this->task_id = $task_id;
-        get_instance()->tid_pid_table->set($this->task_id, ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'st' => time()]);
+        get_instance()->tid_pid_table->set(
+            $this->task_id,
+            ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'st' => time()]
+        );
+
+        if ($context) {
+            $this->setContext($context);
+            $this->PGLog = clone $this->logger;
+            $this->PGLog->logId = $this->getContext()['logId'];
+            $this->PGLog->pushLogId();
+        }
     }
 
     public function destroy()
@@ -29,6 +45,7 @@ class Task extends TaskProxy
         parent::destroy();
         get_instance()->tid_pid_table->del($this->task_id);
         $this->task_id = 0;
+        unset($this->PGLog);
     }
 
     /**
@@ -48,6 +65,7 @@ class Task extends TaskProxy
         if ($interrupted_task_id == $this->task_id) {
             return true;
         }
+
         return false;
     }
 

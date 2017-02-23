@@ -33,6 +33,13 @@ class TestController extends Controller
         $this->send($this->client_data->data);
     }
 
+    public function http_testContext()
+    {
+        $this->getContext()['test'] = 1;
+        print_r($this->getContext());
+        $this->testModel = $this->loader->model('TestModel', $this);
+        $this->testModel->contextTest();
+    }
     /**
      * mysql 事务协程测试
      */
@@ -179,7 +186,7 @@ class TestController extends Controller
 
     public function http_startInterruptedTask()
     {
-        $testTask = $this->loader->task('TestTask');
+        $testTask = $this->loader->task('TestTask', $this);
         $task_id = $testTask->testInterrupted();
         $testTask->startTask(null);
         $this->http_output->end("task_id = $task_id");

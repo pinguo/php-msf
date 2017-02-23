@@ -28,6 +28,11 @@ class TestTask extends Task
         return 123;
     }
 
+    public function contextTest()
+    {
+        print_r($this->getContext());
+    }
+
     public function test_task()
     {
         $testModel = $this->loader->model('TestModel', $this);
@@ -39,5 +44,18 @@ class TestTask extends Task
     {
         $testModel = $this->loader->model('TestModel',$this);
         yield $testModel->test_pdo();
+    }
+
+    /**
+     * 测试中断
+     */
+    public function testInterrupted()
+    {
+        while (true) {
+            if ($this->checkInterrupted()) {
+                print_r("task已中断\n");
+                break;
+            }
+        }
     }
 }
