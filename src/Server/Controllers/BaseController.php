@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /**
  * @desc: 控制器基类
  * @author: leandre <niulingyun@camera360.com>
@@ -9,26 +9,31 @@
 namespace PG\MSF\Server\Controllers;
 
 use PG\MSF\Server\CoreBase\Controller;
+use PG\MSF\Server\Helpers\Log\PGLog;
 use PG\MSF\Server\SwooleMarco;
 
 class BaseController extends Controller
 {
+
     /**
-     * 访问请求日志变量，此变量不用unset，因为每次请求initialization都会重新赋值
-     * @var array
+     * @var PGLog
      */
-    public $accessLog;
-    public $logId;
+    public $PGLog;
 
     public function initialization($controller_name, $method_name)
     {
-        $this->accessLog['path'] = '/' . $controller_name . '/' . $method_name;
-        $this->logId = $this->genLogId();
-        $this->logger->pushLogId($this->logId);
+        $this->PGLog = clone $this->logger;
+        $this->PGLog->accessRecord['beginTime'] = microtime(true);
+        $this->PGLog->accessRecord['uri'] = ('/'.$controller_name.'/'.$method_name);
+        $this->getContext()['logId'] = $this->genLogId();
+        $this->PGLog->logId = $this->getContext()['logId'];
+        $this->PGLog->pushLogId();
     }
 
     public function destroy()
     {
+        $this->PGLog->appendNoticeLog();
+        unset($this->PGLog);
         parent::destroy();
     }
 
@@ -39,9 +44,9 @@ class BaseController extends Controller
     public function genLogId()
     {
         if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $logId = $this->http_input->getRequestHeader('logid') ?? '';
+            $logId = $this->http_input->getRequestHeader('LOG_ID') ?? '';
         } else {
-            $logId =  $this->client_data->logid ?? '';
+            $logId = $this->client_data->logid ?? '';
         }
 
         if (!$logId) {

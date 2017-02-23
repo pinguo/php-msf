@@ -406,13 +406,14 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 return null;
             case SwooleMarco::SERVER_TYPE_TASK://task任务
                 $task_name = $message['task_name'];
-                $task = $this->loader->task($task_name);
+                $task = $this->loader->task($task_name, $this);
                 $task_fuc_name = $message['task_fuc_name'];
                 $task_data = $message['task_fuc_data'];
                 $task_id = $message['task_id'];
+                $task_context = $message['task_context'];
                 if (method_exists($task, $task_fuc_name)) {
                     //给task做初始化操作
-                    $task->initialization($task_id, $this->server->worker_pid, $task_name, $task_fuc_name);
+                    $task->initialization($task_id, $this->server->worker_pid, $task_name, $task_fuc_name, $task_context);
                     $result = call_user_func_array(array($task, $task_fuc_name), $task_data);
                     if ($result instanceof \Generator) {
                         $corotineTask = new CoroutineTask($result, new GeneratorContext());
@@ -717,7 +718,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 if ($timer_task['start_time'] == -1) $timer_task['start_time'] = $time;
                 $timer_task['start_time'] += $timer_task['interval_time'];
                 if (!empty($timer_task['task_name'])) {
-                    $task = $this->loader->task($timer_task['task_name']);
+                    $task = $this->loader->task($timer_task['task_name'], $this);
                     call_user_func([$task, $timer_task['method_name']]);
                     $task->startTask(null);
                 } else {

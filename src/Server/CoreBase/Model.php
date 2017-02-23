@@ -9,6 +9,8 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\MSF\Server\Helpers\Log\PGLog;
+
 class Model extends CoreBase
 {
     /**
@@ -25,6 +27,11 @@ class Model extends CoreBase
      */
     public $client;
 
+    /**
+     * @var PGLog
+     */
+    public $PGLog;
+
     final public function __construct()
     {
         parent::__construct();
@@ -36,9 +43,12 @@ class Model extends CoreBase
     /**
      * 当被loader时会调用这个方法进行初始化
      */
-    public function initialization()
+    public function initialization($context)
     {
-
+        $this->setContext($context);
+        if ($this->parent->PGLog) {
+            $this->PGLog = $this->parent->PGLog;
+        }
     }
 
     /**
@@ -48,6 +58,7 @@ class Model extends CoreBase
     {
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
+        unset($this->PGLog);
     }
 
 }
