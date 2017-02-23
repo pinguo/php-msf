@@ -19,6 +19,13 @@ class TestModel extends Model
         print_r("model timer\n");
     }
 
+    public function contextTest()
+    {
+        print_r($this->getContext());
+        $testTask = $this->loader->task('TestTask', $this);
+        $testTask->contextTest();
+        $testTask->startTask(null);
+    }
     public function test_coroutine()
     {
         $redisCoroutine = $this->redis_pool->coroutineSend('get', 'test');
@@ -49,7 +56,7 @@ class TestModel extends Model
 
     public function test_task()
     {
-        $testTask = $this->loader->task('TestTask');
+        $testTask = $this->loader->task('TestTask', $this);
         $testTask->test();
         $testTask->startTask(null);
     }

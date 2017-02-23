@@ -108,7 +108,6 @@ class Controller extends CoreBase
      */
     public function initialization($controller_name, $method_name)
     {
-
     }
 
     /**
@@ -130,7 +129,8 @@ class Controller extends CoreBase
 
     /**
      * 异常的回调
-     * @param \Exception $e
+     * @param \Throwable $e
+     * @throws \Throwable
      */
     public function onExceptionHandle(\Throwable $e)
     {
@@ -143,8 +143,6 @@ class Controller extends CoreBase
                 $this->send($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
                 break;
         }
-
-        throw $e;
     }
 
     /**
