@@ -24,7 +24,7 @@ class BaseController extends Controller
     {
         $this->PGLog = clone $this->logger;
         $this->PGLog->accessRecord['beginTime'] = microtime(true);
-        $this->PGLog->accessRecord['uri'] = ('/'.$controller_name.'/'.$method_name);
+        $this->PGLog->accessRecord['uri'] = str_replace('\\', '/' ,'/' . $controller_name . '/'.$method_name);
         $this->getContext()['logId'] = $this->genLogId();
         $this->PGLog->logId = $this->getContext()['logId'];
         $this->PGLog->pushLogId();
