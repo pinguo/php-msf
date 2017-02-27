@@ -33,7 +33,6 @@ class BaseController extends Controller
     public function destroy()
     {
         $this->PGLog->appendNoticeLog();
-        unset($this->PGLog);
         parent::destroy();
     }
 
@@ -54,5 +53,23 @@ class BaseController extends Controller
         }
 
         return $logId;
+    }
+
+    /**
+     * 等待协程Task执行完成
+     *
+     * @param \PG\MSF\Server\CoreBase\CoroutineBase $coroutine
+     * @param int $traceLimit
+     * @return mixed
+     */
+    function await($coroutine, $traceLimit = 1)
+    {
+        ob_start();
+        debug_print_backtrace(0, $traceLimit);
+        $trace = ob_get_contents();
+        ob_end_clean();
+        $this->getGeneratorContext()->setErrorMessage($trace);
+
+        return $coroutine;
     }
 }
