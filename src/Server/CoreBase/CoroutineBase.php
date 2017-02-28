@@ -29,6 +29,16 @@ abstract class CoroutineBase implements ICoroutineBase
      */
     public $timeout;
 
+    /**
+     * 协程执行的绝对时间
+     * @var float
+     */
+    public $requestTime = 0.0;
+
+    /**
+     * CoroutineBase constructor.
+     * @param int $timeout
+     */
     public function __construct($timeout = 0)
     {
         if (self::$MAX_TIMERS == 0) {
@@ -41,8 +51,9 @@ abstract class CoroutineBase implements ICoroutineBase
             $this->timeout = self::$MAX_TIMERS;
         }
 
-        $this->result = CoroutineNull::getInstance();
-        $this->getCount = 0;
+        $this->result      = CoroutineNull::getInstance();
+        $this->getCount    = 0;
+        $this->requestTime = microtime(true);
     }
 
     public abstract function send($callback);
@@ -50,7 +61,8 @@ abstract class CoroutineBase implements ICoroutineBase
     public function getResult()
     {
         $this->getCount++;
-        if ($this->getCount > $this->timeout) {
+        if ((($this->getCount > 1) && ((microtime(true) - $this->requestTime) > $this->timeout))
+            || ($this->getCount > $this->timeout)) {
             throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
         }
         return $this->result;

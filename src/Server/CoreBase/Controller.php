@@ -141,10 +141,9 @@ class Controller extends CoreBase
      * 设置协程上下文对象
      *
      * @param GeneratorContext $generatorContext
-     * @param $generatorContext
      * @return $this
      */
-    public function setGeneratorContext(\PG\MSF\Server\CoreBase\GeneratorContext $generatorContext)
+    public function setGeneratorContext(GeneratorContext $generatorContext)
     {
         $this->generatorContext = $generatorContext;
         return $this;

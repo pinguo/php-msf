@@ -21,7 +21,7 @@ class SwooleException extends \Exception
     /**
      * 设置追加信息
      * @param $others
-     * @param  $controller
+     * @param BaseController $controller
      */
     public function setShowOther($others, $controller = null)
     {

@@ -21,7 +21,8 @@ class GeneratorContext
 
     public function __construct()
     {
-        $this->stack = array();
+        $this->stack      = [];
+        $this->errorStack = [];
     }
 
     /**
@@ -40,6 +41,7 @@ class GeneratorContext
     public function popYieldStack()
     {
         array_pop($this->stack);
+        array_pop($this->errorStack);
     }
 
     /**
@@ -80,9 +82,9 @@ class GeneratorContext
         for ($i = 0; $i < count($this->stack); $i++) {
             $trace .= "{$this->stack[$i]}\n";
         }
-        if (!empty($this->errorStack[$i])) {
-            $trace .= $this->errorStack[$i];
-        }
+
+        $trace .= array_pop($this->errorStack);
+
         return $trace;
     }
 
