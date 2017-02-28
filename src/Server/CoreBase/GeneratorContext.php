@@ -17,6 +17,7 @@ class GeneratorContext
     protected $controller_name;
     protected $method_name;
     protected $stack;
+    protected $errorStack;
 
     public function __construct()
     {
@@ -42,20 +43,11 @@ class GeneratorContext
     }
 
     /**
-     * @param $file
-     * @param $line
-     */
-    public function setErrorFile($file, $line)
-    {
-        $this->stack[] = "| #出错文件： $file($line)";
-    }
-
-    /**
      * @param $message
      */
     public function setErrorMessage($message)
     {
-        $this->stack[] = "| #报错消息:$message";
+        $this->errorStack[] = "| #报错消息: $message";
     }
 
     /**
@@ -84,11 +76,13 @@ class GeneratorContext
      */
     public function getTraceStack()
     {
-        $trace = "------------协程错误指南------------\n";
+        $trace = "协程错误指南: \n";
         for ($i = 0; $i < count($this->stack); $i++) {
             $trace .= "{$this->stack[$i]}\n";
         }
-        $trace .= "------------------------------------\n";
+        if (!empty($this->errorStack[$i])) {
+            $trace .= $this->errorStack[$i];
+        }
         return $trace;
     }
 

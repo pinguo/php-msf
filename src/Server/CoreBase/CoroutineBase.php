@@ -23,11 +23,24 @@ abstract class CoroutineBase implements ICoroutineBase
      */
     public $getCount;
 
-    public function __construct()
+    /**
+     * 协程执行的超时时间精确到ms
+     * @var int
+     */
+    public $timeout;
+
+    public function __construct($timeout = 0)
     {
         if (self::$MAX_TIMERS == 0) {
             self::$MAX_TIMERS = get_instance()->config->get('coroution.timerOut', 1000);
         }
+
+        if ($timeout > 0) {
+            $this->timeout = $timeout;
+        } else {
+            $this->timeout = self::$MAX_TIMERS;
+        }
+
         $this->result = CoroutineNull::getInstance();
         $this->getCount = 0;
     }
@@ -37,7 +50,7 @@ abstract class CoroutineBase implements ICoroutineBase
     public function getResult()
     {
         $this->getCount++;
-        if ($this->getCount > self::$MAX_TIMERS) {
+        if ($this->getCount > $this->timeout) {
             throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
         }
         return $this->result;

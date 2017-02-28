@@ -50,11 +50,12 @@ class HttpClient
      * 协程方式Get
      * @param $path
      * @param $query
+     * @param $timeout int 超时时间
      * @return HttpClientRequestCoroutine
      */
-    public function coroutineGet($path, $query = null)
+    public function coroutineGet($path, $query = null, $timeout = 1000)
     {
-        return new HttpClientRequestCoroutine($this, 'GET', $path, $query);
+        return new HttpClientRequestCoroutine($this, 'GET', $path, $query, $timeout);
     }
 
     /**
@@ -71,10 +72,11 @@ class HttpClient
      * 协程方式Post
      * @param $path
      * @param $data
+     * @param $timeout int 超时时间
      * @return HttpClientRequestCoroutine
      */
-    public function coroutinePost($path, $data)
+    public function coroutinePost($path, $data, $timeout = 1000)
     {
-        return new HttpClientRequestCoroutine($this, 'POST', $path, $data);
+        return new HttpClientRequestCoroutine($this, 'POST', $path, $data, $timeout);
     }
 }

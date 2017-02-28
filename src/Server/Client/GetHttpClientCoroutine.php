@@ -18,9 +18,9 @@ class GetHttpClientCoroutine extends CoroutineBase
     public $client;
     public $base_url;
 
-    public function __construct($client, $base_url)
+    public function __construct($client, $base_url, $timeout)
     {
-        parent::__construct();
+        parent::__construct($timeout);
         $this->base_url = $base_url;
         $this->client = $client;
         $this->send(function ($http_client) {
