@@ -21,11 +21,10 @@ class SwooleException extends \Exception
     /**
      * 设置追加信息
      * @param $others
-     * @param \PG\MSF\Server\Controllers\BaseController $controller
+     * @param BaseController $controller
      */
     public function setShowOther($others, $controller = null)
     {
-        print_r("=================================================\e[30;41m [ERROR] \e[0m==============================================================\n");
         if (!empty($others)) {
             print_r($others . "\n");
         } else {
@@ -34,7 +33,7 @@ class SwooleException extends \Exception
         }
         print_r("\n");
         if (!empty($controller) && $controller instanceof BaseController) {
-            $controller->PGLog->notice($others);
+            $controller->PGLog->warning($others);
         }
     }
 }

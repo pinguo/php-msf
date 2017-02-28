@@ -11,15 +11,19 @@ namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\SwooleMarco;
 use PG\MSF\Server\SwooleServer;
+use \PG\MSF\Server\CoreBase\GeneratorContext;
+use \PG\MSF\Server\DataBase\RedisAsynPool;
+use \PG\MSF\Server\DataBase\MysqlAsynPool;
+use \PG\MSF\Server\Client\Client;
 
 class Controller extends CoreBase
 {
     /**
-     * @var \PG\MSF\Server\DataBase\RedisAsynPool
+     * @var RedisAsynPool
      */
     public $redis_pool;
     /**
-     * @var \PG\MSF\Server\DataBase\MysqlAsynPool
+     * @var MysqlAsynPool
      */
     public $mysql_pool;
     /**
@@ -36,7 +40,7 @@ class Controller extends CoreBase
      */
     public $request_type;
     /**
-     * @var \Server\Client\Client
+     * @var Client
      */
     public $client;
     /**
@@ -70,6 +74,12 @@ class Controller extends CoreBase
      * @var array
      */
     protected $testUnitSendStack = [];
+
+    /**
+     * 协程上正文对象
+     * @var GeneratorContext
+     */
+    protected $generatorContext;
 
     /**
      * Controller constructor.
@@ -128,6 +138,28 @@ class Controller extends CoreBase
     }
 
     /**
+     * 设置协程上下文对象
+     *
+     * @param GeneratorContext $generatorContext
+     * @return $this
+     */
+    public function setGeneratorContext(GeneratorContext $generatorContext)
+    {
+        $this->generatorContext = $generatorContext;
+        return $this;
+    }
+
+    /**
+     * 返回协程上下文对象
+     *
+     * @return GeneratorContext
+     */
+    public function getGeneratorContext()
+    {
+        return $this->generatorContext;
+    }
+
+    /**
      * 异常的回调
      * @param \Throwable $e
      * @throws \Throwable
@@ -178,6 +210,7 @@ class Controller extends CoreBase
         unset($this->client_data);
         unset($this->request);
         unset($this->response);
+        unset($this->generatorContext);
         $this->http_input->reset();
         $this->http_output->reset();
         ControllerFactory::getInstance()->revertController($this);

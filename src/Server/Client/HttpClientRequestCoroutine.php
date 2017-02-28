@@ -20,9 +20,9 @@ class HttpClientRequestCoroutine extends CoroutineBase
     public $path;
     public $method;
 
-    public function __construct($httpClient, $method, $path, $data)
+    public function __construct($httpClient, $method, $path, $data, $timeout)
     {
-        parent::__construct();
+        parent::__construct($timeout);
         $this->httpClient = $httpClient;
         $this->path = $path;
         $this->method = $method;

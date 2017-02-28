@@ -68,8 +68,7 @@ class CoroutineTask
             if ($flag) {
                 $this->generatorContext->addYieldStack($routine->key());
             }
-            $this->generatorContext->setErrorFile($e->getFile(), $e->getLine());
-            $this->generatorContext->setErrorMessage($e->getMessage());
+            
             while (!$this->stack->isEmpty()) {
                 $this->routine = $this->stack->pop();
                 try {
@@ -79,6 +78,7 @@ class CoroutineTask
 
                 }
             }
+            
             if ($e instanceof SwooleException) {
                 $e->setShowOther($this->generatorContext->getTraceStack(), $this->generatorContext->getController());
             }

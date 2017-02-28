@@ -155,6 +155,7 @@ abstract class SwooleHttpServer extends SwooleServer
                     if ($generator instanceof \Generator) {
                         $generatorContext = new GeneratorContext();
                         $generatorContext->setController($controller_instance, $controller_name, $method_name);
+                        $controller_instance->setGeneratorContext($generatorContext);
                         $this->coroutine->start($generator, $generatorContext);
                     }
                     return;
