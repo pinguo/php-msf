@@ -72,6 +72,12 @@ class Controller extends CoreBase
     protected $testUnitSendStack = [];
 
     /**
+     * 协程上正文对象
+     * @var \PG\MSF\Server\CoreBase\GeneratorContext
+     */
+    protected $generatorContext;
+
+    /**
      * Controller constructor.
      */
     final public function __construct()
@@ -128,6 +134,29 @@ class Controller extends CoreBase
     }
 
     /**
+     * 设置协程上下文对象
+     *
+     * @param \PG\MSF\Server\CoreBase\GeneratorContext $generatorContext
+     * @param $generatorContext
+     * @return $this
+     */
+    public function setGeneratorContext(\PG\MSF\Server\CoreBase\GeneratorContext $generatorContext)
+    {
+        $this->generatorContext = $generatorContext;
+        return $this;
+    }
+
+    /**
+     * 返回协程上下文对象
+     *
+     * @return GeneratorContext
+     */
+    public function getGeneratorContext()
+    {
+        return $this->generatorContext;
+    }
+
+    /**
      * 异常的回调
      * @param \Throwable $e
      * @throws \Throwable
@@ -178,6 +207,7 @@ class Controller extends CoreBase
         unset($this->client_data);
         unset($this->request);
         unset($this->response);
+        unset($this->generatorContext);
         $this->http_input->reset();
         $this->http_output->reset();
         ControllerFactory::getInstance()->revertController($this);

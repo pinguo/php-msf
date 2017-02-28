@@ -8,22 +8,23 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\MSF\Server\Controllers\BaseController;
+
 class SwooleException extends \Exception
 {
     public function __construct($message, $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
         print_r($message . "\n");
-        get_instance()->log->error($message . "\n" . $this->getTraceAsString());
     }
 
     /**
      * 设置追加信息
      * @param $others
+     * @param \PG\MSF\Server\Controllers\BaseController $controller
      */
-    public function setShowOther($others)
+    public function setShowOther($others, $controller = null)
     {
-        print_r("=================================================\e[30;41m [ERROR] \e[0m==============================================================\n");
         if (!empty($others)) {
             print_r($others . "\n");
         } else {
@@ -31,6 +32,8 @@ class SwooleException extends \Exception
             print_r($this->getTraceAsString() . "\n");
         }
         print_r("\n");
-        get_instance()->log->notice($others);
+        if (!empty($controller) && $controller instanceof BaseController) {
+            $controller->PGLog->warning($others);
+        }
     }
 }
