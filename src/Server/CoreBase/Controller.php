@@ -11,15 +11,19 @@ namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\SwooleMarco;
 use PG\MSF\Server\SwooleServer;
+use \PG\MSF\Server\CoreBase\GeneratorContext;
+use \PG\MSF\Server\DataBase\RedisAsynPool;
+use \PG\MSF\Server\DataBase\MysqlAsynPool;
+use \PG\MSF\Server\Client\Client;
 
 class Controller extends CoreBase
 {
     /**
-     * @var \PG\MSF\Server\DataBase\RedisAsynPool
+     * @var RedisAsynPool
      */
     public $redis_pool;
     /**
-     * @var \PG\MSF\Server\DataBase\MysqlAsynPool
+     * @var MysqlAsynPool
      */
     public $mysql_pool;
     /**
@@ -36,7 +40,7 @@ class Controller extends CoreBase
      */
     public $request_type;
     /**
-     * @var \Server\Client\Client
+     * @var Client
      */
     public $client;
     /**
@@ -73,7 +77,7 @@ class Controller extends CoreBase
 
     /**
      * 协程上正文对象
-     * @var \PG\MSF\Server\CoreBase\GeneratorContext
+     * @var GeneratorContext
      */
     protected $generatorContext;
 
@@ -136,11 +140,10 @@ class Controller extends CoreBase
     /**
      * 设置协程上下文对象
      *
-     * @param \PG\MSF\Server\CoreBase\GeneratorContext $generatorContext
-     * @param $generatorContext
+     * @param GeneratorContext $generatorContext
      * @return $this
      */
-    public function setGeneratorContext(\PG\MSF\Server\CoreBase\GeneratorContext $generatorContext)
+    public function setGeneratorContext(GeneratorContext $generatorContext)
     {
         $this->generatorContext = $generatorContext;
         return $this;

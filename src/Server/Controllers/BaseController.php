@@ -11,6 +11,7 @@ namespace PG\MSF\Server\Controllers;
 use PG\MSF\Server\CoreBase\Controller;
 use PG\MSF\Server\Helpers\Log\PGLog;
 use PG\MSF\Server\SwooleMarco;
+use \PG\MSF\Server\CoreBase\CoroutineBase;
 
 class BaseController extends Controller
 {
@@ -58,7 +59,7 @@ class BaseController extends Controller
     /**
      * 等待协程Task执行完成
      *
-     * @param \PG\MSF\Server\CoreBase\CoroutineBase $coroutine
+     * @param CoroutineBase $coroutine
      * @param int $traceLimit
      * @return mixed
      */
