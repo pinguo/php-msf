@@ -71,7 +71,7 @@ class CoroutineTask
             if (empty($value)) {
                 $value = "";
             }
-            $message = 'yield '. str_replace(["\n", " ", "=>"], ["", "", " => "], var_export($value, true)) . ' message: ' .$e->getMessage();
+            $message = 'yield ' . str_replace(["\n", " ", "=>"], ["", "", " => "], var_export($value, true)) . ' message: ' .$e->getMessage();
             $runTaskException = new CoroutineException($message, $e->getCode(), $e);
             $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
             $this->generatorContext->setErrorMessage($message);
