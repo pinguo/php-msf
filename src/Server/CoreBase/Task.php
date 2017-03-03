@@ -34,21 +34,25 @@ class Task extends TaskProxy
 
         if ($context) {
             $this->setContext($context);
+            $this->PGLog = null;
             $this->PGLog = clone $this->logger;
             $this->PGLog->logId = $this->getContext()['logId'];
-            $this->PGLog->pushLogId();
+            $this->PGLog->accessRecord['beginTime'] = microtime(true);
+            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/'.$task_name.'/'.$method_name);
+            defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME . '-task';
+            $this->PGLog->init();
         }
     }
 
     public function destroy()
     {
+        $this->PGLog && $this->PGLog->appendNoticeLog();
         parent::destroy();
         get_instance()->tid_pid_table->del($this->task_id);
         $this->task_id = 0;
-        unset($this->PGLog);
     }
 
-    /**
+    /**hotpot
      * 检查中断信号返回本Task是否该中断
      * @return bool
      */

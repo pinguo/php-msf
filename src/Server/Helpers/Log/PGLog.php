@@ -22,6 +22,7 @@ class PGLog extends Logger
      */
     public $accessRecord = [];
     public $logId;
+    public $channel;
 
     public $profileStackLen = 20;
 
@@ -60,17 +61,11 @@ class PGLog extends Logger
         }
     }
 
-    /**
-     * 日志中增加logId字段
-     */
-    public function pushLogId()
-    {
-        $callback = function ($record) {
-            $record['logId'] = $record['context']['logId'] ?? $this->logId;
 
-            return $record;
-        };
-        $this->pushProcessor($callback);
+    public function init()
+    {
+        $this->pushLogId();
+        $this->channel();
     }
 
     public function appendNoticeLog()
@@ -89,6 +84,32 @@ class PGLog extends Logger
         $this->_countings = [];
         $this->_pushlogs = [];
         $this->notice($message);
+    }
+
+    /**
+     * 日志中增加logId字段
+     */
+    protected function pushLogId()
+    {
+        $callback = function ($record) {
+            $record['logId'] = $record['context']['logId'] ?? $this->logId ?? '000000';
+
+            return $record;
+        };
+        $this->pushProcessor($callback);
+    }
+
+    /**
+     * 日志中的 channel 字段
+     */
+    protected function channel()
+    {
+        $callback = function ($record) {
+            $record['channel'] = $record['context']['channel'] ?? $this->channel ?? $record['channel'];
+
+            return $record;
+        };
+        $this->pushProcessor($callback);
     }
 
     /**
