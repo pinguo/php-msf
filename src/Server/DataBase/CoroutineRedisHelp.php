@@ -25,4 +25,29 @@ class CoroutineRedisHelp
             return new RedisCoroutine($this->redisAsynPool, $name, $arguments);
         }
     }
+
+    /**
+     * redis cache 操作封装
+     * @param $key
+     * @param string $value
+     * @param int $expire
+     * @return mixed|RedisCoroutine
+     */
+    public function cache($key, $value = '', $expire = 0)
+    {
+        if ($value === '') {
+            $commandData = [$key];
+            $command = 'get';
+        } else {
+            if (!empty($expire)) {
+                $command = 'setex';
+                $commandData = [$key, $expire, $value];
+            } else {
+                $command = 'set';
+                $commandData = [$key, $value];
+            }
+        }
+
+        return $this->__call($command, $commandData);
+    }
 }
