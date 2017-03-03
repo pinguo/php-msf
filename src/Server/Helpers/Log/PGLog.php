@@ -22,6 +22,7 @@ class PGLog extends Logger
      */
     public $accessRecord = [];
     public $logId;
+    public $channel;
 
     public $profileStackLen = 20;
 
@@ -61,18 +62,17 @@ class PGLog extends Logger
     }
 
     /**
-     * 日志中增加logId字段
+     * 初始化
      */
-    public function pushLogId()
+    public function init()
     {
-        $callback = function ($record) {
-            $record['logId'] = $record['context']['logId'] ?? $this->logId;
-
-            return $record;
-        };
-        $this->pushProcessor($callback);
+        $this->pushLogId();
+        $this->channel();
     }
 
+    /**
+     * 写入访问日志或 Task 日志
+     */
     public function appendNoticeLog()
     {
         $timeUsed = sprintf("%.0f", (microtime(true) - $this->accessRecord['beginTime']) * 1000);
@@ -89,6 +89,32 @@ class PGLog extends Logger
         $this->_countings = [];
         $this->_pushlogs = [];
         $this->notice($message);
+    }
+
+    /**
+     * 日志中增加logId字段
+     */
+    protected function pushLogId()
+    {
+        $callback = function ($record) {
+            $record['logId'] = $record['context']['logId'] ?? $this->logId ?? '000000';
+
+            return $record;
+        };
+        $this->pushProcessor($callback);
+    }
+
+    /**
+     * 日志中的 channel 字段
+     */
+    protected function channel()
+    {
+        $callback = function ($record) {
+            $record['channel'] = $record['context']['channel'] ?? $this->channel ?? $record['channel'];
+
+            return $record;
+        };
+        $this->pushProcessor($callback);
     }
 
     /**
