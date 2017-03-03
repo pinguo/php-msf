@@ -35,7 +35,7 @@ class PGLog extends Logger
         string $name,
         array $handlers = [],
         array $processors = [],
-        DateTimeZone $timezone = null
+        \DateTimeZone $timezone = null
     ) {
         parent::__construct($name, $handlers, $processors, $timezone);
         $server = get_instance();
