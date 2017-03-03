@@ -42,7 +42,7 @@ class TestTask extends Task
 
     public function testPdo()
     {
-        $testModel = $this->loader->model('TestModel',$this);
+        $testModel = $this->loader->model('TestModel', $this);
         yield $testModel->test_pdo();
     }
 

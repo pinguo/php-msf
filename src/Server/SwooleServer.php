@@ -164,7 +164,8 @@ abstract class SwooleServer extends Child
      * 协议设置
      * @var
      */
-    protected $probuf_set = ['open_length_check' => 1,
+    protected $probuf_set = [
+        'open_length_check' => 1,
         'package_length_type' => 'N',
         'package_length_offset' => 0,       //第N个字节是包长度的值
         'package_body_offset' => 0,       //第几个字节开始计算长度
@@ -276,7 +277,8 @@ abstract class SwooleServer extends Child
 
         // Pid file.
         if (empty(self::$pidFile)) {
-            self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_', self::$_startFile) . ".pid";
+            self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_',
+                    self::$_startFile) . ".pid";
             if (!is_dir(self::$_worker->config->get('server.pid_path'))) {
                 mkdir(self::$_worker->config->get('server.pid_path'), 0777, true);
             }
@@ -316,7 +318,7 @@ abstract class SwooleServer extends Child
         $start_file = $argv[0];
         if (!isset($argv[1])) {
             $argv[1] = 'start';
-            echo ("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
+            echo("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
         }
 
         // Get command.
@@ -763,9 +765,11 @@ abstract class SwooleServer extends Child
      */
     public function onSwooleWorkerError($serv, $worker_id, $worker_pid, $exit_code)
     {
-        $data = ['worker_id' => $worker_id,
+        $data = [
+            'worker_id' => $worker_id,
             'worker_pid' => $worker_pid,
-            'exit_code' => $exit_code];
+            'exit_code' => $exit_code
+        ];
         $log = "WORKER Error ";
         $log .= json_encode($data);
         $this->log->error($log);
@@ -915,7 +919,7 @@ abstract class SwooleServer extends Child
     public function isWebSocket($fd)
     {
         $fdinfo = $this->server->connection_info($fd);
-        if(empty($fdinfo)){
+        if (empty($fdinfo)) {
             throw new \Exception('fd not exist');
         }
         if (key_exists('websocket_status', $fdinfo) && $fdinfo['websocket_status'] == WEBSOCKET_STATUS_FRAME) {

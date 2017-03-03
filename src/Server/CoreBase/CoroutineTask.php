@@ -41,7 +41,7 @@ class CoroutineTask
                 $routine = $value;
                 return;
             }
-            if ($value != null&&$value instanceof ICoroutineBase) {
+            if ($value != null && $value instanceof ICoroutineBase) {
                 $result = $value->getResult();
                 if ($result !== CoroutineNull::getInstance()) {
                     $routine->send($result);
@@ -58,7 +58,7 @@ class CoroutineTask
                     $routine->send($value);
                 } else {
                     $result = $routine->getReturn();
-                    if(count($this->stack)>0) {
+                    if (count($this->stack) > 0) {
                         $this->routine = $this->stack->pop();
                         $this->routine->send($result);
                     }
@@ -71,11 +71,12 @@ class CoroutineTask
             if (empty($value)) {
                 $value = "";
             }
-            $message = 'yield '. str_replace(["\n", " ", "=>"], ["", "", " => "], var_export($value, true)) . ' message: ' .$e->getMessage();
+            $message = 'yield ' . str_replace(["\n", " ", "=>"], ["", "", " => "],
+                    var_export($value, true)) . ' message: ' . $e->getMessage();
             $runTaskException = new CoroutineException($message, $e->getCode(), $e);
             $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
             $this->generatorContext->setErrorMessage($message);
-            
+
             while (!$this->stack->isEmpty()) {
                 $this->routine = $this->stack->pop();
                 try {
@@ -85,9 +86,10 @@ class CoroutineTask
 
                 }
             }
-            
+
             if ($runTaskException instanceof SwooleException) {
-                $runTaskException->setShowOther($this->generatorContext->getTraceStack(), $this->generatorContext->getController());
+                $runTaskException->setShowOther($this->generatorContext->getTraceStack(),
+                    $this->generatorContext->getController());
             }
             if ($this->generatorContext->getController() != null) {
                 call_user_func([$this->generatorContext->getController(), 'onExceptionHandle'], $e);

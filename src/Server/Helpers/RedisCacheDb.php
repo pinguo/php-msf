@@ -74,7 +74,7 @@ function redis_getHashFromRedisAndDb($hashkey_dbtable, $hashfield_dbfield, $fiel
         }
     }
     if (!empty($needSeachFromDb)) {//此处处理未命中数据，注意where方法将被修改
-        $resultFromDb = $db->where_in($hashfield_dbfield,$needSeachFromDb)->get()->result_array();//向db请求
+        $resultFromDb = $db->where_in($hashfield_dbfield, $needSeachFromDb)->get()->result_array();//向db请求
         if (empty($resultFromDb)) {//代表从数据库中找不到
             return $result;
         }

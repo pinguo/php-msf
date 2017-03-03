@@ -86,7 +86,7 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
      */
     public function send($fd, $data)
     {
-        if(!$this->server->exist($fd)){
+        if (!$this->server->exist($fd)) {
             return;
         }
         if (!$this->websocket_enable) {

@@ -80,11 +80,11 @@ class PGLog extends Logger
         $profile = $this->getAllProfileInfo();
         $counting = $this->getAllCountingInfo();
         $message = "[$timeUsed(ms)]"
-            .' '."[$memUsed(MB)]"
-            .' '."[{$this->accessRecord['uri']}]"
-            .' ['.implode(' ', $this->_pushlogs).']'
-            .' profile['."$profile".']'
-            .' counting['."$counting".']';
+            . ' ' . "[$memUsed(MB)]"
+            . ' ' . "[{$this->accessRecord['uri']}]"
+            . ' [' . implode(' ', $this->_pushlogs) . ']'
+            . ' profile[' . "$profile" . ']'
+            . ' counting[' . "$counting" . ']';
         $this->_profiles = [];
         $this->_countings = [];
         $this->_pushlogs = [];
@@ -132,7 +132,7 @@ class PGLog extends Logger
             if (!isset($val['cost'], $val['total'])) {
                 continue;
             }
-            $arrOut[] = "$name=".sprintf("%.1f", $val['cost'] * 1000).'(ms)/'.$val['total'];
+            $arrOut[] = "$name=" . sprintf("%.1f", $val['cost'] * 1000) . '(ms)/' . $val['total'];
         }
 
         return implode(',', $arrOut);
@@ -146,9 +146,9 @@ class PGLog extends Logger
         $arrCounting = array();
         foreach ($this->_countings as $k => $v) {
             if (isset($v['hit'], $v['total']) && $v['total'] != 0) {
-                $arrCounting[] = "$k=".$v['hit'].'/'.$v['total'];
+                $arrCounting[] = "$k=" . $v['hit'] . '/' . $v['total'];
             } elseif (isset($v['hit'])) {
-                $arrCounting[] = "$k=".$v['hit'];
+                $arrCounting[] = "$k=" . $v['hit'];
             }
         }
 
@@ -167,11 +167,11 @@ class PGLog extends Logger
         }
         $key = urlencode($key);
         if (is_array($val)) {
-            $this->_pushlogs[] = "$key=".json_encode($val);
+            $this->_pushlogs[] = "$key=" . json_encode($val);
         } elseif (is_bool($val)) {
-            $this->_pushlogs[] = "$key=".var_export($val, true);
+            $this->_pushlogs[] = "$key=" . var_export($val, true);
         } elseif (is_string($val) || is_numeric($val)) {
-            $this->_pushlogs[] = "$key=".urlencode($val);
+            $this->_pushlogs[] = "$key=" . urlencode($val);
         } elseif (is_null($val)) {
             $this->_pushlogs[] = "$key=";
         }

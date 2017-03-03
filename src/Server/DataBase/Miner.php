@@ -367,9 +367,11 @@ class Miner
                 $this->set($columnName, $columnValue, $quote);
             }
         } else {
-            $this->set[] = array('column' => $column,
+            $this->set[] = array(
+                'column' => $column,
                 'value' => $value,
-                'quote' => $quote);
+                'quote' => $quote
+            );
         }
 
         return $this;
@@ -433,10 +435,12 @@ class Miner
             $criteria = array($criteria);
         }
 
-        $this->join[] = array('table' => $table,
+        $this->join[] = array(
+            'table' => $table,
             'criteria' => $criteria,
             'type' => $type,
-            'alias' => $alias);
+            'alias' => $alias
+        );
 
         return $this;
     }
@@ -510,14 +514,21 @@ class Miner
      * @param  bool|null $quote optional auto-escape value, default to global
      * @return Miner
      */
-    private function criteria(array &$criteria, $column, $value, $operator = self::EQUALS,
-                              $connector = self::LOGICAL_AND, $quote = null)
-    {
-        $criteria[] = array('column' => $column,
+    private function criteria(
+        array &$criteria,
+        $column,
+        $value,
+        $operator = self::EQUALS,
+        $connector = self::LOGICAL_AND,
+        $quote = null
+    ) {
+        $criteria[] = array(
+            'column' => $column,
             'value' => $value,
             'operator' => $operator,
             'connector' => $connector,
-            'quote' => $quote);
+            'quote' => $quote
+        );
 
         return $this;
     }
@@ -575,9 +586,13 @@ class Miner
      * @param  bool|null $quote optional auto-escape value, default to global
      * @return Miner
      */
-    private function criteriaIn(array &$criteria, $column, array $values, $connector = self::LOGICAL_AND,
-                                $quote = null)
-    {
+    private function criteriaIn(
+        array &$criteria,
+        $column,
+        array $values,
+        $connector = self::LOGICAL_AND,
+        $quote = null
+    ) {
         return $this->criteria($criteria, $column, $values, self::IN, $connector, $quote);
     }
 
@@ -605,9 +620,13 @@ class Miner
      * @param  bool|null $quote optional auto-escape value, default to global
      * @return Miner
      */
-    private function criteriaNotIn(array &$criteria, $column, array $values, $connector = self::LOGICAL_AND,
-                                   $quote = null)
-    {
+    private function criteriaNotIn(
+        array &$criteria,
+        $column,
+        array $values,
+        $connector = self::LOGICAL_AND,
+        $quote = null
+    ) {
         return $this->criteria($criteria, $column, $values, self::NOT_IN, $connector, $quote);
     }
 
@@ -637,9 +656,14 @@ class Miner
      * @param  bool|null $quote optional auto-escape value, default to global
      * @return Miner
      */
-    private function criteriaBetween(array &$criteria, $column, $min, $max, $connector = self::LOGICAL_AND,
-                                     $quote = null)
-    {
+    private function criteriaBetween(
+        array &$criteria,
+        $column,
+        $min,
+        $max,
+        $connector = self::LOGICAL_AND,
+        $quote = null
+    ) {
         return $this->criteria($criteria, $column, array($min, $max), self::BETWEEN, $connector, $quote);
     }
 
@@ -669,9 +693,14 @@ class Miner
      * @param  bool|null $quote optional auto-escape value, default to global
      * @return Miner
      */
-    private function criteriaNotBetween(array &$criteria, $column, $min, $max, $connector = self::LOGICAL_AND,
-                                        $quote = null)
-    {
+    private function criteriaNotBetween(
+        array &$criteria,
+        $column,
+        $min,
+        $max,
+        $connector = self::LOGICAL_AND,
+        $quote = null
+    ) {
         return $this->criteria($criteria, $column, array($min, $max), self::NOT_BETWEEN, $connector, $quote);
     }
 
@@ -1154,9 +1183,11 @@ class Miner
      * @param  array $placeholderValues optional placeholder values array
      * @return string WHERE or HAVING portion of the statement
      */
-    private function getCriteriaString(array &$criteria, $usePlaceholders = true,
-                                       array &$placeholderValues = array())
-    {
+    private function getCriteriaString(
+        array &$criteria,
+        $usePlaceholders = true,
+        array &$placeholderValues = array()
+    ) {
         $statement = "";
         $placeholderValues = array();
 
@@ -1193,7 +1224,8 @@ class Miner
                             $placeholderValues[] = $criterion['value'][0];
                             $placeholderValues[] = $criterion['value'][1];
                         } else {
-                            $value = $this->autoQuote($criterion['value'][0], $autoQuote) . " " . self::LOGICAL_AND . " " .
+                            $value = $this->autoQuote($criterion['value'][0],
+                                    $autoQuote) . " " . self::LOGICAL_AND . " " .
                                 $this->autoQuote($criterion['value'][1], $autoQuote);
                         }
 
@@ -1560,7 +1592,8 @@ class Miner
 
                 $this->setPlaceholderValues[] = $set['value'];
             } else {
-                $statement .= $set['column'] . " " . self::EQUALS . " " . $this->autoQuote($set['value'], $autoQuote) . ", ";
+                $statement .= $set['column'] . " " . self::EQUALS . " " . $this->autoQuote($set['value'],
+                        $autoQuote) . ", ";
             }
         }
 
@@ -2016,7 +2049,8 @@ class Miner
                     $Miner->closeWhere();
                 }
             } else {
-                $Miner->where($where['column'], $where['value'], $where['operator'], $where['connector'], $where['quote']);
+                $Miner->where($where['column'], $where['value'], $where['operator'], $where['connector'],
+                    $where['quote']);
             }
         }
 
@@ -2044,8 +2078,10 @@ class Miner
      */
     private function openCriteria(array &$criteria, $connector = self::LOGICAL_AND)
     {
-        $criteria[] = array('bracket' => self::BRACKET_OPEN,
-            'connector' => $connector);
+        $criteria[] = array(
+            'bracket' => self::BRACKET_OPEN,
+            'connector' => $connector
+        );
 
         return $this;
     }
@@ -2069,8 +2105,10 @@ class Miner
      */
     private function closeCriteria(array &$criteria)
     {
-        $criteria[] = array('bracket' => self::BRACKET_CLOSE,
-            'connector' => null);
+        $criteria[] = array(
+            'bracket' => self::BRACKET_CLOSE,
+            'connector' => null
+        );
 
         return $this;
     }
@@ -2114,8 +2152,10 @@ class Miner
      */
     public function groupBy($column, $order = null)
     {
-        $this->groupBy[] = array('column' => $column,
-            'order' => $order);
+        $this->groupBy[] = array(
+            'column' => $column,
+            'order' => $order
+        );
 
         return $this;
     }
@@ -2205,8 +2245,10 @@ class Miner
      */
     public function orderBy($column, $order = self::ORDER_BY_ASC)
     {
-        $this->orderBy[] = array('column' => $column,
-            'order' => $order);
+        $this->orderBy[] = array(
+            'column' => $column,
+            'order' => $order
+        );
 
         return $this;
     }
@@ -2439,13 +2481,13 @@ class Miner
         }
         $data['result'] = 1;
         $isSelect = false;
-        if($sql!=null){//代表手动执行的sql
-            $str = strtolower(substr(trim($sql) , 0 , 6));
-            if($str=='select'){
+        if ($sql != null) {//代表手动执行的sql
+            $str = strtolower(substr(trim($sql), 0, 6));
+            if ($str == 'select') {
                 $isSelect = true;
             }
         }
-        if ($this->isSelect()||$isSelect) {
+        if ($this->isSelect() || $isSelect) {
             $data['result'] = $pdoStatement->fetchAll($fetchmode);
             $data['insert_id'] = 0;
             $data['affected_rows'] = 0;

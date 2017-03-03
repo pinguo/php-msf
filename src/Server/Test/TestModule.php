@@ -22,6 +22,7 @@ class TestModule
     private $tests;
     private $asyn = false;
     private $dir = '';
+
     public function __construct($dir, Coroutine $coroutine = null)
     {
         $this->dir = $dir;

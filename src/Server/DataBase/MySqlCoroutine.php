@@ -40,7 +40,7 @@ class MySqlCoroutine extends CoroutineBase
     public function getResult()
     {
         $result = parent::getResult();
-        if(is_array($result)&&isset($result['error'])){
+        if (is_array($result) && isset($result['error'])) {
             throw new SwooleException($result['error']);
         }
         return $result;

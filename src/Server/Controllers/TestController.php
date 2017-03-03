@@ -40,14 +40,17 @@ class TestController extends Controller
         $this->testModel = $this->loader->model('TestModel', $this);
         $this->testModel->contextTest();
     }
+
     /**
      * mysql 事务协程测试
      */
     public function http_mysql_begin_coroutine_test()
     {
         $id = yield $this->mysql_pool->coroutineBegin($this);
-        $update_result = yield $this->mysql_pool->dbQueryBuilder->update('user_info')->set('sex', '0')->where('uid', 36)->coroutineSend($id);
-        $result = yield $this->mysql_pool->dbQueryBuilder->select('*')->from('user_info')->where('uid', 36)->coroutineSend($id);
+        $update_result = yield $this->mysql_pool->dbQueryBuilder->update('user_info')->set('sex', '0')->where('uid',
+            36)->coroutineSend($id);
+        $result = yield $this->mysql_pool->dbQueryBuilder->select('*')->from('user_info')->where('uid',
+            36)->coroutineSend($id);
         if ($result['result'][0]['channel'] == 888) {
             $this->http_output->end('commit');
             yield $this->mysql_pool->coroutineCommit($id);
@@ -56,6 +59,7 @@ class TestController extends Controller
             yield $this->mysql_pool->coroutineRollback($id);
         }
     }
+
     /**
      * 绑定uid
      */
@@ -100,9 +104,13 @@ class TestController extends Controller
      */
     public function http_mysqlStatement()
     {
-        $value = $this->mysql_pool->dbQueryBuilder->insertInto('account')->intoColumns(['uid', 'static'])->intoValues([[36, 0], [37, 0]])->getStatement(true);
+        $value = $this->mysql_pool->dbQueryBuilder->insertInto('account')->intoColumns([
+            'uid',
+            'static'
+        ])->intoValues([[36, 0], [37, 0]])->getStatement(true);
         $this->http_output->end($value);
     }
+
     /**
      * http测试
      */
@@ -138,6 +146,7 @@ class TestController extends Controller
         $value3 = get_instance()->getRedis()->get('test3');
         $this->http_output->end(1, false);
     }
+
     /**
      * html测试
      */
@@ -204,6 +213,7 @@ class TestController extends Controller
         $messages = get_instance()->getServerAllTaskMessage();
         $this->http_output->end(json_encode($messages));
     }
+
     /**
      * @return boolean
      */

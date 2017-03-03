@@ -64,10 +64,10 @@ class MongoDbTask extends Task
      */
     public function prepare(string $confKey, string $db, string $collection)
     {
-        $this->profileName = 'mongo.'.$db.'.';
+        $this->profileName = 'mongo.' . $db . '.';
         $this->config = get_instance()->config['mongodb'] ?? [];
         if (!isset($this->config[$confKey])) {
-            throw new \MongoConnectionException('No such a MongoDB config '.$confKey);
+            throw new \MongoConnectionException('No such a MongoDB config ' . $confKey);
         }
         $conf = $this->config[$confKey];
         $this->mongoClient = new \MongoClient($conf['server'], $conf['options'], $conf['driverOptions']);
@@ -93,7 +93,7 @@ class MongoDbTask extends Task
         $skip = null,
         $timeout = 10000
     ) {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $cursor = $this->mongoCollection->find($query, $fields);
         if (!is_null($sort)) {
             $cursor->sort($sort);
@@ -106,7 +106,7 @@ class MongoDbTask extends Task
         }
         $cursor->maxTimeMS($timeout);
         $out = iterator_to_array($cursor);
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
 
         return $out;
     }
@@ -121,14 +121,14 @@ class MongoDbTask extends Task
      */
     public function add($doc, $timeout = 5000, $w = 1, $fsync = false)
     {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $options = array(
             'w' => $w,
             'fsync' => $fsync,
             'socketTimeoutMS' => $timeout,
         );
         $ret = $this->mongoCollection->insert($doc, $options);
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
             if ($ret['ok'] && is_null($ret['err'])) {
                 return true;
@@ -156,7 +156,7 @@ class MongoDbTask extends Task
         $w = 1,
         $fsync = false
     ) {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $options = array(
             'w' => $w,
             'fsync' => $fsync,
@@ -164,7 +164,7 @@ class MongoDbTask extends Task
             'socketTimeoutMS' => $timeout,
         );
         $ret = $this->mongoCollection->batchInsert($docs, $options);
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
             if ($ret['ok'] && is_null($ret['err'])) {
                 return true;
@@ -196,7 +196,7 @@ class MongoDbTask extends Task
         $w = 1,
         $fsync = false
     ) {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
 
         $options = array(
             'w' => $w,
@@ -206,7 +206,7 @@ class MongoDbTask extends Task
             'socketTimeoutMS' => $timeout,
         );
         $ret = $this->mongoCollection->update($criteria, array('$set' => $doc), $options);
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
             if ($ret['ok'] && is_null($ret['err'])) {
                 return true;
@@ -238,7 +238,7 @@ class MongoDbTask extends Task
         $w = 1,
         $fsync = false
     ) {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $options = array(
             'w' => $w,
             'fsync' => $fsync,
@@ -247,12 +247,12 @@ class MongoDbTask extends Task
             'socketTimeoutMS' => $timeout,
         );
         $ret = $this->mongoCollection->update($criteria, $doc, $options);
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
             if ($ret['ok'] && is_null($ret['err'])) {
                 return $ret['n'];
             } else {
-                $this->PGLog->error('update failed. criteria:'.json_encode($criteria).' doc:'.json_encode($doc).' err:'.$ret['err']);
+                $this->PGLog->error('update failed. criteria:' . json_encode($criteria) . ' doc:' . json_encode($doc) . ' err:' . $ret['err']);
 
                 return false;
             }
@@ -277,7 +277,7 @@ class MongoDbTask extends Task
         $w = 1,
         $fsync = false
     ) {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $options = array(
             'justOne' => $justOne,
             'w' => $w,
@@ -285,7 +285,7 @@ class MongoDbTask extends Task
             'socketTimeoutMS' => $timeout,
         );
         $ret = $this->mongoCollection->remove($criteria, $options);
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
             if ($ret['ok'] && is_null($ret['err'])) {
                 return true;
@@ -305,14 +305,14 @@ class MongoDbTask extends Task
      */
     public function command($command, $timeout = 5000)
     {
-        $this->PGLog->profileStart($this->profileName.__FUNCTION__);
+        $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $result = $this->mongoDb->command($command, array('socketTimeoutMS' => $timeout));
-        $this->PGLog->profileEnd($this->profileName.__FUNCTION__);
+        $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($result['ok'] == 1) {
             return $result['results'];
         } else {
-            $this->PGLog->error("mongo command failed: command-".json_encode($command)." result-"
-                .json_encode($result));
+            $this->PGLog->error("mongo command failed: command-" . json_encode($command) . " result-"
+                . json_encode($result));
 
             return false;
         }
