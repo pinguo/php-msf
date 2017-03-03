@@ -52,7 +52,7 @@ class Task extends TaskProxy
         $this->task_id = 0;
     }
 
-    /**hotpot
+    /**
      * 检查中断信号返回本Task是否该中断
      * @return bool
      */
@@ -125,5 +125,4 @@ class Task extends TaskProxy
     {
         return get_instance()->getMysql();
     }
-
 }
