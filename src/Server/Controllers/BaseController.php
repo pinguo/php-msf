@@ -23,6 +23,7 @@ class BaseController extends Controller
 
     public function initialization($controller_name, $method_name)
     {
+        $this->PGLog = null;
         $this->PGLog = clone $this->logger;
         $this->PGLog->accessRecord['beginTime'] = microtime(true);
         $this->PGLog->accessRecord['uri'] = str_replace('\\', '/' ,'/' . $controller_name . '/'.$method_name);

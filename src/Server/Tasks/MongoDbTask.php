@@ -64,4 +64,9 @@ class MongoDbTask extends Task
 
         $this->mongoCollection = $this->mongoClient->selectDB($db)->selectCollection($collection);
     }
+
+    public function query()
+    {
+
+    }
 }
