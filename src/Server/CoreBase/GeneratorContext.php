@@ -17,12 +17,10 @@ class GeneratorContext
     protected $controller_name;
     protected $method_name;
     protected $stack;
-    protected $errorStack;
 
     public function __construct()
     {
-        $this->stack      = [];
-        $this->errorStack = [];
+        $this->stack = array();
     }
 
     /**
@@ -41,7 +39,15 @@ class GeneratorContext
     public function popYieldStack()
     {
         array_pop($this->stack);
-        array_pop($this->errorStack);
+    }
+
+    /**
+     * @param $file
+     * @param $line
+     */
+    public function setErrorFile($file, $line)
+    {
+        $this->stack[] = "| #出错文件: $file($line)";
     }
 
     /**
@@ -49,7 +55,7 @@ class GeneratorContext
      */
     public function setErrorMessage($message)
     {
-        $this->errorStack[] = "| #报错消息: $message";
+        $this->stack[] = "| #报错消息: $message";
     }
 
     /**
@@ -83,7 +89,7 @@ class GeneratorContext
             $trace .= "{$this->stack[$i]}\n";
         }
 
-        $trace .= array_pop($this->errorStack);
+        $trace = trim($trace);
 
         return $trace;
     }

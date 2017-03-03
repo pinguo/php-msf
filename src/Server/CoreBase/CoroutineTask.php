@@ -68,24 +68,31 @@ class CoroutineTask
             if ($flag) {
                 $this->generatorContext->addYieldStack($routine->key());
             }
+            if (empty($value)) {
+                $value = "";
+            }
+            $message = 'yield '. str_replace(["\n", " ", "=>"], ["", "", " => "], var_export($value, true)) . ' message: ' .$e->getMessage();
+            $runTaskException = new CoroutineException($message, $e->getCode(), $e);
+            $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
+            $this->generatorContext->setErrorMessage($message);
             
             while (!$this->stack->isEmpty()) {
                 $this->routine = $this->stack->pop();
                 try {
-                    $this->routine->throw($e);
+                    $this->routine->throw($runTaskException);
                     break;
                 } catch (\Exception $e) {
 
                 }
             }
             
-            if ($e instanceof SwooleException) {
-                $e->setShowOther($this->generatorContext->getTraceStack(), $this->generatorContext->getController());
+            if ($runTaskException instanceof SwooleException) {
+                $runTaskException->setShowOther($this->generatorContext->getTraceStack(), $this->generatorContext->getController());
             }
             if ($this->generatorContext->getController() != null) {
                 call_user_func([$this->generatorContext->getController(), 'onExceptionHandle'], $e);
             } else {
-                $routine->throw($e);
+                $routine->throw($runTaskException);
             }
         }
     }
