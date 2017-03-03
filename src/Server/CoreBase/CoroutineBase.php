@@ -51,8 +51,8 @@ abstract class CoroutineBase implements ICoroutineBase
             $this->timeout = self::$MAX_TIMERS;
         }
 
-        $this->result      = CoroutineNull::getInstance();
-        $this->getCount    = 0;
+        $this->result = CoroutineNull::getInstance();
+        $this->getCount = 0;
         $this->requestTime = microtime(true);
     }
 
@@ -62,7 +62,8 @@ abstract class CoroutineBase implements ICoroutineBase
     {
         $this->getCount++;
         if ((($this->getCount > 1) && ((microtime(true) - $this->requestTime) > $this->timeout))
-            || ($this->getCount > $this->timeout)) {
+            || ($this->getCount > $this->timeout)
+        ) {
             throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
         }
         return $this->result;

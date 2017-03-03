@@ -692,12 +692,12 @@ class DbConnection
     protected function buildDELETE()
     {
         return 'DELETE'
-        . $this->buildFlags()
-        . $this->buildFrom()
-        . $this->buildWhere()
-        . $this->buildOrderBy()
-        . $this->buildLimit()
-        . $this->buildReturning();
+            . $this->buildFlags()
+            . $this->buildFrom()
+            . $this->buildWhere()
+            . $this->buildOrderBy()
+            . $this->buildLimit()
+            . $this->buildReturning();
     }
 
     /**
@@ -827,10 +827,10 @@ class DbConnection
     protected function buildINSERT()
     {
         return 'INSERT'
-        . $this->buildFlags()
-        . $this->buildInto()
-        . $this->buildValuesForInsert()
-        . $this->buildReturning();
+            . $this->buildFlags()
+            . $this->buildInto()
+            . $this->buildValuesForInsert()
+            . $this->buildReturning();
     }
 
     /**
@@ -851,7 +851,7 @@ class DbConnection
     protected function buildValuesForInsert()
     {
         return ' (' . $this->indentCsv(array_keys($this->col_values)) . ') VALUES (' .
-        $this->indentCsv(array_values($this->col_values)) . ')';
+            $this->indentCsv(array_values($this->col_values)) . ')';
     }
 
     /**
@@ -860,13 +860,13 @@ class DbConnection
     protected function buildUPDATE()
     {
         return 'UPDATE'
-        . $this->buildFlags()
-        . $this->buildTable()
-        . $this->buildValuesForUpdate()
-        . $this->buildWhere()
-        . $this->buildOrderBy()
-        . $this->buildLimit()
-        . $this->buildReturning();
+            . $this->buildFlags()
+            . $this->buildTable()
+            . $this->buildValuesForUpdate()
+            . $this->buildWhere()
+            . $this->buildOrderBy()
+            . $this->buildLimit()
+            . $this->buildReturning();
     }
 
     /**
@@ -901,15 +901,15 @@ class DbConnection
     protected function buildSELECT()
     {
         return 'SELECT'
-        . $this->buildFlags()
-        . $this->buildCols()
-        . $this->buildFrom()
-        . $this->buildWhere()
-        . $this->buildGroupBy()
-        . $this->buildHaving()
-        . $this->buildOrderBy()
-        . $this->buildLimit()
-        . $this->buildForUpdate();
+            . $this->buildFlags()
+            . $this->buildCols()
+            . $this->buildFrom()
+            . $this->buildWhere()
+            . $this->buildGroupBy()
+            . $this->buildHaving()
+            . $this->buildOrderBy()
+            . $this->buildLimit()
+            . $this->buildForUpdate();
     }
 
     /**

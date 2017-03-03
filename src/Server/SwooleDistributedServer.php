@@ -226,12 +226,15 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         }
         if ($this->config->get('use_dispatch')) {
             //创建dispatch端口用于连接dispatch
-            $this->dispatch_port = $this->server->listen($this->config['tcp']['socket'], $this->config['server']['dispatch_port'], SWOOLE_SOCK_TCP);
+            $this->dispatch_port = $this->server->listen($this->config['tcp']['socket'],
+                $this->config['server']['dispatch_port'], SWOOLE_SOCK_TCP);
             $this->dispatch_port->set($this->setServerSet());
             $this->dispatch_port->on('close', function ($serv, $fd) {
                 print_r("Remove a dispatcher.\n");
                 for ($i = 0; $i < $this->worker_num + $this->task_num; $i++) {
-                    if ($i == $serv->worker_id) continue;
+                    if ($i == $serv->worker_id) {
+                        continue;
+                    }
                     $data = $this->packSerevrMessageBody(SwooleMarco::REMOVE_DISPATCH_CLIENT, $fd);
                     $serv->sendMessage($data, $i);
                 }
@@ -252,7 +255,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                         $uns_data['remote_ip'] = $fdinfo['remote_ip'];
                         $send_data = $this->packSerevrMessageBody($type, $uns_data);
                         for ($i = 0; $i < $this->worker_num + $this->task_num; $i++) {
-                            if ($i == $serv->worker_id) continue;
+                            if ($i == $serv->worker_id) {
+                                continue;
+                            }
                             $serv->sendMessage($send_data, $i);
                         }
                         $this->addDispatch($uns_data);
@@ -334,7 +339,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $fd = $this->uid_fd_table->get($uid)['fd'];
             $this->send($fd, $data);
         } else {
-            if ($fromDispatch) return;
+            if ($fromDispatch) {
+                return;
+            }
             $this->sendToDispatchMessage(SwooleMarco::MSG_TYPE_SEND, ['data' => $data, 'uid' => $uid]);
         }
     }
@@ -354,7 +361,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $this->server->send($fd, $this->encode($send_data));
         } else {
             //如果没有dispatch那么MSG_TYPE_SEND_BATCH这个消息不需要发出，因为本机已经处理过可以发送的uid了
-            if ($type == SwooleMarco::MSG_TYPE_SEND_BATCH) return;
+            if ($type == SwooleMarco::MSG_TYPE_SEND_BATCH) {
+                return;
+            }
             if ($this->isTaskWorker()) {
                 $this->onSwooleTask($this->server, 0, 0, $send_data);
             } else {
@@ -413,7 +422,8 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 $task_context = $message['task_context'];
                 if (method_exists($task, $task_fuc_name)) {
                     //给task做初始化操作
-                    $task->initialization($task_id, $this->server->worker_pid, $task_name, $task_fuc_name, $task_context);
+                    $task->initialization($task_id, $this->server->worker_pid, $task_name, $task_fuc_name,
+                        $task_context);
                     $result = call_user_func_array(array($task, $task_fuc_name), $task_data);
                     if ($result instanceof \Generator) {
                         $corotineTask = new CoroutineTask($result, new GeneratorContext());
@@ -465,7 +475,8 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             }
         }
         if (count($current_fds) > $this->send_use_task_num) {//过多人就通过task
-            $task_data = $this->packSerevrMessageBody(SwooleMarco::MSG_TYPE_SEND_BATCH, ['data' => $data, 'fd' => $current_fds]);
+            $task_data = $this->packSerevrMessageBody(SwooleMarco::MSG_TYPE_SEND_BATCH,
+                ['data' => $data, 'fd' => $current_fds]);
             if ($this->isTaskWorker()) {
                 $this->onSwooleTask($this->server, 0, 0, $task_data);
             } else {
@@ -476,10 +487,13 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 $this->send($fd, $data);
             }
         }
-        if ($fromDispatch) return;
+        if ($fromDispatch) {
+            return;
+        }
         //本机处理不了的发给dispatch
         if (count($uids) > 0) {
-            $this->sendToDispatchMessage(SwooleMarco::MSG_TYPE_SEND_BATCH, ['data' => $data, 'uids' => array_values($uids)]);
+            $this->sendToDispatchMessage(SwooleMarco::MSG_TYPE_SEND_BATCH,
+                ['data' => $data, 'uids' => array_values($uids)]);
         }
     }
 
@@ -494,7 +508,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $fd = $this->uid_fd_table->get($uid)['fd'];
             $this->close($fd);
         } else {
-            if ($fromDispatch) return;
+            if ($fromDispatch) {
+                return;
+            }
             $usid = $this->getRedis()->hGet(SwooleMarco::redis_uid_usid_hash_name, $uid);
             $this->sendToDispatchMessage(SwooleMarco::MSG_TYPE_KICK_UID, ['usid' => $usid, 'uid' => $uid]);
         }
@@ -579,7 +595,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             });
         }
         //进程锁
-        if (!$this->isTaskWorker()&&$this->initLock->trylock()) {
+        if (!$this->isTaskWorker() && $this->initLock->trylock()) {
             //进程启动后进行开服的初始化
             $generator = $this->onOpenServiceInitialization();
             if ($generator instanceof \Generator) {
@@ -709,13 +725,17 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 ($timer_task['now_exec'] < $timer_task['max_exec'] || $timer_task['max_exec'] == -1)
             ) {
                 if ($timer_task['delay']) {
-                    if ($timer_task['start_time'] == -1) $timer_task['start_time'] = $time;
+                    if ($timer_task['start_time'] == -1) {
+                        $timer_task['start_time'] = $time;
+                    }
                     $timer_task['start_time'] += $timer_task['interval_time'];
                     $timer_task['delay'] = false;
                     continue;
                 }
                 $timer_task['now_exec']++;
-                if ($timer_task['start_time'] == -1) $timer_task['start_time'] = $time;
+                if ($timer_task['start_time'] == -1) {
+                    $timer_task['start_time'] = $time;
+                }
                 $timer_task['start_time'] += $timer_task['interval_time'];
                 if (!empty($timer_task['task_name'])) {
                     $task = $this->loader->task($timer_task['task_name'], $this);

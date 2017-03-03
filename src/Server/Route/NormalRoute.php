@@ -36,7 +36,7 @@ class NormalRoute implements IRoute
     {
         $this->client_data->path = $request->server['path_info'];
         $route = explode('/', $request->server['path_info']);
-        $route = array_map(function($name){
+        $route = array_map(function ($name) {
             $name = strtolower($name);
             $name = ucfirst($name);
             return $name;

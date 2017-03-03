@@ -32,8 +32,15 @@ class TestResponse
         $this->header[$key] = $value;
     }
 
-    public function cookie(string $key, string $value = '', int $expire = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = false)
-    {
+    public function cookie(
+        string $key,
+        string $value = '',
+        int $expire = 0,
+        string $path = '/',
+        string $domain = '',
+        bool $secure = false,
+        bool $httponly = false
+    ) {
         $this->cookie[$key] = $value;
     }
 

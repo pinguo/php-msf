@@ -146,7 +146,8 @@ abstract class SwooleHttpServer extends SwooleServer
             if ($controller_instance != null) {
                 $method_name = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
                 if (!method_exists($controller_instance, $method_name)) {
-                    $method_name = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+                    $method_name = $this->config->get('http.method_prefix',
+                            '') . $this->config->get('http.default_method', 'Index');
                     $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
                 try {

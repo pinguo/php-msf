@@ -73,10 +73,14 @@ class RedisAsynPool extends AsynPool
      */
     public function getSync()
     {
-        if (isset($this->redis_client)) return $this->redis_client;
+        if (isset($this->redis_client)) {
+            return $this->redis_client;
+        }
         //同步redis连接，给task使用
         $this->redis_client = new \Redis();
-        if ($this->redis_client->connect($this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']) == false) {
+        if ($this->redis_client->connect($this->config['redis'][$this->active]['ip'],
+                $this->config['redis'][$this->active]['port']) == false
+        ) {
             throw new SwooleException($this->redis_client->getLastError());
         }
         if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
@@ -110,7 +114,7 @@ class RedisAsynPool extends AsynPool
             $this->commands->push($data);
         } else {
             $client = $this->pool->shift();
-            if($client->isClose){
+            if ($client->isClose) {
                 $this->reconnect($client);
                 $this->commands->push($data);
                 return;
@@ -431,7 +435,7 @@ class RedisAsynPool extends AsynPool
         };
 
         $this->connect = [$this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']];
-        $client->on('Close',[$this,'onClose']);
+        $client->on('Close', [$this, 'onClose']);
         $client->connect($this->connect[0], $this->connect[1], $callback);
     }
 
@@ -439,7 +443,8 @@ class RedisAsynPool extends AsynPool
      * 断开链接
      * @param $client
      */
-    public function onClose($client){
+    public function onClose($client)
+    {
         $client->isClose = true;
     }
 

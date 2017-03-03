@@ -128,8 +128,15 @@ class HttpOutput
      * @param bool $secure
      * @param bool $httponly
      */
-    public function setCookie(string $key, string $value = '', int $expire = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = false)
-    {
+    public function setCookie(
+        string $key,
+        string $value = '',
+        int $expire = 0,
+        string $path = '/',
+        string $domain = '',
+        bool $secure = false,
+        bool $httponly = false
+    ) {
         $this->response->cookie($key, $value, $expire, $path, $domain, $secure, $httponly);
     }
 

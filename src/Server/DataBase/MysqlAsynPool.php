@@ -146,7 +146,7 @@ class MysqlAsynPool extends AsynPool
                 $this->pushToPool($client);
             }
         });
-        $client->on('Close',[$this,'onClose']);
+        $client->on('Close', [$this, 'onClose']);
     }
 
     /**
@@ -289,7 +289,9 @@ class MysqlAsynPool extends AsynPool
      */
     public function getSync()
     {
-        if (isset($this->mysql_client)) return $this->mysql_client;
+        if (isset($this->mysql_client)) {
+            return $this->mysql_client;
+        }
         $activeConfig = $this->config['database'][$this->active];
         $this->mysql_client = new Miner();
         $this->mysql_client->pdoConnect($activeConfig);

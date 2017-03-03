@@ -38,7 +38,7 @@ class Task extends TaskProxy
             $this->PGLog = clone $this->logger;
             $this->PGLog->logId = $this->getContext()['logId'];
             $this->PGLog->accessRecord['beginTime'] = microtime(true);
-            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/'.$task_name.'/'.$method_name);
+            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $task_name . '/' . $method_name);
             defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME . '-task';
             $this->PGLog->init();
         }
