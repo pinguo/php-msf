@@ -61,13 +61,18 @@ class PGLog extends Logger
         }
     }
 
-
+    /**
+     * 初始化
+     */
     public function init()
     {
         $this->pushLogId();
         $this->channel();
     }
 
+    /**
+     * 写入访问日志或 Task 日志
+     */
     public function appendNoticeLog()
     {
         $timeUsed = sprintf("%.0f", (microtime(true) - $this->accessRecord['beginTime']) * 1000);
