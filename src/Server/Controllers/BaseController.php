@@ -11,7 +11,6 @@ namespace PG\MSF\Server\Controllers;
 use PG\MSF\Server\CoreBase\Controller;
 use PG\MSF\Server\Helpers\Log\PGLog;
 use PG\MSF\Server\SwooleMarco;
-use \PG\MSF\Server\CoreBase\CoroutineBase;
 
 class BaseController extends Controller
 {
@@ -46,7 +45,7 @@ class BaseController extends Controller
     public function genLogId()
     {
         if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $logId = $this->http_input->getRequestHeader('LOG_ID') ?? '';
+            $logId = $this->http_input->getRequestHeader('log_id') ?? '';
         } else {
             $logId = $this->client_data->logid ?? '';
         }
