@@ -121,7 +121,7 @@ class PGLog extends Logger
      * 获取profile信息
      * @return string
      */
-    protected function getAllProfileInfo()
+    public function getAllProfileInfo()
     {
         if (empty($this->_profiles)) {
             return '';

@@ -14,7 +14,7 @@ class ControllerFactory
      * @var ControllerFactory
      */
     private static $instance;
-    private $pool = [];
+    public $pool = [];
 
     /**
      * ControllerFactory constructor.

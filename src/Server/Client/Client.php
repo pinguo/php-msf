@@ -48,10 +48,15 @@ class Client
 
         $url_host = substr($url_host, 2);
         swoole_async_dns_lookup($url_host, function ($host, $ip) use (&$data) {
-            $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
-            $http_client = new HttpClient($client);
-            $http_client->setHeaders(['Host' => $host]);
-            call_user_func($data['callBack'], $http_client);
+            if (empty($ip)) {
+                // 异步回调的异常捕获是一个问题,暂时没有解决
+                // throw new \PG\MSF\Server\CoreBase\SwooleException($data['url'] . ' DNS查询失败');
+            } else {
+                $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
+                $http_client = new HttpClient($client);
+                $http_client->setHeaders(['Host' => $host]);
+                call_user_func($data['callBack'], $http_client);
+            }
         });
     }
 

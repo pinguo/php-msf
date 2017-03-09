@@ -20,8 +20,14 @@ class BaseController extends Controller
      */
     public $PGLog;
 
+    /**
+     * @var float 请求开始处理的时间
+     */
+    public $requestStartTime = 0.0;
+
     public function initialization($controller_name, $method_name)
     {
+        $this->requestStartTime = microtime(true);
         $this->PGLog = null;
         $this->PGLog = clone $this->logger;
         $this->PGLog->accessRecord['beginTime'] = microtime(true);
@@ -55,5 +61,77 @@ class BaseController extends Controller
         }
 
         return $logId;
+    }
+
+    /**
+     * 响应json格式数据
+     *
+     * @param null $data
+     * @param string $message
+     * @param int $status
+     * @param null $callback
+     * @return array
+     */
+    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    {
+        $callback = $this->getCallback($callback);
+        $result = [
+            'data'       => $data,
+            'status'     => $status,
+            'message'    => $message,
+            'serverTime' => (float)number_format(microtime(true) - $this->requestStartTime, 3, '.', ''),
+        ];
+
+        if (!is_null($callback)) {
+            $output = $callback . '(' . json_encode($result) . ');';
+        } else {
+            $output = json_encode($result);
+        }
+        $this->http_output->setContentType('application/json; charset=UTF-8');
+        $this->http_output->end($output);
+    }
+
+    /**
+     * 获取jsonp的callback名称
+     *
+     * @param $callback
+     * @return string
+     */
+    public function getCallback($callback)
+    {
+        if (is_null($callback) && (!empty($this->http_input->postGet('callback'))
+                || !empty($this->http_input->postGet('cb')) || !empty($this->http_input->postGet('jsonpCallback')))) {
+            $callback = !empty($this->http_input->postGet('callback'))
+                ? $this->http_input->postGet('callback')
+                : !empty($this->http_input->postGet('cb'))
+                    ? $this->http_input->postGet('cb')
+                    : $this->http_input->postGet('jsonpCallback');
+        }
+
+        return $callback;
+    }
+
+    /**
+     * 异常的回调
+     *
+     * @param \Throwable $e
+     * @throws \PG\MSF\Server\CoreBase\SwooleException
+     * @throws \Throwable
+     */
+    public function onExceptionHandle(\Throwable $e)
+    {
+        $message  = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+        $message .= ' trace: ' . $e->getTraceAsString();
+
+        $this->PGLog->error($message);
+
+        switch ($this->request_type) {
+            case SwooleMarco::HTTP_REQUEST:
+                $this->outputJson([], 'error', 500);
+                break;
+            case SwooleMarco::TCP_REQUEST:
+                $this->outputJson([], 'error', 500);
+                break;
+        }
     }
 }
