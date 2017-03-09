@@ -16,7 +16,7 @@ class Coroutine
      **/
     const TICK_INTERVAL = 1;
 
-    private $routineList;
+    public $routineList;
 
     private $tickId = -1;
 
@@ -43,7 +43,7 @@ class Coroutine
         if (empty($this->routineList)) {
             return;
         }
-
+        
         foreach ($this->routineList as $k => $task) {
             $task->run();
 

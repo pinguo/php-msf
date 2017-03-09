@@ -61,9 +61,10 @@ abstract class CoroutineBase implements ICoroutineBase
     public function getResult()
     {
         $this->getCount++;
-        if ((($this->getCount > 1) && ((microtime(true) - $this->requestTime) > $this->timeout))
+        if ((($this->getCount > 1) && (1000*(microtime(true) - $this->requestTime) > $this->timeout))
             || ($this->getCount > $this->timeout)
         ) {
+
             throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
         }
         return $this->result;

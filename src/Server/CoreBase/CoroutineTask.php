@@ -12,7 +12,7 @@ class CoroutineTask
 {
     protected $stack;
     protected $routine;
-    protected $generatorContext;
+    public $generatorContext;
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)
     {
