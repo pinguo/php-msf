@@ -11,8 +11,8 @@ namespace PG\MSF\Server\Helpers\Log;
 use Monolog\Handler\BufferHandler;
 use Monolog\Logger;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\StreamHandler;
 use Monolog\Handler\FilterHandler;
+use PG\MSF\Server\Helpers\Log\Handler\PGStreamHandler;
 
 class PGLog extends Logger
 {
@@ -41,7 +41,7 @@ class PGLog extends Logger
         $server = get_instance();
         $cofig = $server->config;
         foreach ($cofig['server.log.handlers'] as $handler) {
-            $stream = new StreamHandler($handler['stream']);
+            $stream = new PGStreamHandler($handler['stream']);
 
             //格式
             if (isset($handler['format']) && isset($handler['dateFormat'])) {
