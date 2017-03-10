@@ -63,7 +63,7 @@ abstract class CoroutineBase implements ICoroutineBase
         $this->getCount++;
 
         if ($this->result !== CoroutineNull::getInstance()) {
-            $this->result;
+            return $this->result;
         }
 
         if ((1000*(microtime(true) - $this->requestTime) > $this->timeout)
