@@ -39,8 +39,8 @@ class PGLog extends Logger
     ) {
         parent::__construct($name, $handlers, $processors, $timezone);
         $server = get_instance();
-        $cofig = $server->config;
-        foreach ($cofig['server.log.handlers'] as $handler) {
+        $config = $server->config;
+        foreach ($config['server.log.handlers'] as $handler) {
             $stream = new PGStreamHandler($handler['stream']);
 
             //格式
