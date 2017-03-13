@@ -9,16 +9,13 @@
 namespace PG\MSF\Server;
 
 use PG\MSF\Server\Client\Client;
-use PG\MSF\Server\CoreBase\CoroutineTask;
-use PG\MSF\Server\CoreBase\GeneratorContext;
-use PG\MSF\Server\CoreBase\InotifyProcess;
-use PG\MSF\Server\CoreBase\SwooleException;
-use PG\MSF\Server\DataBase\AsynPool;
-use PG\MSF\Server\DataBase\AsynPoolManager;
-use PG\MSF\Server\DataBase\Miner;
-use PG\MSF\Server\DataBase\MysqlAsynPool;
-use PG\MSF\Server\DataBase\RedisAsynPool;
 use PG\MSF\Server\Test\TestModule;
+use PG\MSF\Server\CoreBase\{
+    CoroutineTask, GeneratorContext, InotifyProcess, SwooleException
+};
+use PG\MSF\Server\DataBase\{
+    AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
+};
 
 abstract class SwooleDistributedServer extends SwooleWebSocketServer
 {

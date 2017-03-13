@@ -9,8 +9,9 @@
 namespace PG\MSF\Server;
 
 use League\Plates\Engine;
-use PG\MSF\Server\CoreBase\ControllerFactory;
-use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\{
+    ControllerFactory, GeneratorContext
+};
 
 abstract class SwooleHttpServer extends SwooleServer
 {

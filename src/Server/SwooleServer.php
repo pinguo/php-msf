@@ -9,15 +9,12 @@
 namespace PG\MSF\Server;
 
 use Noodlehaus\Config;
-use PG\MSF\Server\CoreBase\Child;
-use PG\MSF\Server\CoreBase\ControllerFactory;
-use PG\MSF\Server\CoreBase\Coroutine;
-use PG\MSF\Server\CoreBase\GeneratorContext;
-use PG\MSF\Server\CoreBase\Loader;
-use PG\MSF\Server\CoreBase\SwooleException;
-use PG\MSF\Server\Pack\IPack;
-use PG\MSF\Server\Route\IRoute;
-use PG\MSF\Server\Helpers\Log\PGLog;
+use PG\MSF\Server\CoreBase\{
+    Child, ControllerFactory, Coroutine, GeneratorContext, Loader, SwooleException
+};
+use PG\MSF\Server\{
+    Pack\IPack, Route\IRoute, Helpers\Log\PGLog
+};
 
 abstract class SwooleServer extends Child
 {

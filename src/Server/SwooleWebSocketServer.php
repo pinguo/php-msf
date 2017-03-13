@@ -8,8 +8,9 @@
 
 namespace PG\MSF\Server;
 
-use PG\MSF\Server\CoreBase\ControllerFactory;
-use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\{
+    ControllerFactory, GeneratorContext
+};
 
 abstract class SwooleWebSocketServer extends SwooleHttpServer
 {
