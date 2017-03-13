@@ -27,7 +27,6 @@ class Server extends BaseController
             $data['coroutine'][$logId][$name]['run_time']         = strval(number_format(1000*(microtime(true) - $routine->getRoutine()->current()->requestTime), 4, '.', ''));
             $data['coroutine'][$logId][$name]['request_time']     = strval(number_format(1000*(microtime(true) - $routine->generatorContext->getController()->requestStartTime), 4, '.', ''));
             $data['coroutine'][$logId][$name]['profile']          = $routine->generatorContext->getController()->PGLog->getAllProfileInfo();
-                                         
         }
         $data['coroutine']['total'] = count($data['coroutine']);
         $data['memory']['peak']     = strval(number_format(memory_get_peak_usage()/1024/1024, 3, '.', '')) . 'M';

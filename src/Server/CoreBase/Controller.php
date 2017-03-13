@@ -9,12 +9,9 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\SwooleMarco;
-use PG\MSF\Server\SwooleServer;
-use \PG\MSF\Server\CoreBase\GeneratorContext;
-use \PG\MSF\Server\DataBase\RedisAsynPool;
-use \PG\MSF\Server\DataBase\MysqlAsynPool;
-use \PG\MSF\Server\Client\Client;
+use PG\MSF\Server\{
+    SwooleMarco, SwooleServer, DataBase\RedisAsynPool, DataBase\MysqlAsynPool, Client\Client
+};
 
 class Controller extends CoreBase
 {

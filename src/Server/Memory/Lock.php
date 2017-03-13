@@ -8,8 +8,9 @@
  */
 namespace PG\MSF\Server\Memory;
 
-use PG\MSF\Server\CoreBase\SwooleException;
-use PG\MSF\Server\DataBase\RedisAsynPool;
+use PG\MSF\Server\{
+    CoreBase\SwooleException, DataBase\RedisAsynPool
+};
 
 class Lock
 {

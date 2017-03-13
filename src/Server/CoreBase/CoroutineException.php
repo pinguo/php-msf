@@ -8,8 +8,6 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\Controllers\BaseController;
-
 class CoroutineException extends SwooleException
 {
     public function __construct($message, $code = 0, \Exception $previous = null)

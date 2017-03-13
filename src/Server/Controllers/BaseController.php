@@ -8,13 +8,12 @@
 
 namespace PG\MSF\Server\Controllers;
 
-use PG\MSF\Server\CoreBase\Controller;
-use PG\MSF\Server\Helpers\Log\PGLog;
-use PG\MSF\Server\SwooleMarco;
+use PG\MSF\Server\{
+    CoreBase\Controller, Helpers\Log\PGLog, SwooleMarco
+};
 
 class BaseController extends Controller
 {
-
     /**
      * @var PGLog
      */
@@ -76,9 +75,9 @@ class BaseController extends Controller
     {
         $callback = $this->getCallback($callback);
         $result = [
-            'data'       => $data,
-            'status'     => $status,
-            'message'    => $message,
+            'data' => $data,
+            'status' => $status,
+            'message' => $message,
             'serverTime' => (float)number_format(microtime(true) - $this->requestStartTime, 3, '.', ''),
         ];
 
@@ -100,7 +99,8 @@ class BaseController extends Controller
     public function getCallback($callback)
     {
         if (is_null($callback) && (!empty($this->http_input->postGet('callback'))
-                || !empty($this->http_input->postGet('cb')) || !empty($this->http_input->postGet('jsonpCallback')))) {
+                || !empty($this->http_input->postGet('cb')) || !empty($this->http_input->postGet('jsonpCallback')))
+        ) {
             $callback = !empty($this->http_input->postGet('callback'))
                 ? $this->http_input->postGet('callback')
                 : !empty($this->http_input->postGet('cb'))
@@ -120,7 +120,7 @@ class BaseController extends Controller
      */
     public function onExceptionHandle(\Throwable $e)
     {
-        $message  = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+        $message = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
         $message .= ' trace: ' . $e->getTraceAsString();
 
         $this->PGLog->error($message);

@@ -9,8 +9,9 @@
 namespace PG\MSF\Server;
 
 use Noodlehaus\Exception;
-use PG\MSF\Server\DataBase\AsynPoolManager;
-use PG\MSF\Server\DataBase\RedisAsynPool;
+use PG\MSF\Server\DataBase\{
+    AsynPoolManager, RedisAsynPool
+};
 
 class SwooleDispatchClient extends SwooleServer
 {
