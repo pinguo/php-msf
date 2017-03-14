@@ -37,7 +37,7 @@ class PGStreamHandler extends StreamHandler
     public function close()
     {
         $server = get_instance()->server;
-        if (!property_exists($server, 'taskworker') || get_instance()->server->taskworker) {
+        if (is_object($server) && (!property_exists($server, 'taskworker') || get_instance()->server->taskworker)) {
             parent::close();
         }
     }
