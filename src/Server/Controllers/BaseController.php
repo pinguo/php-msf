@@ -73,12 +73,12 @@ class BaseController extends Controller
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        $callback = $this->getCallback($callback);
+        $callback     = $this->getCallback($callback);
         $result = [
-            'data' => $data,
-            'status' => $status,
-            'message' => $message,
-            'serverTime' => (float)number_format(microtime(true) - $this->requestStartTime, 3, '.', ''),
+            'data'       => $data,
+            'status'     => $status,
+            'message'    => $message,
+            'serverTime' => (int)(number_format(microtime(true) - $this->requestStartTime, 3, '.', '') * 1000),
         ];
 
         if (!is_null($callback)) {
@@ -86,6 +86,7 @@ class BaseController extends Controller
         } else {
             $output = json_encode($result);
         }
+
         $this->http_output->setContentType('application/json; charset=UTF-8');
         $this->http_output->end($output);
     }

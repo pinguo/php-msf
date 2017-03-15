@@ -91,6 +91,60 @@ class PGLog extends Logger
     }
 
     /**
+     * Adds a log record.（解决原始版本的进程崩溃问题）
+     *
+     * @param  int     $level   The logging level
+     * @param  string  $message The log message
+     * @param  array   $context The log context
+     * @return Boolean Whether the record has been processed
+     */
+    public function addRecord(int $level, string $message, array $context = []): bool
+    {
+        // check if any handler will handle this message so we can return early and save cycles
+        $handlerKey = null;
+        reset($this->handlers);
+        while ($handler = current($this->handlers)) {
+            if ($handler->isHandling(['level' => $level])) {
+                $handlerKey = key($this->handlers);
+                break;
+            }
+
+            next($this->handlers);
+        }
+
+        if (null === $handlerKey) {
+            return false;
+        }
+
+        $levelName = static::getLevelName($level);
+
+        $record = [
+            'message' => $message,
+            'context' => $context,
+            'level' => $level,
+            'level_name' => $levelName,
+            'channel' => $this->name,
+            'datetime' => date('Y/m/d H:i:s'),
+            'extra' => [],
+        ];
+
+        foreach ($this->processors as $processor) {
+            $record = call_user_func($processor, $record);
+        }
+
+        while ($handler = current($this->handlers)) {
+            if (true === $handler->handle($record)) {
+                break;
+            }
+
+            next($this->handlers);
+        }
+
+        return true;
+    }
+
+
+    /**
      * 日志中增加logId字段
      */
     protected function pushLogId()
