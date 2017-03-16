@@ -78,7 +78,7 @@ class BaseController extends Controller
             'data'       => $data,
             'status'     => $status,
             'message'    => $message,
-            'serverTime' => (int)(number_format(microtime(true) - $this->requestStartTime, 3, '.', '') * 1000),
+            'serverTime' => microtime(true),
         ];
 
         if (!is_null($callback)) {
