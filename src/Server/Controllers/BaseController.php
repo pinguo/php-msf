@@ -74,6 +74,7 @@ class BaseController extends Controller
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
+        $this->PGLog->pushLog('status', $status);
         $callback     = $this->getCallback($callback);
         $result = [
             'data'       => $data,
