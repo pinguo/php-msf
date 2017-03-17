@@ -7,14 +7,20 @@
  */
 namespace PG\MSF\Server\Client;
 
+use PG\MSF\Server\Helpers\Context;
+
 class Client
 {
     /**
      * 上下文
-     * 目前包含 ['PGLog']
-     * @var array
+     * @var Context
      */
-    public $context = [];
+    public $context;
+
+    public function __construct()
+    {
+        $this->context = new Context();
+    }
 
     /**
      * 获取一个http客户端
@@ -63,8 +69,8 @@ class Client
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
                 $http_client = new HttpClient($client);
                 $headers = ['Host' => $host];
-                if (isset($this->context['PGLog'])) {
-                    $PGLog = $this->context['PGLog'];
+                if (isset($this->context->PGLog)) {
+                    $PGLog = $this->context->PGLog;
                     $headers['X-Ngx-LogId'] = $PGLog->logId;
                 }
                 $http_client->setHeaders($headers);

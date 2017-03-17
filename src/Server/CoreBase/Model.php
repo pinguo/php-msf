@@ -48,7 +48,7 @@ class Model extends CoreBase
         $this->setContext($context);
         if ($this->parent->PGLog) {
             $this->PGLog = $this->parent->PGLog;
-            $this->client->context['PGLog'] = $this->PGLog;
+            $this->client->context->PGLog = $this->PGLog;
         }
     }
 
@@ -59,7 +59,7 @@ class Model extends CoreBase
     {
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
-        unset($this->PGLog, $this->client->context['PGLog']);
+        unset($this->PGLog, $this->client->context->PGLog);
     }
 
 }
