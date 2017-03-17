@@ -20,25 +20,21 @@ class PGStreamHandler extends StreamHandler
     {
         // worker 进程使用异步 IO  ，task 进程使用同步 IO
         $server = get_instance()->server;
-        if (property_exists($server, 'taskworker') && $server->taskworker === false) {
+        if (is_object($server) && property_exists($server, 'taskworker') && $server->taskworker === false) {
             if (null === $this->url || '' === $this->url) {
                 throw new \LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
             }
 
-            if (!swoole_async_write($this->url, (string)$record['formatted'], -1)) {
-                throw new \UnexpectedValueException(sprintf('Writing to stream or file "%s" could not be finished: ',
-                    $this->url));
+            //不能异步就同步
+            if (!swoole_async_writefile($this->url, (string)$record['formatted'], null, FILE_APPEND)) {
+                file_put_contents($this->url, (string)$record['formatted'], FILE_APPEND);
             }
         } else {
-            parent::write($record);
+            file_put_contents($this->url, (string)$record['formatted'], FILE_APPEND);
         }
     }
 
     public function close()
     {
-        $server = get_instance()->server;
-        if (is_object($server) && (!property_exists($server, 'taskworker') || get_instance()->server->taskworker)) {
-            parent::close();
-        }
     }
 }
