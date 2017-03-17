@@ -30,10 +30,15 @@ abstract class CoroutineBase implements ICoroutineBase
     public $timeout;
 
     /**
-     * 协程执行的绝对时间
+     * 协程执行请求开始时间
      * @var float
      */
     public $requestTime = 0.0;
+
+    /**
+     * 协程执行请求结束时间
+     */
+    public $responseTime = 0.0;
 
     /**
      * CoroutineBase constructor.

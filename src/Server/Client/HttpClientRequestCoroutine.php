@@ -27,8 +27,11 @@ class HttpClientRequestCoroutine extends CoroutineBase
         $this->path = $path;
         $this->method = $method;
         $this->data = $data;
+        $this->httpClient->context->PGLog->profileStart('api-' . $this->httpClient->headers['Host'] . $this->path);
         $this->send(function ($client) {
-            $this->result = (array)$client;
+            $this->result       = (array)$client;
+            $this->responseTime = microtime(true);
+            $this->httpClient->context->PGLog->profileEnd('api-' . $this->httpClient->headers['Host'] . $this->path);
         });
     }
 
