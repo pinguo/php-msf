@@ -10,9 +10,17 @@ namespace PG\MSF\Server\Client;
 class Client
 {
     /**
+     * 上下文
+     * 目前包含 ['PGLog']
+     * @var array
+     */
+    public $context = [];
+
+    /**
      * 获取一个http客户端
      * @param $base_url
      * @param $callBack
+     * @throws \PG\MSF\Server\CoreBase\SwooleException
      */
     public function getHttpClient($base_url, $callBack)
     {
@@ -54,7 +62,12 @@ class Client
             } else {
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
                 $http_client = new HttpClient($client);
-                $http_client->setHeaders(['Host' => $host]);
+                $headers = ['Host' => $host];
+                if (isset($this->context['PGLog'])) {
+                    $PGLog = $this->context['PGLog'];
+                    $headers['X-Ngx-LogId'] = $PGLog->logId;
+                }
+                $http_client->setHeaders($headers);
                 call_user_func($data['callBack'], $http_client);
             }
         });

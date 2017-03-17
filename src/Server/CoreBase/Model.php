@@ -37,7 +37,7 @@ class Model extends CoreBase
         parent::__construct();
         $this->redis_pool = get_instance()->redis_pool;
         $this->mysql_pool = get_instance()->mysql_pool;
-        $this->client = get_instance()->client;
+        $this->client = clone get_instance()->client;
     }
 
     /**
@@ -48,6 +48,7 @@ class Model extends CoreBase
         $this->setContext($context);
         if ($this->parent->PGLog) {
             $this->PGLog = $this->parent->PGLog;
+            $this->client->context['PGLog'] = $this->PGLog;
         }
     }
 
@@ -58,7 +59,7 @@ class Model extends CoreBase
     {
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
-        unset($this->PGLog);
+        unset($this->PGLog, $this->client->context['PGLog']);
     }
 
 }
