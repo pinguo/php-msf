@@ -239,9 +239,8 @@ class PGLog extends Logger
         if (!is_string($name) || empty($name)) {
             return;
         }
-        if (count($this->_profiles) < $this->profileStackLen) {
-            $this->_profileStacks[] = [$name, microtime(true)];
-        }
+
+        $this->_profileStacks[$name] = microtime(true);
     }
 
     /**
@@ -253,12 +252,9 @@ class PGLog extends Logger
         if (!is_string($name) || empty($name) || empty($this->_profileStacks)) {
             return;
         }
-        while (!empty($this->_profileStacks)) {
-            $last = array_pop($this->_profileStacks);
-            if ($last[0] === $name) {
-                $this->profile($name, microtime(true) - $last[1]);
-                break;
-            }
+
+        if (!empty($this->_profileStacks[$name])) {
+            $this->profile($name, microtime(true) - $this->_profileStacks[$name]);
         }
     }
 
