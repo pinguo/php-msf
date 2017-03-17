@@ -8,10 +8,29 @@
 
 namespace PG\MSF\Server\Client;
 
+use PG\MSF\Server\Helpers\Context;
+
 class HttpClient
 {
+    /**
+     * @var array
+     */
+    public $headers;
+
+    /**
+     * @var \swoole_http_client
+     */
     public $client;
 
+    /**
+     * @var Context
+     */
+    public $context;
+    
+    /**
+     * HttpClient constructor.
+     * @param $client
+     */
     public function __construct($client)
     {
         $this->client = $client;
@@ -22,7 +41,17 @@ class HttpClient
      */
     public function setHeaders($headers)
     {
+        $this->headers = $headers;
         $this->client->setHeaders($headers);
+    }
+
+    /**
+     * @param void
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
     }
 
     /**

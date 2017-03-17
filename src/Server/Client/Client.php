@@ -63,18 +63,18 @@ class Client
         $url_host = substr($url_host, 2);
         swoole_async_dns_lookup($url_host, function ($host, $ip) use (&$data) {
             if (empty($ip)) {
-                // 异步回调的异常捕获是一个问题,暂时没有解决
-                // throw new \PG\MSF\Server\CoreBase\SwooleException($data['url'] . ' DNS查询失败');
+                $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
             } else {
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
-                $http_client = new HttpClient($client);
-                $headers = ['Host' => $host];
-                if (isset($this->context->PGLog)) {
-                    $PGLog = $this->context->PGLog;
-                    $headers['X-Ngx-LogId'] = $PGLog->logId;
-                }
-                $http_client->setHeaders($headers);
-                call_user_func($data['callBack'], $http_client);
+                $httpClient          = new HttpClient($client);
+                $httpClient->context = $this->context;
+                $headers = [
+                    'Host'        => $host,
+                    'X-Ngx-LogId' => $this->context->PGLog->logId,
+                ];
+
+                $httpClient->setHeaders($headers);
+                call_user_func($data['callBack'], $httpClient);
             }
         });
     }

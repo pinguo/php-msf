@@ -23,8 +23,11 @@ class GetHttpClientCoroutine extends CoroutineBase
         parent::__construct($timeout);
         $this->base_url = $base_url;
         $this->client = $client;
+        $this->client->context->PGLog->profileStart('dns-' . $this->base_url);
         $this->send(function ($http_client) {
-            $this->result = $http_client;
+            $this->result       = $http_client;
+            $this->responseTime = microtime(true);
+            $this->client->context->PGLog->profileEnd('dns-' . $this->base_url);
         });
     }
 
