@@ -22,12 +22,13 @@ class GetHttpClientCoroutine extends CoroutineBase
     {
         parent::__construct($timeout);
         $this->base_url = $base_url;
-        $this->client = $client;
-        $this->client->context->PGLog->profileStart('dns-' . $this->base_url);
-        $this->send(function ($http_client) {
+        $this->client   = $client;
+        $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->base_url;
+        $this->client->context->PGLog->profileStart($profileName);
+        $this->send(function ($http_client) use ($profileName) {
             $this->result       = $http_client;
             $this->responseTime = microtime(true);
-            $this->client->context->PGLog->profileEnd('dns-' . $this->base_url);
+            $this->client->context->PGLog->profileEnd($profileName);
         });
     }
 
