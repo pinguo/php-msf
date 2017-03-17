@@ -35,7 +35,7 @@ class BaseController extends Controller
         $this->PGLog->logId = $this->getContext()['logId'];
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
-        $this->client->context['PGLog'] = $this->PGLog;
+        $this->client->context->PGLog = $this->PGLog;
     }
 
     public function destroy()
