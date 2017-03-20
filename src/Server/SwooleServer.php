@@ -236,7 +236,7 @@ abstract class SwooleServer extends Child
         swoole_async_set([
             'thread_num' => $this->config->get('server.set.worker_num', 4),
             'aio_mode' => SWOOLE_AIO_BASE,
-            'use_async_resolver' => true,
+            'use_async_resolver' => false,
         ]);
     }
 
