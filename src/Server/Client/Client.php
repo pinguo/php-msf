@@ -17,11 +17,6 @@ class Client
      */
     public $context;
 
-    public function __construct()
-    {
-        $this->context = new Context();
-    }
-
     /**
      * 获取一个http客户端
      * @param $base_url
