@@ -18,6 +18,8 @@ class Coroutine
 
     public $routineList;
 
+    public $keepRun;
+
     private $tickId = -1;
 
     private $tickTime = 0;
@@ -43,15 +45,29 @@ class Coroutine
         if (empty($this->routineList)) {
             return;
         }
-        
+
         foreach ($this->routineList as $k => $task) {
-            $task->run();
+            if (!empty($this->keepRun)) {
+                /**
+                 * @var $kTask CoroutineTask
+                 */
+                foreach ($this->keepRun as $kk => $kTask) {
+                    $kTask->run();
+                    unset($this->keepRun[$kk]);
+                }
+            }
 
             if ($task->isFinished()) {
                 $task->destroy();
                 unset($this->routineList[$k]);
+            } else {
+                /**
+                 * @var $task CoroutineTask
+                 */
+                $task->run();
             }
         }
+        $t2 = microtime(true);
     }
 
     /**
@@ -66,7 +82,7 @@ class Coroutine
     public function start(\Generator $routine, GeneratorContext $generatorContext)
     {
         $task = new CoroutineTask($routine, $generatorContext);
-        $this->routineList[] = $task;
+        $this->routineList[$generatorContext->getController()->PGLog->logId] = $task;
     }
 
     public function stop(\Generator $routine)
