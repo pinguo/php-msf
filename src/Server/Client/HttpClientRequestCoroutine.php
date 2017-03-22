@@ -33,6 +33,9 @@ class HttpClientRequestCoroutine extends CoroutineBase
             $this->result       = (array)$client;
             $this->responseTime = microtime(true);
             $this->httpClient->context->PGLog->profileEnd($profileName);
+            if (!empty(get_instance()->coroutine->routineList[$this->httpClient->context->PGLog->logId])) {
+                get_instance()->coroutine->keepRun[$this->httpClient->context->PGLog->logId] = get_instance()->coroutine->routineList[$this->httpClient->context->PGLog->logId];
+            }
         });
     }
 

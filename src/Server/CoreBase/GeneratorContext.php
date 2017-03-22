@@ -59,7 +59,7 @@ class GeneratorContext
     }
 
     /**
-     * @return Controller
+     * @return \PG\MSF\Server\Controllers\BaseController
      */
     public function getController()
     {
