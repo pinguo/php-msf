@@ -67,7 +67,6 @@ class Coroutine
                 $task->run();
             }
         }
-        $t2 = microtime(true);
     }
 
     /**

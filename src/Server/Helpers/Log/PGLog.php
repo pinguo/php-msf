@@ -30,6 +30,22 @@ class PGLog extends Logger
     protected $_profiles = [];
     protected $_countings = [];
 
+    /**
+     * Logging levels from syslog protocol defined in RFC 5424
+     *
+     * @var array $levels Logging levels
+     */
+    protected static $levels = array(
+        100 => 'debug',
+        200 => 'info',
+        250 => 'notice',
+        300 => 'warning',
+        400 => 'error',
+        500 => 'critical',
+        550 => 'alert',
+        600 => 'emergency',
+    );
+
     public function __construct(
         string $name,
         array $handlers = [],
