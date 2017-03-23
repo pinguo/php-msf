@@ -845,6 +845,10 @@ abstract class SwooleServer extends Child
      */
     public function displayErrorHandler($error, $error_string, $filename, $line, $symbols)
     {
+        // 如果表达式前面有@时忽略错误
+        if (0 == error_reporting()) {
+            return;
+        }
         $log = "WORKER Error ";
         $log .= "$error_string ($filename:$line)";
         $this->log->error($log);
