@@ -63,6 +63,7 @@ class Coroutine
                 }
             }
 
+            $task = $this->routineList[$k];
             if ($task->isFinished()) {
                 $task->destroy();
                 unset($this->routineList[$k]);
