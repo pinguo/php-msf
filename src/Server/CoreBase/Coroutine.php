@@ -63,15 +63,17 @@ class Coroutine
                 }
             }
 
-            $task = $this->routineList[$k];
-            if ($task->isFinished()) {
-                $task->destroy();
-                unset($this->routineList[$k]);
-            } else {
-                /**
-                 * @var $task CoroutineTask
-                 */
-                $task->run();
+            if (!empty($this->routineList[$k])) {
+                $task = $this->routineList[$k];
+                if ($task->isFinished()) {
+                    $task->destroy();
+                    unset($this->routineList[$k]);
+                } else {
+                    /**
+                     * @var $task CoroutineTask
+                     */
+                    $task->run();
+                }
             }
         }
     }
