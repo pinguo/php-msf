@@ -53,7 +53,11 @@ class Coroutine
                  */
                 foreach ($this->keepRun as $kk => $kTask) {
                     $kTask->run();
-                    unset($this->keepRun[$kk]);
+                    if ($kTask->isFinished()) {
+                        $kTask->destroy();
+                        unset($this->keepRun[$kk]);
+                        unset($this->routineList[$kk]);
+                    }
                 }
             }
 
