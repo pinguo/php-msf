@@ -58,8 +58,8 @@ class CoroutineTask
                 if ($routine->valid()) {
                     $routine->send($value);
                 } else {
-                    $result = $routine->getReturn();
                     if (count($this->stack) > 0) {
+                        $result = $routine->getReturn();
                         $this->routine = $this->stack->pop();
                         $this->routine->send($result);
                     }

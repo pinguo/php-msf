@@ -58,6 +58,7 @@ class Coroutine
                         unset($this->routineList[$kk]);
                     } else {
                         $kTask->run();
+                        $this->routineList[$kk] = $kTask;
                     }
                 }
             }
