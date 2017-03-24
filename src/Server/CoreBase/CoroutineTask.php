@@ -108,7 +108,7 @@ class CoroutineTask
      */
     public function isFinished()
     {
-        return $this->stack->isEmpty() && !$this->routine->valid();
+        return !empty($this->stack) && $this->stack->isEmpty() && !$this->routine->valid();
     }
 
     public function getRoutine()
