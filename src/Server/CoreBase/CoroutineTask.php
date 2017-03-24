@@ -13,6 +13,7 @@ class CoroutineTask
     protected $stack;
     protected $routine;
     public $generatorContext;
+    public $destroy = false;
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)
     {
@@ -120,9 +121,12 @@ class CoroutineTask
      */
     public function destroy()
     {
-        $this->generatorContext->destroy();
-        unset($this->generatorContext);
-        unset($this->stack);
-        unset($this->routine);
+        if (!$this->destroy) {
+            $this->generatorContext->destroy();
+            unset($this->generatorContext);
+            unset($this->stack);
+            unset($this->routine);
+            $this->destroy = true;
+        }
     }
 }
