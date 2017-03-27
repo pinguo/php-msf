@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /**
  * @desc: 控制器基类
  * @author: leandre <niulingyun@camera360.com>
@@ -35,7 +35,6 @@ class BaseController extends Controller
         $this->PGLog->logId = $this->getContext()['logId'];
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
-        $this->client->context->PGLog = $this->PGLog;
     }
 
     public function destroy()
@@ -74,12 +73,11 @@ class BaseController extends Controller
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        $this->PGLog->pushLog('status', $status);
-        $callback     = $this->getCallback($callback);
+        $callback = $this->getCallback($callback);
         $result = [
-            'data'       => $data,
-            'status'     => $status,
-            'message'    => $message,
+            'data' => $data,
+            'status' => $status,
+            'message' => $message,
             'serverTime' => microtime(true),
         ];
 
@@ -89,8 +87,16 @@ class BaseController extends Controller
             $output = json_encode($result);
         }
 
-        $this->http_output->setContentType('application/json; charset=UTF-8');
-        $this->http_output->end($output);
+        switch ($this->request_type) {
+            case SwooleMarco::HTTP_REQUEST:
+                $this->http_output->setContentType('application/json; charset=UTF-8');
+                $this->http_output->end($output);
+                break;
+            case SwooleMarco::TCP_REQUEST:
+                $this->send($output);
+                break;
+        }
+
     }
 
     /**
@@ -128,13 +134,6 @@ class BaseController extends Controller
 
         $this->PGLog->error($message);
 
-        switch ($this->request_type) {
-            case SwooleMarco::HTTP_REQUEST:
-                $this->outputJson([], 'error', 500);
-                break;
-            case SwooleMarco::TCP_REQUEST:
-                $this->outputJson([], 'error', 500);
-                break;
-        }
+        $this->outputJson([], 'error', 500);
     }
 }

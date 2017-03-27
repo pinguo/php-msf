@@ -8,7 +8,9 @@
 
 namespace PG\MSF\Server;
 
-use PG\MSF\Server\Client\Client;
+use PG\MSF\Server\Client\{
+    Http\Client as HttpClient, Tcp\Client as TcpClient
+};
 use PG\MSF\Server\Test\TestModule;
 use PG\MSF\Server\CoreBase\{
     CoroutineTask, GeneratorContext, InotifyProcess, SwooleException
@@ -34,10 +36,16 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     public $mysql_pool;
     /**
-     * 各种client
-     * @var Client
+     * http client
+     * @var HttpClient
      */
     public $client;
+
+    /**
+     * tcp client
+     * @var TcpClient
+     */
+    public $tcpClient;
     /**
      * 覆盖set配置
      * @var array
@@ -186,20 +194,25 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     public function beforeSwooleStart()
     {
         parent::beforeSwooleStart();
+
         //创建uid->fd共享内存表
         $this->uid_fd_table = new \swoole_table(65536);
         $this->uid_fd_table->column('fd', \swoole_table::TYPE_INT, 8);
         $this->uid_fd_table->create();
-        //创建task用的taskid
+
+        //创建task用的Atomic
         $this->task_atomic = new \swoole_atomic(0);
+
         //创建task用的id->pid共享内存表不至于同时超过1024个任务吧
         $this->tid_pid_table = new \swoole_table(1024);
         $this->tid_pid_table->column('pid', \swoole_table::TYPE_INT, 8);
         $this->tid_pid_table->column('des', \swoole_table::TYPE_STRING, 50);
-        $this->tid_pid_table->column('st', \swoole_table::TYPE_INT, 8);
+        $this->tid_pid_table->column('start_time', \swoole_table::TYPE_INT, 8);
         $this->tid_pid_table->create();
+
         //创建task用的锁
         $this->task_lock = new \swoole_lock(SWOOLE_MUTEX);
+
         //创建异步连接池进程
         if ($this->config->get('asyn_process_enable', false)) {//代表启动单独进程进行管理
             $this->pool_process = new \swoole_process(function ($process) {
@@ -213,6 +226,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             }, false, 2);
             $this->server->addProcess($this->pool_process);
         }
+
         //reload监控进程
         if ($this->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理
             $reload_process = new \swoole_process(function ($process) {
@@ -221,6 +235,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             }, false, 2);
             $this->server->addProcess($reload_process);
         }
+
         if ($this->config->get('use_dispatch')) {
             //创建dispatch端口用于连接dispatch
             $this->dispatch_port = $this->server->listen($this->config['tcp']['socket'],
@@ -584,7 +599,8 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 $this->asnyPoolManager->registAsyn($pool);
             }
             //初始化异步Client
-            $this->client = new Client();
+            $this->client = new HttpClient();
+            $this->tcpClient = new TcpClient();
         } else {
             //注册中断信号
             pcntl_signal(SIGUSR1, function () {
@@ -938,5 +954,45 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     {
         $data = $this->encode($this->pack->pack($data));
         $this->sendToDispatchMessage(SwooleMarco::MSG_TYPE_SEND_GROUP, ['data' => $data, 'groupId' => $groupId]);
+    }
+
+    /**
+     * 向task发送中断信号
+     * @param $task_id
+     * @throws SwooleException
+     */
+    public function interruptedTask($task_id)
+    {
+        $ok = $this->task_lock->trylock();
+        if ($ok) {
+            get_instance()->tid_pid_table->set(0, ['pid' => $task_id]);
+            $task_pid = get_instance()->tid_pid_table->get($task_id)['pid'];
+            if ($task_pid == false) {
+                $this->task_lock->unlock();
+                throw new SwooleException('中断Task 失败，可能是task已运行完，或者task_id不存在。');
+            }
+            //发送信号
+            posix_kill($task_pid, SIGUSR1);
+            print_r("向TaskID=$task_id ,PID=$task_pid 的进程发送中断信号\n");
+        } else {
+            throw new SwooleException('interruptedTask 获得锁失败，中断操作正在进行请稍后。');
+        }
+    }
+
+    /**
+     * 获取服务器上正在运行的Task
+     * @return array
+     */
+    public function getServerAllTaskMessage()
+    {
+        $tasks = [];
+        foreach ($this->tid_pid_table as $id => $row) {
+            if ($id != 0) {
+                $row['task_id'] = $id;
+                $row['run_time'] = time() - $row['start_time'];
+                $tasks[] = $row;
+            }
+        }
+        return $tasks;
     }
 }

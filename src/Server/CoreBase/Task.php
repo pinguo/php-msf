@@ -27,12 +27,10 @@ class Task extends TaskProxy
     public function initialization($task_id, $worker_pid, $task_name, $method_name, $context)
     {
         $this->task_id = $task_id;
-        get_instance()->tid_pid_table->set(
-            $this->task_id,
-            ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'st' => time()]
-        );
-
+        get_instance()->tid_pid_table->set($this->task_id, ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'start_time' => time()]);
+        $this->start_run_time = microtime(true);
         if ($context) {
+            $context['task_name'] = "$task_name:$method_name";
             $this->setContext($context);
             $this->PGLog = null;
             $this->PGLog = clone $this->logger;
@@ -46,9 +44,10 @@ class Task extends TaskProxy
 
     public function destroy()
     {
+        $this->context['execution_time'] = (microtime(true) - $this->start_run_time) * 1000;
         $this->PGLog && $this->PGLog->appendNoticeLog();
-        parent::destroy();
         get_instance()->tid_pid_table->del($this->task_id);
+        parent::destroy();
         $this->task_id = 0;
     }
 
