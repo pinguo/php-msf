@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @desc:
+ * @desc: 协程Tcp客户端
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/3/21
  * @copyright All rights reserved.
@@ -9,9 +9,7 @@
 
 namespace PG\MSF\Server\Client\Tcp;
 
-use PG\MSF\Server\CoreBase\{
-    CoroutineBase
-};
+use PG\MSF\Server\CoreBase\CoroutineBase;
 
 class TcpClientRequestCoroutine extends CoroutineBase
 {
