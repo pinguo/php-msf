@@ -5,9 +5,12 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
-namespace PG\MSF\Server\Client;
+namespace PG\MSF\Server\Client\Http;
 
-use PG\MSF\Server\Helpers\Context;
+use PG\MSF\Server\ {
+    CoreBase\SwooleException,
+    Helpers\Context
+};
 
 class Client
 {
@@ -40,7 +43,7 @@ class Client
             $url_host = $parseBaseUrlResult[1];
             $url_port = $parseBaseUrlResult[2];
         } else {
-            throw new \PG\MSF\Server\CoreBase\SwooleException($base_url . '不合法,请检查配置或者参数');
+            throw new SwooleException($base_url . ' 不合法,请检查配置或者参数');
         }
 
         if (!empty($url_port)) {

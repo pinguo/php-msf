@@ -33,4 +33,20 @@ class Server extends BaseController
         $data['memory']['usage']    = strval(number_format(memory_get_usage()/1024/1024, 3, '.', '')) . 'M';
         $this->outputJson($data, 'success');
     }
+
+    /**
+     * Http 服务状态探测
+     */
+    public function HttpStatus()
+    {
+        $this->http_output->end('ok');
+    }
+
+    /**
+     * Tcp 服务状态探测
+     */
+    public function TcpStatus()
+    {
+        $this->send('ok');
+    }
 }

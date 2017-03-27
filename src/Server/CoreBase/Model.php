@@ -23,9 +23,14 @@ class Model extends CoreBase
     public $mysql_pool;
 
     /**
-     * @var \PG\MSF\Server\Client\Client
+     * @var \PG\MSF\Server\Client\Http\Client
      */
     public $client;
+
+    /**
+     * @var \PG\MSF\Server\Client\Tcp\Client
+     */
+    public $tcpClient;
 
     /**
      * @var PGLog
@@ -38,10 +43,12 @@ class Model extends CoreBase
         $this->redis_pool = get_instance()->redis_pool;
         $this->mysql_pool = get_instance()->mysql_pool;
         $this->client = clone get_instance()->client;
+        $this->tcpClient = clone get_instance()->tcpClient;
     }
 
     /**
      * 当被loader时会调用这个方法进行初始化
+     * @param $context
      */
     public function initialization($context)
     {

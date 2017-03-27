@@ -10,7 +10,7 @@
 namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\{
-    SwooleMarco, SwooleServer, DataBase\RedisAsynPool, DataBase\MysqlAsynPool, Client\Client
+    SwooleMarco, SwooleServer, DataBase\RedisAsynPool, DataBase\MysqlAsynPool
 };
 
 class Controller extends CoreBase
@@ -37,9 +37,13 @@ class Controller extends CoreBase
      */
     public $request_type;
     /**
-     * @var Client
+     * @var \PG\MSF\Server\Client\Http\Client
      */
     public $client;
+    /**
+     * @var \PG\MSF\Server\Client\Tcp\Client
+     */
+    public $tcpClient;
     /**
      * fd
      * @var int
@@ -89,6 +93,7 @@ class Controller extends CoreBase
         $this->redis_pool = get_instance()->redis_pool;
         $this->mysql_pool = get_instance()->mysql_pool;
         $this->client = clone get_instance()->client;
+        $this->tcpClient = clone get_instance()->tcpClient;
     }
 
     /**

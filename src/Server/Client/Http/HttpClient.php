@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\Client;
+namespace PG\MSF\Server\Client\Http;
 
 use PG\MSF\Server\Helpers\Context;
 
@@ -31,7 +31,7 @@ class HttpClient
      * HttpClient constructor.
      * @param $client
      */
-    public function __construct($client)
+    public function __construct(Client $client)
     {
         $this->client = $client;
     }

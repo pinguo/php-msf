@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\Client;
+namespace PG\MSF\Server\Client\Http;
 
 use PG\MSF\Server\CoreBase\CoroutineBase;
 
@@ -20,7 +20,7 @@ class HttpClientRequestCoroutine extends CoroutineBase
     public $path;
     public $method;
 
-    public function __construct($httpClient, $method, $path, $data, $timeout)
+    public function __construct(HttpClient $httpClient, $method, $path, $data, $timeout)
     {
         parent::__construct($timeout);
         $this->httpClient = $httpClient;
