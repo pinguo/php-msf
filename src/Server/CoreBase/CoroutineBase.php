@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\MSF\Server\Coroutine\CoroutineTask;
+
 abstract class CoroutineBase implements ICoroutineBase
 {
     public static $MAX_TIMERS = 0;
@@ -17,11 +19,6 @@ abstract class CoroutineBase implements ICoroutineBase
      */
     public $request;
     public $result;
-    /**
-     * 获取的次数，用于判断超时
-     * @var int
-     */
-    public $getCount;
 
     /**
      * 协程执行的超时时间精确到ms
@@ -41,6 +38,16 @@ abstract class CoroutineBase implements ICoroutineBase
     public $responseTime = 0.0;
 
     /**
+     * @var CoroutineTask
+     */
+    public $coroutine;
+
+    /**
+     * @var bool
+     */
+    public $ioBack = false;
+
+    /**
      * CoroutineBase constructor.
      * @param int $timeout
      */
@@ -57,26 +64,49 @@ abstract class CoroutineBase implements ICoroutineBase
         }
 
         $this->result = CoroutineNull::getInstance();
-        $this->getCount = 0;
         $this->requestTime = microtime(true);
     }
 
     public abstract function send($callback);
 
+    public function getCoroutine()
+    {
+        return $this->coroutine;
+    }
+
+    public function setCoroutine(CoroutineTask $coroutine)
+    {
+        $this->coroutine = $coroutine;
+        return $this;
+    }
+
     public function getResult()
     {
-        $this->getCount++;
-
         if ($this->result !== CoroutineNull::getInstance()) {
             return $this->result;
         }
 
-        if ((1000*(microtime(true) - $this->requestTime) > $this->timeout)
-            || ($this->getCount > $this->timeout)
-        ) {
+        if (1000*(microtime(true) - $this->requestTime) > $this->timeout) {
             throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
         }
 
         return $this->result;
+    }
+
+    public function nextRun($logId)
+    {
+        if (empty(get_instance()->coroutine->IOCallBack[$logId])) {
+            return true;
+        }
+
+        foreach (get_instance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
+            if ($coroutine->ioBack && !empty(get_instance()->coroutine->taskMap[$logId])) {
+                unset(get_instance()->coroutine->IOCallBack[$logId][$k]);
+                get_instance()->coroutine->schedule(get_instance()->coroutine->taskMap[$logId])->run();
+            } else {
+                break;
+            }
+        }
+        return true;
     }
 }

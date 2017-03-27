@@ -37,6 +37,7 @@ class BaseController extends Controller
         $this->PGLog->init();
         $this->client->context = new Context();
         $this->client->context->PGLog = $this->PGLog;
+        $this->client->context->controller = &$this;
     }
 
     public function destroy()
@@ -90,8 +91,10 @@ class BaseController extends Controller
             $output = json_encode($result);
         }
 
-        $this->http_output->setContentType('application/json; charset=UTF-8');
-        $this->http_output->end($output);
+        if (!empty($this->http_output->response)) {
+            $this->http_output->setContentType('application/json; charset=UTF-8');
+            $this->http_output->end($output);
+        }
     }
 
     /**

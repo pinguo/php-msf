@@ -9,8 +9,9 @@
 namespace PG\MSF\Server;
 
 use Noodlehaus\Config;
+use PG\MSF\Server\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Server\CoreBase\{
-    Child, ControllerFactory, Coroutine, GeneratorContext, Loader, SwooleException
+    Child, ControllerFactory, GeneratorContext, Loader, SwooleException
 };
 use PG\MSF\Server\{
     Pack\IPack, Route\IRoute, Helpers\Log\PGLog

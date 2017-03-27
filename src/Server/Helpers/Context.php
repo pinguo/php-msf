@@ -23,4 +23,9 @@ class Context
      * @var HttpInput
      */
     public $HttpInput;
+
+    /**
+     * @var \PG\MSF\Server\Controllers\BaseController
+     */
+    public $controller;
 }
