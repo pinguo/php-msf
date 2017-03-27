@@ -36,10 +36,11 @@ class BaseController extends Controller
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
 
-        $context = new Context();
-        $context->PGLog = $this->PGLog;
-        $this->client->context = $context;
-        $this->tcpClient->context = $context;
+        $context                           = new Context();
+        $context->PGLog                    = $this->PGLog;
+        $this->client->context             = $context;
+        $this->tcpClient->context          = $context;
+        $this->client->context->controller = &$this;
     }
 
     public function destroy()
@@ -94,8 +95,10 @@ class BaseController extends Controller
 
         switch ($this->request_type) {
             case SwooleMarco::HTTP_REQUEST:
-                $this->http_output->setContentType('application/json; charset=UTF-8');
-                $this->http_output->end($output);
+                if (!empty($this->http_output->response)) {
+                    $this->http_output->setContentType('application/json; charset=UTF-8');
+                    $this->http_output->end($output);
+                }
                 break;
             case SwooleMarco::TCP_REQUEST:
                 $this->send($output);

@@ -9,6 +9,7 @@
 namespace PG\MSF\Server\Client\Http;
 
 use PG\MSF\Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\Coroutine\Scheduler;
 
 class GetHttpClientCoroutine extends CoroutineBase
 {
@@ -25,13 +26,13 @@ class GetHttpClientCoroutine extends CoroutineBase
         $this->client   = $client;
         $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->base_url;
         $this->client->context->PGLog->profileStart($profileName);
+        get_instance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
         $this->send(function ($http_client) use ($profileName) {
             $this->result       = $http_client;
             $this->responseTime = microtime(true);
             $this->client->context->PGLog->profileEnd($profileName);
-            if (!empty(get_instance()->coroutine->routineList[$this->client->context->PGLog->logId])) {
-                get_instance()->coroutine->keepRun[$this->client->context->PGLog->logId] = get_instance()->coroutine->routineList[$this->client->context->PGLog->logId];
-            }
+            $this->ioBack = true;
+            $this->nextRun($this->client->context->PGLog->logId);
         });
     }
 
