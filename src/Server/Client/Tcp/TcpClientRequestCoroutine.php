@@ -18,13 +18,13 @@ class TcpClientRequestCoroutine extends CoroutineBase
     public $tcpClient;
     public $data;
 
-    public function __construct(TcpClient $tcpClient, $data, $timeout)
+    public function __construct(TcpClient $tcpClient, string $data, string $path, int $timeout)
     {
         parent::__construct($timeout);
         $this->tcpClient = $tcpClient;
         $this->data = $data;
 
-        $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-tcp://'; //todo
+        $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-tcp:' . $path;
         $this->tcpClient->context->PGLog->profileStart($profileName);
         $this->send(function ($cli, $recData) use ($profileName) {
             $this->result = $recData;
