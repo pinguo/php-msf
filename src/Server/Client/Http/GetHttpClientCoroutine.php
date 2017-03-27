@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\Client;
+namespace PG\MSF\Server\Client\Http;
 
 use PG\MSF\Server\CoreBase\CoroutineBase;
 use PG\MSF\Server\Coroutine\Scheduler;
@@ -19,7 +19,7 @@ class GetHttpClientCoroutine extends CoroutineBase
     public $client;
     public $base_url;
 
-    public function __construct($client, $base_url, $timeout)
+    public function __construct(Client $client, $base_url, $timeout)
     {
         parent::__construct($timeout);
         $this->base_url = $base_url;

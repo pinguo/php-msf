@@ -111,6 +111,10 @@ class HttpOutput
             $this->response->header('Vary', 'Accept-Encoding');
             $output = gzencode($output . " \n", 9);
         }*/
+        if (!is_string($output)) {
+            $this->setHeader('Content-Type', 'application/json');
+            $output = json_encode($output, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        }
         $this->response->end($output);
         if ($destroy) {
             $this->controller->destroy();

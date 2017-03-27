@@ -655,7 +655,6 @@ abstract class SwooleServer extends Child
      */
     public function onSwooleConnect($serv, $fd)
     {
-
     }
 
     /**

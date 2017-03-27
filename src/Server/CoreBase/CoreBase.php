@@ -41,6 +41,8 @@ class CoreBase extends Child
      */
     public $pack;
 
+    protected $start_run_time;
+
 
     /**
      * Task constructor.
