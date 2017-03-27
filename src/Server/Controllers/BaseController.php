@@ -9,7 +9,7 @@
 namespace PG\MSF\Server\Controllers;
 
 use PG\MSF\Server\{
-    CoreBase\Controller, Helpers\Log\PGLog, SwooleMarco
+    CoreBase\Controller, Helpers\Log\PGLog, SwooleMarco, Helpers\Context
 };
 
 class BaseController extends Controller
@@ -35,6 +35,11 @@ class BaseController extends Controller
         $this->PGLog->logId = $this->getContext()['logId'];
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
+
+        $context = new Context();
+        $context->PGLog = $this->PGLog;
+        $this->client->context = $context;
+        $this->tcpClient->context = $context;
     }
 
     public function destroy()
@@ -52,7 +57,7 @@ class BaseController extends Controller
         if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
             $logId = $this->http_input->getRequestHeader('log_id') ?? '';
         } else {
-            $logId = $this->client_data->logid ?? '';
+            $logId = $this->client_data->logId ?? '';
         }
 
         if (!$logId) {

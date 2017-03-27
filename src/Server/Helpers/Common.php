@@ -101,3 +101,80 @@ function isMac()
         return false;
     }
 }
+
+/**
+ * 剔出协程相关上下文信息
+ *
+ * @param mixed $var
+ * @param int $level
+ * @return string
+ */
+function dumpCoroutineTaskMessage(&$output, $var, $level)
+{
+    switch (gettype($var)) {
+        case 'boolean':
+            $output .= $var ? 'true' : 'false';
+            break;
+        case 'integer':
+            $output .= "$var";
+            break;
+        case 'double':
+            $output .= "$var";
+            break;
+        case 'string':
+            $output .= "'" . addslashes($var) . "'";
+            break;
+        case 'resource':
+            $output .= '{resource}';
+            break;
+        case 'NULL':
+            $output .= 'null';
+            break;
+        case 'unknown type':
+            $output .= '{unknown}';
+            break;
+        case 'array':
+            if (4 <= $level) {
+                $output .= '[...]';
+            } elseif (empty($var)) {
+                $output .= '[]';
+            } else {
+                $keys = array_keys($var);
+                $output .= '[';
+                foreach ($keys as $key) {
+                    dumpCoroutineTaskMessage($output, $key, 0);
+                    $output .= ' => ';
+                    dumpCoroutineTaskMessage($output, $var[$key], $level + 1);
+                    $output .= ', ';
+                }
+                $output .= "], ";
+            }
+            break;
+        case 'object':
+            if ($var instanceof \PG\MSF\Server\Helpers\Context || $var instanceof \PG\MSF\Server\CoreBase\Controller) {
+                $output .= '..., ';
+                break;
+            }
+            if (4 <= $level) {
+                $output .= get_class($var) . '(...)';
+            } else {
+                $className = get_class($var);
+                $output .= "$className(";
+                if ('__PHP_Incomplete_Class' !== get_class($var) && method_exists($var, '__debugInfo')) {
+                    $dumpValues = $var->__debugInfo();
+                } else {
+                    $dumpValues = (array) $var;
+                }
+                foreach ($dumpValues as $key => $value) {
+                    $keyDisplay = strtr(trim($key), "\0", ':');
+                    $output .= "$keyDisplay => ";
+                    dumpCoroutineTaskMessage($output, $value, $level + 1);
+                    $output .= ', ';
+                }
+                $output .= '), ';
+            }
+            break;
+    }
+
+    $output = str_replace([', ,', ',  ', ', )', ', ]'], [', ', ', ', ')', ']'], $output);
+}

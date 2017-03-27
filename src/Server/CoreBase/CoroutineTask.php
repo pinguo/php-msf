@@ -13,6 +13,7 @@ class CoroutineTask
     protected $stack;
     protected $routine;
     public $generatorContext;
+    public $destroy = false;
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)
     {
@@ -57,8 +58,8 @@ class CoroutineTask
                 if ($routine->valid()) {
                     $routine->send($value);
                 } else {
-                    $result = $routine->getReturn();
                     if (count($this->stack) > 0) {
+                        $result = $routine->getReturn();
                         $this->routine = $this->stack->pop();
                         $this->routine->send($result);
                     }
@@ -71,8 +72,10 @@ class CoroutineTask
             if (empty($value)) {
                 $value = "";
             }
-            $message = 'yield ' . str_replace(["\n", " ", "=>"], ["", "", " => "],
-                    var_export($value, true)) . ' message: ' . $e->getMessage();
+
+            $logValue = "";
+            dumpCoroutineTaskMessage($logValue, $value, 0);
+            $message = 'yield ' . $logValue . ' message: ' . $e->getMessage();
             $runTaskException = new CoroutineException($message, $e->getCode(), $e);
             $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
             $this->generatorContext->setErrorMessage($message);
@@ -105,7 +108,7 @@ class CoroutineTask
      */
     public function isFinished()
     {
-        return $this->stack->isEmpty() && !$this->routine->valid();
+        return !empty($this->stack) && $this->stack->isEmpty() && !$this->routine->valid();
     }
 
     public function getRoutine()
@@ -118,9 +121,12 @@ class CoroutineTask
      */
     public function destroy()
     {
-        $this->generatorContext->destroy();
-        unset($this->generatorContext);
-        unset($this->stack);
-        unset($this->routine);
+        if (!$this->destroy) {
+            $this->generatorContext->destroy();
+            unset($this->generatorContext);
+            unset($this->stack);
+            unset($this->routine);
+            $this->destroy = true;
+        }
     }
 }

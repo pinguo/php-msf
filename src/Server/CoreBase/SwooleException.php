@@ -31,8 +31,5 @@ class SwooleException extends \Exception
             print_r($this->getTraceAsString() . "\n");
         }
         print_r("\n");
-        if (!empty($controller) && $controller instanceof BaseController) {
-            $controller->PGLog->warning($others);
-        }
     }
 }
