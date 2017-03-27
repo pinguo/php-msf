@@ -19,6 +19,9 @@ class Scheduler
     public function __construct()
     {
         $this->taskQueue = new \SplQueue();
+        swoole_timer_tick(2, function ($timerId) {
+            $this->run();
+        });
     }
 
     public function schedule(CoroutineTask $task)
@@ -33,16 +36,12 @@ class Scheduler
             $task = $this->taskQueue->dequeue();
             $task->run();
 
-            if (!empty($task->routine) && !is_null($task->routine->current())) {
-                if (!($task->routine->current() instanceof ICoroutineBase)) {
-                    $this->schedule($task);
-                }
-            } else {
-                if (!$task->isFinished()) {
-                    $this->schedule($task);
-                } else {
-                    $task->destroy();
-                }
+            if ($task->routine->valid() && !($task->routine->current() instanceof ICoroutineBase)) {
+                $this->schedule($task);
+            }
+
+            if ($task->isFinished()) {
+                $task->destroy();
             }
         }
     }
