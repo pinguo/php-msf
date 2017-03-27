@@ -102,7 +102,7 @@ abstract class CoroutineBase implements ICoroutineBase
         foreach (get_instance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
             if ($coroutine->ioBack && !empty(get_instance()->coroutine->taskMap[$logId])) {
                 unset(get_instance()->coroutine->IOCallBack[$logId][$k]);
-                get_instance()->coroutine->schedule(get_instance()->coroutine->taskMap[$logId])->run();
+                get_instance()->coroutine->schedule(get_instance()->coroutine->taskMap[$logId]);
             } else {
                 break;
             }
