@@ -53,9 +53,12 @@ class RedisAsynPool extends AsynPool
 
     /**
      * 协程模式
+     *
+     * @param $context
      * @param $name
-     * @param $arg
-     * @return RedisCoroutine
+     * @param array ...$arg
+     * @return mixed|RedisCoroutine
+     * @throws SwooleException
      */
     public function coroutineSend($context, $name, ...$arg)
     {

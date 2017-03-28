@@ -22,7 +22,7 @@ class CoroutineRedisHelp
         if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return call_user_func_array([get_instance()->getRedis(), $name], $arguments);
         } else {
-            return new RedisCoroutine($this->redisAsynPool, $name, $arguments);
+            return new RedisCoroutine($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
         }
     }
 
