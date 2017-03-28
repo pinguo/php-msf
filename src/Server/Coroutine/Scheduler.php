@@ -35,9 +35,7 @@ class Scheduler
                     }
 
                     if ($callBack->isTimeout()) {
-                        if ($this->taskMap[$logId]->destroy()) {
-                            $this->taskMap[$logId]->throwSwooleException();
-                        }
+                        $this->nextRun($this->taskMap[$logId]);
                     }
                 }
             }
