@@ -6,14 +6,20 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\CoreBase;
+namespace PG\MSF\Server\Coroutine;
+use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\CoreBase\ICoroutineBase;
+use PG\MSF\Server\CoreBase\CoroutineNull;
+use PG\MSF\Server\CoreBase\CoroutineException;
+use PG\MSF\Server\CoreBase\SwooleException;
 
 class CoroutineTask
 {
     protected $stack;
-    protected $routine;
+    public $routine;
     public $generatorContext;
     public $destroy = false;
+    public $asyncCallBack = [];
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)
     {
@@ -99,6 +105,8 @@ class CoroutineTask
             } else {
                 $routine->throw($runTaskException);
             }
+
+            $this->destroy();
         }
     }
 
@@ -122,11 +130,16 @@ class CoroutineTask
     public function destroy()
     {
         if (!$this->destroy) {
+            unset(get_instance()->coroutine->taskMap[$this->generatorContext->getController()->PGLog->logId]);
+            unset(get_instance()->coroutine->IOCallBack[$this->generatorContext->getController()->PGLog->logId]);
             $this->generatorContext->destroy();
             unset($this->generatorContext);
             unset($this->stack);
             unset($this->routine);
             $this->destroy = true;
+            return true;
+        } else {
+            return false;
         }
     }
 }

@@ -12,8 +12,9 @@ use PG\MSF\Server\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
 use PG\MSF\Server\Test\TestModule;
+use PG\MSF\Server\Coroutine\CoroutineTask;
 use PG\MSF\Server\CoreBase\{
-    CoroutineTask, GeneratorContext, InotifyProcess, SwooleException
+    GeneratorContext, InotifyProcess, SwooleException
 };
 use PG\MSF\Server\DataBase\{
     AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool

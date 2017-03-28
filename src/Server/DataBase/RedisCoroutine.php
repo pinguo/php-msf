@@ -18,15 +18,19 @@ class RedisCoroutine extends CoroutineBase
     public $name;
     public $arguments;
 
-    public function __construct($redisAsynPool, $name, $arguments)
+    public function __construct($context, $redisAsynPool, $name, $arguments)
     {
         parent::__construct();
         $this->redisAsynPool = $redisAsynPool;
         $this->name = $name;
         $this->arguments = $arguments;
         $this->request = "#redis: $name";
-        $this->send(function ($result) {
+        $logId = $context->PGLog->logId;
+        get_instance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($result) use ($logId) {
             $this->result = $result;
+            $this->ioBack = true;
+            $this->nextRun($logId);
         });
     }
 

@@ -53,16 +53,19 @@ class RedisAsynPool extends AsynPool
 
     /**
      * 协程模式
+     *
+     * @param $context
      * @param $name
-     * @param $arg
-     * @return RedisCoroutine
+     * @param array ...$arg
+     * @return mixed|RedisCoroutine
+     * @throws SwooleException
      */
-    public function coroutineSend($name, ...$arg)
+    public function coroutineSend($context, $name, ...$arg)
     {
         if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return call_user_func_array([$this->getSync(), $name], $arg);
         } else {
-            return new RedisCoroutine($this, $name, $arg);
+            return new RedisCoroutine($context, $this, $name, $arg);
         }
     }
 

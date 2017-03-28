@@ -31,6 +31,7 @@ class GeneratorContext
         $number++;
         $i = count($this->stack);
         $this->stack[] = "| #第 $i 层嵌套出错在第 $number 个yield后";
+        
     }
 
     /**
