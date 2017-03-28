@@ -69,17 +69,6 @@ abstract class CoroutineBase implements ICoroutineBase
 
     public abstract function send($callback);
 
-    public function getCoroutine()
-    {
-        return $this->coroutine;
-    }
-
-    public function setCoroutine(CoroutineTask $coroutine)
-    {
-        $this->coroutine = $coroutine;
-        return $this;
-    }
-
     public function getResult()
     {
         if ($this->result !== CoroutineNull::getInstance()) {
@@ -87,10 +76,24 @@ abstract class CoroutineBase implements ICoroutineBase
         }
 
         if (1000*(microtime(true) - $this->requestTime) > $this->timeout) {
-            throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
+            $this->throwSwooleException();
         }
 
         return $this->result;
+    }
+
+    public function throwSwooleException()
+    {
+        throw new SwooleException("[CoroutineTask]: Time Out!, [Request]: $this->request");
+    }
+
+    public function isTimeout()
+    {
+        if (1000*(microtime(true) - $this->requestTime) > $this->timeout) {
+            return true;
+        }
+
+        return false;
     }
 
     public function nextRun($logId)

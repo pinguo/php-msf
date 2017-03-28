@@ -105,6 +105,8 @@ class CoroutineTask
             } else {
                 $routine->throw($runTaskException);
             }
+
+            $this->destroy();
         }
     }
 
@@ -135,6 +137,9 @@ class CoroutineTask
             unset($this->stack);
             unset($this->routine);
             $this->destroy = true;
+            return true;
+        } else {
+            return false;
         }
     }
 }

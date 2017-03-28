@@ -19,8 +19,28 @@ class Scheduler
     public function __construct()
     {
         $this->taskQueue = new \SplQueue();
-        swoole_timer_tick(2, function ($timerId) {
+        swoole_timer_tick(1, function ($timerId) {
             $this->run();
+        });
+
+        swoole_timer_tick(1000, function ($timerId) {
+            if (empty($this->IOCallBack)) {
+                return true;
+            }
+
+            foreach ($this->IOCallBack as $logId => $callBacks) {
+                foreach ($callBacks as $key => $callBack) {
+                    if ($callBack->ioBack) {
+                        continue;
+                    }
+
+                    if ($callBack->isTimeout()) {
+                        if ($this->taskMap[$logId]->destroy()) {
+                            $this->taskMap[$logId]->throwSwooleException();
+                        }
+                    }
+                }
+            }
         });
     }
 
@@ -36,7 +56,8 @@ class Scheduler
             $task = $this->taskQueue->dequeue();
             $task->run();
 
-            if ($task->routine->valid() && !($task->routine->current() instanceof ICoroutineBase)) {
+            if ($task->routine && $task->routine->valid() && ($task->routine->current() instanceof ICoroutineBase)) {
+            } else if ($task->routine) {
                 $this->schedule($task);
             }
 
