@@ -101,10 +101,12 @@ class CoroutineTask
                     $this->generatorContext->getController());
             }
             if ($this->generatorContext->getController() != null) {
-                call_user_func([$this->generatorContext->getController(), 'onExceptionHandle'], $e);
+                call_user_func([$this->generatorContext->getController(), 'onExceptionHandle'], $runTaskException);
             } else {
                 $routine->throw($runTaskException);
             }
+
+            $this->destroy();
         }
     }
 
@@ -135,6 +137,9 @@ class CoroutineTask
             unset($this->stack);
             unset($this->routine);
             $this->destroy = true;
+            return true;
+        } else {
+            return false;
         }
     }
 }
