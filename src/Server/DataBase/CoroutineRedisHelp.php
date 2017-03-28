@@ -28,23 +28,25 @@ class CoroutineRedisHelp
 
     /**
      * redis cache 操作封装
+     *
+     * @param $context
      * @param $key
      * @param string $value
      * @param int $expire
      * @return mixed|RedisCoroutine
      */
-    public function cache($key, $value = '', $expire = 0)
+    public function cache($context, $key, $value = '', $expire = 0)
     {
         if ($value === '') {
-            $commandData = [$key];
+            $commandData = [$context, $key];
             $command = 'get';
         } else {
             if (!empty($expire)) {
                 $command = 'setex';
-                $commandData = [$key, $expire, $value];
+                $commandData = [$context, $key, $expire, $value];
             } else {
                 $command = 'set';
-                $commandData = [$key, $value];
+                $commandData = [$context, $key, $value];
             }
         }
 
