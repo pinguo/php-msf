@@ -31,7 +31,7 @@ class HttpClient
      * HttpClient constructor.
      * @param $client
      */
-    public function __construct(Client $client)
+    public function __construct(\swoole_http_client $client)
     {
         $this->client = $client;
     }
