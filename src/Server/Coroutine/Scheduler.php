@@ -35,7 +35,7 @@ class Scheduler
                     }
 
                     if ($callBack->isTimeout()) {
-                        $this->nextRun($this->taskMap[$logId]);
+                        $this->schedule($this->taskMap[$logId]);
                     }
                 }
             }
@@ -54,8 +54,12 @@ class Scheduler
             $task = $this->taskQueue->dequeue();
             $task->run();
 
-            if ($task->routine && $task->routine->valid() && ($task->routine->current() instanceof ICoroutineBase)) {
-            } else if ($task->routine) {
+            if (empty($task->routine)) {
+                continue;
+            }
+
+            if ($task->routine->valid() && ($task->routine->current() instanceof ICoroutineBase)) {
+            } else {
                 $this->schedule($task);
             }
 
