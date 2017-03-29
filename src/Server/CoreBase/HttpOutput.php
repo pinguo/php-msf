@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\MSF\Server\SwooleMarco;
+
 class HttpOutput
 {
     /**
@@ -33,6 +35,11 @@ class HttpOutput
     public function __construct($controller)
     {
         $this->controller = $controller;
+    }
+
+    public function __sleep()
+    {
+        return ['response', 'request'];
     }
 
     /**
@@ -93,6 +100,67 @@ class HttpOutput
     }
 
     /**
+     * 响应json格式数据
+     *
+     * @param null $data
+     * @param string $message
+     * @param int $status
+     * @param null $callback
+     * @return array
+     */
+    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    {
+        $this->controller->PGLog->pushLog('status', $status);
+        $result = [
+            'data'       => $data,
+            'status'     => $status,
+            'message'    => $message,
+            'serverTime' => microtime(true),
+        ];
+
+        switch ($this->controller->request_type) {
+            case SwooleMarco::HTTP_REQUEST:
+                $callback = $this->getCallback($callback);
+                if (!is_null($callback)) {
+                    $output = $callback . '(' . json_encode($result) . ');';
+                } else {
+                    $output = json_encode($result);
+                }
+
+                if (!empty($this->response)) {
+                    $this->setContentType('application/json; charset=UTF-8');
+                    $this->end($output);
+                }
+                break;
+            case SwooleMarco::TCP_REQUEST:
+                $output = json_encode($result);
+                $this->controller->send($output);
+                break;
+        }
+    }
+
+    /**
+     * 获取jsonp的callback名称
+     *
+     * @param $callback
+     * @return string
+     */
+    public function getCallback($callback)
+    {
+        if (is_null($callback) && (!empty($this->controller->http_input->postGet('callback'))
+                || !empty($this->controller->http_input->postGet('cb')) || !empty($this->controller->http_input->postGet('jsonpCallback')))
+        ) {
+            $callback = !empty($this->controller->http_input->postGet('callback'))
+                ? $this->controller->http_input->postGet('callback')
+                : !empty($this->controller->http_input->postGet('cb'))
+                    ? $this->controller->http_input->postGet('cb')
+                    : $this->controller->http_input->postGet('jsonpCallback');
+        }
+
+        return $callback;
+    }
+
+    /**
      * 发送
      * @param string $output
      * @param bool $gzip
@@ -101,16 +169,10 @@ class HttpOutput
     public function end($output = '', $gzip = true, $destroy = true)
     {
         $acceptEncoding = strtolower($this->request->header['accept-encoding'] ?? '');
-        //低版本swoole的gzip方法存在效率问题
         if ($gzip && strpos($acceptEncoding, 'gzip') !== false) {
             $this->response->gzip(1);
         }
-        //压缩备用方案
-        /*if ($gzip) {
-            $this->response->header('Content-Encoding', 'gzip');
-            $this->response->header('Vary', 'Accept-Encoding');
-            $output = gzencode($output . " \n", 9);
-        }*/
+
         if (!is_string($output)) {
             $this->setHeader('Content-Type', 'application/json');
             $output = json_encode($output, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
@@ -119,7 +181,6 @@ class HttpOutput
         if ($destroy) {
             $this->controller->destroy();
         }
-        return;
     }
 
     /**

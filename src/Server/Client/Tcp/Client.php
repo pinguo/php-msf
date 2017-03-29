@@ -56,6 +56,7 @@ class Client
         swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut) {
             if (empty($ip)) {
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
+                $this->context->httpOutput->outputJson([], 'error', 500);
             } else {
                 $c = new \swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
                 $c->set($this->set);

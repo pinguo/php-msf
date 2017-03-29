@@ -42,21 +42,18 @@ class Model extends CoreBase
         parent::__construct();
         $this->redis_pool = get_instance()->redis_pool;
         $this->mysql_pool = get_instance()->mysql_pool;
-        $this->client = clone get_instance()->client;
-        $this->tcpClient = clone get_instance()->tcpClient;
     }
 
     /**
      * 当被loader时会调用这个方法进行初始化
-     * @param $context
+     * @param \PG\MSF\Server\Helpers\Context $context
      */
     public function initialization($context)
     {
         $this->setContext($context);
-        if ($this->parent->PGLog) {
-            $this->PGLog = $this->parent->PGLog;
-            $this->client->context->PGLog = $this->PGLog;
-        }
+        $this->PGLog     = $context->PGLog;
+        $this->client    = $context->controller->client;
+        $this->tcpClient = $context->controller->tcpClient;
     }
 
     /**
