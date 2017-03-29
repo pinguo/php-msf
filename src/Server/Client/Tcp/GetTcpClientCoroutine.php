@@ -31,6 +31,7 @@ class GetTcpClientCoroutine extends CoroutineBase
             $this->result       = $tcpClient;
             $this->responseTime = microtime(true);
             $this->client->context->PGLog->profileEnd($profileName);
+            $this->ioBack = true;
             $this->nextRun($this->client->context->PGLog->logId);
         });
     }
