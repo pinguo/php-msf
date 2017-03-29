@@ -26,10 +26,12 @@ class GetTcpClientCoroutine extends CoroutineBase
         $this->client   = $client;
         $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->base_url;
         $this->client->context->PGLog->profileStart($profileName);
+        get_instance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
         $this->send(function ($tcpClient) use ($profileName) {
             $this->result       = $tcpClient;
             $this->responseTime = microtime(true);
             $this->client->context->PGLog->profileEnd($profileName);
+            $this->nextRun($this->client->context->PGLog->logId);
         });
     }
 
