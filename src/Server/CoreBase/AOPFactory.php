@@ -8,17 +8,6 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-
-use PG\MSF\Server\Helpers\Log\PGLog;
-
 class AOPFactory
 {
-    /**
-     * @param $name
-     * @return AOP | PGLog
-     */
-    /*public static function PGLog($name)
-    {
-        return new AOP(new PGLog($name));
-    }*/
 }

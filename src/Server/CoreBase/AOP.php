@@ -11,15 +11,28 @@ namespace PG\MSF\Server\CoreBase;
 class AOP
 {
     private $instance;
+    private $attributes = [];
 
     private $onBeforeFunc = [];
     private $onAfterFunc = [];
 
     private $data = [];
 
-    public function __construct($instance)
+    public function __construct($instance, $isClone = false)
     {
+        $isClone && ($instance = clone $instance);
+        $instance->aop = $this;
         $this->instance = $instance;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        return $this->attributes[$name] ?? null;
     }
 
     public function __call($method, $arguments)
