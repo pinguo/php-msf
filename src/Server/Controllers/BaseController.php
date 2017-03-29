@@ -40,7 +40,7 @@ class BaseController extends Controller
         $context->PGLog                    = $this->PGLog;
         $context->httpInput                = $this->http_input;
         $context->httpOutput               = $this->http_output;
-        $context->controller               = &$this;
+        $context->controller               = $this;
         $this->client->context             = $context;
         $this->tcpClient->context          = $context;
         $this->setContext($context);
