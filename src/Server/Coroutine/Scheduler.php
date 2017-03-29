@@ -53,18 +53,16 @@ class Scheduler
         while (!$this->taskQueue->isEmpty()) {
             $task = $this->taskQueue->dequeue();
             $task->run();
-
             if (empty($task->routine)) {
                 continue;
             }
-
             if ($task->routine->valid() && ($task->routine->current() instanceof ICoroutineBase)) {
             } else {
-                $this->schedule($task);
-            }
-
-            if ($task->isFinished()) {
-                $task->destroy();
+                if ($task->isFinished()) {
+                    $task->destroy();
+                } else {
+                    $this->schedule($task);
+                }
             }
         }
     }
