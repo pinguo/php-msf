@@ -24,11 +24,13 @@ class TcpClientRequestCoroutine extends CoroutineBase
 
         $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-tcp:' . $path;
         $this->tcpClient->context->PGLog->profileStart($profileName);
+        get_instance()->coroutine->IOCallBack[$this->tcpClient->context->PGLog->logId][] = $this;
         $this->send(function ($cli, $recData) use ($profileName) {
             $this->result = $recData;
             $this->responseTime = microtime(true);
             $cli->close();
             $this->tcpClient->context->PGLog->profileEnd($profileName);
+            $this->nextRun($this->tcpClient->context->PGLog->logId);
         });
     }
 
