@@ -38,9 +38,12 @@ class BaseController extends Controller
 
         $context                           = new Context();
         $context->PGLog                    = $this->PGLog;
+        $context->httpInput                = $this->http_input;
+        $context->httpOutput               = $this->http_output;
+        $context->controller               = $this;
         $this->client->context             = $context;
         $this->tcpClient->context          = $context;
-        $this->client->context->controller = &$this;
+        $this->setContext($context);
     }
 
     public function destroy()
@@ -77,56 +80,10 @@ class BaseController extends Controller
      * @param null $callback
      * @return array
      */
+
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        $this->PGLog->pushLog('status', $status);
-        $callback = $this->getCallback($callback);
-        $result = [
-            'data' => $data,
-            'status' => $status,
-            'message' => $message,
-            'serverTime' => microtime(true),
-        ];
-
-        if (!is_null($callback)) {
-            $output = $callback . '(' . json_encode($result) . ');';
-        } else {
-            $output = json_encode($result);
-        }
-
-        switch ($this->request_type) {
-            case SwooleMarco::HTTP_REQUEST:
-                if (!empty($this->http_output->response)) {
-                    $this->http_output->setContentType('application/json; charset=UTF-8');
-                    $this->http_output->end($output);
-                }
-                break;
-            case SwooleMarco::TCP_REQUEST:
-                $this->send($output);
-                break;
-        }
-
-    }
-
-    /**
-     * 获取jsonp的callback名称
-     *
-     * @param $callback
-     * @return string
-     */
-    public function getCallback($callback)
-    {
-        if (is_null($callback) && (!empty($this->http_input->postGet('callback'))
-                || !empty($this->http_input->postGet('cb')) || !empty($this->http_input->postGet('jsonpCallback')))
-        ) {
-            $callback = !empty($this->http_input->postGet('callback'))
-                ? $this->http_input->postGet('callback')
-                : !empty($this->http_input->postGet('cb'))
-                    ? $this->http_input->postGet('cb')
-                    : $this->http_input->postGet('jsonpCallback');
-        }
-
-        return $callback;
+        $this->http_output->outputJson($data, $message, $status, $callback);
     }
 
     /**
@@ -139,7 +96,11 @@ class BaseController extends Controller
     public function onExceptionHandle(\Throwable $e)
     {
         $message = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
-        $message .= ' trace: ' . $e->getTraceAsString();
+        $message .= ' Trace: ' . $e->getTraceAsString();
+
+        if (!empty($e->getPrevious())) {
+            $message .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
+        }
 
         $this->PGLog->error($message);
 

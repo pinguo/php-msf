@@ -9,7 +9,7 @@
 namespace PG\MSF\Server\Helpers;
 
 use PG\MSF\Server\{
-    CoreBase\HttpInput, Helpers\Log\PGLog
+    CoreBase\HttpInput, CoreBase\HttpOutput, Helpers\Log\PGLog
 };
 
 class Context
@@ -22,10 +22,20 @@ class Context
     /**
      * @var HttpInput
      */
-    public $HttpInput;
+    public $httpInput;
+
+    /**
+     * @var HttpOutput
+     */
+    public $httpOutput;
 
     /**
      * @var \PG\MSF\Server\Controllers\BaseController
      */
     public $controller;
+
+    public function __sleep()
+    {
+        return ['PGLog', 'httpInput', 'httpOutput'];
+    }
 }

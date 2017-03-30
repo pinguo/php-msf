@@ -123,7 +123,7 @@ abstract class SwooleHttpServer extends SwooleServer
      */
     public function onSwooleRequest($request, $response)
     {
-        $error_404 = false;
+        $error = '';
         $controller_instance = null;
         $this->route->handleClientRequest($request);
         list($host) = explode(':', $request->header['host']??'');
@@ -131,7 +131,7 @@ abstract class SwooleHttpServer extends SwooleServer
             $www_path = $this->getHostRoot($host) . $this->getHostIndex($host);
             $result = httpEndFile($www_path, $request, $response);
             if (!$result) {
-                $error_404 = true;
+                $error = 'index not found';
             } else {
                 return;
             }
@@ -147,42 +147,40 @@ abstract class SwooleHttpServer extends SwooleServer
             if ($controller_instance != null) {
                 $method_name = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
                 if (!method_exists($controller_instance, $method_name)) {
-                    $method_name = $this->config->get('http.method_prefix',
-                            '') . $this->config->get('http.default_method', 'Index');
+                    $method_name = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
                     $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
-                try {
-                    $controller_instance->setRequestResponse($request, $response, $controller_name, $method_name);
-                    $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
-                    if ($generator instanceof \Generator) {
-                        $generatorContext = new GeneratorContext();
-                        $generatorContext->setController($controller_instance, $controller_name, $method_name);
-                        $controller_instance->setGeneratorContext($generatorContext);
-                        $this->coroutine->start($generator, $generatorContext);
+
+                $controller_instance->setRequestResponse($request, $response, $controller_name, $method_name);
+                if (!method_exists($controller_instance, $method_name)) {
+                    $error = 'api not found(action)';
+                } else {
+                    try {
+
+                        $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
+                        if ($generator instanceof \Generator) {
+                            $generatorContext = new GeneratorContext();
+                            $generatorContext->setController($controller_instance, $controller_name, $method_name);
+                            $controller_instance->setGeneratorContext($generatorContext);
+                            $this->coroutine->start($generator, $generatorContext);
+                        }
+                        return;
+                    } catch (\Throwable $e) {
+                        call_user_func([$controller_instance, 'onExceptionHandle'], $e);
                     }
-                    return;
-                } catch (\Throwable $e) {
-                    call_user_func([$controller_instance, 'onExceptionHandle'], $e);
                 }
             } else {
-                $error_404 = true;
+                $error = 'api not found(controller)';
             }
         }
-        if ($error_404) {
+        
+        if ($error) {
             if ($controller_instance != null) {
                 $controller_instance->destroy();
             }
-            //先根据path找下www目录
-            $www_path = $this->getHostRoot($host) . $this->route->getPath();
-            $result = httpEndFile($www_path, $request, $response);
-            if (!$result) {
-                $response->header('HTTP/1.1', '404 Not Found');
-                if (!isset($this->cache404)) {//内存缓存404页面
-                    $template = $this->loader->view('server::error_404');
-                    $this->cache404 = $template->render();
-                }
-                $response->end($this->cache404);
-            }
+
+            $res = ['data' => [], 'message' => $error, 'status' => 500, 'serverTime' => microtime(true)];
+            $response->end(json_encode($res));
         }
     }
 

@@ -66,20 +66,10 @@ class TcpClient
             throw new SwooleException('tcp data must has path');
         }
 
-        $path = $data['path'];
-        $pathArr = explode('.', $path);
-        if (count($pathArr) === 1) {
-            throw new SwooleException('path must have 2 elements at least');
-        }
-
-        $data['method_name'] = array_pop($pathArr);
-        $data['controller_name'] = implode('/', $pathArr);
-        unset($data['path']);
-
+        $path          = $data['path'];
         $data['logId'] = $this->context->PGLog->logId;
-
         $data = $this->encode($this->pack->pack($data));
-        return new TcpClientRequestCoroutine($this, $data, $path, $this->timeOut);
+        return new TcpClientRequestCoroutine($this, $data, $path,$this->timeOut);
     }
 
     public function send($data, $callback)

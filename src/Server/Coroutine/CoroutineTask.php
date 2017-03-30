@@ -97,7 +97,7 @@ class CoroutineTask
             }
 
             if ($runTaskException instanceof SwooleException) {
-                $runTaskException->setShowOther($this->generatorContext->getTraceStack(),
+                $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
                     $this->generatorContext->getController());
             }
             if ($this->generatorContext->getController() != null) {

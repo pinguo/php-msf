@@ -39,6 +39,8 @@ class Server extends BaseController
      */
     public function HttpStatus()
     {
+        $client = yield $this->client->coroutineGetHttpClient('http://localhost');
+        $data   = yield $client->coroutineGet('/');
         $this->http_output->end('ok');
     }
 
@@ -47,6 +49,13 @@ class Server extends BaseController
      */
     public function TcpStatus()
     {
-        $this->send('ok');
+        $this->outputJson('ok');
+    }
+
+    public function HttpTcp()
+    {
+        $tcpClient = yield $this->tcpClient->coroutineGetTcpClient('localhost:8000');
+        $data      = yield $tcpClient->coroutineSend(['path' => 'server/status', 'data' => 1234]);
+        $this->outputJson($data);
     }
 }
