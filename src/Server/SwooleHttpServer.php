@@ -151,12 +151,11 @@ abstract class SwooleHttpServer extends SwooleServer
                     $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
 
-                $controller_instance->setRequestResponse($request, $response, $controller_name, $method_name);
-                if (!method_exists($controller_instance, $method_name)) {
-                    $error = 'api not found(action)';
-                } else {
-                    try {
-
+                try {
+                    $controller_instance->setRequestResponse($request, $response, $controller_name, $method_name);
+                    if (!method_exists($controller_instance, $method_name)) {
+                        $error = 'api not found(action)';
+                    } else {
                         $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
                         if ($generator instanceof \Generator) {
                             $generatorContext = new GeneratorContext();
@@ -165,9 +164,9 @@ abstract class SwooleHttpServer extends SwooleServer
                             $this->coroutine->start($generator, $generatorContext);
                         }
                         return;
-                    } catch (\Throwable $e) {
-                        call_user_func([$controller_instance, 'onExceptionHandle'], $e);
                     }
+                } catch (\Throwable $e) {
+                    call_user_func([$controller_instance, 'onExceptionHandle'], $e);
                 }
             } else {
                 $error = 'api not found(controller)';
