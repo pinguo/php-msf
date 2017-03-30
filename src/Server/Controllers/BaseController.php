@@ -15,6 +15,11 @@ use PG\MSF\Server\{
 class BaseController extends Controller
 {
     /**
+     * @var string
+     */
+    public $logId;
+
+    /**
      * @var PGLog
      */
     public $PGLog;
@@ -31,12 +36,12 @@ class BaseController extends Controller
         $this->PGLog = clone $this->logger;
         $this->PGLog->accessRecord['beginTime'] = $this->requestStartTime;
         $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $controller_name . '/' . $method_name);
-        $this->getContext()['logId'] = $this->genLogId();
-        $this->PGLog->logId = $this->getContext()['logId'];
+        $this->PGLog->logId = $this->genLogId();
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
 
         $context                           = new Context();
+        $context->logId                    = $this->logId;
         $context->PGLog                    = $this->PGLog;
         $context->httpInput                = $this->http_input;
         $context->httpOutput               = $this->http_output;
@@ -59,16 +64,16 @@ class BaseController extends Controller
     public function genLogId()
     {
         if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $logId = $this->http_input->getRequestHeader('log_id') ?? '';
+            $this->logId = $this->http_input->getRequestHeader('log_id') ?? '';
         } else {
-            $logId = $this->client_data->logId ?? '';
+            $this->logId = $this->client_data->logId ?? '';
         }
 
-        if (!$logId) {
-            $logId = strval(new \MongoId());
+        if (!$this->logId) {
+            $this->logId = strval(new \MongoId());
         }
 
-        return $logId;
+        return $this->logId;
     }
 
     /**
