@@ -185,7 +185,7 @@ class Controller extends CoreBase
      * @param $destroy
      * @throws SwooleException
      */
-    protected function send($data, $destroy = true)
+    public function send($data, $destroy = true)
     {
         if ($this->is_destroy) {
             throw new SwooleException('controller is destroy can not send data');

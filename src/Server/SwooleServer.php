@@ -667,6 +667,7 @@ abstract class SwooleServer extends Child
      */
     public function onSwooleReceive($serv, $fd, $from_id, $data)
     {
+        $error = '';
         $data = substr($data, $this->package_length_type_length);
         //反序列化，出现异常断开连接
         try {
@@ -679,6 +680,13 @@ abstract class SwooleServer extends Child
         $client_data = $this->route->handleClientData($client_data);
         $controller_name = $this->route->getControllerName();
         $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
+
+        if ($controller_instance == null) {
+            $controller_name = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
+            $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
+            $this->route->setControllerName($controller_name);
+        }
+        
         if ($controller_instance != null) {
             if (SwooleServer::$testUnity) {
                 $fd = 'self';
@@ -688,21 +696,39 @@ abstract class SwooleServer extends Child
             }
             $method_name = $this->config->get('tcp.method_prefix', '') . $this->route->getMethodName();
             $controller_instance->setClientData($uid, $fd, $client_data, $controller_name, $method_name);
-            try {
-                if (!method_exists($controller_instance, $method_name)) {
-                    $method_name = 'defaultMethod';
-                }
-                $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
-                if ($generator instanceof \Generator) {
-                    $generatorContext = new GeneratorContext();
-                    $generatorContext->setController($controller_instance, $controller_name, $method_name);
-                    $this->coroutine->start($generator, $generatorContext);
-                }
-            } catch (\Throwable $e) {
-                call_user_func([$controller_instance, 'onExceptionHandle'], $e);
+            
+            if (!method_exists($controller_instance, $method_name)) {
+                $method_name = $this->config->get('tcp.method_prefix', '') . $this->config->get('tcp.default_method', 'Index');
+                $this->route->setMethodName($this->config->get('tcp.default_method', 'Index'));
             }
+
+            if (!method_exists($controller_instance, $method_name)) {
+                $error = 'api not found(action)';
+            } else {
+                try {
+                    $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
+                    if ($generator instanceof \Generator) {
+                        $generatorContext = new GeneratorContext();
+                        $generatorContext->setController($controller_instance, $controller_name, $method_name);
+                        $this->coroutine->start($generator, $generatorContext);
+                    }
+                } catch (\Throwable $e) {
+                    call_user_func([$controller_instance, 'onExceptionHandle'], $e);
+                }
+            }
+        } else {
+            $error = 'api not found(controller)';
         }
-        return $controller_instance;
+
+        if ($error) {
+            if ($controller_instance != null) {
+                $controller_instance->destroy();
+            }
+
+            $response = ['data' => [], 'message' => $error, 'status' => 500, 'serverTime' => microtime(true)];
+            $response = get_instance()->encode($this->pack->pack(json_encode($response)));
+            get_instance()->send($fd, $response);
+        }
     }
 
     /**

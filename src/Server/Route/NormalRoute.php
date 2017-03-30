@@ -25,6 +25,7 @@ class NormalRoute implements IRoute
     public function handleClientData($data)
     {
         $this->client_data = $data;
+        $this->parsePath($data->path);
         return $this->client_data;
     }
 
@@ -35,7 +36,17 @@ class NormalRoute implements IRoute
     public function handleClientRequest($request)
     {
         $this->client_data->path = $request->server['path_info'];
-        $route = explode('/', $request->server['path_info']);
+        $this->parsePath($this->client_data->path);
+    }
+
+    /**
+     * 解析path
+     *
+     * @param $path
+     */
+    public function parsePath($path)
+    {
+        $route = explode('/', $path);
         $route = array_map(function ($name) {
             $name = strtolower($name);
             $name = ucfirst($name);
