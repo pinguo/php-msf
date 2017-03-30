@@ -22,10 +22,10 @@ class TestTcpCoroutine extends CoroutineBase
     {
         parent::__construct();
         $this->request = '#TcpRequest:' . json_encode($data);
-        $data = get_instance()->pack->pack($data);
-        $data = get_instance()->encode($data);
+        $data = getInstance()->pack->pack($data);
+        $data = getInstance()->encode($data);
         try {
-            $this->controller = get_instance()->onSwooleReceive(get_instance()->server, $uid, 0, $data);
+            $this->controller = getInstance()->onSwooleReceive(getInstance()->server, $uid, 0, $data);
         } catch (\Exception $e) {
             $this->controller = CoroutineNull::getInstance();
         }
@@ -42,7 +42,7 @@ class TestTcpCoroutine extends CoroutineBase
         if ($this->controller == CoroutineNull::getInstance()) {
             return null;
         }
-        if ($this->controller->is_destroy) {
+        if ($this->controller->isDestroy) {
             $result = $this->controller->getTestUnitResult();
         }
         return $result;

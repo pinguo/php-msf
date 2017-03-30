@@ -20,18 +20,18 @@ class MysqlAsynPool extends AsynPool
     /**
      * @var array
      */
-    public $bind_pool;
-    protected $mysql_max_count = 0;
+    public $bindPool;
+    protected $mysqlMaxCount = 0;
     private $active;
-    private $mysql_client;
+    private $mysqlClient;
 
     public function __construct($config, $active)
     {
         parent::__construct($config);
         $this->active = $active;
-        $this->bind_pool = [];
+        $this->bindPool = [];
         $this->dbQueryBuilder = new Miner();
-        $this->dbQueryBuilder->mysql_pool = $this;
+        $this->dbQueryBuilder->mysqlPool = $this;
     }
 
     /**
@@ -42,9 +42,9 @@ class MysqlAsynPool extends AsynPool
     public function execute($data)
     {
         $client = null;
-        $bind_id = $data['bind_id']??null;
-        if ($bind_id != null) {//绑定
-            $client = $this->bind_pool[$bind_id]['client']??null;
+        $bindId = $data['bind_id']??null;
+        if ($bindId != null) {//绑定
+            $client = $this->bindPool[$bindId]['client']??null;
             $sql = strtolower($data['sql']);
             if ($sql != 'begin' && $client == null) {
                 throw new SwooleException('error mysql affairs not begin.');
@@ -63,8 +63,8 @@ class MysqlAsynPool extends AsynPool
                     $this->commands->push($data);
                     return;
                 }
-                if ($bind_id != null) {//添加绑定
-                    $this->bind_pool[$bind_id]['client'] = $client;
+                if ($bindId != null) {//添加绑定
+                    $this->bindPool[$bindId]['client'] = $client;
                 }
             }
         }
@@ -97,15 +97,15 @@ class MysqlAsynPool extends AsynPool
                 $data['result']['insert_id'] = $client->insert_id;
             }
             //给worker发消息
-            $this->asyn_manager->sendMessageToWorker($this, $data);
+            $this->asynManager->sendMessageToWorker($this, $data);
 
             //不是绑定的连接就回归连接
             if (!isset($data['bind_id'])) {
                 $this->pushToPool($client);
             } else {//事务
-                $bind_id = $data['bind_id'];
+                $bindId = $data['bind_id'];
                 if ($sql == 'commit' || $sql == 'rollback') {//结束事务
-                    $this->free_bind($bind_id);
+                    $this->freeBind($bindId);
                 }
             }
         });
@@ -116,7 +116,7 @@ class MysqlAsynPool extends AsynPool
      */
     public function prepareOne()
     {
-        if ($this->mysql_max_count + $this->waitConnetNum >= $this->config->get('database.asyn_max_count', 10)) {
+        if ($this->mysqlMaxCount + $this->waitConnetNum >= $this->config->get('database.asyn_max_count', 10)) {
             return;
         }
         $this->reconnect();
@@ -140,8 +140,8 @@ class MysqlAsynPool extends AsynPool
             } else {
                 $client->isClose = false;
                 if (!isset($client->client_id)) {
-                    $client->client_id = $this->mysql_max_count;
-                    $this->mysql_max_count++;
+                    $client->client_id = $this->mysqlMaxCount;
+                    $this->mysqlMaxCount++;
                 }
                 $this->pushToPool($client);
             }
@@ -151,15 +151,15 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 释放绑定
-     * @param $bind_id
+     * @param $bindId
      */
-    public function free_bind($bind_id)
+    public function freeBind($bindId)
     {
-        $client = $this->bind_pool[$bind_id]['client'];
+        $client = $this->bindPool[$bindId]['client'];
         if ($client != null) {
             $this->pushToPool($client);
         }
-        unset($this->bind_pool[$bind_id]);
+        unset($this->bindPool[$bindId]);
     }
 
     /**
@@ -207,11 +207,11 @@ class MysqlAsynPool extends AsynPool
     /**
      * 执行一个sql语句
      * @param $callback
-     * @param null $bind_id
+     * @param null $bindId
      * @param null $sql
      * @throws SwooleException
      */
-    public function query($callback, $bind_id = null, $sql = null)
+    public function query($callback, $bindId = null, $sql = null)
     {
         if ($sql == null) {
             $sql = $this->dbQueryBuilder->getStatement(false);
@@ -224,11 +224,11 @@ class MysqlAsynPool extends AsynPool
             'sql' => $sql
         ];
         $data['token'] = $this->addTokenCallback($callback);
-        if (!empty($bind_id)) {
-            $data['bind_id'] = $bind_id;
+        if (!empty($bindId)) {
+            $data['bind_id'] = $bindId;
         }
         //写入管道
-        $this->asyn_manager->writePipe($this, $data, $this->worker_id);
+        $this->asynManager->writePipe($this, $data, $this->workerId);
     }
 
     /**
@@ -289,12 +289,12 @@ class MysqlAsynPool extends AsynPool
      */
     public function getSync()
     {
-        if (isset($this->mysql_client)) {
-            return $this->mysql_client;
+        if (isset($this->mysqlClient)) {
+            return $this->mysqlClient;
         }
         $activeConfig = $this->config['database'][$this->active];
-        $this->mysql_client = new Miner();
-        $this->mysql_client->pdoConnect($activeConfig);
-        return $this->mysql_client;
+        $this->mysqlClient = new Miner();
+        $this->mysqlClient->pdoConnect($activeConfig);
+        return $this->mysqlClient;
     }
 }

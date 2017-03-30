@@ -29,13 +29,13 @@ class BaseController extends Controller
      */
     public $requestStartTime = 0.0;
 
-    public function initialization($controller_name, $method_name)
+    public function initialization($controllerName, $methodName)
     {
         $this->requestStartTime = microtime(true);
         $this->PGLog = null;
         $this->PGLog = clone $this->logger;
         $this->PGLog->accessRecord['beginTime'] = $this->requestStartTime;
-        $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $controller_name . '/' . $method_name);
+        $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $controllerName . '/' . $methodName);
         $this->PGLog->logId = $this->genLogId();
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
@@ -43,8 +43,8 @@ class BaseController extends Controller
         $context                           = new Context();
         $context->logId                    = $this->logId;
         $context->PGLog                    = $this->PGLog;
-        $context->httpInput                = $this->http_input;
-        $context->httpOutput               = $this->http_output;
+        $context->httpInput                = $this->httpInput;
+        $context->httpOutput               = $this->httpOutput;
         $context->controller               = $this;
         $this->client->context             = $context;
         $this->tcpClient->context          = $context;
@@ -64,9 +64,9 @@ class BaseController extends Controller
     public function genLogId()
     {
         if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $this->logId = $this->http_input->getRequestHeader('log_id') ?? '';
+            $this->logId = $this->httpInput->getRequestHeader('log_id') ?? '';
         } else {
-            $this->logId = $this->client_data->logId ?? '';
+            $this->logId = $this->clientData->logId ?? '';
         }
 
         if (!$this->logId) {
@@ -88,7 +88,7 @@ class BaseController extends Controller
 
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        $this->http_output->outputJson($data, $message, $status, $callback);
+        $this->httpOutput->outputJson($data, $message, $status, $callback);
     }
 
     /**

@@ -17,16 +17,16 @@ class GetTcpClientCoroutine extends CoroutineBase
      * @var Client
      */
     public $client;
-    public $base_url;
+    public $baseUrl;
 
-    public function __construct(Client $client, $base_url, $timeout)
+    public function __construct(Client $client, $baseUrl, $timeout)
     {
         parent::__construct($timeout);
-        $this->base_url = $base_url;
+        $this->baseUrl = $baseUrl;
         $this->client   = $client;
-        $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->base_url;
+        $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
         $this->client->context->PGLog->profileStart($profileName);
-        get_instance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
+        getInstance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
         $this->send(function ($tcpClient) use ($profileName) {
             $this->result       = $tcpClient;
             $this->responseTime = microtime(true);
@@ -38,6 +38,6 @@ class GetTcpClientCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-        $this->client->getTcpClient($this->base_url, $callback, $this->timeout);
+        $this->client->getTcpClient($this->baseUrl, $callback, $this->timeout);
     }
 }

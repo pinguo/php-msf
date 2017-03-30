@@ -36,7 +36,7 @@ class Coroutine
             $this->tickTime++;
             $this->tickId = $timerId;
             $this->run();
-            get_instance()->tickTime = $this->getTickTime();
+            getInstance()->tickTime = $this->getTickTime();
         });
     }
 

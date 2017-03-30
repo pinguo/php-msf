@@ -53,7 +53,7 @@ class PGLog extends Logger
         \DateTimeZone $timezone = null
     ) {
         parent::__construct($name, $handlers, $processors, $timezone);
-        $server = get_instance();
+        $server = getInstance();
         $config = $server->config;
         foreach ($config['server.log.handlers'] as $handler) {
             $stream = new PGStreamHandler($handler['stream']);

@@ -17,14 +17,14 @@ class MySqlCoroutine extends CoroutineBase
      * @var MysqlAsynPool
      */
     public $mysqlAsynPool;
-    public $bind_id;
+    public $bindId;
     public $sql;
 
     public function __construct($_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
         parent::__construct();
         $this->mysqlAsynPool = $_mysqlAsynPool;
-        $this->bind_id = $_bind_id;
+        $this->bindId = $_bind_id;
         $this->sql = $_sql;
         $this->request = '#Mysql:' . $_sql;
         $this->send(function ($result) {
@@ -34,7 +34,7 @@ class MySqlCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-        $this->mysqlAsynPool->query($callback, $this->bind_id, $this->sql);
+        $this->mysqlAsynPool->query($callback, $this->bindId, $this->sql);
     }
 
     public function getResult()

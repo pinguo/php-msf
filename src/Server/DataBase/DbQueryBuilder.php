@@ -24,7 +24,7 @@ class DbQueryBuilder
      *
      * @var    string
      */
-    public $swap_pre = '';
+    public $swapPre = '';
     /**
      * Bind marker
      *
@@ -32,7 +32,7 @@ class DbQueryBuilder
      *
      * @var    string
      */
-    public $bind_marker = '?';
+    public $bindMarker = '?';
     /**
      * @var MysqlAsynPool
      */
@@ -42,79 +42,79 @@ class DbQueryBuilder
      *
      * @var    bool
      */
-    protected $return_delete_sql = false;
+    protected $returnDeleteSql = false;
     /**
      * Reset DELETE data flag
      *
      * @var    bool
      */
-    protected $reset_delete_data = false;
+    protected $resetDeleteData = false;
     /**
      * QB SELECT data
      *
      * @var    array
      */
-    protected $qb_select = array();
+    protected $qbSelect = array();
     /**
      * QB DISTINCT flag
      *
      * @var    bool
      */
-    protected $qb_distinct = false;
+    protected $qbDistinct = false;
     /**
      * QB FROM data
      *
      * @var    array
      */
-    protected $qb_from = array();
+    protected $qbFrom = array();
     /**
      * QB JOIN data
      *
      * @var    array
      */
-    protected $qb_join = array();
+    protected $qbJoin = array();
     /**
      * QB WHERE data
      *
      * @var    array
      */
-    protected $qb_where = array();
+    protected $qbWhere = array();
     /**
      * QB GROUP BY data
      *
      * @var    array
      */
-    protected $qb_groupby = array();
+    protected $qbGroupBy = array();
     /**
      * QB HAVING data
      *
      * @var    array
      */
-    protected $qb_having = array();
+    protected $qbHaving = array();
     /**
      * QB keys
      *
      * @var    array
      */
-    protected $qb_keys = array();
+    protected $qbKeys = array();
     /**
      * QB LIMIT data
      *
      * @var    int
      */
-    protected $qb_limit = false;
+    protected $qbLimit = false;
     /**
      * QB OFFSET data
      *
      * @var    int
      */
-    protected $qb_offset = false;
+    protected $qbOffset = false;
     /**
      * QB ORDER BY data
      *
      * @var    array
      */
-    protected $qb_orderby = array();
+    protected $qbOrderby = array();
 
     // Query Builder Caching variables
     /**
@@ -122,109 +122,109 @@ class DbQueryBuilder
      *
      * @var    array
      */
-    protected $qb_set = array();
+    protected $qbSet = array();
     /**
      * QB aliased tables list
      *
      * @var    array
      */
-    protected $qb_aliased_tables = array();
+    protected $qbAliasedTables = array();
     /**
      * QB WHERE group started flag
      *
      * @var    bool
      */
-    protected $qb_where_group_started = false;
+    protected $qbWhereGroupStarted = false;
     /**
      * QB WHERE group count
      *
      * @var    int
      */
-    protected $qb_where_group_count = 0;
+    protected $qbWhereGroupCount = 0;
     /**
      * QB Caching flag
      *
      * @var    bool
      */
-    protected $qb_caching = false;
+    protected $qbCaching = false;
     /**
      * QB Cache exists list
      *
      * @var    array
      */
-    protected $qb_cache_exists = array();
+    protected $qbCacheExists = array();
     /**
      * QB Cache SELECT data
      *
      * @var    array
      */
-    protected $qb_cache_select = array();
+    protected $qbCacheSelect = array();
     /**
      * QB Cache FROM data
      *
      * @var    array
      */
-    protected $qb_cache_from = array();
+    protected $qbCacheFrom = array();
     /**
      * QB Cache JOIN data
      *
      * @var    array
      */
-    protected $qb_cache_join = array();
+    protected $qbCacheJoin = array();
     /**
      * QB Cache WHERE data
      *
      * @var    array
      */
-    protected $qb_cache_where = array();
+    protected $qbCacheWhere = array();
     /**
      * QB Cache GROUP BY data
      *
      * @var    array
      */
-    protected $qb_cache_groupby = array();
+    protected $qbCacheGroupBy = array();
     /**
      * QB Cache HAVING data
      *
      * @var    array
      */
-    protected $qb_cache_having = array();
+    protected $qbCacheHaving = array();
     /**
      * QB Cache ORDER BY data
      *
      * @var    array
      */
-    protected $qb_cache_orderby = array();
+    protected $qbCacheOrderBy = array();
     /**
      * QB Cache data sets
      *
      * @var    array
      */
-    protected $qb_cache_set = array();
+    protected $qbCacheSet = array();
     /**
      * QB No Escape data
      *
      * @var    array
      */
-    protected $qb_no_escape = array();
+    protected $qbNoEscape = array();
     /**
      * QB Cache No Escape data
      *
      * @var    array
      */
-    protected $qb_cache_no_escape = array();
+    protected $qbCacheNoEscape = array();
     /**
      * Protect identifiers flag
      *
      * @var    bool
      */
-    protected $_protect_identifiers = true;
+    protected $_protectIdentifiers = true;
     /**
      * Identifier escape character
      *
      * @var    string
      */
-    protected $_escape_char = '"';
+    protected $_escapeChar = '"';
     /**
      * List of reserved identifiers
      *
@@ -232,25 +232,25 @@ class DbQueryBuilder
      *
      * @var    string[]
      */
-    protected $_reserved_identifiers = array('*');
+    protected $_reservedIdentifiers = array('*');
     /**
      * ESCAPE statement string
      *
      * @var    string
      */
-    protected $_like_escape_str = " ESCAPE '%s' ";
+    protected $_likeEscapeStr = " ESCAPE '%s' ";
     /**
      * ESCAPE character
      *
      * @var    string
      */
-    protected $_like_escape_chr = '!';
+    protected $_likeEscapeChr = '!';
     /**
      * ORDER BY random keyword
      *
      * @var    array
      */
-    protected $_random_keyword = array('RAND()', 'RAND(%d)');
+    protected $_randomKeyword = array('RAND()', 'RAND(%d)');
 
     public function __construct($dbDirve)
     {
@@ -274,19 +274,19 @@ class DbQueryBuilder
         }
 
         // If the escape value was not set, we will base it on the global setting
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
         foreach ($select as $val) {
             $val = trim($val);
 
             if ($val !== '') {
-                $this->qb_select[] = $val;
-                $this->qb_no_escape[] = $escape;
+                $this->qbSelect[] = $val;
+                $this->qbNoEscape[] = $escape;
 
-                if ($this->qb_caching === true) {
-                    $this->qb_cache_select[] = $val;
-                    $this->qb_cache_exists[] = 'select';
-                    $this->qb_cache_no_escape[] = $escape;
+                if ($this->qbCaching === true) {
+                    $this->qbCacheSelect[] = $val;
+                    $this->qbCacheExists[] = 'select';
+                    $this->qbCacheNoEscape[] = $escape;
                 }
             }
         }
@@ -305,9 +305,9 @@ class DbQueryBuilder
      * @param    string    an alias
      * @return    DbQueryBuilder
      */
-    public function select_max($select = '', $alias = '')
+    public function selectMax($select = '', $alias = '')
     {
-        return $this->_max_min_avg_sum($select, $alias, 'MAX');
+        return $this->_maxMinAvgSum($select, $alias, 'MAX');
     }
 
     // --------------------------------------------------------------------
@@ -315,17 +315,17 @@ class DbQueryBuilder
     /**
      * SELECT [MAX|MIN|AVG|SUM]()
      *
-     * @used-by    select_max()
-     * @used-by    select_min()
-     * @used-by    select_avg()
-     * @used-by    select_sum()
+     * @used-by    selectMax()
+     * @used-by    selectMin()
+     * @used-by    selectAvg()
+     * @used-by    selectSum()
      *
      * @param    string $select Field name
      * @param    string $alias
      * @param    string $type
      * @return    DbQueryBuilder
      */
-    protected function _max_min_avg_sum($select = '', $alias = '', $type = 'MAX')
+    protected function _maxMinAvgSum($select = '', $alias = '', $type = 'MAX')
     {
         if (!is_string($select) OR $select === '') {
             throw new SwooleException('db_invalid_query');
@@ -338,17 +338,17 @@ class DbQueryBuilder
         }
 
         if ($alias === '') {
-            $alias = $this->_create_alias_from_table(trim($select));
+            $alias = $this->_createAliasFromTable(trim($select));
         }
 
-        $sql = $type . '(' . $this->protect_identifiers(trim($select)) . ') AS ' . $this->escape_identifiers(trim($alias));
+        $sql = $type . '(' . $this->protectIdentifiers(trim($select)) . ') AS ' . $this->escapeIdentifiers(trim($alias));
 
-        $this->qb_select[] = $sql;
-        $this->qb_no_escape[] = null;
+        $this->qbSelect[] = $sql;
+        $this->qbNoEscape[] = null;
 
-        if ($this->qb_caching === true) {
-            $this->qb_cache_select[] = $sql;
-            $this->qb_cache_exists[] = 'select';
+        if ($this->qbCaching === true) {
+            $this->qbCacheSelect[] = $sql;
+            $this->qbCacheExists[] = 'select';
         }
 
         return $this;
@@ -362,7 +362,7 @@ class DbQueryBuilder
      * @param    string $item
      * @return    string
      */
-    protected function _create_alias_from_table($item)
+    protected function _createAliasFromTable($item)
     {
         if (strpos($item, '.') !== false) {
             $item = explode('.', $item);
@@ -400,20 +400,20 @@ class DbQueryBuilder
      * @param    bool
      * @return    string
      */
-    public function protect_identifiers(
+    public function protectIdentifiers(
         $item,
         $prefix_single = false,
         $protect_identifiers = null,
         $field_exists = true
     ) {
         if (!is_bool($protect_identifiers)) {
-            $protect_identifiers = $this->_protect_identifiers;
+            $protect_identifiers = $this->_protectIdentifiers;
         }
 
         if (is_array($item)) {
             $escaped_array = array();
             foreach ($item as $k => $v) {
-                $escaped_array[$this->protect_identifiers($k)] = $this->protect_identifiers($v, $prefix_single,
+                $escaped_array[$this->protectIdentifiers($k)] = $this->protectIdentifiers($v, $prefix_single,
                     $protect_identifiers, $field_exists);
             }
 
@@ -438,12 +438,12 @@ class DbQueryBuilder
         // Note: strripos() is used in order to support spaces in table names
         if ($offset = strripos($item, ' AS ')) {
             $alias = ($protect_identifiers)
-                ? substr($item, $offset, 4) . $this->escape_identifiers(substr($item, $offset + 4))
+                ? substr($item, $offset, 4) . $this->escapeIdentifiers(substr($item, $offset + 4))
                 : substr($item, $offset);
             $item = substr($item, 0, $offset);
         } elseif ($offset = strrpos($item, ' ')) {
             $alias = ($protect_identifiers)
-                ? ' ' . $this->escape_identifiers(substr($item, $offset + 1))
+                ? ' ' . $this->escapeIdentifiers(substr($item, $offset + 1))
                 : substr($item, $offset);
             $item = substr($item, 0, $offset);
         } else {
@@ -462,11 +462,11 @@ class DbQueryBuilder
             //
             // NOTE: The ! empty() condition prevents this method
             //       from breaking when QB isn't enabled.
-            if (!empty($this->qb_aliased_tables) && in_array($parts[0], $this->qb_aliased_tables)) {
+            if (!empty($this->qbAliasedTables) && in_array($parts[0], $this->qbAliasedTables)) {
                 if ($protect_identifiers === true) {
                     foreach ($parts as $key => $val) {
-                        if (!in_array($val, $this->_reserved_identifiers)) {
-                            $parts[$key] = $this->escape_identifiers($val);
+                        if (!in_array($val, $this->_reservedIdentifiers)) {
+                            $parts[$key] = $this->escapeIdentifiers($val);
                         }
                     }
 
@@ -502,8 +502,8 @@ class DbQueryBuilder
                 }
 
                 // Verify table prefix and replace if necessary
-                if ($this->swap_pre !== '' && strpos($parts[$i], $this->swap_pre) === 0) {
-                    $parts[$i] = preg_replace('/^' . $this->swap_pre . '(\S+?)/', $this->dbprefix . '\\1', $parts[$i]);
+                if ($this->swapPre !== '' && strpos($parts[$i], $this->swapPre) === 0) {
+                    $parts[$i] = preg_replace('/^' . $this->swapPre . '(\S+?)/', $this->dbprefix . '\\1', $parts[$i]);
                 } // We only add the table prefix if it does not already exist
                 elseif (strpos($parts[$i], $this->dbprefix) !== 0) {
                     $parts[$i] = $this->dbprefix . $parts[$i];
@@ -514,7 +514,7 @@ class DbQueryBuilder
             }
 
             if ($protect_identifiers === true) {
-                $item = $this->escape_identifiers($item);
+                $item = $this->escapeIdentifiers($item);
             }
 
             return $item . $alias;
@@ -523,16 +523,16 @@ class DbQueryBuilder
         // Is there a table prefix? If not, no need to insert it
         if ($this->dbprefix !== '') {
             // Verify table prefix and replace if necessary
-            if ($this->swap_pre !== '' && strpos($item, $this->swap_pre) === 0) {
-                $item = preg_replace('/^' . $this->swap_pre . '(\S+?)/', $this->dbprefix . '\\1', $item);
+            if ($this->swapPre !== '' && strpos($item, $this->swapPre) === 0) {
+                $item = preg_replace('/^' . $this->swapPre . '(\S+?)/', $this->dbprefix . '\\1', $item);
             } // Do we prefix an item with no segments?
             elseif ($prefix_single === true && strpos($item, $this->dbprefix) !== 0) {
                 $item = $this->dbprefix . $item;
             }
         }
 
-        if ($protect_identifiers === true && !in_array($item, $this->_reserved_identifiers)) {
-            $item = $this->escape_identifiers($item);
+        if ($protect_identifiers === true && !in_array($item, $this->_reservedIdentifiers)) {
+            $item = $this->escapeIdentifiers($item);
         }
 
         return $item . $alias;
@@ -548,18 +548,18 @@ class DbQueryBuilder
      * @param    mixed
      * @return    mixed
      */
-    public function escape_identifiers($item)
+    public function escapeIdentifiers($item)
     {
-        if ($this->_escape_char === '' OR empty($item) OR in_array($item, $this->_reserved_identifiers)) {
+        if ($this->_escapeChar === '' OR empty($item) OR in_array($item, $this->_reservedIdentifiers)) {
             return $item;
         } elseif (is_array($item)) {
             foreach ($item as $key => $value) {
-                $item[$key] = $this->escape_identifiers($value);
+                $item[$key] = $this->escapeIdentifiers($value);
             }
 
             return $item;
         } // Avoid breaking functions and literal values inside queries
-        elseif (ctype_digit($item) OR $item[0] === "'" OR ($this->_escape_char !== '"' && $item[0] === '"') OR strpos($item,
+        elseif (ctype_digit($item) OR $item[0] === "'" OR ($this->_escapeChar !== '"' && $item[0] === '"') OR strpos($item,
                 '(') !== false
         ) {
             return $item;
@@ -568,20 +568,20 @@ class DbQueryBuilder
         static $preg_ec = array();
 
         if (empty($preg_ec)) {
-            if (is_array($this->_escape_char)) {
+            if (is_array($this->_escapeChar)) {
                 $preg_ec = array(
-                    preg_quote($this->_escape_char[0], '/'),
-                    preg_quote($this->_escape_char[1], '/'),
-                    $this->_escape_char[0],
-                    $this->_escape_char[1]
+                    preg_quote($this->_escapeChar[0], '/'),
+                    preg_quote($this->_escapeChar[1], '/'),
+                    $this->_escapeChar[0],
+                    $this->_escapeChar[1]
                 );
             } else {
-                $preg_ec[0] = $preg_ec[1] = preg_quote($this->_escape_char, '/');
-                $preg_ec[2] = $preg_ec[3] = $this->_escape_char;
+                $preg_ec[0] = $preg_ec[1] = preg_quote($this->_escapeChar, '/');
+                $preg_ec[2] = $preg_ec[3] = $this->_escapeChar;
             }
         }
 
-        foreach ($this->_reserved_identifiers as $id) {
+        foreach ($this->_reservedIdentifiers as $id) {
             if (strpos($item, '.' . $id) !== false) {
                 return preg_replace('/' . $preg_ec[0] . '?([^' . $preg_ec[1] . '\.]+)' . $preg_ec[1] . '?\./i',
                     $preg_ec[2] . '$1' . $preg_ec[3] . '.', $item);
@@ -603,9 +603,9 @@ class DbQueryBuilder
      * @param    string    an alias
      * @return    DbQueryBuilder
      */
-    public function select_min($select = '', $alias = '')
+    public function selectMin($select = '', $alias = '')
     {
-        return $this->_max_min_avg_sum($select, $alias, 'MIN');
+        return $this->_maxMinAvgSum($select, $alias, 'MIN');
     }
 
     // --------------------------------------------------------------------
@@ -619,9 +619,9 @@ class DbQueryBuilder
      * @param    string    an alias
      * @return    DbQueryBuilder
      */
-    public function select_avg($select = '', $alias = '')
+    public function selectAvg($select = '', $alias = '')
     {
-        return $this->_max_min_avg_sum($select, $alias, 'AVG');
+        return $this->_maxMinAvgSum($select, $alias, 'AVG');
     }
 
     // --------------------------------------------------------------------
@@ -635,9 +635,9 @@ class DbQueryBuilder
      * @param    string    an alias
      * @return    DbQueryBuilder
      */
-    public function select_sum($select = '', $alias = '')
+    public function selectSum($select = '', $alias = '')
     {
-        return $this->_max_min_avg_sum($select, $alias, 'SUM');
+        return $this->_maxMinAvgSum($select, $alias, 'SUM');
     }
 
     // --------------------------------------------------------------------
@@ -652,7 +652,7 @@ class DbQueryBuilder
      */
     public function distinct($val = true)
     {
-        $this->qb_distinct = is_bool($val) ? $val : true;
+        $this->qbDistinct = is_bool($val) ? $val : true;
         return $this;
     }
 
@@ -683,12 +683,12 @@ class DbQueryBuilder
 
         // Extract any aliases that might exist. We use this information
         // in the protect_identifiers to know whether to add a table prefix
-        $this->_track_aliases($table);
+        $this->_trackAliases($table);
 
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
-        if (!$this->_has_operator($cond)) {
-            $cond = ' USING (' . ($escape ? $this->escape_identifiers($cond) : $cond) . ')';
+        if (!$this->_hasOperator($cond)) {
+            $cond = ' USING (' . ($escape ? $this->escapeIdentifiers($cond) : $cond) . ')';
         } elseif ($escape === false) {
             $cond = ' ON ' . $cond;
         } else {
@@ -711,26 +711,26 @@ class DbQueryBuilder
 
             $cond = ' ON ';
             for ($i = 0, $c = count($conditions); $i < $c; $i++) {
-                $operator = $this->_get_operator($conditions[$i]);
+                $operator = $this->_getOperator($conditions[$i]);
                 $cond .= $joints[$i];
                 $cond .= preg_match("/(\(*)?([\[\]\w\.'-]+)" . preg_quote($operator) . "(.*)/i", $conditions[$i],
                     $match)
-                    ? $match[1] . $this->protect_identifiers($match[2]) . $operator . $this->protect_identifiers($match[3])
+                    ? $match[1] . $this->protectIdentifiers($match[2]) . $operator . $this->protectIdentifiers($match[3])
                     : $conditions[$i];
             }
         }
 
         // Do we want to escape the table name?
         if ($escape === true) {
-            $table = $this->protect_identifiers($table, true, null, false);
+            $table = $this->protectIdentifiers($table, true, null, false);
         }
 
         // Assemble the JOIN statement
-        $this->qb_join[] = $join = $type . 'JOIN ' . $table . $cond;
+        $this->qbJoin[] = $join = $type . 'JOIN ' . $table . $cond;
 
-        if ($this->qb_caching === true) {
-            $this->qb_cache_join[] = $join;
-            $this->qb_cache_exists[] = 'join';
+        if ($this->qbCaching === true) {
+            $this->qbCacheJoin[] = $join;
+            $this->qbCacheExists[] = 'join';
         }
 
         return $this;
@@ -746,11 +746,11 @@ class DbQueryBuilder
      * @param    string    The table to inspect
      * @return    string
      */
-    protected function _track_aliases($table)
+    protected function _trackAliases($table)
     {
         if (is_array($table)) {
             foreach ($table as $t) {
-                $this->_track_aliases($t);
+                $this->_trackAliases($t);
             }
             return;
         }
@@ -758,7 +758,7 @@ class DbQueryBuilder
         // Does the string contain a comma?  If so, we need to separate
         // the string into discreet statements
         if (strpos($table, ',') !== false) {
-            return $this->_track_aliases(explode(',', $table));
+            return $this->_trackAliases(explode(',', $table));
         }
 
         // if a table alias is used we can recognize it by a space
@@ -770,8 +770,8 @@ class DbQueryBuilder
             $table = trim(strrchr($table, ' '));
 
             // Store the alias, if it doesn't already exist
-            if (!in_array($table, $this->qb_aliased_tables)) {
-                $this->qb_aliased_tables[] = $table;
+            if (!in_array($table, $this->qbAliasedTables)) {
+                $this->qbAliasedTables[] = $table;
             }
         }
     }
@@ -784,7 +784,7 @@ class DbQueryBuilder
      * @param    string
      * @return    bool
      */
-    protected function _has_operator($str)
+    protected function _hasOperator($str)
     {
         return (bool)preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i',
             trim($str));
@@ -798,13 +798,13 @@ class DbQueryBuilder
      * @param    string
      * @return    string
      */
-    protected function _get_operator($str)
+    protected function _getOperator($str)
     {
         static $_operators;
 
         if (empty($_operators)) {
-            $_les = ($this->_like_escape_str !== '')
-                ? '\s+' . preg_quote(trim(sprintf($this->_like_escape_str, $this->_like_escape_chr)), '/')
+            $_les = ($this->_likeEscapeStr !== '')
+                ? '\s+' . preg_quote(trim(sprintf($this->_likeEscapeStr, $this->_likeEscapeChr)), '/')
                 : '';
             $_operators = array(
                 '\s*(?:<|>|!)?=\s*',             // =, <=, >=, !=
@@ -840,7 +840,7 @@ class DbQueryBuilder
      * @param    bool
      * @return    DbQueryBuilder
      */
-    public function or_where($key, $value = null, $escape = null)
+    public function orWhere($key, $value = null, $escape = null)
     {
         return $this->_wh('qb_where', $key, $value, 'OR ', $escape);
     }
@@ -851,9 +851,9 @@ class DbQueryBuilder
      * WHERE, HAVING
      *
      * @used-by    where()
-     * @used-by    or_where()
+     * @used-by    orWhere()
      * @used-by    having()
-     * @used-by    or_having()
+     * @used-by    orHaving()
      *
      * @param    string $qb_key 'qb_where' or 'qb_having'
      * @param    mixed $key
@@ -871,22 +871,22 @@ class DbQueryBuilder
         }
 
         // If the escape value was not set will base it on the global setting
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
         foreach ($key as $k => $v) {
             $prefix = (count($this->$qb_key) === 0 && count($this->$qb_cache_key) === 0)
-                ? $this->_group_get_type('')
-                : $this->_group_get_type($type);
+                ? $this->_groupGetType('')
+                : $this->_groupGetType($type);
 
             if ($v !== null) {
                 if ($escape === true) {
                     $v = ' ' . $this->escape($v);
                 }
 
-                if (!$this->_has_operator($k)) {
+                if (!$this->_hasOperator($k)) {
                     $k .= ' = ';
                 }
-            } elseif (!$this->_has_operator($k)) {
+            } elseif (!$this->_hasOperator($k)) {
                 // value appears not to have been set, assign the test to IS NULL
                 $k .= ' IS NULL';
             } elseif (preg_match('/\s*(!?=|<>|IS(?:\s+NOT)?)\s*$/i', $k, $match, PREG_OFFSET_CAPTURE)) {
@@ -894,9 +894,9 @@ class DbQueryBuilder
             }
 
             $this->{$qb_key}[] = array('condition' => $prefix . $k . $v, 'escape' => $escape);
-            if ($this->qb_caching === true) {
+            if ($this->qbCaching === true) {
                 $this->{$qb_cache_key}[] = array('condition' => $prefix . $k . $v, 'escape' => $escape);
-                $this->qb_cache_exists[] = substr($qb_key, 3);
+                $this->qbCacheExists[] = substr($qb_key, 3);
             }
 
         }
@@ -909,19 +909,19 @@ class DbQueryBuilder
     /**
      * Group_get_type
      *
-     * @used-by    group_start()
+     * @used-by    groupStart()
      * @used-by    _like()
      * @used-by    _wh()
-     * @used-by    _where_in()
+     * @used-by    _whereIn()
      *
      * @param    string $type
      * @return    string
      */
-    protected function _group_get_type($type)
+    protected function _groupGetType($type)
     {
-        if ($this->qb_where_group_started) {
+        if ($this->qbWhereGroupStarted) {
             $type = '';
-            $this->qb_where_group_started = false;
+            $this->qbWhereGroupStarted = false;
         }
 
         return $type;
@@ -944,7 +944,7 @@ class DbQueryBuilder
             $str = array_map(array(&$this, 'escape'), $str);
             return $str;
         } elseif (is_string($str) OR (is_object($str) && method_exists($str, '__toString'))) {
-            return "'" . $this->escape_str($str) . "'";
+            return "'" . $this->escapeStr($str) . "'";
         } elseif (is_bool($str)) {
             return ($str === false) ? 0 : 1;
         } elseif ($str === null) {
@@ -963,26 +963,26 @@ class DbQueryBuilder
      * @param    bool $like Whether or not the string will be used in a LIKE condition
      * @return    string
      */
-    public function escape_str($str, $like = false)
+    public function escapeStr($str, $like = false)
     {
         if (is_array($str)) {
             foreach ($str as $key => $val) {
-                $str[$key] = $this->escape_str($val, $like);
+                $str[$key] = $this->escapeStr($val, $like);
             }
 
             return $str;
         }
 
-        $str = $this->_escape_str($str);
+        $str = $this->_escapeStr($str);
 
         // escape LIKE condition wildcards
         if ($like === true) {
             return str_replace(
-                array($this->_like_escape_chr, '%', '_'),
+                array($this->_likeEscapeChr, '%', '_'),
                 array(
-                    $this->_like_escape_chr . $this->_like_escape_chr,
-                    $this->_like_escape_chr . '%',
-                    $this->_like_escape_chr . '_'
+                    $this->_likeEscapeChr . $this->_likeEscapeChr,
+                    $this->_likeEscapeChr . '%',
+                    $this->_likeEscapeChr . '_'
                 ),
                 $str
             );
@@ -999,7 +999,7 @@ class DbQueryBuilder
      * @param    string
      * @return    string
      */
-    protected function _escape_str($str)
+    protected function _escapeStr($str)
     {
         return str_replace("'", "''", remove_invisible_characters($str));
     }
@@ -1017,9 +1017,9 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function where_in($key = null, $values = null, $escape = null)
+    public function whereIn($key = null, $values = null, $escape = null)
     {
-        return $this->_where_in($key, $values, false, 'AND ', $escape);
+        return $this->_whereIn($key, $values, false, 'AND ', $escape);
     }
 
     // --------------------------------------------------------------------
@@ -1027,10 +1027,10 @@ class DbQueryBuilder
     /**
      * Internal WHERE IN
      *
-     * @used-by    where_in()
-     * @used-by    or_where_in()
-     * @used-by    where_not_in()
-     * @used-by    or_where_not_in()
+     * @used-by    whereIn()
+     * @used-by    orWhereIn()
+     * @used-by    whereNotIn()
+     * @used-by    orWhereNotIn()
      *
      * @param    string $key The field to search
      * @param    array $values The values searched on
@@ -1039,7 +1039,7 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    protected function _where_in($key = null, $values = null, $not = false, $type = 'AND ', $escape = null)
+    protected function _whereIn($key = null, $values = null, $not = false, $type = 'AND ', $escape = null)
     {
         if ($key === null OR $values === null) {
             return $this;
@@ -1049,7 +1049,7 @@ class DbQueryBuilder
             $values = array($values);
         }
 
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
         $not = ($not) ? ' NOT' : '';
 
@@ -1062,19 +1062,19 @@ class DbQueryBuilder
             $where_in = array_values($values);
         }
 
-        $prefix = (count($this->qb_where) === 0 && count($this->qb_cache_where) === 0)
-            ? $this->_group_get_type('')
-            : $this->_group_get_type($type);
+        $prefix = (count($this->qbWhere) === 0 && count($this->qbCacheWhere) === 0)
+            ? $this->_groupGetType('')
+            : $this->_groupGetType($type);
 
         $where_in = array(
             'condition' => $prefix . $key . $not . ' IN(' . implode(', ', $where_in) . ')',
             'escape' => $escape
         );
 
-        $this->qb_where[] = $where_in;
-        if ($this->qb_caching === true) {
-            $this->qb_cache_where[] = $where_in;
-            $this->qb_cache_exists[] = 'where';
+        $this->qbWhere[] = $where_in;
+        if ($this->qbCaching === true) {
+            $this->qbCacheWhere[] = $where_in;
+            $this->qbCacheExists[] = 'where';
         }
 
         return $this;
@@ -1093,9 +1093,9 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function or_where_in($key = null, $values = null, $escape = null)
+    public function orWhereIn($key = null, $values = null, $escape = null)
     {
-        return $this->_where_in($key, $values, false, 'OR ', $escape);
+        return $this->_whereIn($key, $values, false, 'OR ', $escape);
     }
 
     // --------------------------------------------------------------------
@@ -1111,9 +1111,9 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function where_not_in($key = null, $values = null, $escape = null)
+    public function whereNotIn($key = null, $values = null, $escape = null)
     {
-        return $this->_where_in($key, $values, true, 'AND ', $escape);
+        return $this->_whereIn($key, $values, true, 'AND ', $escape);
     }
 
     // --------------------------------------------------------------------
@@ -1129,9 +1129,9 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function or_where_not_in($key = null, $values = null, $escape = null)
+    public function orWhereNotIn($key = null, $values = null, $escape = null)
     {
-        return $this->_where_in($key, $values, true, 'OR ', $escape);
+        return $this->_whereIn($key, $values, true, 'OR ', $escape);
     }
 
     // --------------------------------------------------------------------
@@ -1159,9 +1159,9 @@ class DbQueryBuilder
      * Internal LIKE
      *
      * @used-by    like()
-     * @used-by    or_like()
-     * @used-by    not_like()
-     * @used-by    or_not_like()
+     * @used-by    orLike()
+     * @used-by    notLike()
+     * @used-by    orNotLike()
      *
      * @param    mixed $field
      * @param    string $match
@@ -1177,16 +1177,16 @@ class DbQueryBuilder
             $field = array($field => $match);
         }
 
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
         // lowercase $side in case somebody writes e.g. 'BEFORE' instead of 'before' (doh)
         $side = strtolower($side);
 
         foreach ($field as $k => $v) {
-            $prefix = (count($this->qb_where) === 0 && count($this->qb_cache_where) === 0)
-                ? $this->_group_get_type('') : $this->_group_get_type($type);
+            $prefix = (count($this->qbWhere) === 0 && count($this->qbCacheWhere) === 0)
+                ? $this->_groupGetType('') : $this->_groupGetType($type);
 
             if ($escape === true) {
-                $v = $this->escape_like_str($v);
+                $v = $this->escapeLikeStr($v);
             }
 
             if ($side === 'none') {
@@ -1200,14 +1200,14 @@ class DbQueryBuilder
             }
 
             // some platforms require an escape sequence definition for LIKE wildcards
-            if ($escape === true && $this->_like_escape_str !== '') {
-                $like_statement .= sprintf($this->_like_escape_str, $this->_like_escape_chr);
+            if ($escape === true && $this->_likeEscapeStr !== '') {
+                $like_statement .= sprintf($this->_likeEscapeStr, $this->_likeEscapeChr);
             }
 
-            $this->qb_where[] = array('condition' => $like_statement, 'escape' => $escape);
-            if ($this->qb_caching === true) {
-                $this->qb_cache_where[] = array('condition' => $like_statement, 'escape' => $escape);
-                $this->qb_cache_exists[] = 'where';
+            $this->qbWhere[] = array('condition' => $like_statement, 'escape' => $escape);
+            if ($this->qbCaching === true) {
+                $this->qbCacheWhere[] = array('condition' => $like_statement, 'escape' => $escape);
+                $this->qbCacheExists[] = 'where';
             }
         }
 
@@ -1225,9 +1225,9 @@ class DbQueryBuilder
      * @param    string|string[]
      * @return    mixed
      */
-    public function escape_like_str($str)
+    public function escapeLikeStr($str)
     {
-        return $this->escape_str($str, true);
+        return $this->escapeStr($str, true);
     }
 
     // --------------------------------------------------------------------
@@ -1244,7 +1244,7 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function not_like($field, $match = '', $side = 'both', $escape = null)
+    public function notLike($field, $match = '', $side = 'both', $escape = null)
     {
         return $this->_like($field, $match, 'AND ', $side, 'NOT', $escape);
     }
@@ -1263,7 +1263,7 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function or_like($field, $match = '', $side = 'both', $escape = null)
+    public function orLike($field, $match = '', $side = 'both', $escape = null)
     {
         return $this->_like($field, $match, 'OR ', $side, '', $escape);
     }
@@ -1282,7 +1282,7 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function or_not_like($field, $match = '', $side = 'both', $escape = null)
+    public function orNotLike($field, $match = '', $side = 'both', $escape = null)
     {
         return $this->_like($field, $match, 'OR ', $side, 'NOT', $escape);
     }
@@ -1294,9 +1294,9 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function or_group_start()
+    public function orGroupStart()
     {
-        return $this->group_start('', 'OR ');
+        return $this->groupStart('', 'OR ');
     }
 
     // --------------------------------------------------------------------
@@ -1308,20 +1308,20 @@ class DbQueryBuilder
      * @param    string $type (Internal use only)
      * @return    DbQueryBuilder
      */
-    public function group_start($not = '', $type = 'AND ')
+    public function groupStart($not = '', $type = 'AND ')
     {
-        $type = $this->_group_get_type($type);
+        $type = $this->_groupGetType($type);
 
-        $this->qb_where_group_started = true;
-        $prefix = (count($this->qb_where) === 0 && count($this->qb_cache_where) === 0) ? '' : $type;
+        $this->qbWhereGroupStarted = true;
+        $prefix = (count($this->qbWhere) === 0 && count($this->qbCacheWhere) === 0) ? '' : $type;
         $where = array(
-            'condition' => $prefix . $not . str_repeat(' ', ++$this->qb_where_group_count) . ' (',
+            'condition' => $prefix . $not . str_repeat(' ', ++$this->qbWhereGroupCount) . ' (',
             'escape' => false
         );
 
-        $this->qb_where[] = $where;
-        if ($this->qb_caching) {
-            $this->qb_cache_where[] = $where;
+        $this->qbWhere[] = $where;
+        if ($this->qbCaching) {
+            $this->qbCacheWhere[] = $where;
         }
 
         return $this;
@@ -1334,9 +1334,9 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function not_group_start()
+    public function notGroupStart()
     {
-        return $this->group_start('NOT ', 'AND ');
+        return $this->groupStart('NOT ', 'AND ');
     }
 
     // --------------------------------------------------------------------
@@ -1346,9 +1346,9 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function or_not_group_start()
+    public function orNotGroupStart()
     {
-        return $this->group_start('NOT ', 'OR ');
+        return $this->groupStart('NOT ', 'OR ');
     }
 
     // --------------------------------------------------------------------
@@ -1358,17 +1358,17 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function group_end()
+    public function groupEnd()
     {
-        $this->qb_where_group_started = false;
+        $this->qbWhereGroupStarted = false;
         $where = array(
-            'condition' => str_repeat(' ', $this->qb_where_group_count--) . ')',
+            'condition' => str_repeat(' ', $this->qbWhereGroupCount--) . ')',
             'escape' => false
         );
 
-        $this->qb_where[] = $where;
-        if ($this->qb_caching) {
-            $this->qb_cache_where[] = $where;
+        $this->qbWhere[] = $where;
+        if ($this->qbCaching) {
+            $this->qbCacheWhere[] = $where;
         }
 
         return $this;
@@ -1383,9 +1383,9 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function group_by($by, $escape = null)
+    public function groupBy($by, $escape = null)
     {
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
         if (is_string($by)) {
             $by = ($escape === true)
@@ -1399,10 +1399,10 @@ class DbQueryBuilder
             if ($val !== '') {
                 $val = array('field' => $val, 'escape' => $escape);
 
-                $this->qb_groupby[] = $val;
-                if ($this->qb_caching === true) {
-                    $this->qb_cache_groupby[] = $val;
-                    $this->qb_cache_exists[] = 'groupby';
+                $this->qbGroupBy[] = $val;
+                if ($this->qbCaching === true) {
+                    $this->qbCacheGroupBy[] = $val;
+                    $this->qbCacheExists[] = 'groupby';
                 }
             }
         }
@@ -1438,7 +1438,7 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function or_having($key, $value = null, $escape = null)
+    public function orHaving($key, $value = null, $escape = null)
     {
         return $this->_wh('qb_having', $key, $value, 'OR ', $escape);
     }
@@ -1452,7 +1452,7 @@ class DbQueryBuilder
      * @param    bool $escape
      * @return    DbQueryBuilder
      */
-    public function order_by($orderby, $direction = '', $escape = null)
+    public function orderBy($orderby, $direction = '', $escape = null)
     {
         $direction = strtoupper(trim($direction));
 
@@ -1461,22 +1461,22 @@ class DbQueryBuilder
 
             // Do we have a seed value?
             $orderby = ctype_digit((string)$orderby)
-                ? sprintf($this->_random_keyword[1], $orderby)
-                : $this->_random_keyword[0];
+                ? sprintf($this->_randomKeyword[1], $orderby)
+                : $this->_randomKeyword[0];
         } elseif (empty($orderby)) {
             return $this;
         } elseif ($direction !== '') {
             $direction = in_array($direction, array('ASC', 'DESC'), true) ? ' ' . $direction : '';
         }
 
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
         if ($escape === false) {
-            $qb_orderby[] = array('field' => $orderby, 'direction' => $direction, 'escape' => false);
+            $qbOrderby[] = array('field' => $orderby, 'direction' => $direction, 'escape' => false);
         } else {
-            $qb_orderby = array();
+            $qbOrderby = array();
             foreach (explode(',', $orderby) as $field) {
-                $qb_orderby[] = ($direction === '' && preg_match('/\s+(ASC|DESC)$/i', rtrim($field), $match,
+                $qbOrderby[] = ($direction === '' && preg_match('/\s+(ASC|DESC)$/i', rtrim($field), $match,
                         PREG_OFFSET_CAPTURE))
                     ? array(
                         'field' => ltrim(substr($field, 0, $match[0][1])),
@@ -1487,10 +1487,10 @@ class DbQueryBuilder
             }
         }
 
-        $this->qb_orderby = array_merge($this->qb_orderby, $qb_orderby);
-        if ($this->qb_caching === true) {
-            $this->qb_cache_orderby = array_merge($this->qb_cache_orderby, $qb_orderby);
-            $this->qb_cache_exists[] = 'orderby';
+        $this->qbOrderby = array_merge($this->qbOrderby, $qbOrderby);
+        if ($this->qbCaching === true) {
+            $this->qbCacheOrderBy = array_merge($this->qbCacheOrderBy, $qbOrderby);
+            $this->qbCacheExists[] = 'orderby';
         }
 
         return $this;
@@ -1506,7 +1506,7 @@ class DbQueryBuilder
      */
     public function offset($offset)
     {
-        empty($offset) OR $this->qb_offset = (int)$offset;
+        empty($offset) OR $this->qbOffset = (int)$offset;
         return $this;
     }
 
@@ -1521,17 +1521,17 @@ class DbQueryBuilder
      * @param    bool    TRUE: resets QB values; FALSE: leave QB values alone
      * @return    string
      */
-    public function get_compiled_select($table = '', $reset = true)
+    public function getCompiledSelect($table = '', $reset = true)
     {
         if ($table !== '') {
-            $this->_track_aliases($table);
+            $this->_trackAliases($table);
             $this->from($table);
         }
 
-        $select = $this->_compile_select();
+        $select = $this->_compileSelect();
 
         if ($reset === true) {
-            $this->_reset_select();
+            $this->_resetSelect();
         }
 
         return $select;
@@ -1553,13 +1553,13 @@ class DbQueryBuilder
             if (strpos($val, ',') !== false) {
                 foreach (explode(',', $val) as $v) {
                     $v = trim($v);
-                    $this->_track_aliases($v);
+                    $this->_trackAliases($v);
 
-                    $this->qb_from[] = $v = $this->protect_identifiers($v, true, null, false);
+                    $this->qbFrom[] = $v = $this->protectIdentifiers($v, true, null, false);
 
-                    if ($this->qb_caching === true) {
-                        $this->qb_cache_from[] = $v;
-                        $this->qb_cache_exists[] = 'from';
+                    if ($this->qbCaching === true) {
+                        $this->qbCacheFrom[] = $v;
+                        $this->qbCacheExists[] = 'from';
                     }
                 }
             } else {
@@ -1567,13 +1567,13 @@ class DbQueryBuilder
 
                 // Extract any aliases that might exist. We use this information
                 // in the protect_identifiers to know whether to add a table prefix
-                $this->_track_aliases($val);
+                $this->_trackAliases($val);
 
-                $this->qb_from[] = $val = $this->protect_identifiers($val, true, null, false);
+                $this->qbFrom[] = $val = $this->protectIdentifiers($val, true, null, false);
 
-                if ($this->qb_caching === true) {
-                    $this->qb_cache_from[] = $val;
-                    $this->qb_cache_exists[] = 'from';
+                if ($this->qbCaching === true) {
+                    $this->qbCacheFrom[] = $val;
+                    $this->qbCacheExists[] = 'from';
                 }
             }
         }
@@ -1591,49 +1591,49 @@ class DbQueryBuilder
      * @param    bool $select_override
      * @return    string
      */
-    protected function _compile_select($select_override = false)
+    protected function _compileSelect($select_override = false)
     {
         // Combine any cached components with the current statements
-        $this->_merge_cache();
+        $this->_mergeCache();
 
         // Write the "select" portion of the query
         if ($select_override !== false) {
             $sql = $select_override;
         } else {
-            $sql = (!$this->qb_distinct) ? 'SELECT ' : 'SELECT DISTINCT ';
+            $sql = (!$this->qbDistinct) ? 'SELECT ' : 'SELECT DISTINCT ';
 
-            if (count($this->qb_select) === 0) {
+            if (count($this->qbSelect) === 0) {
                 $sql .= '*';
             } else {
                 // Cycle through the "select" portion of the query and prep each column name.
                 // The reason we protect identifiers here rather than in the select() function
                 // is because until the user calls the from() function we don't know if there are aliases
-                foreach ($this->qb_select as $key => $val) {
-                    $no_escape = isset($this->qb_no_escape[$key]) ? $this->qb_no_escape[$key] : null;
-                    $this->qb_select[$key] = $this->protect_identifiers($val, false, $no_escape);
+                foreach ($this->qbSelect as $key => $val) {
+                    $no_escape = isset($this->qbNoEscape[$key]) ? $this->qbNoEscape[$key] : null;
+                    $this->qbSelect[$key] = $this->protectIdentifiers($val, false, $no_escape);
                 }
 
-                $sql .= implode(', ', $this->qb_select);
+                $sql .= implode(', ', $this->qbSelect);
             }
         }
 
         // Write the "FROM" portion of the query
-        if (count($this->qb_from) > 0) {
-            $sql .= "\nFROM " . $this->_from_tables();
+        if (count($this->qbFrom) > 0) {
+            $sql .= "\nFROM " . $this->_fromTables();
         }
 
         // Write the "JOIN" portion of the query
-        if (count($this->qb_join) > 0) {
-            $sql .= "\n" . implode("\n", $this->qb_join);
+        if (count($this->qbJoin) > 0) {
+            $sql .= "\n" . implode("\n", $this->qbJoin);
         }
 
-        $sql .= $this->_compile_wh('qb_where')
-            . $this->_compile_group_by()
-            . $this->_compile_wh('qb_having')
-            . $this->_compile_order_by(); // ORDER BY
+        $sql .= $this->_compileWh('qb_where')
+            . $this->_compileGroupBy()
+            . $this->_compileWh('qb_having')
+            . $this->_compileOrderBy(); // ORDER BY
 
         // LIMIT
-        if ($this->qb_limit) {
+        if ($this->qbLimit) {
             return $this->_limit($sql . "\n");
         }
 
@@ -1650,15 +1650,15 @@ class DbQueryBuilder
      *
      * @return    void
      */
-    protected function _merge_cache()
+    protected function _mergeCache()
     {
-        if (count($this->qb_cache_exists) === 0) {
+        if (count($this->qbCacheExists) === 0) {
             return;
-        } elseif (in_array('select', $this->qb_cache_exists, true)) {
-            $qb_no_escape = $this->qb_cache_no_escape;
+        } elseif (in_array('select', $this->qbCacheExists, true)) {
+            $qbNoEscape = $this->qbCacheNoEscape;
         }
 
-        foreach (array_unique($this->qb_cache_exists) as $val) // select, from, etc.
+        foreach (array_unique($this->qbCacheExists) as $val) // select, from, etc.
         {
             $qb_variable = 'qb_' . $val;
             $qb_cache_var = 'qb_cache_' . $val;
@@ -1668,21 +1668,21 @@ class DbQueryBuilder
                 if (!in_array($this->{$qb_variable}[$i], $qb_new, true)) {
                     $qb_new[] = $this->{$qb_variable}[$i];
                     if ($val === 'select') {
-                        $qb_no_escape[] = $this->qb_no_escape[$i];
+                        $qbNoEscape[] = $this->qbNoEscape[$i];
                     }
                 }
             }
 
             $this->$qb_variable = $qb_new;
             if ($val === 'select') {
-                $this->qb_no_escape = $qb_no_escape;
+                $this->qbNoEscape = $qbNoEscape;
             }
         }
 
         // If we are "protecting identifiers" we need to examine the "from"
         // portion of the query to determine if there are any aliases
-        if ($this->_protect_identifiers === true && count($this->qb_cache_from) > 0) {
-            $this->_track_aliases($this->qb_from);
+        if ($this->_protectIdentifiers === true && count($this->qbCacheFrom) > 0) {
+            $this->_trackAliases($this->qbFrom);
         }
     }
 
@@ -1698,9 +1698,9 @@ class DbQueryBuilder
      *
      * @return    string
      */
-    protected function _from_tables()
+    protected function _fromTables()
     {
-        return implode(', ', $this->qb_from);
+        return implode(', ', $this->qbFrom);
     }
 
     // --------------------------------------------------------------------
@@ -1711,13 +1711,13 @@ class DbQueryBuilder
      * Escapes identifiers in WHERE and HAVING statements at execution time.
      *
      * Required so that aliases are tracked properly, regardless of whether
-     * where(), or_where(), having(), or_having are called prior to from(),
+     * where(), orWhere(), having(), or_having are called prior to from(),
      * join() and dbprefix is added only if needed.
      *
      * @param    string $qb_key 'qb_where' or 'qb_having'
      * @return    string    SQL statement
      */
-    protected function _compile_wh($qb_key)
+    protected function _compileWh($qb_key)
     {
         if (count($this->$qb_key) > 0) {
             for ($i = 0, $c = count($this->$qb_key); $i < $c; $i++) {
@@ -1738,7 +1738,7 @@ class DbQueryBuilder
                 );
 
                 for ($ci = 0, $cc = count($conditions); $ci < $cc; $ci++) {
-                    if (($op = $this->_get_operator($conditions[$ci])) === false
+                    if (($op = $this->_getOperator($conditions[$ci])) === false
                         OR !preg_match('/^(\(?)(.*)(' . preg_quote($op, '/') . ')\s*(.*(?<!\)))?(\)?)$/i',
                             $conditions[$ci], $matches)
                     ) {
@@ -1755,11 +1755,11 @@ class DbQueryBuilder
                     // );
 
                     if (!empty($matches[4])) {
-                        $this->_is_literal($matches[4]) OR $matches[4] = $this->protect_identifiers(trim($matches[4]));
+                        $this->_isLiteral($matches[4]) OR $matches[4] = $this->protectIdentifiers(trim($matches[4]));
                         $matches[4] = ' ' . $matches[4];
                     }
 
-                    $conditions[$ci] = $matches[1] . $this->protect_identifiers(trim($matches[2]))
+                    $conditions[$ci] = $matches[1] . $this->protectIdentifiers(trim($matches[2]))
                         . ' ' . trim($matches[3]) . $matches[4] . $matches[5];
                 }
 
@@ -1783,7 +1783,7 @@ class DbQueryBuilder
      * @param    string $str
      * @return    bool
      */
-    protected function _is_literal($str)
+    protected function _isLiteral($str)
     {
         $str = trim($str);
 
@@ -1796,7 +1796,7 @@ class DbQueryBuilder
         static $_str;
 
         if (empty($_str)) {
-            $_str = ($this->_escape_char !== '"')
+            $_str = ($this->_escapeChar !== '"')
                 ? array('"', "'") : array("'");
         }
 
@@ -1811,26 +1811,26 @@ class DbQueryBuilder
      * Escapes identifiers in GROUP BY statements at execution time.
      *
      * Required so that aliases are tracked properly, regardless of wether
-     * group_by() is called prior to from(), join() and dbprefix is added
+     * groupBy() is called prior to from(), join() and dbprefix is added
      * only if needed.
      *
      * @return    string    SQL statement
      */
-    protected function _compile_group_by()
+    protected function _compileGroupBy()
     {
-        if (count($this->qb_groupby) > 0) {
-            for ($i = 0, $c = count($this->qb_groupby); $i < $c; $i++) {
+        if (count($this->qbGroupBy) > 0) {
+            for ($i = 0, $c = count($this->qbGroupBy); $i < $c; $i++) {
                 // Is it already compiled?
-                if (is_string($this->qb_groupby[$i])) {
+                if (is_string($this->qbGroupBy[$i])) {
                     continue;
                 }
 
-                $this->qb_groupby[$i] = ($this->qb_groupby[$i]['escape'] === false OR $this->_is_literal($this->qb_groupby[$i]['field']))
-                    ? $this->qb_groupby[$i]['field']
-                    : $this->protect_identifiers($this->qb_groupby[$i]['field']);
+                $this->qbGroupBy[$i] = ($this->qbGroupBy[$i]['escape'] === false OR $this->_isLiteral($this->qbGroupBy[$i]['field']))
+                    ? $this->qbGroupBy[$i]['field']
+                    : $this->protectIdentifiers($this->qbGroupBy[$i]['field']);
             }
 
-            return "\nGROUP BY " . implode(', ', $this->qb_groupby);
+            return "\nGROUP BY " . implode(', ', $this->qbGroupBy);
         }
 
         return '';
@@ -1844,25 +1844,25 @@ class DbQueryBuilder
      * Escapes identifiers in ORDER BY statements at execution time.
      *
      * Required so that aliases are tracked properly, regardless of wether
-     * order_by() is called prior to from(), join() and dbprefix is added
+     * orderBy() is called prior to from(), join() and dbprefix is added
      * only if needed.
      *
      * @return    string    SQL statement
      */
-    protected function _compile_order_by()
+    protected function _compileOrderBy()
     {
-        if (is_array($this->qb_orderby) && count($this->qb_orderby) > 0) {
-            for ($i = 0, $c = count($this->qb_orderby); $i < $c; $i++) {
-                if ($this->qb_orderby[$i]['escape'] !== false && !$this->_is_literal($this->qb_orderby[$i]['field'])) {
-                    $this->qb_orderby[$i]['field'] = $this->protect_identifiers($this->qb_orderby[$i]['field']);
+        if (is_array($this->qbOrderby) && count($this->qbOrderby) > 0) {
+            for ($i = 0, $c = count($this->qbOrderby); $i < $c; $i++) {
+                if ($this->qbOrderby[$i]['escape'] !== false && !$this->_isLiteral($this->qbOrderby[$i]['field'])) {
+                    $this->qbOrderby[$i]['field'] = $this->protectIdentifiers($this->qbOrderby[$i]['field']);
                 }
 
-                $this->qb_orderby[$i] = $this->qb_orderby[$i]['field'] . $this->qb_orderby[$i]['direction'];
+                $this->qbOrderby[$i] = $this->qbOrderby[$i]['field'] . $this->qbOrderby[$i]['direction'];
             }
 
-            return $this->qb_orderby = "\nORDER BY " . implode(', ', $this->qb_orderby);
-        } elseif (is_string($this->qb_orderby)) {
-            return $this->qb_orderby;
+            return $this->qbOrderby = "\nORDER BY " . implode(', ', $this->qbOrderby);
+        } elseif (is_string($this->qbOrderby)) {
+            return $this->qbOrderby;
         }
 
         return '';
@@ -1880,7 +1880,7 @@ class DbQueryBuilder
      */
     protected function _limit($sql)
     {
-        return $sql . ' LIMIT ' . ($this->qb_offset ? $this->qb_offset . ', ' : '') . $this->qb_limit;
+        return $sql . ' LIMIT ' . ($this->qbOffset ? $this->qbOffset . ', ' : '') . $this->qbLimit;
     }
 
     // --------------------------------------------------------------------
@@ -1890,9 +1890,9 @@ class DbQueryBuilder
      *
      * @return    void
      */
-    protected function _reset_select()
+    protected function _resetSelect()
     {
-        $this->_reset_run(array(
+        $this->_resetRun(array(
             'qb_select' => array(),
             'qb_from' => array(),
             'qb_join' => array(),
@@ -1916,7 +1916,7 @@ class DbQueryBuilder
      * @param    array    An array of fields to reset
      * @return    void
      */
-    protected function _reset_run($qb_reset_items)
+    protected function _resetRun($qb_reset_items)
     {
         foreach ($qb_reset_items as $item => $default_value) {
             $this->$item = $default_value;
@@ -1934,22 +1934,22 @@ class DbQueryBuilder
      * @param    bool    TRUE: reset QB values; FALSE: leave QB values alone
      * @return    string
      */
-    public function get_compiled_insert($table = '', $reset = true)
+    public function getCompiledInsert($table = '', $reset = true)
     {
-        if ($this->_validate_insert($table) === false) {
+        if ($this->_validateInsert($table) === false) {
             return false;
         }
 
         $sql = $this->_insert(
-            $this->protect_identifiers(
-                $this->qb_from[0], true, null, false
+            $this->protectIdentifiers(
+                $this->qbFrom[0], true, null, false
             ),
-            array_keys($this->qb_set),
-            array_values($this->qb_set)
+            array_keys($this->qbSet),
+            array_values($this->qbSet)
         );
 
         if ($reset === true) {
-            $this->_reset_write();
+            $this->_resetWrite();
         }
 
         return $sql;
@@ -1960,22 +1960,22 @@ class DbQueryBuilder
     /**
      * Validate Insert
      *
-     * This method is used by both insert() and get_compiled_insert() to
+     * This method is used by both insert() and getCompiledInsert() to
      * validate that the there data is actually being set and that table
      * has been chosen to be inserted into.
      *
      * @param    string    the table to insert data into
      * @return    string
      */
-    protected function _validate_insert($table = '')
+    protected function _validateInsert($table = '')
     {
-        if (count($this->qb_set) === 0) {
+        if (count($this->qbSet) === 0) {
             throw new SwooleException('db_must_use_set');
         }
 
         if ($table !== '') {
-            $this->qb_from[0] = $table;
-        } elseif (!isset($this->qb_from[0])) {
+            $this->qbFrom[0] = $table;
+        } elseif (!isset($this->qbFrom[0])) {
             throw new SwooleException('db_must_set_table');
         }
 
@@ -2008,9 +2008,9 @@ class DbQueryBuilder
      *
      * @return    void
      */
-    protected function _reset_write()
+    protected function _resetWrite()
     {
-        $this->_reset_run(array(
+        $this->_resetRun(array(
             'qb_set' => array(),
             'qb_from' => array(),
             'qb_join' => array(),
@@ -2039,19 +2039,19 @@ class DbQueryBuilder
             $this->set($set, '', $escape);
         }
 
-        if ($this->_validate_insert($table) === false) {
+        if ($this->_validateInsert($table) === false) {
             return false;
         }
 
         $sql = $this->_insert(
-            $this->protect_identifiers(
-                $this->qb_from[0], true, $escape, false
+            $this->protectIdentifiers(
+                $this->qbFrom[0], true, $escape, false
             ),
-            array_keys($this->qb_set),
-            array_values($this->qb_set)
+            array_keys($this->qbSet),
+            array_values($this->qbSet)
         );
 
-        $this->_reset_write();
+        $this->_resetWrite();
         return $this->query($sql, $callback);
     }
 
@@ -2069,16 +2069,16 @@ class DbQueryBuilder
      */
     public function set($key, $value = '', $escape = null)
     {
-        $key = $this->_object_to_array($key);
+        $key = $this->_objectToArray($key);
 
         if (!is_array($key)) {
             $key = array($key => $value);
         }
 
-        is_bool($escape) OR $escape = $this->_protect_identifiers;
+        is_bool($escape) OR $escape = $this->_protectIdentifiers;
 
         foreach ($key as $k => $v) {
-            $this->qb_set[$this->protect_identifiers($k, false, $escape)] = ($escape)
+            $this->qbSet[$this->protectIdentifiers($k, false, $escape)] = ($escape)
                 ? $this->escape($v) : $v;
         }
 
@@ -2095,7 +2095,7 @@ class DbQueryBuilder
      * @param    object
      * @return    array
      */
-    protected function _object_to_array($object)
+    protected function _objectToArray($object)
     {
         if (!is_object($object)) {
             return $object;
@@ -2135,8 +2135,8 @@ class DbQueryBuilder
         }
 
         // Verify table prefix and replace if necessary
-        if ($this->dbprefix !== '' && $this->swap_pre !== '' && $this->dbprefix !== $this->swap_pre) {
-            $sql = preg_replace('/(\W)' . $this->swap_pre . '(\S+?)/', '\\1' . $this->dbprefix . '\\2', $sql);
+        if ($this->dbprefix !== '' && $this->swapPre !== '' && $this->dbprefix !== $this->swapPre) {
+            $sql = preg_replace('/(\W)' . $this->swapPre . '(\S+?)/', '\\1' . $this->dbprefix . '\\2', $sql);
         }
         $this->dbDrive->query($sql, $callback);
     }
@@ -2158,22 +2158,22 @@ class DbQueryBuilder
             $this->set($set);
         }
 
-        if (count($this->qb_set) === 0) {
+        if (count($this->qbSet) === 0) {
             throw new SwooleException('db_must_use_set');
         }
 
         if ($table === '') {
-            if (!isset($this->qb_from[0])) {
+            if (!isset($this->qbFrom[0])) {
                 throw new SwooleException('db_must_set_table');
             }
 
-            $table = $this->qb_from[0];
+            $table = $this->qbFrom[0];
         }
 
-        $sql = $this->_replace($this->protect_identifiers($table, true, null, false), array_keys($this->qb_set),
-            array_values($this->qb_set));
+        $sql = $this->_replace($this->protectIdentifiers($table, true, null, false), array_keys($this->qbSet),
+            array_values($this->qbSet));
 
-        $this->_reset_write();
+        $this->_resetWrite();
         return $this->query($sql, $callback);
     }
 
@@ -2205,19 +2205,19 @@ class DbQueryBuilder
      * @param    bool    TRUE: reset QB values; FALSE: leave QB values alone
      * @return    string
      */
-    public function get_compiled_update($table = '', $reset = true)
+    public function getCompiledUpdate($table = '', $reset = true)
     {
         // Combine any cached components with the current statements
-        $this->_merge_cache();
+        $this->_mergeCache();
 
-        if ($this->_validate_update($table) === false) {
+        if ($this->_validateUpdate($table) === false) {
             return false;
         }
 
-        $sql = $this->_update($this->qb_from[0], $this->qb_set);
+        $sql = $this->_update($this->qbFrom[0], $this->qbSet);
 
         if ($reset === true) {
-            $this->_reset_write();
+            $this->_resetWrite();
         }
 
         return $sql;
@@ -2228,22 +2228,22 @@ class DbQueryBuilder
     /**
      * Validate Update
      *
-     * This method is used by both update() and get_compiled_update() to
+     * This method is used by both update() and getCompiledUpdate() to
      * validate that data is actually being set and that a table has been
      * chosen to be update.
      *
      * @param    string    the table to update data on
      * @return    bool
      */
-    protected function _validate_update($table)
+    protected function _validateUpdate($table)
     {
-        if (count($this->qb_set) === 0) {
+        if (count($this->qbSet) === 0) {
             throw new SwooleException('db_must_use_set');
         }
 
         if ($table !== '') {
-            $this->qb_from = array($this->protect_identifiers($table, true, null, false));
-        } elseif (!isset($this->qb_from[0])) {
+            $this->qbFrom = array($this->protectIdentifiers($table, true, null, false));
+        } elseif (!isset($this->qbFrom[0])) {
             throw new SwooleException('db_must_set_table');
         }
 
@@ -2268,9 +2268,9 @@ class DbQueryBuilder
         }
 
         return 'UPDATE ' . $table . ' SET ' . implode(', ', $valstr)
-            . $this->_compile_wh('qb_where')
-            . $this->_compile_order_by()
-            . ($this->qb_limit ? ' LIMIT ' . $this->qb_limit : '');
+            . $this->_compileWh('qb_where')
+            . $this->_compileOrderBy()
+            . ($this->qbLimit ? ' LIMIT ' . $this->qbLimit : '');
     }
 
     // --------------------------------------------------------------------
@@ -2289,13 +2289,13 @@ class DbQueryBuilder
     public function update($callback, $table = '', $set = null, $where = null, $limit = null)
     {
         // Combine any cached components with the current statements
-        $this->_merge_cache();
+        $this->_mergeCache();
 
         if ($set !== null) {
             $this->set($set);
         }
 
-        if ($this->_validate_update($table) === false) {
+        if ($this->_validateUpdate($table) === false) {
             return false;
         }
 
@@ -2307,8 +2307,8 @@ class DbQueryBuilder
             $this->limit($limit);
         }
 
-        $sql = $this->_update($this->qb_from[0], $this->qb_set);
-        $this->_reset_write();
+        $sql = $this->_update($this->qbFrom[0], $this->qbSet);
+        $this->_resetWrite();
         return $this->query($sql, $callback);
     }
 
@@ -2341,8 +2341,8 @@ class DbQueryBuilder
      */
     public function limit($value, $offset = 0)
     {
-        is_null($value) OR $this->qb_limit = (int)$value;
-        empty($offset) OR $this->qb_offset = (int)$offset;
+        is_null($value) OR $this->qbLimit = (int)$value;
+        empty($offset) OR $this->qbOffset = (int)$offset;
 
         return $this;
     }
@@ -2357,20 +2357,20 @@ class DbQueryBuilder
      * @param    string    the table to empty
      * @return    bool    TRUE on success, FALSE on failure
      */
-    public function empty_table($callback, $table = '')
+    public function emptyTable($callback, $table = '')
     {
         if ($table === '') {
-            if (!isset($this->qb_from[0])) {
+            if (!isset($this->qbFrom[0])) {
                 throw new SwooleException('db_must_set_table');
             }
 
-            $table = $this->qb_from[0];
+            $table = $this->qbFrom[0];
         } else {
-            $table = $this->protect_identifiers($table, true, null, false);
+            $table = $this->protectIdentifiers($table, true, null, false);
         }
 
         $sql = $this->_delete($table);
-        $this->_reset_write();
+        $this->_resetWrite();
         return $this->query($sql, $callback);
     }
 
@@ -2386,8 +2386,8 @@ class DbQueryBuilder
      */
     protected function _delete($table)
     {
-        return 'DELETE FROM ' . $table . $this->_compile_wh('qb_where')
-            . ($this->qb_limit ? ' LIMIT ' . $this->qb_limit : '');
+        return 'DELETE FROM ' . $table . $this->_compileWh('qb_where')
+            . ($this->qbLimit ? ' LIMIT ' . $this->qbLimit : '');
     }
 
     // --------------------------------------------------------------------
@@ -2405,17 +2405,17 @@ class DbQueryBuilder
     public function truncate($callback, $table = '')
     {
         if ($table === '') {
-            if (!isset($this->qb_from[0])) {
+            if (!isset($this->qbFrom[0])) {
                 throw new SwooleException('db_must_set_table');
             }
 
-            $table = $this->qb_from[0];
+            $table = $this->qbFrom[0];
         } else {
-            $table = $this->protect_identifiers($table, true, null, false);
+            $table = $this->protectIdentifiers($table, true, null, false);
         }
 
         $sql = $this->_truncate($table);
-        $this->_reset_write();
+        $this->_resetWrite();
         return $this->query($sql, $callback);
     }
     // --------------------------------------------------------------------
@@ -2446,11 +2446,11 @@ class DbQueryBuilder
      * @param    bool    TRUE: reset QB values; FALSE: leave QB values alone
      * @return    string
      */
-    public function get_compiled_delete($table = '', $reset = true)
+    public function getCompiledDelete($table = '', $reset = true)
     {
-        $this->return_delete_sql = true;
+        $this->returnDeleteSql = true;
         $sql = $this->delete($table, '', null, $reset);
-        $this->return_delete_sql = false;
+        $this->returnDeleteSql = false;
         return $sql;
     }
     // --------------------------------------------------------------------
@@ -2469,14 +2469,14 @@ class DbQueryBuilder
     public function delete($callback, $table = '', $where = '', $limit = null, $reset_data = true)
     {
         // Combine any cached components with the current statements
-        $this->_merge_cache();
+        $this->_mergeCache();
 
         if ($table === '') {
-            if (!isset($this->qb_from[0])) {
+            if (!isset($this->qbFrom[0])) {
                 throw new SwooleException('db_must_set_table');
             }
 
-            $table = $this->qb_from[0];
+            $table = $this->qbFrom[0];
         } elseif (is_array($table)) {
             empty($where) && $reset_data = false;
 
@@ -2486,7 +2486,7 @@ class DbQueryBuilder
 
             return;
         } else {
-            $table = $this->protect_identifiers($table, true, null, false);
+            $table = $this->protectIdentifiers($table, true, null, false);
         }
 
         if ($where !== '') {
@@ -2497,16 +2497,16 @@ class DbQueryBuilder
             $this->limit($limit);
         }
 
-        if (count($this->qb_where) === 0) {
+        if (count($this->qbWhere) === 0) {
             throw new SwooleException('db_del_must_use_where');
         }
 
         $sql = $this->_delete($table);
         if ($reset_data) {
-            $this->_reset_write();
+            $this->_resetWrite();
         }
 
-        return ($this->return_delete_sql === true) ? $sql : $this->query($sql, $callback);
+        return ($this->returnDeleteSql === true) ? $sql : $this->query($sql, $callback);
     }
     // --------------------------------------------------------------------
 
@@ -2535,7 +2535,7 @@ class DbQueryBuilder
      * @param    string    the prefix
      * @return    string
      */
-    public function set_dbprefix($prefix = '')
+    public function setDBPrefix($prefix = '')
     {
         return $this->dbprefix = $prefix;
     }
@@ -2548,9 +2548,9 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function start_cache()
+    public function startCache()
     {
-        $this->qb_caching = true;
+        $this->qbCaching = true;
         return $this;
     }
     // --------------------------------------------------------------------
@@ -2562,9 +2562,9 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function stop_cache()
+    public function stopCache()
     {
-        $this->qb_caching = false;
+        $this->qbCaching = false;
         return $this;
     }
 
@@ -2575,9 +2575,9 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function flush_cache()
+    public function flushCache()
     {
-        $this->_reset_run(array(
+        $this->_resetRun(array(
             'qb_cache_select' => array(),
             'qb_cache_from' => array(),
             'qb_cache_join' => array(),
@@ -2601,10 +2601,10 @@ class DbQueryBuilder
      *
      * @return    DbQueryBuilder
      */
-    public function reset_query()
+    public function resetQuery()
     {
-        $this->_reset_select();
-        $this->_reset_write();
+        $this->_resetSelect();
+        $this->_resetWrite();
         return $this;
     }
     // --------------------------------------------------------------------
@@ -2622,15 +2622,15 @@ class DbQueryBuilder
     public function get($callback, $table = '', $limit = null, $offset = null)
     {
         if ($table !== '') {
-            $this->_track_aliases($table);
+            $this->_trackAliases($table);
             $this->from($table);
         }
 
         if (!empty($limit)) {
             $this->limit($limit, $offset);
         }
-        $this->query($this->_compile_select(), $callback);
-        $this->_reset_select();
+        $this->query($this->_compileSelect(), $callback);
+        $this->_resetSelect();
         return;
     }
     // --------------------------------------------------------------------
@@ -2643,7 +2643,7 @@ class DbQueryBuilder
      * @param    object
      * @return    array
      */
-    protected function _object_to_array_batch($object)
+    protected function _objectToArrayBatch($object)
     {
         if (!is_object($object)) {
             return $object;

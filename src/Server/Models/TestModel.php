@@ -27,48 +27,48 @@ class TestModel extends Model
         $testTask->startTask(null);
     }
 
-    public function test_coroutine()
+    public function testCoroutine()
     {
-        $redisCoroutine = $this->redis_pool->coroutineSend('get', 'test');
+        $redisCoroutine = $this->redisPool->coroutineSend('get', 'test');
         $result = yield $redisCoroutine;
         return $result;
     }
 
-    public function test_coroutineII($callback)
+    public function testCoroutineII($callback)
     {
-        $this->redis_pool->get('test', function ($uid) use ($callback) {
-            $this->mysql_pool->dbQueryBuilder->select('*')->from('account')->where('uid', $uid);
-            $this->mysql_pool->query(function ($result) use ($callback) {
+        $this->redisPool->get('test', function ($uid) use ($callback) {
+            $this->mysqlPool->dbQueryBuilder->select('*')->from('account')->where('uid', $uid);
+            $this->mysqlPool->query(function ($result) use ($callback) {
                 call_user_func($callback, $result);
             });
         });
     }
 
-    public function test_exception()
+    public function testException()
     {
         throw new SwooleException('test');
     }
 
-    public function test_exceptionII()
+    public function testExceptionII()
     {
-        $result = yield $this->redis_pool->coroutineSend('get', 'test');
-        $result = yield $this->mysql_pool->dbQueryBuilder->select('*')->where('uid', 10303)->coroutineSend();
+        $result = yield $this->redisPool->coroutineSend('get', 'test');
+        $result = yield $this->mysqlPool->dbQueryBuilder->select('*')->where('uid', 10303)->coroutineSend();
     }
 
-    public function test_task()
+    public function testTask()
     {
         $testTask = $this->loader->task('TestTask', $this);
         $testTask->test();
         $testTask->startTask(null);
     }
 
-    public function test_pdo()
+    public function testPdo()
     {
-        $result = yield $this->mysql_pool->dbQueryBuilder->select('*')->from('account')->where('uid',
+        $result = yield $this->mysqlPool->dbQueryBuilder->select('*')->from('account')->where('uid',
             36)->coroutineSend();
-        $result = yield $this->mysql_pool->dbQueryBuilder->update('account')->where('uid',
+        $result = yield $this->mysqlPool->dbQueryBuilder->update('account')->where('uid',
             36)->set(['status' => 1])->coroutineSend();
-        $result = yield $this->mysql_pool->dbQueryBuilder->replace('account')->where('uid',
+        $result = yield $this->mysqlPool->dbQueryBuilder->replace('account')->where('uid',
             91)->set(['status' => 1])->coroutineSend();
         print_r($result);
     }

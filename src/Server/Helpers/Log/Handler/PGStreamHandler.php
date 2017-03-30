@@ -19,7 +19,7 @@ class PGStreamHandler extends StreamHandler
     protected function write(array $record)
     {
         // worker 进程使用异步 IO  ，task 进程使用同步 IO
-        $server = get_instance()->server;
+        $server = getInstance()->server;
         if (is_object($server) && property_exists($server, 'taskworker') && $server->taskworker === false) {
             if (null === $this->url || '' === $this->url) {
                 throw new \LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');

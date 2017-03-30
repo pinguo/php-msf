@@ -14,8 +14,8 @@ class GeneratorContext
      * @var Controller
      */
     protected $controller;
-    protected $controller_name;
-    protected $method_name;
+    protected $controllerName;
+    protected $methodName;
     protected $stack;
 
     public function __construct()
@@ -69,15 +69,15 @@ class GeneratorContext
 
     /**
      * @param $controller
-     * @param $controller_name
-     * @param $method_name
+     * @param $controllerName
+     * @param $methodName
      */
-    public function setController($controller, $controller_name, $method_name)
+    public function setController($controller, $controllerName, $methodName)
     {
         $this->controller = $controller;
-        $this->controller_name = $controller_name;
-        $this->method_name = $method_name;
-        $this->stack[] = "| #目标函数： $controller_name -> $method_name";
+        $this->controllerName = $controllerName;
+        $this->methodName = $methodName;
+        $this->stack[] = "| #目标函数： $controllerName -> $methodName";
     }
 
     /**

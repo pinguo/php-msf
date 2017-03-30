@@ -30,7 +30,7 @@ class TestController extends Controller
      */
     public function testTcp()
     {
-        $this->send($this->client_data->data);
+        $this->send($this->clientData->data);
     }
 
     public function http_testContext()
@@ -46,17 +46,17 @@ class TestController extends Controller
      */
     public function http_mysql_begin_coroutine_test()
     {
-        $id = yield $this->mysql_pool->coroutineBegin($this);
-        $update_result = yield $this->mysql_pool->dbQueryBuilder->update('user_info')->set('sex', '0')->where('uid',
+        $id = yield $this->mysqlPool->coroutineBegin($this);
+        $updateResult = yield $this->mysqlPool->dbQueryBuilder->update('user_info')->set('sex', '0')->where('uid',
             36)->coroutineSend($id);
-        $result = yield $this->mysql_pool->dbQueryBuilder->select('*')->from('user_info')->where('uid',
+        $result = yield $this->mysqlPool->dbQueryBuilder->select('*')->from('user_info')->where('uid',
             36)->coroutineSend($id);
         if ($result['result'][0]['channel'] == 888) {
-            $this->http_output->end('commit');
-            yield $this->mysql_pool->coroutineCommit($id);
+            $this->httpOutput->end('commit');
+            yield $this->mysqlPool->coroutineCommit($id);
         } else {
-            $this->http_output->end('rollback');
-            yield $this->mysql_pool->coroutineRollback($id);
+            $this->httpOutput->end('rollback');
+            yield $this->mysqlPool->coroutineRollback($id);
         }
     }
 
@@ -65,7 +65,7 @@ class TestController extends Controller
      */
     public function bind_uid()
     {
-        $this->bindUid($this->fd, $this->client_data->data);
+        $this->bindUid($this->fd, $this->clientData->data);
         $this->destroy();
     }
 
@@ -75,7 +75,7 @@ class TestController extends Controller
      */
     public function efficiency_test()
     {
-        $data = $this->client_data->data;
+        $data = $this->clientData->data;
         $this->sendToUid(mt_rand(1, 100), $data);
     }
 
@@ -85,7 +85,7 @@ class TestController extends Controller
      */
     public function efficiency_test2()
     {
-        $data = $this->client_data->data;
+        $data = $this->clientData->data;
         $this->send($data);
     }
 
@@ -95,8 +95,8 @@ class TestController extends Controller
      */
     public function mysql_efficiency()
     {
-        yield $this->mysql_pool->dbQueryBuilder->select('*')->from('account')->where('uid', 10004)->coroutineSend();
-        $this->send($this->client_data->data);
+        yield $this->mysqlPool->dbQueryBuilder->select('*')->from('account')->where('uid', 10004)->coroutineSend();
+        $this->send($this->clientData->data);
     }
 
     /**
@@ -104,11 +104,11 @@ class TestController extends Controller
      */
     public function http_mysqlStatement()
     {
-        $value = $this->mysql_pool->dbQueryBuilder->insertInto('account')->intoColumns([
+        $value = $this->mysqlPool->dbQueryBuilder->insertInto('account')->intoColumns([
             'uid',
             'static'
         ])->intoValues([[36, 0], [37, 0]])->getStatement(true);
-        $this->http_output->end($value);
+        $this->httpOutput->end($value);
     }
 
     /**
@@ -116,7 +116,7 @@ class TestController extends Controller
      */
     public function http_test()
     {
-        $this->http_output->end('helloworld', false);
+        $this->httpOutput->end('helloworld', false);
     }
 
     /**
@@ -124,15 +124,15 @@ class TestController extends Controller
      */
     public function http_redis()
     {
-        $value = $this->redis_pool->getCoroutine()->get('test');
+        $value = $this->redisPool->getCoroutine()->get('test');
         yield $value;
-        $value1 = $this->redis_pool->getCoroutine()->get('test1');
+        $value1 = $this->redisPool->getCoroutine()->get('test1');
         yield $value1;
-        $value2 = $this->redis_pool->getCoroutine()->get('test2');
+        $value2 = $this->redisPool->getCoroutine()->get('test2');
         yield $value2;
-        $value3 = $this->redis_pool->getCoroutine()->get('test3');
+        $value3 = $this->redisPool->getCoroutine()->get('test3');
         yield $value3;
-        $this->http_output->end(1, false);
+        $this->httpOutput->end(1, false);
     }
 
     /**
@@ -140,11 +140,11 @@ class TestController extends Controller
      */
     public function http_aredis()
     {
-        $value = get_instance()->getRedis()->get('test');
-        $value1 = get_instance()->getRedis()->get('test1');
-        $value2 = get_instance()->getRedis()->get('test2');
-        $value3 = get_instance()->getRedis()->get('test3');
-        $this->http_output->end(1, false);
+        $value = getInstance()->getRedis()->get('test');
+        $value1 = getInstance()->getRedis()->get('test1');
+        $value2 = getInstance()->getRedis()->get('test2');
+        $value3 = getInstance()->getRedis()->get('test3');
+        $this->httpOutput->end(1, false);
     }
 
     /**
@@ -153,7 +153,7 @@ class TestController extends Controller
     public function http_html_test()
     {
         $template = $this->loader->view('server::error_404');
-        $this->http_output->end($template->render(['controller' => 'TestController\html_test', 'message' => '页面不存在！']));
+        $this->httpOutput->end($template->render(['controller' => 'TestController\html_test', 'message' => '页面不存在！']));
     }
 
     /**
@@ -161,7 +161,7 @@ class TestController extends Controller
      */
     public function http_html_file_test()
     {
-        $this->http_output->endFile(ROOT_PATH, 'Views/test.html');
+        $this->httpOutput->endFile(ROOT_PATH, 'Views/test.html');
     }
 
 
@@ -172,7 +172,7 @@ class TestController extends Controller
     {
         $httpClient = yield $this->client->coroutineGetHttpClient('http://localhost:8081');
         $result = yield $httpClient->coroutineGet("/TestController/test_request", ['id' => 123]);
-        $this->http_output->end($result);
+        $this->httpOutput->end($result);
     }
 
     /**
@@ -181,37 +181,37 @@ class TestController extends Controller
      */
     public function http_test_select()
     {
-        yield $this->redis_pool->getCoroutine()->set('test', 1);
-        $c1 = $this->redis_pool->getCoroutine()->get('test');
-        $c2 = $this->redis_pool->getCoroutine()->get('test1');
+        yield $this->redisPool->getCoroutine()->set('test', 1);
+        $c1 = $this->redisPool->getCoroutine()->get('test');
+        $c2 = $this->redisPool->getCoroutine()->get('test1');
         $result = yield SelectCoroutine::Select(function ($result) {
             if ($result != null) {
                 return true;
             }
             return false;
         }, $c2, $c1);
-        $this->http_output->end($result);
+        $this->httpOutput->end($result);
     }
 
     public function http_startInterruptedTask()
     {
         $testTask = $this->loader->task('TestTask', $this);
-        $task_id = $testTask->testInterrupted();
+        $taskId = $testTask->testInterrupted();
         $testTask->startTask(null);
-        $this->http_output->end("task_id = $task_id");
+        $this->httpOutput->end("task_id = $taskId");
     }
 
     public function http_interruptedTask()
     {
-        $task_id = $this->http_input->getPost('task_id');
-        get_instance()->interruptedTask($task_id);
-        $this->http_output->end("ok");
+        $taskId = $this->httpInput->getPost('task_id');
+        getInstance()->interruptedTask($taskId);
+        $this->httpOutput->end("ok");
     }
 
     public function http_getAllTask()
     {
-        $messages = get_instance()->getServerAllTaskMessage();
-        $this->http_output->end(json_encode($messages));
+        $messages = getInstance()->getServerAllTaskMessage();
+        $this->httpOutput->end(json_encode($messages));
     }
 
     /**
@@ -219,7 +219,7 @@ class TestController extends Controller
      */
     public function isIsDestroy()
     {
-        return $this->is_destroy;
+        return $this->isDestroy;
     }
 
 }

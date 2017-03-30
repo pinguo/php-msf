@@ -51,24 +51,24 @@ class ControllerFactory
             $controllers = $this->pool[$controller] = new \SplQueue();
         }
         if (!$controllers->isEmpty()) {
-            $controller_instance = $controllers->shift();
-            $controller_instance->reUse();
-            return $controller_instance;
+            $controllerInstance = $controllers->shift();
+            $controllerInstance->reUse();
+            return $controllerInstance;
         }
         $class_name = "\\App\\Controllers\\$controller";
         if (class_exists($class_name)) {
-            $controller_instance = new $class_name;
-            $controller_instance->core_name = $controller;
-            $controller_instance->afterConstruct();
-            return $controller_instance;
+            $controllerInstance = new $class_name;
+            $controllerInstance->coreName = $controller;
+            $controllerInstance->afterConstruct();
+            return $controllerInstance;
         }
 
         $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
         if (class_exists($class_name)) {
-            $controller_instance = new $class_name;
-            $controller_instance->core_name = $controller;
-            $controller_instance->afterConstruct();
-            return $controller_instance;
+            $controllerInstance = new $class_name;
+            $controllerInstance->coreName = $controller;
+            $controllerInstance->afterConstruct();
+            return $controllerInstance;
         }
 
         return null;
@@ -80,9 +80,9 @@ class ControllerFactory
      */
     public function revertController($controller)
     {
-        if (!$controller->is_destroy) {
+        if (!$controller->isDestroy) {
             $controller->destroy();
         }
-        $this->pool[$controller->core_name]->push($controller);
+        $this->pool[$controller->coreName]->push($controller);
     }
 }

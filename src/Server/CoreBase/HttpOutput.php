@@ -147,14 +147,14 @@ class HttpOutput
      */
     public function getCallback($callback)
     {
-        if (is_null($callback) && (!empty($this->controller->http_input->postGet('callback'))
-                || !empty($this->controller->http_input->postGet('cb')) || !empty($this->controller->http_input->postGet('jsonpCallback')))
+        if (is_null($callback) && (!empty($this->controller->httpInput->postGet('callback'))
+                || !empty($this->controller->httpInput->postGet('cb')) || !empty($this->controller->httpInput->postGet('jsonpCallback')))
         ) {
-            $callback = !empty($this->controller->http_input->postGet('callback'))
-                ? $this->controller->http_input->postGet('callback')
-                : !empty($this->controller->http_input->postGet('cb'))
-                    ? $this->controller->http_input->postGet('cb')
-                    : $this->controller->http_input->postGet('jsonpCallback');
+            $callback = !empty($this->controller->httpInput->postGet('callback'))
+                ? $this->controller->httpInput->postGet('callback')
+                : !empty($this->controller->httpInput->postGet('cb'))
+                    ? $this->controller->httpInput->postGet('cb')
+                    : $this->controller->httpInput->postGet('jsonpCallback');
         }
 
         return $callback;

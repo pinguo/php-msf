@@ -16,10 +16,10 @@ use PG\MSF\Server\CoreBase\SwooleException;
 class CoroutineTask
 {
     protected $stack;
-    public $routine;
-    public $generatorContext;
-    public $destroy = false;
-    public $asyncCallBack = [];
+    public    $routine;
+    public    $generatorContext;
+    public    $destroy = false;
+    public    $asyncCallBack = [];
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)
     {
@@ -130,8 +130,8 @@ class CoroutineTask
     public function destroy()
     {
         if (!$this->destroy) {
-            unset(get_instance()->coroutine->taskMap[$this->generatorContext->getController()->PGLog->logId]);
-            unset(get_instance()->coroutine->IOCallBack[$this->generatorContext->getController()->PGLog->logId]);
+            unset(getInstance()->coroutine->taskMap[$this->generatorContext->getController()->PGLog->logId]);
+            unset(getInstance()->coroutine->IOCallBack[$this->generatorContext->getController()->PGLog->logId]);
             $this->generatorContext->destroy();
             unset($this->generatorContext);
             unset($this->stack);

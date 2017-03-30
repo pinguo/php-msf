@@ -60,9 +60,9 @@ class TestModule
                     $doc = $method->getDocComment();
                     //解析注释
                     $info = $this->docParser->parse($doc);
-                    $method_name = $method->getName();
-                    if (substr($method_name, 0, 4) === 'test') {
-                        $this->tests[$class_name][$method_name] = $info;
+                    $methodName = $method->getName();
+                    if (substr($methodName, 0, 4) === 'test') {
+                        $this->tests[$class_name][$methodName] = $info;
                     }
                 }
             }
@@ -79,7 +79,7 @@ class TestModule
                     break;
                 }
             }
-            get_instance()->server->shutdown();
+            getInstance()->server->shutdown();
         }
     }
 
@@ -236,7 +236,7 @@ class TestModule
         }
         print_r("└───总共$this->totalCount,忽略$this->ignoreCount,成功$this->successCount,失败$this->failCount\n");
         if ($this->asyn) {//异步完了再执行同步的测试
-            $unitTestTask = get_instance()->loader->task('UnitTestTask');
+            $unitTestTask = getInstance()->loader->task('UnitTestTask');
             $unitTestTask->startTest($this->dir);
             $unitTestTask->startTask(null);
         }

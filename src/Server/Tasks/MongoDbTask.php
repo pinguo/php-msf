@@ -76,7 +76,7 @@ class MongoDbTask extends Task
     public function prepare(string $confKey, string $db, string $collection)
     {
         $this->profileName = 'mongo.' . $db . '.';
-        $this->config = get_instance()->config['mongodb'] ?? [];
+        $this->config = getInstance()->config['mongodb'] ?? [];
         if (!isset($this->config[$confKey])) {
             throw new \MongoConnectionException('No such a MongoDB config ' . $confKey);
         }

@@ -19,17 +19,17 @@ abstract class SwooleHttpServer extends SwooleServer
      * http host
      * @var string
      */
-    public $http_socket_name;
+    public $httpSocketName;
     /**
      * http port
      * @var integer
      */
-    public $http_port;
+    public $httpPort;
     /**
      * http使能
      * @var bool
      */
-    public $http_enable;
+    public $httpEnable;
     /**
      * 模板引擎
      * @var Engine
@@ -53,9 +53,9 @@ abstract class SwooleHttpServer extends SwooleServer
     public function setConfig()
     {
         parent::setConfig();
-        $this->http_enable = $this->config['http_server']['enable'];
-        $this->http_socket_name = $this->config['http_server']['socket'];
-        $this->http_port = $this->config['http_server']['port'];
+        $this->httpEnable = $this->config['http_server']['enable'];
+        $this->httpSocketName = $this->config['http_server']['socket'];
+        $this->httpPort = $this->config['http_server']['port'];
     }
 
     /**
@@ -63,12 +63,12 @@ abstract class SwooleHttpServer extends SwooleServer
      */
     public function start()
     {
-        if (!$this->http_enable) {
+        if (!$this->httpEnable) {
             parent::start();
             return;
         }
         //开启一个http服务器
-        $this->server = new \swoole_http_server($this->http_socket_name, $this->http_port);
+        $this->server = new \swoole_http_server($this->httpSocketName, $this->httpPort);
         $this->server->on('Start', [$this, 'onSwooleStart']);
         $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
         $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
@@ -82,8 +82,8 @@ abstract class SwooleHttpServer extends SwooleServer
         $set = $this->setServerSet();
         $set['daemonize'] = self::$daemonize ? 1 : 0;
         $this->server->set($set);
-        if ($this->tcp_enable) {
-            $this->port = $this->server->listen($this->socket_name, $this->port, $this->socket_type);
+        if ($this->tcpEnable) {
+            $this->port = $this->server->listen($this->socketName, $this->port, $this->socketType);
             $this->port->set($set);
             $this->port->on('connect', [$this, 'onSwooleConnect']);
             $this->port->on('receive', [$this, 'onSwooleReceive']);
@@ -124,7 +124,7 @@ abstract class SwooleHttpServer extends SwooleServer
     public function onSwooleRequest($request, $response)
     {
         $error = '';
-        $controller_instance = null;
+        $controllerInstance = null;
         $this->route->handleClientRequest($request);
         list($host) = explode(':', $request->header['host']??'');
         if ($this->route->getPath() == '/') {
@@ -136,37 +136,37 @@ abstract class SwooleHttpServer extends SwooleServer
                 return;
             }
         } else {
-            $controller_name = $this->route->getControllerName();
-            $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
-            if ($controller_instance == null) {
-                $controller_name = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
-                $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
-                $this->route->setControllerName($controller_name);
+            $controllerName = $this->route->getControllerName();
+            $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+            if ($controllerInstance == null) {
+                $controllerName = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
+                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+                $this->route->setControllerName($controllerName);
             }
 
-            if ($controller_instance != null) {
-                $method_name = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
-                if (!method_exists($controller_instance, $method_name)) {
-                    $method_name = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+            if ($controllerInstance != null) {
+                $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
+                if (!method_exists($controllerInstance, $methodName)) {
+                    $methodName = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
                     $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
 
                 try {
-                    $controller_instance->setRequestResponse($request, $response, $controller_name, $method_name);
-                    if (!method_exists($controller_instance, $method_name)) {
+                    $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
+                    if (!method_exists($controllerInstance, $methodName)) {
                         $error = 'api not found(action)';
                     } else {
-                        $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
+                        $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                         if ($generator instanceof \Generator) {
                             $generatorContext = new GeneratorContext();
-                            $generatorContext->setController($controller_instance, $controller_name, $method_name);
-                            $controller_instance->setGeneratorContext($generatorContext);
+                            $generatorContext->setController($controllerInstance, $controllerName, $methodName);
+                            $controllerInstance->setGeneratorContext($generatorContext);
                             $this->coroutine->start($generator, $generatorContext);
                         }
                         return;
                     }
                 } catch (\Throwable $e) {
-                    call_user_func([$controller_instance, 'onExceptionHandle'], $e);
+                    call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
                 }
             } else {
                 $error = 'api not found(controller)';
@@ -174,8 +174,8 @@ abstract class SwooleHttpServer extends SwooleServer
         }
         
         if ($error) {
-            if ($controller_instance != null) {
-                $controller_instance->destroy();
+            if ($controllerInstance != null) {
+                $controllerInstance->destroy();
             }
 
             $res = ['data' => [], 'message' => $error, 'status' => 500, 'serverTime' => microtime(true)];
@@ -190,13 +190,13 @@ abstract class SwooleHttpServer extends SwooleServer
      */
     public function getHostRoot($host)
     {
-        $root_path = $this->config['http']['root'][$host]['root']??'';
-        if (!empty($root_path)) {
-            $root_path = WWW_DIR . "/$root_path/";
+        $rootPath = $this->config['http']['root'][$host]['root']??'';
+        if (!empty($rootPath)) {
+            $rootPath = WWW_DIR . "/$rootPath/";
         } else {
-            $root_path = WWW_DIR . "/";
+            $rootPath = WWW_DIR . "/";
         }
-        return $root_path;
+        return $rootPath;
     }
 
     /**

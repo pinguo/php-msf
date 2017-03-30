@@ -54,7 +54,7 @@ abstract class CoroutineBase implements ICoroutineBase
     public function __construct($timeout = 0)
     {
         if (self::$MAX_TIMERS == 0) {
-            self::$MAX_TIMERS = get_instance()->config->get('coroution.timerOut', 1000);
+            self::$MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 1000);
         }
 
         if ($timeout > 0) {
@@ -98,14 +98,14 @@ abstract class CoroutineBase implements ICoroutineBase
 
     public function nextRun($logId)
     {
-        if (empty(get_instance()->coroutine->IOCallBack[$logId])) {
+        if (empty(getInstance()->coroutine->IOCallBack[$logId])) {
             return true;
         }
 
-        foreach (get_instance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
-            if ($coroutine->ioBack && !empty(get_instance()->coroutine->taskMap[$logId])) {
-                unset(get_instance()->coroutine->IOCallBack[$logId][$k]);
-                get_instance()->coroutine->schedule(get_instance()->coroutine->taskMap[$logId]);
+        foreach (getInstance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
+            if ($coroutine->ioBack && !empty(getInstance()->coroutine->taskMap[$logId])) {
+                unset(getInstance()->coroutine->IOCallBack[$logId][$k]);
+                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$logId]);
             } else {
                 break;
             }

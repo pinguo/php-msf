@@ -26,7 +26,7 @@ class DbConnection
      *
      * @var bool
      */
-    protected $for_update = false;
+    protected $forUpdate = false;
 
     /**
      * 选择的列
@@ -47,14 +47,14 @@ class DbConnection
      *
      * @var int
      */
-    protected $from_key = -1;
+    protected $fromKey = -1;
 
     /**
      * GROUP BY 的列
      *
      * @var array
      */
-    protected $group_by = array();
+    protected $groupBy = array();
 
     /**
      * HAVING 条件数组.
@@ -68,7 +68,7 @@ class DbConnection
      *
      * @var array
      */
-    protected $bind_having = array();
+    protected $bindHaving = array();
 
     /**
      * 每页多少条记录
@@ -82,7 +82,7 @@ class DbConnection
      *
      * @var array
      */
-    protected $bind_values = array();
+    protected $bindValues = array();
 
     /**
      * WHERE 条件.
@@ -96,21 +96,21 @@ class DbConnection
      *
      * @var array
      */
-    protected $bind_where = array();
+    protected $bindWhere = array();
 
     /**
      * ORDER BY 的列
      *
      * @var array
      */
-    protected $order_by = array();
+    protected $orderBy = array();
 
     /**
      * ORDER BY 的排序方式,默认为升序
      *
      * @var bool
      */
-    protected $order_asc = true;
+    protected $orderAsc = true;
     /**
      * SELECT 多少记录
      *
@@ -144,14 +144,14 @@ class DbConnection
      *
      * @var array
      */
-    protected $last_insert_id_names = array();
+    protected $lastInsertIdNames = array();
 
     /**
      * INSERT 或者 UPDATE 的列
      *
      * @param array
      */
-    protected $col_values;
+    protected $colValues;
 
     /**
      * 返回的列
@@ -343,7 +343,7 @@ class DbConnection
     protected function addCol($col)
     {
         $key = $this->quoteName($col);
-        $this->col_values[$key] = ":$col";
+        $this->colValues[$key] = ":$col";
         $args = func_get_args();
         if (count($args) > 1) {
             $this->bindValue($col, $args[1]);
@@ -410,7 +410,7 @@ class DbConnection
      */
     public function bindValue($name, $value)
     {
-        $this->bind_values[$name] = $value;
+        $this->bindValues[$name] = $value;
         return $this;
     }
 
@@ -437,7 +437,7 @@ class DbConnection
     public function fromRaw($table)
     {
         $this->from[] = array($table);
-        $this->from_key++;
+        $this->fromKey++;
         return $this;
     }
 
@@ -587,7 +587,7 @@ class DbConnection
      */
     public function forUpdate($enable = true)
     {
-        $this->for_update = (bool)$enable;
+        $this->forUpdate = (bool)$enable;
         return $this;
     }
 
@@ -773,14 +773,14 @@ class DbConnection
      */
     protected function buildOrderBy()
     {
-        if (!$this->order_by) {
+        if (!$this->orderBy) {
             return '';
         }
 
-        if ($this->order_asc) {
-            return ' ORDER BY' . $this->indentCsv($this->order_by) . ' ASC';
+        if ($this->orderAsc) {
+            return ' ORDER BY' . $this->indentCsv($this->orderBy) . ' ASC';
         } else {
-            return ' ORDER BY' . $this->indentCsv($this->order_by) . ' DESC';
+            return ' ORDER BY' . $this->indentCsv($this->orderBy) . ' DESC';
         }
     }
 
@@ -850,8 +850,8 @@ class DbConnection
      */
     protected function buildValuesForInsert()
     {
-        return ' (' . $this->indentCsv(array_keys($this->col_values)) . ') VALUES (' .
-            $this->indentCsv(array_values($this->col_values)) . ')';
+        return ' (' . $this->indentCsv(array_keys($this->colValues)) . ') VALUES (' .
+            $this->indentCsv(array_values($this->colValues)) . ')';
     }
 
     /**
@@ -887,7 +887,7 @@ class DbConnection
     protected function buildValuesForUpdate()
     {
         $values = array();
-        foreach ($this->col_values as $col => $value) {
+        foreach ($this->colValues as $col => $value) {
             $values[] = "{$col} = {$value}";
         }
         return ' SET' . $this->indentCsv($values);
@@ -1037,10 +1037,10 @@ class DbConnection
      */
     protected function buildGroupBy()
     {
-        if (!$this->group_by) {
+        if (!$this->groupBy) {
             return '';
         }
-        return ' GROUP BY' . $this->indentCsv($this->group_by);
+        return ' GROUP BY' . $this->indentCsv($this->groupBy);
     }
 
     // -------------abstractquery----------
@@ -1065,7 +1065,7 @@ class DbConnection
      */
     protected function buildForUpdate()
     {
-        if (!$this->for_update) {
+        if (!$this->forUpdate) {
             return '';
         }
         return ' FOR UPDATE';
@@ -1115,7 +1115,7 @@ class DbConnection
     public function fromSubSelect($table, $name)
     {
         $this->from[] = array("($table) AS " . $this->quoteName($name));
-        $this->from_key++;
+        $this->fromKey++;
         return $this;
     }
 
@@ -1151,7 +1151,7 @@ class DbConnection
         $join = strtoupper(ltrim("$join JOIN"));
         $table = $this->quoteName($table);
         $cond = $this->fixJoinCondition($cond);
-        $this->from[$this->from_key][] = rtrim("$join $table $cond");
+        $this->from[$this->fromKey][] = rtrim("$join $table $cond");
         return $this;
     }
 
@@ -1239,7 +1239,7 @@ class DbConnection
         $join = strtoupper(ltrim("$join JOIN"));
         $name = $this->quoteName($name);
         $cond = $this->fixJoinCondition($cond);
-        $this->from[$this->from_key][] = rtrim("$join ($spec) AS $name $cond");
+        $this->from[$this->fromKey][] = rtrim("$join ($spec) AS $name $cond");
         return $this;
     }
 
@@ -1252,7 +1252,7 @@ class DbConnection
     public function groupBy(array $cols)
     {
         foreach ($cols as $col) {
-            $this->group_by[] = $this->quoteNamesIn($col);
+            $this->groupBy[] = $this->quoteNamesIn($col);
         }
         return $this;
     }
@@ -1345,14 +1345,14 @@ class DbConnection
         $this->resetFlags();
         $this->cols = array();
         $this->from = array();
-        $this->from_key = -1;
+        $this->fromKey = -1;
         $this->where = array();
-        $this->group_by = array();
+        $this->groupBy = array();
         $this->having = array();
-        $this->order_by = array();
+        $this->orderBy = array();
         $this->limit = 0;
         $this->offset = 0;
-        $this->for_update = false;
+        $this->forUpdate = false;
     }
 
     /**
@@ -1480,7 +1480,7 @@ class DbConnection
     protected function addOrderBy(array $spec)
     {
         foreach ($spec as $col) {
-            $this->order_by[] = $this->quoteNamesIn($col);
+            $this->orderBy[] = $this->quoteNamesIn($col);
         }
         return $this;
     }
@@ -1489,12 +1489,12 @@ class DbConnection
      * order by ASC OR DESC
      *
      * @param array $cols
-     * @param bool $order_asc
+     * @param bool $orderAsc
      * @return self
      */
-    public function orderByASC(array $cols, $order_asc = true)
+    public function orderByASC(array $cols, $orderAsc = true)
     {
-        $this->order_asc = $order_asc;
+        $this->orderAsc = $orderAsc;
         return $this->addOrderBy($cols);
     }
 
@@ -1503,13 +1503,13 @@ class DbConnection
     /**
      * 批量为占位符绑定值
      *
-     * @param array $bind_values
+     * @param array $bindValues
      * @return self
      *
      */
-    public function bindValues(array $bind_values)
+    public function bindValues(array $bindValues)
     {
-        foreach ($bind_values as $key => $val) {
+        foreach ($bindValues as $key => $val) {
             $this->bindValue($key, $val);
         }
         return $this;
@@ -1518,11 +1518,11 @@ class DbConnection
     /**
      * 设置 `table.column` 与 last-insert-id 的映射
      *
-     * @param array $last_insert_id_names
+     * @param array $lastInsertIdNames
      */
-    public function setLastInsertIdNames(array $last_insert_id_names)
+    public function setLastInsertIdNames(array $lastInsertIdNames)
     {
-        $this->last_insert_id_names = $last_insert_id_names;
+        $this->lastInsertIdNames = $lastInsertIdNames;
     }
 
     /**
@@ -1546,8 +1546,8 @@ class DbConnection
     public function getLastInsertIdName($col)
     {
         $key = str_replace('`', '', $this->table) . '.' . $col;
-        if (isset($this->last_insert_id_names[$key])) {
-            return $this->last_insert_id_names[$key];
+        if (isset($this->lastInsertIdNames[$key])) {
+            return $this->lastInsertIdNames[$key];
         }
 
         return null;
@@ -1593,7 +1593,7 @@ class DbConnection
 
         $key = $this->quoteName($col);
         $value = $this->quoteNamesIn($value);
-        $this->col_values[$key] = $value;
+        $this->colValues[$key] = $value;
         return $this;
     }
 
@@ -1674,17 +1674,17 @@ class DbConnection
      */
     public function getBindValuesSELECT()
     {
-        $bind_values = $this->bind_values;
+        $bindValues = $this->bindValues;
         $i = 1;
-        foreach ($this->bind_where as $val) {
-            $bind_values[$i] = $val;
+        foreach ($this->bindWhere as $val) {
+            $bindValues[$i] = $val;
             $i++;
         }
-        foreach ($this->bind_having as $val) {
-            $bind_values[$i] = $val;
+        foreach ($this->bindHaving as $val) {
+            $bindValues[$i] = $val;
             $i++;
         }
-        return $bind_values;
+        return $bindValues;
     }
 
     /**
@@ -1694,13 +1694,13 @@ class DbConnection
      */
     public function getBindValuesCOMMON()
     {
-        $bind_values = $this->bind_values;
+        $bindValues = $this->bindValues;
         $i = 1;
-        foreach ($this->bind_where as $val) {
-            $bind_values[$i] = $val;
+        foreach ($this->bindWhere as $val) {
+            $bindValues[$i] = $val;
             $i++;
         }
-        return $bind_values;
+        return $bindValues;
     }
 
     /**
@@ -1709,24 +1709,24 @@ class DbConnection
     protected function resetAll()
     {
         $this->union = array();
-        $this->for_update = false;
+        $this->forUpdate = false;
         $this->cols = array();
         $this->from = array();
-        $this->from_key = -1;
-        $this->group_by = array();
+        $this->fromKey = -1;
+        $this->groupBy = array();
         $this->having = array();
-        $this->bind_having = array();
+        $this->bindHaving = array();
         $this->paging = 10;
-        $this->bind_values = array();
+        $this->bindValues = array();
         $this->where = array();
-        $this->bind_where = array();
-        $this->order_by = array();
+        $this->bindWhere = array();
+        $this->orderBy = array();
         $this->limit = 0;
         $this->offset = 0;
         $this->flags = array();
         $this->table = '';
-        $this->last_insert_id_names = array();
-        $this->col_values = array();
+        $this->lastInsertIdNames = array();
+        $this->colValues = array();
         $this->returning = array();
         $this->parameters = array();
     }

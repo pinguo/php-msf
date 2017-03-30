@@ -23,7 +23,7 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
      * websocket使能
      * @var bool
      */
-    public $websocket_enable;
+    public $websocketEnable;
 
     public function __construct()
     {
@@ -37,7 +37,7 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
     public function setConfig()
     {
         parent::setConfig();
-        $this->websocket_enable = $this->config->get('websocket.enable', false);
+        $this->websocketEnable = $this->config->get('websocket.enable', false);
         $this->opcode = $this->config->get('websocket.opcode', WEBSOCKET_OPCODE_TEXT);
     }
 
@@ -46,12 +46,12 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
      */
     public function start()
     {
-        if (!$this->websocket_enable) {
+        if (!$this->websocketEnable) {
             parent::start();
             return;
         }
         //开启一个websocket服务器
-        $this->server = new \swoole_websocket_server($this->http_socket_name, $this->http_port);
+        $this->server = new \swoole_websocket_server($this->httpSocketName, $this->httpPort);
         $this->server->on('Start', [$this, 'onSwooleStart']);
         $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
         $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
@@ -68,8 +68,8 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
         $set = $this->setServerSet();
         $set['daemonize'] = self::$daemonize ? 1 : 0;
         $this->server->set($set);
-        if ($this->tcp_enable) {
-            $this->port = $this->server->listen($this->socket_name, $this->port, $this->socket_type);
+        if ($this->tcpEnable) {
+            $this->port = $this->server->listen($this->socketName, $this->port, $this->socketType);
             $this->port->set($set);
             $this->port->on('connect', [$this, 'onSwooleConnect']);
             $this->port->on('receive', [$this, 'onSwooleReceive']);
@@ -90,7 +90,7 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
         if (!$this->server->exist($fd)) {
             return;
         }
-        if (!$this->websocket_enable) {
+        if (!$this->websocketEnable) {
             parent::send($fd, $data);
             return;
         }
@@ -132,31 +132,31 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
     {
         //反序列化，出现异常断开连接
         try {
-            $client_data = $this->pack->unPack($data);
+            $clientData = $this->pack->unPack($data);
         } catch (\Exception $e) {
             $serv->close($fd);
             return;
         }
         //client_data进行处理
-        $client_data = $this->route->handleClientData($client_data);
-        $controller_name = $this->route->getControllerName();
-        $controller_instance = ControllerFactory::getInstance()->getController($controller_name);
-        if ($controller_instance != null) {
+        $clientData = $this->route->handleClientData($clientData);
+        $controllerName = $this->route->getControllerName();
+        $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+        if ($controllerInstance != null) {
             $uid = $serv->connection_info($fd)['uid']??0;
-            $method_name = $this->config->get('websocket.method_prefix', '') . $this->route->getMethodName();
-            if (!method_exists($controller_instance, $method_name)) {
-                $method_name = 'defaultMethod';
+            $methodName = $this->config->get('websocket.method_prefix', '') . $this->route->getMethodName();
+            if (!method_exists($controllerInstance, $methodName)) {
+                $methodName = 'defaultMethod';
             }
-            $controller_instance->setClientData($uid, $fd, $client_data, $controller_name, $method_name);
+            $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
             try {
-                $generator = call_user_func([$controller_instance, $method_name], $this->route->getParams());
+                $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                 if ($generator instanceof \Generator) {
                     $generatorContext = new GeneratorContext();
-                    $generatorContext->setController($controller_instance, $controller_name, $method_name);
+                    $generatorContext->setController($controllerInstance, $controllerName, $methodName);
                     $this->coroutine->start($generator, $generatorContext);
                 }
             } catch (\Throwable $e) {
-                call_user_func([$controller_instance, 'onExceptionHandle'], $e);
+                call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
             }
         }
     }

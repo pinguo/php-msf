@@ -12,7 +12,7 @@
  * @param string $field_name_db 索引字段不传默认0-N,一般为数据库字段名
  * @return array
  */
-function redis_putToRedisHash($key, $array, $field_name_db = '')
+function redisPutToRedisHash($key, $array, $field_name_db = '')
 {
     $redis = MyRedis::getInstance();
     $set_array = array();
@@ -35,7 +35,7 @@ function redis_putToRedisHash($key, $array, $field_name_db = '')
  * @param array $field 为空代表取全部 例子array(1,2,3)
  * @return array 额定为二维数组,不存在返回null
  */
-function redis_getHashFromRedis($key, $fields = null)
+function redisGetHashFromRedis($key, $fields = null)
 {
     $redis = MyRedis::getInstance();
     if (empty($fields)) {
@@ -62,9 +62,9 @@ function redis_getHashFromRedis($key, $fields = null)
  * @param string $dbfield_other_name 别名
  * @return array 找不到为null，否则额定为二维数组@data_from后面表示数据来源
  */
-function redis_getHashFromRedisAndDb($hashkey_dbtable, $hashfield_dbfield, $field_values, $db, $dbfield_other_name = '')
+function redisGetHashFromRedisAndDb($hashkey_dbtable, $hashfield_dbfield, $field_values, $db, $dbfield_other_name = '')
 {
-    $result = redis_getHashFromRedis($hashkey_dbtable, $field_values);
+    $result = redisGetHashFromRedis($hashkey_dbtable, $field_values);
     $needSeachFromDb = array();
     foreach ($field_values as $value) {
         if (empty($result[$value])) {
@@ -81,7 +81,7 @@ function redis_getHashFromRedisAndDb($hashkey_dbtable, $hashfield_dbfield, $fiel
         if (empty($dbfield_other_name)) {
             $dbfield_other_name = $hashfield_dbfield;
         }
-        redis_putToRedisHash($hashkey_dbtable, $resultFromDb, $dbfield_other_name); //写入redis
+        redisPutToRedisHash($hashkey_dbtable, $resultFromDb, $dbfield_other_name); //写入redis
         foreach ($resultFromDb as $value) {
             $result[$value[$dbfield_other_name]] = $value; //拼合数据
             $result[$value[$dbfield_other_name]]['@data_from'] = 'db';
@@ -100,11 +100,11 @@ function redis_getHashFromRedisAndDb($hashkey_dbtable, $hashfield_dbfield, $fiel
  * @param string $hashkey
  * @param array $updateValueArrary 二维数组符合redisfordb返回的结构{$field=>{},$field=>{}};
  */
-function redis_updateHashToRedis($hashkey, $updateValueArrary)
+function redisUpdateHashToRedis($hashkey, $updateValueArrary)
 {
     $result = array();
     $fields = array_keys($updateValueArrary);
-    $resultFromRedis = redis_getHashFromRedis($hashkey, $fields);
+    $resultFromRedis = redisGetHashFromRedis($hashkey, $fields);
     foreach ($resultFromRedis as $r_key => $r_value) {//剔除不完整的数据
         if (!empty($r_value)) {
             $result[$r_key] = json_encode(array_merge($resultFromRedis[$r_key], $updateValueArrary[$r_key]));
@@ -119,7 +119,7 @@ function redis_updateHashToRedis($hashkey, $updateValueArrary)
  * @param $key
  * @param $field
  */
-function redis_delHashField($key, $field)
+function redisDelHashField($key, $field)
 {
     $redis = MyRedis::getInstance();
     $redis->hDel($key, $field);
