@@ -48,11 +48,22 @@ class MongoDbTask extends Task
      */
     public function afterConstruct()
     {
-        if (empty($this->mongoConf) || count($this->mongoConf) != 3) {
-            throw new \MongoConnectionException('No $mongoConf in this class');
+        if (empty($this->mongoConf)) {
+            throw new \MongoConnectionException('No $mongoConf in this class or no server config in $mongoConf');
         }
-        $this->prepare($this->mongoConf[0], $this->mongoConf[1], $this->mongoConf[2]);
+        $this->prepare($this->mongoConf[0], $this->mongoConf[1] ?? '', $this->mongoConf[2] ?? '');
         parent::afterConstruct();
+    }
+
+    /**
+     * 独立选择db和collection
+     * @param string $dbName
+     * @param string $collectionName
+     * @return \MongoCollection
+     */
+    public function setDbCollection(string $dbName, string $collectionName) : \MongoCollection
+    {
+        return $this->mongoClient->selectDB($dbName)->selectCollection($collectionName);
     }
 
     /**
@@ -71,8 +82,8 @@ class MongoDbTask extends Task
         }
         $conf = $this->config[$confKey];
         $this->mongoClient = new \MongoClient($conf['server'], $conf['options'], $conf['driverOptions']);
-        $this->mongoDb = $this->mongoClient->selectDB($db);
-        $this->mongoCollection = $this->mongoDb->selectCollection($collection);
+        $db && ($this->mongoDb = $this->mongoClient->selectDB($db));
+        $collection && ($this->mongoCollection = $this->mongoDb->selectCollection($collection));
     }
 
     /**
@@ -86,12 +97,12 @@ class MongoDbTask extends Task
      * @return array:
      */
     public function query(
-        $query = array(),
-        $fields = array(),
+        $query = [],
+        $fields = [],
         $sort = null,
         $limit = null,
         $skip = null,
-        $timeout = 10000
+        $timeout = 2000
     ) {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
         $cursor = $this->mongoCollection->find($query, $fields);
@@ -122,11 +133,11 @@ class MongoDbTask extends Task
     public function add($doc, $timeout = 5000, $w = 1, $fsync = false)
     {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
-        $options = array(
+        $options = [
             'w' => $w,
             'fsync' => $fsync,
             'socketTimeoutMS' => $timeout,
-        );
+        ];
         $ret = $this->mongoCollection->insert($doc, $options);
         $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
@@ -152,17 +163,17 @@ class MongoDbTask extends Task
     public function batchAdd(
         $docs,
         $continueOnError = true,
-        $timeout = 10000,
+        $timeout = 2000,
         $w = 1,
         $fsync = false
     ) {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
-        $options = array(
+        $options = [
             'w' => $w,
             'fsync' => $fsync,
             'continueOnError' => $continueOnError,
             'socketTimeoutMS' => $timeout,
-        );
+        ];
         $ret = $this->mongoCollection->batchInsert($docs, $options);
         $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
@@ -192,20 +203,20 @@ class MongoDbTask extends Task
         $doc,
         $multiple = true,
         $upsert = false,
-        $timeout = 10000,
+        $timeout = 2000,
         $w = 1,
         $fsync = false
     ) {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
 
-        $options = array(
+        $options = [
             'w' => $w,
             'fsync' => $fsync,
             'upsert' => $upsert,
             'multiple' => $multiple,
             'socketTimeoutMS' => $timeout,
-        );
-        $ret = $this->mongoCollection->update($criteria, array('$set' => $doc), $options);
+        ];
+        $ret = $this->mongoCollection->update($criteria, ['$set' => $doc], $options);
         $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
             if ($ret['ok'] && is_null($ret['err'])) {
@@ -234,18 +245,18 @@ class MongoDbTask extends Task
         $doc,
         $multiple = true,
         $upsert = false,
-        $timeout = 10000,
+        $timeout = 2000,
         $w = 1,
         $fsync = false
     ) {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
-        $options = array(
+        $options = [
             'w' => $w,
             'fsync' => $fsync,
             'upsert' => $upsert,
             'multiple' => $multiple,
             'socketTimeoutMS' => $timeout,
-        );
+        ];
         $ret = $this->mongoCollection->update($criteria, $doc, $options);
         $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
@@ -278,12 +289,12 @@ class MongoDbTask extends Task
         $fsync = false
     ) {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
-        $options = array(
+        $options = [
             'justOne' => $justOne,
             'w' => $w,
             'fsync' => $fsync,
             'socketTimeoutMS' => $timeout,
-        );
+        ];
         $ret = $this->mongoCollection->remove($criteria, $options);
         $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($w > 0) {
@@ -306,7 +317,7 @@ class MongoDbTask extends Task
     public function command($command, $timeout = 5000)
     {
         $this->PGLog->profileStart($this->profileName . __FUNCTION__);
-        $result = $this->mongoDb->command($command, array('socketTimeoutMS' => $timeout));
+        $result = $this->mongoDb->command($command, ['socketTimeoutMS' => $timeout]);
         $this->PGLog->profileEnd($this->profileName . __FUNCTION__);
         if ($result['ok'] == 1) {
             return $result['results'];
