@@ -42,8 +42,9 @@ function shellRead()
 /**
  * http发送文件
  * @param $path
+ * @param $request
  * @param $response
- * @return mixed
+ * @return bool
  */
 function httpEndFile($path, $request, $response)
 {
@@ -104,10 +105,9 @@ function isMac()
 
 /**
  * 剔出协程相关上下文信息
- *
- * @param mixed $var
- * @param int $level
- * @return string
+ * @param $output
+ * @param $var
+ * @param $level
  */
 function dumpCoroutineTaskMessage(&$output, $var, $level)
 {

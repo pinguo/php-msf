@@ -182,8 +182,8 @@ class MysqlAsynPool extends AsynPool
     /**
      * 开启一个事务
      * @param $object
+     * @param $callback
      * @return string
-     * @throws SwooleException
      */
     public function begin($object, $callback)
     {
@@ -191,9 +191,11 @@ class MysqlAsynPool extends AsynPool
         $this->query($callback, $id, 'begin');
         return $id;
     }
-
+    
     /**
      * 获取绑定值
+     * @param $object
+     * @return string
      */
     public function bind($object)
     {

@@ -82,6 +82,8 @@ class TaskProxy extends CoreBase
 
     /**
      * 开始同步任务
+     * @param float $timeOut
+     * @return mixed
      */
     public function startTaskWait($timeOut = 0.5)
     {

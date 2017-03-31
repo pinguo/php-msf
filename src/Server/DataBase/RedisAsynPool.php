@@ -366,7 +366,6 @@ class RedisAsynPool extends AsynPool
         if ($this->redisMaxCount + $this->waitConnetNum >= $this->config->get('redis.asyn_max_count', 10)) {
             return;
         }
-        $this->prepareLock = true;
         $this->reconnect();
     }
 

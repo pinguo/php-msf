@@ -75,7 +75,7 @@ abstract class AsynPool implements IAsynPool
     }
 
     /**
-     * @param $workerid
+     * @param $workerId
      */
     public function workerInit($workerId)
     {

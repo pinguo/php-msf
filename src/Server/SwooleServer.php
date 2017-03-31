@@ -19,7 +19,7 @@ use PG\MSF\Server\{
 
 abstract class SwooleServer extends Child
 {
-    const version = "1.7.8";
+    const version = "2.0.0_alpha";
     /**
      * Daemonize.
      *
