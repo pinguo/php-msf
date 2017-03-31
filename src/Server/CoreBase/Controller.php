@@ -248,6 +248,7 @@ class Controller extends CoreBase
      * sendToUid
      * @param $uid
      * @param $data
+     * @param bool $destroy
      * @throws SwooleException
      */
     protected function sendToUid($uid, $data, $destroy = true)
