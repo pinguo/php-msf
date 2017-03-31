@@ -52,10 +52,10 @@ class TestController extends Controller
         $result = yield $this->mysqlPool->dbQueryBuilder->select('*')->from('user_info')->where('uid',
             36)->coroutineSend($id);
         if ($result['result'][0]['channel'] == 888) {
-            $this->httpOutput->end('commit');
+            $this->output->end('commit');
             yield $this->mysqlPool->coroutineCommit($id);
         } else {
-            $this->httpOutput->end('rollback');
+            $this->output->end('rollback');
             yield $this->mysqlPool->coroutineRollback($id);
         }
     }
@@ -108,7 +108,7 @@ class TestController extends Controller
             'uid',
             'static'
         ])->intoValues([[36, 0], [37, 0]])->getStatement(true);
-        $this->httpOutput->end($value);
+        $this->output->end($value);
     }
 
     /**
@@ -116,7 +116,7 @@ class TestController extends Controller
      */
     public function http_test()
     {
-        $this->httpOutput->end('helloworld', false);
+        $this->output->end('helloworld', false);
     }
 
     /**
@@ -132,7 +132,7 @@ class TestController extends Controller
         yield $value2;
         $value3 = $this->redisPool->getCoroutine()->get('test3');
         yield $value3;
-        $this->httpOutput->end(1, false);
+        $this->output->end(1, false);
     }
 
     /**
@@ -144,7 +144,7 @@ class TestController extends Controller
         $value1 = getInstance()->getRedis()->get('test1');
         $value2 = getInstance()->getRedis()->get('test2');
         $value3 = getInstance()->getRedis()->get('test3');
-        $this->httpOutput->end(1, false);
+        $this->output->end(1, false);
     }
 
     /**
@@ -153,7 +153,7 @@ class TestController extends Controller
     public function http_html_test()
     {
         $template = $this->loader->view('server::error_404');
-        $this->httpOutput->end($template->render(['controller' => 'TestController\html_test', 'message' => '页面不存在！']));
+        $this->output->end($template->render(['controller' => 'TestController\html_test', 'message' => '页面不存在！']));
     }
 
     /**
@@ -161,7 +161,7 @@ class TestController extends Controller
      */
     public function http_html_file_test()
     {
-        $this->httpOutput->endFile(ROOT_PATH, 'Views/test.html');
+        $this->output->endFile(ROOT_PATH, 'Views/test.html');
     }
 
 
@@ -172,7 +172,7 @@ class TestController extends Controller
     {
         $httpClient = yield $this->client->coroutineGetHttpClient('http://localhost:8081');
         $result = yield $httpClient->coroutineGet("/TestController/test_request", ['id' => 123]);
-        $this->httpOutput->end($result);
+        $this->output->end($result);
     }
 
     /**
@@ -190,7 +190,7 @@ class TestController extends Controller
             }
             return false;
         }, $c2, $c1);
-        $this->httpOutput->end($result);
+        $this->output->end($result);
     }
 
     public function http_startInterruptedTask()
@@ -198,20 +198,20 @@ class TestController extends Controller
         $testTask = $this->loader->task('TestTask', $this);
         $taskId = $testTask->testInterrupted();
         $testTask->startTask(null);
-        $this->httpOutput->end("task_id = $taskId");
+        $this->output->end("task_id = $taskId");
     }
 
     public function http_interruptedTask()
     {
-        $taskId = $this->httpInput->getPost('task_id');
+        $taskId = $this->input->getPost('task_id');
         getInstance()->interruptedTask($taskId);
-        $this->httpOutput->end("ok");
+        $this->output->end("ok");
     }
 
     public function http_getAllTask()
     {
         $messages = getInstance()->getServerAllTaskMessage();
-        $this->httpOutput->end(json_encode($messages));
+        $this->output->end(json_encode($messages));
     }
 
     /**

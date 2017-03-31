@@ -41,7 +41,7 @@ class Server extends BaseController
     {
         $client = yield $this->client->coroutineGetHttpClient('http://localhost');
         $data   = yield $client->coroutineGet('/');
-        $this->httpOutput->end('ok');
+        $this->output->end('ok');
     }
 
     /**

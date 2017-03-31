@@ -43,8 +43,8 @@ class BaseController extends Controller
         $context                           = new Context();
         $context->logId                    = $this->logId;
         $context->PGLog                    = $this->PGLog;
-        $context->httpInput                = $this->httpInput;
-        $context->httpOutput               = $this->httpOutput;
+        $context->input                    = $this->input;
+        $context->output                   = $this->output;
         $context->controller               = $this;
         $this->client->context             = $context;
         $this->tcpClient->context          = $context;
@@ -63,8 +63,8 @@ class BaseController extends Controller
      */
     public function genLogId()
     {
-        if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $this->logId = $this->httpInput->getRequestHeader('log_id') ?? '';
+        if ($this->requestType == SwooleMarco::HTTP_REQUEST) {
+            $this->logId = $this->input->getRequestHeader('log_id') ?? '';
         } else {
             $this->logId = $this->clientData->logId ?? '';
         }
@@ -88,7 +88,7 @@ class BaseController extends Controller
 
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        $this->httpOutput->outputJson($data, $message, $status, $callback);
+        $this->output->outputJson($data, $message, $status, $callback);
     }
 
     /**
