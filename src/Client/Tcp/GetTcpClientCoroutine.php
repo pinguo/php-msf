@@ -6,7 +6,7 @@
  * @copyright All rights reserved.
  */
 
-namespace PG\MSF\Server\Client\Tcp;
+namespace PG\MSF\Client\Tcp;
 
 
 use PG\MSF\Server\CoreBase\CoroutineBase;

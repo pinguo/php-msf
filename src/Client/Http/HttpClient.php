@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\Client\Http;
+namespace PG\MSF\Client\Http;
 
 use PG\MSF\Server\Helpers\Context;
 
