@@ -22,7 +22,7 @@ class Client
 
     /**
      * 获取一个http客户端
-     * @param $base_url
+     * @param $baseUrl
      * @param $callBack
      * @throws \PG\MSF\Server\CoreBase\SwooleException
      */
