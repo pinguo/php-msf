@@ -109,7 +109,7 @@ class Controller extends CoreBase
         $this->uid = $uid;
         $this->fd = $fd;
         $this->clientData = $clientData;
-        $this->input->request = $clientData;
+        $this->input->set($clientData);
         $this->requestType = SwooleMarco::TCP_REQUEST;
         $this->initialization($controllerName, $methodName);
     }
