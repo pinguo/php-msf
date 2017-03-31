@@ -1,6 +1,6 @@
 <?php
 /**
- * HttpInput
+ * Output
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -10,7 +10,7 @@ namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\SwooleMarco;
 
-class HttpOutput
+class Output
 {
     /**
      * http response
@@ -29,7 +29,7 @@ class HttpOutput
     protected $controller;
 
     /**
-     * HttpOutput constructor.
+     * Output constructor.
      * @param $controller
      */
     public function __construct($controller)
@@ -118,7 +118,7 @@ class HttpOutput
             'serverTime' => microtime(true),
         ];
 
-        switch ($this->controller->request_type) {
+        switch ($this->controller->requestType) {
             case SwooleMarco::HTTP_REQUEST:
                 $callback = $this->getCallback($callback);
                 if (!is_null($callback)) {
@@ -147,14 +147,14 @@ class HttpOutput
      */
     public function getCallback($callback)
     {
-        if (is_null($callback) && (!empty($this->controller->httpInput->postGet('callback'))
-                || !empty($this->controller->httpInput->postGet('cb')) || !empty($this->controller->httpInput->postGet('jsonpCallback')))
+        if (is_null($callback) && (!empty($this->controller->input->postGet('callback'))
+                || !empty($this->controller->input->postGet('cb')) || !empty($this->controller->input->postGet('jsonpCallback')))
         ) {
-            $callback = !empty($this->controller->httpInput->postGet('callback'))
-                ? $this->controller->httpInput->postGet('callback')
-                : !empty($this->controller->httpInput->postGet('cb'))
-                    ? $this->controller->httpInput->postGet('cb')
-                    : $this->controller->httpInput->postGet('jsonpCallback');
+            $callback = !empty($this->controller->input->postGet('callback'))
+                ? $this->controller->input->postGet('callback')
+                : !empty($this->controller->input->postGet('cb'))
+                    ? $this->controller->input->postGet('cb')
+                    : $this->controller->input->postGet('jsonpCallback');
         }
 
         return $callback;

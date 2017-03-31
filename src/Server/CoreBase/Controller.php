@@ -26,16 +26,16 @@ class Controller extends CoreBase
     /**
      * @var HttpInPut
      */
-    public $httpInput;
+    public $input;
     /**
      * @var HttpOutPut
      */
-    public $httpOutput;
+    public $output;
     /**
      * 是否来自http的请求不是就是来自tcp
      * @var string
      */
-    public $request_type;
+    public $requestType;
     /**
      * @var \PG\MSF\Server\Client\Http\Client
      */
@@ -88,8 +88,8 @@ class Controller extends CoreBase
     final public function __construct()
     {
         parent::__construct();
-        $this->httpInput  = new HttpInput();
-        $this->httpOutput = new HttpOutput($this);
+        $this->input      = new Input();
+        $this->output     = new Output($this);
         $this->redisPool  = getInstance()->redisPool;
         $this->mysqlPool  = getInstance()->mysqlPool;
         $this->client     = clone getInstance()->client;
@@ -109,7 +109,8 @@ class Controller extends CoreBase
         $this->uid = $uid;
         $this->fd = $fd;
         $this->clientData = $clientData;
-        $this->request_type = SwooleMarco::TCP_REQUEST;
+        $this->input->request = $clientData;
+        $this->requestType = SwooleMarco::TCP_REQUEST;
         $this->initialization($controllerName, $methodName);
     }
 
@@ -133,9 +134,9 @@ class Controller extends CoreBase
     {
         $this->request = $request;
         $this->response = $response;
-        $this->httpInput->set($request);
-        $this->httpOutput->set($request, $response);
-        $this->request_type = SwooleMarco::HTTP_REQUEST;
+        $this->input->set($request);
+        $this->output->set($request, $response);
+        $this->requestType = SwooleMarco::HTTP_REQUEST;
         $this->initialization($controllerName, $methodName);
     }
 
@@ -168,10 +169,10 @@ class Controller extends CoreBase
      */
     public function onExceptionHandle(\Throwable $e)
     {
-        switch ($this->request_type) {
+        switch ($this->requestType) {
             case SwooleMarco::HTTP_REQUEST:
-                $this->httpOutput->setStatusHeader(500);
-                $this->httpOutput->end($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+                $this->output->setStatusHeader(500);
+                $this->output->end($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
                 break;
             case SwooleMarco::TCP_REQUEST:
                 $this->send($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
@@ -213,8 +214,8 @@ class Controller extends CoreBase
         unset($this->request);
         unset($this->response);
         unset($this->generatorContext);
-        $this->httpInput->reset();
-        $this->httpOutput->reset();
+        $this->input->reset();
+        $this->output->reset();
         ControllerFactory::getInstance()->revertController($this);
     }
 
@@ -234,10 +235,10 @@ class Controller extends CoreBase
      */
     public function defaultMethod()
     {
-        if ($this->request_type == SwooleMarco::HTTP_REQUEST) {
-            $this->httpOutput->setHeader('HTTP/1.1', '404 Not Found');
+        if ($this->requestType == SwooleMarco::HTTP_REQUEST) {
+            $this->output->setHeader('HTTP/1.1', '404 Not Found');
             $template = $this->loader->view('server::error_404');
-            $this->httpOutput->end($template->render());
+            $this->output->end($template->render());
         } else {
             throw new SwooleException('method not exist');
         }

@@ -1,6 +1,6 @@
 <?php
 /**
- * HttpInput
+ * Input
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -8,11 +8,10 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-class HttpInput
+class Input
 {
     /**
-     * http request
-     * @var \swoole_http_request
+     * @var \swoole_http_request|\stdClass
      */
     public $request;
 

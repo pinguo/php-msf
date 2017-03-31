@@ -62,7 +62,7 @@ class Client
         swoole_async_dns_lookup($urlHost, function ($host, $ip) use (&$data) {
             if (empty($ip)) {
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
-                $this->context->httpOutput->end();
+                $this->context->output->end();
             } else {
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
                 $httpClient          = new HttpClient($client);

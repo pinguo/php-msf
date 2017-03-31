@@ -9,7 +9,7 @@
 namespace PG\MSF\Server\Helpers;
 
 use PG\MSF\Server\{
-    CoreBase\HttpInput, CoreBase\HttpOutput, Helpers\Log\PGLog
+    CoreBase\Input, CoreBase\Output, Helpers\Log\PGLog
 };
 
 class Context implements \ArrayAccess
@@ -25,14 +25,14 @@ class Context implements \ArrayAccess
     public $PGLog;
 
     /**
-     * @var HttpInput
+     * @var Input
      */
-    public $httpInput;
+    public $input;
 
     /**
-     * @var HttpOutput
+     * @var Output
      */
-    public $httpOutput;
+    public $output;
 
     /**
      * @var \PG\MSF\Server\Controllers\BaseController
@@ -41,7 +41,7 @@ class Context implements \ArrayAccess
 
     public function __sleep()
     {
-        return ['logId', 'httpInput'];
+        return ['logId', 'input'];
     }
 
     public function offsetSet($offset, $value) {
