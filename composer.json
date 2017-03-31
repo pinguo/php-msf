@@ -15,7 +15,7 @@
     "alcaeus/mongo-php-adapter": "^1.0"
   },
   "repositories": {
-    "php-msf": {
+    "php-log": {
       "type": "vcs",
       "url": "http://192.168.1.45:3000/PGWireless/php-log.git"
     }
