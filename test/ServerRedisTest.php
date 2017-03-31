@@ -23,7 +23,7 @@ class ServerRedisTest extends TestCase
      */
     public function setUpBeforeClass()
     {
-        yield $this->redis_pool->getCoroutine()->del(["testSet2", "testSet1", "test", "test1", "key1", "testSet", "testlist1"
+        yield $this->redisPool->getCoroutine()->del(["testSet2", "testSet1", "test", "test1", "key1", "testSet", "testlist1"
             , "testlist", "testHash", "testZset", "testZset1", "testZset2", "testuid_level_2", "testuid_level_1", "testuid_name_2", "testuid_name_1"
             , "testuid"]);
     }
@@ -33,7 +33,7 @@ class ServerRedisTest extends TestCase
      */
     public function tearDownAfterClass()
     {
-        yield $this->redis_pool->getCoroutine()->del(["testSet2", "testSet1", "test", "test1", "key1", "testSet", "testlist1"
+        yield $this->redisPool->getCoroutine()->del(["testSet2", "testSet1", "test", "test1", "key1", "testSet", "testlist1"
             , "testlist", "testHash", "testZset", "testZset1", "testZset2", "testuid_level_2", "testuid_level_1", "testuid_name_2", "testuid_name_1"
             , "testuid"]);
     }
@@ -60,7 +60,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisConnect()
     {
-        $value = yield $this->redis_pool->getCoroutine()->ping();
+        $value = yield $this->redisPool->getCoroutine()->ping();
         if (!$value) {
             throw new SwooleTestException('redis连接失败');
         }
@@ -72,7 +72,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedsisSet()
     {
-        $value = yield $this->redis_pool->getCoroutine()->set('test', 'testRedis');
+        $value = yield $this->redisPool->getCoroutine()->set('test', 'testRedis');
         if (!$value) {
             throw new SwooleTestException('redis set 失败');
         }
@@ -84,7 +84,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedsisSetEx()
     {
-        $value = yield $this->redis_pool->getCoroutine()->setex('test', 10, 'testRedis');
+        $value = yield $this->redisPool->getCoroutine()->setex('test', 10, 'testRedis');
         if (!$value) {
             throw new SwooleTestException('redis setex 失败');
         }
@@ -96,8 +96,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedsisSetNx()
     {
-        yield $this->redis_pool->getCoroutine()->setnx('test', 'testRedis2');
-        $value = yield $this->redis_pool->getCoroutine()->get('test');
+        yield $this->redisPool->getCoroutine()->setnx('test', 'testRedis2');
+        $value = yield $this->redisPool->getCoroutine()->get('test');
         $this->assertEquals($value, 'testRedis', 'redis setnx 失败');
     }
 
@@ -107,7 +107,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedsisGet()
     {
-        $value = yield $this->redis_pool->getCoroutine()->get('test');
+        $value = yield $this->redisPool->getCoroutine()->get('test');
         if ($value != 'testRedis') {
             throw new SwooleTestException('redis get 失败');
         }
@@ -119,9 +119,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisRename()
     {
-        yield $this->redis_pool->getCoroutine()->set('test', 'testRedis');
-        yield $this->redis_pool->getCoroutine()->rename('test', 'test1');
-        $value = yield $this->redis_pool->getCoroutine()->get('test1');
+        yield $this->redisPool->getCoroutine()->set('test', 'testRedis');
+        yield $this->redisPool->getCoroutine()->rename('test', 'test1');
+        $value = yield $this->redisPool->getCoroutine()->get('test1');
         $this->assertEquals($value, 'testRedis', 'redis rename 失败');
     }
 
@@ -131,15 +131,15 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisMset()
     {
-        $value = yield $this->redis_pool->getCoroutine()->mset(array('key0' => 'value0', 'key1' => 'value1'));
+        $value = yield $this->redisPool->getCoroutine()->mset(array('key0' => 'value0', 'key1' => 'value1'));
         if (!$value) {
             throw new SwooleTestException('redis mset 失败');
         }
-        $value = yield $this->redis_pool->getCoroutine()->get('key0');
+        $value = yield $this->redisPool->getCoroutine()->get('key0');
         if ($value != 'value0') {
             throw new SwooleTestException('redis mset 失败');
         }
-        $value = yield $this->redis_pool->getCoroutine()->get('key1');
+        $value = yield $this->redisPool->getCoroutine()->get('key1');
         if ($value != 'value1') {
             throw new SwooleTestException('redis mset 失败');
         }
@@ -151,7 +151,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisMget()
     {
-        $value = yield $this->redis_pool->getCoroutine()->mget(['key0', 'key1', 'key2']);
+        $value = yield $this->redisPool->getCoroutine()->mget(['key0', 'key1', 'key2']);
         if ($value[0] != 'value0' || $value[1] != 'value1' || $value[2] != null) {
             throw new SwooleTestException('redis mget 失败');
         }
@@ -164,16 +164,16 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisDel()
     {
-        yield $this->redis_pool->getCoroutine()->del('test');
-        $value = yield $this->redis_pool->getCoroutine()->get('test');
+        yield $this->redisPool->getCoroutine()->del('test');
+        $value = yield $this->redisPool->getCoroutine()->get('test');
         if ($value != null) {
             throw new SwooleTestException('redis del 失败');
         }
-        yield $this->redis_pool->getCoroutine()->del(array('key0', 'key1'));
+        yield $this->redisPool->getCoroutine()->del(array('key0', 'key1'));
         if ($value != null) {
             throw new SwooleTestException('redis del 失败');
         }
-        $value = yield $this->redis_pool->getCoroutine()->get('key1');
+        $value = yield $this->redisPool->getCoroutine()->get('key1');
         if ($value != null) {
             throw new SwooleTestException('redis del 失败');
         }
@@ -186,9 +186,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisIncr()
     {
-        yield $this->redis_pool->getCoroutine()->set('key1', 0);
-        yield $this->redis_pool->getCoroutine()->incr('key1');
-        $value = yield $this->redis_pool->getCoroutine()->get('key1');
+        yield $this->redisPool->getCoroutine()->set('key1', 0);
+        yield $this->redisPool->getCoroutine()->incr('key1');
+        $value = yield $this->redisPool->getCoroutine()->get('key1');
         if ($value != 1) {
             throw new SwooleTestException('redis incr 失败');
         }
@@ -201,9 +201,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisIncrBy()
     {
-        yield $this->redis_pool->getCoroutine()->set('key1', 0);
-        yield $this->redis_pool->getCoroutine()->incrBy('key1', 10);
-        $value = yield $this->redis_pool->getCoroutine()->get('key1');
+        yield $this->redisPool->getCoroutine()->set('key1', 0);
+        yield $this->redisPool->getCoroutine()->incrBy('key1', 10);
+        $value = yield $this->redisPool->getCoroutine()->get('key1');
         if ($value != 10) {
             throw new SwooleTestException('redis incrBy 失败');
         }
@@ -216,9 +216,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisDecr()
     {
-        yield $this->redis_pool->getCoroutine()->set('key1', 1);
-        yield $this->redis_pool->getCoroutine()->decr('key1');
-        $value = yield $this->redis_pool->getCoroutine()->get('key1');
+        yield $this->redisPool->getCoroutine()->set('key1', 1);
+        yield $this->redisPool->getCoroutine()->decr('key1');
+        $value = yield $this->redisPool->getCoroutine()->get('key1');
         if ($value != 0) {
             throw new SwooleTestException('redis decr 失败');
         }
@@ -231,9 +231,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisDecrBy()
     {
-        yield $this->redis_pool->getCoroutine()->set('key1', 10);
-        yield $this->redis_pool->getCoroutine()->decrBy('key1', 10);
-        $value = yield $this->redis_pool->getCoroutine()->get('key1');
+        yield $this->redisPool->getCoroutine()->set('key1', 10);
+        yield $this->redisPool->getCoroutine()->decrBy('key1', 10);
+        $value = yield $this->redisPool->getCoroutine()->get('key1');
         if ($value != 0) {
             throw new SwooleTestException('redis incrBy 失败');
         }
@@ -245,11 +245,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisExists()
     {
-        $value = yield $this->redis_pool->getCoroutine()->exists('key1000');
+        $value = yield $this->redisPool->getCoroutine()->exists('key1000');
         if ($value) {
             throw new SwooleTestException('redis exists 失败');
         }
-        $value = yield $this->redis_pool->getCoroutine()->exists('key1');
+        $value = yield $this->redisPool->getCoroutine()->exists('key1');
         if (!$value) {
             throw new SwooleTestException('redis exists 失败');
         }
@@ -261,7 +261,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLPush()
     {
-        $value = yield $this->redis_pool->getCoroutine()->lpush('testlist', 'test1');
+        $value = yield $this->redisPool->getCoroutine()->lpush('testlist', 'test1');
         if (!$value) {
             throw new SwooleTestException('redis lpush 失败');
         }
@@ -273,7 +273,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisRPush()
     {
-        $value = yield $this->redis_pool->getCoroutine()->rpush('testlist', 'test2');
+        $value = yield $this->redisPool->getCoroutine()->rpush('testlist', 'test2');
         if (!$value) {
             throw new SwooleTestException('redis rpush 失败');
         }
@@ -285,7 +285,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLPop()
     {
-        $value = yield $this->redis_pool->getCoroutine()->lpop('testlist');
+        $value = yield $this->redisPool->getCoroutine()->lpop('testlist');
         if ($value != 'test1') {
             throw new SwooleTestException('redis lpop 失败');
         }
@@ -297,7 +297,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisRPop()
     {
-        $value = yield $this->redis_pool->getCoroutine()->rpop('testlist');
+        $value = yield $this->redisPool->getCoroutine()->rpop('testlist');
         if ($value != 'test2') {
             throw new SwooleTestException('redis rpop 失败');
         }
@@ -309,8 +309,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLSet()
     {
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'test1');
-        $value = yield $this->redis_pool->getCoroutine()->lset('testlist', 0, 'test0');
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'test1');
+        $value = yield $this->redisPool->getCoroutine()->lset('testlist', 0, 'test0');
         if (!$value) {
             throw new SwooleTestException('redis lSet 失败');
         }
@@ -322,7 +322,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLIndex()
     {
-        $value = yield $this->redis_pool->getCoroutine()->lIndex('testlist', 0);
+        $value = yield $this->redisPool->getCoroutine()->lIndex('testlist', 0);
         if ($value != 'test0') {
             throw new SwooleTestException('redis lIndex 失败');
         }
@@ -334,7 +334,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLLen()
     {
-        $value = yield $this->redis_pool->getCoroutine()->lLen('testlist');
+        $value = yield $this->redisPool->getCoroutine()->lLen('testlist');
         if ($value != 1) {
             throw new SwooleTestException('redis lLen 失败');
         }
@@ -346,8 +346,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLRange()
     {
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'test3');
-        $value = yield $this->redis_pool->getCoroutine()->lRange('testlist', 0, -1);
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'test3');
+        $value = yield $this->redisPool->getCoroutine()->lRange('testlist', 0, -1);
         if (count($value) != 2) {
             throw new SwooleTestException('redis lRange 失败');
         }
@@ -359,14 +359,14 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLTrim()
     {
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'test4');
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'test5');
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'test6');
-        $value = yield $this->redis_pool->getCoroutine()->lTrim('testlist', 0, 1);
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'test4');
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'test5');
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'test6');
+        $value = yield $this->redisPool->getCoroutine()->lTrim('testlist', 0, 1);
         if (!$value) {
             throw new SwooleTestException('redis lTrim 失败');
         }
-        $value = yield $this->redis_pool->getCoroutine()->lLen('testlist');
+        $value = yield $this->redisPool->getCoroutine()->lLen('testlist');
         if ($value != 2) {
             throw new SwooleTestException('redis lTrim 失败');
         }
@@ -378,13 +378,13 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLRem()
     {
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'testrem');
-        yield $this->redis_pool->getCoroutine()->lpush('testlist', 'testrem');
-        $value = yield $this->redis_pool->getCoroutine()->lRem('testlist', 'testrem', 0);
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'testrem');
+        yield $this->redisPool->getCoroutine()->lpush('testlist', 'testrem');
+        $value = yield $this->redisPool->getCoroutine()->lRem('testlist', 'testrem', 0);
         if (!$value) {
             throw new SwooleTestException('redis lRem 失败');
         }
-        $value = yield $this->redis_pool->getCoroutine()->lLen('testlist');
+        $value = yield $this->redisPool->getCoroutine()->lLen('testlist');
         if ($value != 2) {
             throw new SwooleTestException('redis lRem 失败');
         }
@@ -397,9 +397,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisLInsert()
     {
-        yield $this->redis_pool->getCoroutine()->lset('testlist', 0, 'testinsert');
-        yield $this->redis_pool->getCoroutine()->lInsert('testlist', \Redis::AFTER, 'testinsert', 'testinsert1');
-        $value = yield $this->redis_pool->getCoroutine()->lIndex('testlist', '1');
+        yield $this->redisPool->getCoroutine()->lset('testlist', 0, 'testinsert');
+        yield $this->redisPool->getCoroutine()->lInsert('testlist', \Redis::AFTER, 'testinsert', 'testinsert1');
+        $value = yield $this->redisPool->getCoroutine()->lIndex('testlist', '1');
         if ($value != 'testinsert1') {
             throw new SwooleTestException('redis lInsert 失败');
         }
@@ -412,9 +412,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisRpoplpush()
     {
-        yield $this->redis_pool->getCoroutine()->rpush('testlist', 'testrpoplpush');
-        yield $this->redis_pool->getCoroutine()->rpoplpush('testlist', 'testlist1');
-        $value = yield $this->redis_pool->getCoroutine()->lIndex('testlist1', '0');
+        yield $this->redisPool->getCoroutine()->rpush('testlist', 'testrpoplpush');
+        yield $this->redisPool->getCoroutine()->rpoplpush('testlist', 'testlist1');
+        $value = yield $this->redisPool->getCoroutine()->lIndex('testlist1', '0');
         if ($value != 'testrpoplpush') {
             throw new SwooleTestException('redis rpoplpush 失败');
         }
@@ -426,9 +426,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSAdd()
     {
-        $value = yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
+        $value = yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
         $this->assertTrue($value, 'redis sadd 失败');
-        $value = yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
+        $value = yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
         $this->assertFalse($value, 'redis sadd 失败');
     }
 
@@ -438,7 +438,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSIsMember()
     {
-        $value = yield $this->redis_pool->getCoroutine()->sIsMember('testSet', 'index0');
+        $value = yield $this->redisPool->getCoroutine()->sIsMember('testSet', 'index0');
         $this->assertTrue($value, 'redis sIsMember 失败');
     }
 
@@ -448,9 +448,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSRem()
     {
-        $value = yield $this->redis_pool->getCoroutine()->sRem('testSet', 'index0');
+        $value = yield $this->redisPool->getCoroutine()->sRem('testSet', 'index0');
         $this->assertTrue($value, 'redis sRem 失败');
-        $value = yield $this->redis_pool->getCoroutine()->sIsMember('testSet', 'index0');
+        $value = yield $this->redisPool->getCoroutine()->sIsMember('testSet', 'index0');
         $this->assertFalse($value, 'redis sRem 失败');
     }
 
@@ -460,9 +460,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSCard()
     {
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        $value = yield $this->redis_pool->getCoroutine()->sCard('testSet');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        $value = yield $this->redisPool->getCoroutine()->sCard('testSet');
         $this->assertEquals($value, 2, 'redis sCard 失败');
     }
 
@@ -472,7 +472,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSRandMember()
     {
-        $value = yield $this->redis_pool->getCoroutine()->sRandMember('testSet');
+        $value = yield $this->redisPool->getCoroutine()->sRandMember('testSet');
         $this->assertNotEmpty($value, 'redis sRandMember 失败');
     }
 
@@ -482,7 +482,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSPop()
     {
-        $value = yield $this->redis_pool->getCoroutine()->sPop('testSet');
+        $value = yield $this->redisPool->getCoroutine()->sPop('testSet');
         $this->assertNotEmpty($value, 'redis sPop 失败');
     }
 
@@ -492,11 +492,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSMove()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        $value = yield $this->redis_pool->getCoroutine()->sMove('testSet', 'testSet1', 'index0');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        $value = yield $this->redisPool->getCoroutine()->sMove('testSet', 'testSet1', 'index0');
         $this->assertTrue($value, 'redis sMove 失败');
-        $value = yield $this->redis_pool->getCoroutine()->sPop('testSet1');
+        $value = yield $this->redisPool->getCoroutine()->sPop('testSet1');
         $this->assertEquals($value, 'index0', 'redis sMove 失败');
     }
 
@@ -506,12 +506,12 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSInter()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index1');
-        $value = yield $this->redis_pool->getCoroutine()->sInter('testSet1', 'testSet');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index1');
+        $value = yield $this->redisPool->getCoroutine()->sInter('testSet1', 'testSet');
         $this->assertCount(2, $value, 'redis sInter 失败');
     }
 
@@ -521,13 +521,13 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSInterStore()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index1');
-        yield $this->redis_pool->getCoroutine()->sInterStore('testSet2', 'testSet1', 'testSet');
-        $value = yield $this->redis_pool->getCoroutine()->scard('testSet2');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index1');
+        yield $this->redisPool->getCoroutine()->sInterStore('testSet2', 'testSet1', 'testSet');
+        $value = yield $this->redisPool->getCoroutine()->scard('testSet2');
         $this->assertEquals($value, 2, 'redis sInterStroe 失败');
     }
 
@@ -537,12 +537,12 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSUnion()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index2');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index3');
-        $value = yield $this->redis_pool->getCoroutine()->sUnion('testSet1', 'testSet');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index2');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index3');
+        $value = yield $this->redisPool->getCoroutine()->sUnion('testSet1', 'testSet');
         $this->assertCount(4, $value, 'redis sUnion 失败');
     }
 
@@ -552,13 +552,13 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSUnionStore()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index2');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index3');
-        yield $this->redis_pool->getCoroutine()->sUnionStore('testSet2', 'testSet1', 'testSet');
-        $value = yield $this->redis_pool->getCoroutine()->scard('testSet2');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index2');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index3');
+        yield $this->redisPool->getCoroutine()->sUnionStore('testSet2', 'testSet1', 'testSet');
+        $value = yield $this->redisPool->getCoroutine()->scard('testSet2');
         $this->assertEquals($value, 4, 'redis sUnionStore 失败');
     }
 
@@ -568,12 +568,12 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSDiff()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index2');
-        $value = yield $this->redis_pool->getCoroutine()->sUnion('testSet1', 'testSet');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index2');
+        $value = yield $this->redisPool->getCoroutine()->sUnion('testSet1', 'testSet');
         $this->assertCount(3, $value, 'redis sDiff 失败');
     }
 
@@ -583,13 +583,13 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSDiffStore()
     {
-        yield $this->redis_pool->getCoroutine()->del(['testSet', 'testSet1']);
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet1', 'index2');
-        yield $this->redis_pool->getCoroutine()->sUnionStore('testSet2', 'testSet1', 'testSet');
-        $value = yield $this->redis_pool->getCoroutine()->scard('testSet2');
+        yield $this->redisPool->getCoroutine()->del(['testSet', 'testSet1']);
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet1', 'index2');
+        yield $this->redisPool->getCoroutine()->sUnionStore('testSet2', 'testSet1', 'testSet');
+        $value = yield $this->redisPool->getCoroutine()->scard('testSet2');
         $this->assertEquals($value, 3, 'redis sDiffStore 失败');
     }
 
@@ -599,10 +599,10 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSMembers()
     {
-        yield $this->redis_pool->getCoroutine()->del('testSet');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index0');
-        yield $this->redis_pool->getCoroutine()->sAdd('testSet', 'index1');
-        $value = yield $this->redis_pool->getCoroutine()->sMembers('testSet');
+        yield $this->redisPool->getCoroutine()->del('testSet');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index0');
+        yield $this->redisPool->getCoroutine()->sAdd('testSet', 'index1');
+        $value = yield $this->redisPool->getCoroutine()->sMembers('testSet');
         $this->assertCount(2, $value, 'redis sMembers 失败');
     }
 
@@ -612,18 +612,18 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisSort()
     {
-        yield $this->redis_pool->getCoroutine()->del('testuid');
-        yield $this->redis_pool->getCoroutine()->lpush('testuid', 1);
-        yield $this->redis_pool->getCoroutine()->set('testuid_name_1', 'test1');
-        yield $this->redis_pool->getCoroutine()->set('testuid_level_1', 10);
-        yield $this->redis_pool->getCoroutine()->lpush('testuid', 2);
-        yield $this->redis_pool->getCoroutine()->set('testuid_name_2', 'test2');
-        yield $this->redis_pool->getCoroutine()->set('testuid_level_2', 20);
-        $value = yield $this->redis_pool->getCoroutine()->sort('testuid', ['sort' => 'desc']);
+        yield $this->redisPool->getCoroutine()->del('testuid');
+        yield $this->redisPool->getCoroutine()->lpush('testuid', 1);
+        yield $this->redisPool->getCoroutine()->set('testuid_name_1', 'test1');
+        yield $this->redisPool->getCoroutine()->set('testuid_level_1', 10);
+        yield $this->redisPool->getCoroutine()->lpush('testuid', 2);
+        yield $this->redisPool->getCoroutine()->set('testuid_name_2', 'test2');
+        yield $this->redisPool->getCoroutine()->set('testuid_level_2', 20);
+        $value = yield $this->redisPool->getCoroutine()->sort('testuid', ['sort' => 'desc']);
         $this->assertCount(2, $value, 'redis Sort 失败');
-        $value = yield $this->redis_pool->getCoroutine()->sort('testuid', ['by' => 'testuid_level_*', 'sort' => 'desc']);
+        $value = yield $this->redisPool->getCoroutine()->sort('testuid', ['by' => 'testuid_level_*', 'sort' => 'desc']);
         $this->assertCount(2, $value, 'redis Sort 失败');
-        $value = yield $this->redis_pool->getCoroutine()->sort('testuid', ['by' => 'testuid_level_*', 'get' => ['testuid_name_*', '#', 'testuid_level_*'], 'sort' => 'desc']);
+        $value = yield $this->redisPool->getCoroutine()->sort('testuid', ['by' => 'testuid_level_*', 'get' => ['testuid_name_*', '#', 'testuid_level_*'], 'sort' => 'desc']);
         $this->assertCount(6, $value, 'redis Sort 失败');
     }
 
@@ -633,10 +633,10 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisGetSet()
     {
-        yield $this->redis_pool->getCoroutine()->set('test', 42);
-        $value = yield $this->redis_pool->getCoroutine()->getSet('test', 'lol');
+        yield $this->redisPool->getCoroutine()->set('test', 42);
+        $value = yield $this->redisPool->getCoroutine()->getSet('test', 'lol');
         $this->assertEquals($value, 42, 'redis getSet 失败');
-        $value = yield $this->redis_pool->getCoroutine()->get('test');
+        $value = yield $this->redisPool->getCoroutine()->get('test');
         $this->assertEquals($value, 'lol', 'redis getSet 失败');
     }
 
@@ -646,9 +646,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisAppend()
     {
-        yield $this->redis_pool->getCoroutine()->set('test', 'test');
-        yield $this->redis_pool->getCoroutine()->append('test', 'lol');
-        $value = yield $this->redis_pool->getCoroutine()->get('test');
+        yield $this->redisPool->getCoroutine()->set('test', 'test');
+        yield $this->redisPool->getCoroutine()->append('test', 'lol');
+        $value = yield $this->redisPool->getCoroutine()->get('test');
         $this->assertEquals($value, 'testlol', 'redis append 失败');
     }
 
@@ -658,8 +658,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisStrlen()
     {
-        yield $this->redis_pool->getCoroutine()->set('test', 'test');
-        $value = yield $this->redis_pool->getCoroutine()->strlen('test');
+        yield $this->redisPool->getCoroutine()->set('test', 'test');
+        $value = yield $this->redisPool->getCoroutine()->strlen('test');
         $this->assertEquals($value, '4', 'redis strlen 失败');
     }
 
@@ -669,8 +669,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHSet()
     {
-        yield $this->redis_pool->getCoroutine()->hset('testHash', 'key0', 'value0');
-        $value = yield $this->redis_pool->getCoroutine()->keys('testHash');
+        yield $this->redisPool->getCoroutine()->hset('testHash', 'key0', 'value0');
+        $value = yield $this->redisPool->getCoroutine()->keys('testHash');
         $this->assertContains('testHash', $value, 'redis hset 失败');
     }
 
@@ -680,7 +680,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHGet()
     {
-        $value = yield $this->redis_pool->getCoroutine()->hget('testHash', 'key0');
+        $value = yield $this->redisPool->getCoroutine()->hget('testHash', 'key0');
         $this->assertEquals($value, 'value0', 'redis hget 失败');
     }
 
@@ -690,7 +690,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHLen()
     {
-        $value = yield $this->redis_pool->getCoroutine()->hlen('testHash');
+        $value = yield $this->redisPool->getCoroutine()->hlen('testHash');
         $this->assertEquals($value, 1, 'redis hlen 失败');
     }
 
@@ -700,8 +700,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHDel()
     {
-        yield $this->redis_pool->getCoroutine()->hdel('testHash', 'key0');
-        $value = yield $this->redis_pool->getCoroutine()->hlen('testHash');
+        yield $this->redisPool->getCoroutine()->hdel('testHash', 'key0');
+        $value = yield $this->redisPool->getCoroutine()->hlen('testHash');
         $this->assertEquals($value, 0, 'redis hdel 失败');
     }
 
@@ -711,8 +711,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHKeys()
     {
-        yield $this->redis_pool->getCoroutine()->hset('testHash', 'key0', 'value0');
-        $value = yield $this->redis_pool->getCoroutine()->hkeys('testHash');
+        yield $this->redisPool->getCoroutine()->hset('testHash', 'key0', 'value0');
+        $value = yield $this->redisPool->getCoroutine()->hkeys('testHash');
         $this->assertContains('key0', $value, 'redis hkeys 失败');
     }
 
@@ -722,7 +722,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHVals()
     {
-        $value = yield $this->redis_pool->getCoroutine()->hvals('testHash');
+        $value = yield $this->redisPool->getCoroutine()->hvals('testHash');
         $this->assertContains('value0', $value, 'redis hvals 失败');
     }
 
@@ -732,7 +732,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHGetAll()
     {
-        $value = yield $this->redis_pool->getCoroutine()->hGetAll('testHash');
+        $value = yield $this->redisPool->getCoroutine()->hGetAll('testHash');
         $this->assertEquals($value['key0'], 'value0', 'redis hgetall 失败');
     }
 
@@ -742,7 +742,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHExists()
     {
-        $value = yield $this->redis_pool->getCoroutine()->hExists('testHash', 'key0');
+        $value = yield $this->redisPool->getCoroutine()->hExists('testHash', 'key0');
         $this->assertTrue($value, 'redis hExists 失败');
     }
 
@@ -752,9 +752,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHIncrBy()
     {
-        yield $this->redis_pool->getCoroutine()->hset('testHash', 'key1', 1);
-        yield $this->redis_pool->getCoroutine()->hIncrBy('testHash', 'key1', 10);
-        $value = yield $this->redis_pool->getCoroutine()->hget('testHash', 'key1');
+        yield $this->redisPool->getCoroutine()->hset('testHash', 'key1', 1);
+        yield $this->redisPool->getCoroutine()->hIncrBy('testHash', 'key1', 10);
+        $value = yield $this->redisPool->getCoroutine()->hget('testHash', 'key1');
         $this->assertEquals($value, 11, 'redis hIncrBy 失败');
     }
 
@@ -764,10 +764,10 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHMset()
     {
-        yield $this->redis_pool->getCoroutine()->hMset('testHash', ['key1' => 1, 'key2' => 2]);
-        $value = yield $this->redis_pool->getCoroutine()->hget('testHash', 'key1');
+        yield $this->redisPool->getCoroutine()->hMset('testHash', ['key1' => 1, 'key2' => 2]);
+        $value = yield $this->redisPool->getCoroutine()->hget('testHash', 'key1');
         $this->assertEquals($value, 1, 'redis hMset 失败');
-        $value = yield $this->redis_pool->getCoroutine()->hget('testHash', 'key2');
+        $value = yield $this->redisPool->getCoroutine()->hget('testHash', 'key2');
         $this->assertEquals($value, 2, 'redis hMset 失败');
     }
 
@@ -777,7 +777,7 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisHMget()
     {
-        $value = yield $this->redis_pool->getCoroutine()->hMget('testHash', ['key1', 'key2']);
+        $value = yield $this->redisPool->getCoroutine()->hMget('testHash', ['key1', 'key2']);
         $this->assertEquals($value['key1'], 1, 'redis hMget 失败');
         $this->assertEquals($value['key2'], 2, 'redis hMget 失败');
     }
@@ -788,10 +788,10 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZAdd()
     {
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->keys('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->keys('testZset');
         $this->assertContains('testZset', $value, 'redis zadd 失败');
     }
 
@@ -801,11 +801,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRange()
     {
-        $value = yield $this->redis_pool->getCoroutine()->zRange('testZset', 0, -1);
+        $value = yield $this->redisPool->getCoroutine()->zRange('testZset', 0, -1);
         $this->assertContains('vol0', $value, 'redis zrange 失败');
         $this->assertContains('vol5', $value, 'redis zrange 失败');
         $this->assertContains('vol2', $value, 'redis zrange 失败');
-        $value = yield $this->redis_pool->getCoroutine()->zRange('testZset', 0, -1, true);
+        $value = yield $this->redisPool->getCoroutine()->zRange('testZset', 0, -1, true);
         $this->assertEquals($value['vol0'], 0, 'redis zrange 失败');
         $this->assertEquals($value['vol2'], 2, 'redis zrange 失败');
         $this->assertEquals($value['vol5'], 5, 'redis zrange 失败');
@@ -817,11 +817,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRevRange()
     {
-        $value = yield $this->redis_pool->getCoroutine()->zRevRange('testZset', 0, -1);
+        $value = yield $this->redisPool->getCoroutine()->zRevRange('testZset', 0, -1);
         $this->assertContains('vol0', $value, 'redis zRevRange 失败');
         $this->assertContains('vol5', $value, 'redis zRevRange 失败');
         $this->assertContains('vol2', $value, 'redis zRevRange 失败');
-        $value = yield $this->redis_pool->getCoroutine()->zRevRange('testZset', 0, -1, true);
+        $value = yield $this->redisPool->getCoroutine()->zRevRange('testZset', 0, -1, true);
         $this->assertEquals($value['vol0'], 0, 'redis zRevRange 失败');
         $this->assertEquals($value['vol2'], 2, 'redis zRevRange 失败');
         $this->assertEquals($value['vol5'], 5, 'redis zRevRange 失败');
@@ -833,11 +833,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZCount()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zCount('testZset', 0, 5);
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zCount('testZset', 0, 5);
         $this->assertEquals($value, 3, 'redis zCount 失败');
     }
 
@@ -847,11 +847,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZCard()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zCard('testZset');
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zCard('testZset');
         $this->assertEquals($value, 3, 'redis zCard 失败');
     }
 
@@ -861,9 +861,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRem()
     {
-        $value = yield $this->redis_pool->getCoroutine()->zRem('testZset', 'vol0');
+        $value = yield $this->redisPool->getCoroutine()->zRem('testZset', 'vol0');
         $this->assertTrue($value, 'redis zRem 失败');
-        $value = yield $this->redis_pool->getCoroutine()->zCard('testZset');
+        $value = yield $this->redisPool->getCoroutine()->zCard('testZset');
         $this->assertEquals($value, 2, 'redis zRem 失败');
     }
 
@@ -873,8 +873,8 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZScore()
     {
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        $value = yield $this->redis_pool->getCoroutine()->zScore('testZset', 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        $value = yield $this->redisPool->getCoroutine()->zScore('testZset', 'vol0');
         $this->assertEquals($value, 0, 'redis zScore 失败');
     }
 
@@ -884,11 +884,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRank()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zRank('testZset', 'vol2');
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zRank('testZset', 'vol2');
         $this->assertEquals($value, 1, 'redis zRank 失败');
     }
 
@@ -898,11 +898,11 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRevRank()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zRevRank('testZset', 'vol2');
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zRevRank('testZset', 'vol2');
         $this->assertEquals($value, 1, 'redis zRevRank 失败');
     }
 
@@ -912,9 +912,9 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZIncrBy()
     {
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        yield $this->redis_pool->getCoroutine()->zIncrBy('testZset', 10, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zScore('testZset', 'vol2');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        yield $this->redisPool->getCoroutine()->zIncrBy('testZset', 10, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zScore('testZset', 'vol2');
         $this->assertEquals($value, 12, 'redis zIncrBy 失败');
     }
 
@@ -924,15 +924,15 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRangeByScore()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zRangeByScore('testZset', 0, 5);
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zRangeByScore('testZset', 0, 5);
         $this->assertContains('vol0', $value, 'redis zRangeByScore 失败');
         $this->assertContains('vol5', $value, 'redis zRangeByScore 失败');
         $this->assertContains('vol2', $value, 'redis zRangeByScore 失败');
-        $value = yield $this->redis_pool->getCoroutine()->zRangeByScore('testZset', 0, 5, ['withscores' => true, 'limit' => [0, 5]]);
+        $value = yield $this->redisPool->getCoroutine()->zRangeByScore('testZset', 0, 5, ['withscores' => true, 'limit' => [0, 5]]);
         $this->assertEquals($value['vol0'], 0, 'redis zRangeByScore 失败');
         $this->assertEquals($value['vol2'], 2, 'redis zRangeByScore 失败');
         $this->assertEquals($value['vol5'], 5, 'redis zRangeByScore 失败');
@@ -944,15 +944,15 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRevRangeByScore()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
-        $value = yield $this->redis_pool->getCoroutine()->zRangeByScore('testZset', 0, 5);
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        $value = yield $this->redisPool->getCoroutine()->zRangeByScore('testZset', 0, 5);
         $this->assertContains('vol0', $value, 'redis zRevRangeByScore 失败');
         $this->assertContains('vol5', $value, 'redis zRevRangeByScore 失败');
         $this->assertContains('vol2', $value, 'redis zRevRangeByScore 失败');
-        $value = yield $this->redis_pool->getCoroutine()->zRangeByScore('testZset', 0, 5, ['withscores' => true, 'limit' => [0, 5]]);
+        $value = yield $this->redisPool->getCoroutine()->zRangeByScore('testZset', 0, 5, ['withscores' => true, 'limit' => [0, 5]]);
         $this->assertEquals($value['vol0'], 0, 'redis zRevRangeByScore 失败');
         $this->assertEquals($value['vol2'], 2, 'redis zRevRangeByScore 失败');
         $this->assertEquals($value['vol5'], 5, 'redis zRevRangeByScore 失败');
@@ -964,10 +964,10 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZRemRangeByScore()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0', 5, 'vol5', 2, 'vol2');
-        yield $this->redis_pool->getCoroutine()->zRemRangeByScore('testZset', 0, 5);
-        $value = yield $this->redis_pool->getCoroutine()->zCard('testZset');
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0', 5, 'vol5', 2, 'vol2');
+        yield $this->redisPool->getCoroutine()->zRemRangeByScore('testZset', 0, 5);
+        $value = yield $this->redisPool->getCoroutine()->zCard('testZset');
         $this->assertEquals($value, 0, 'redis zRemRangeByScore 失败');
     }
 
@@ -977,18 +977,18 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZUnion()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol5');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol2');
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol5');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol2');
 
-        yield $this->redis_pool->getCoroutine()->del('testZset1');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset1', 1, 'vol1');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset1', 3, 'vol3');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset1', 4, 'vol4');
+        yield $this->redisPool->getCoroutine()->del('testZset1');
+        yield $this->redisPool->getCoroutine()->zadd('testZset1', 1, 'vol1');
+        yield $this->redisPool->getCoroutine()->zadd('testZset1', 3, 'vol3');
+        yield $this->redisPool->getCoroutine()->zadd('testZset1', 4, 'vol4');
 
-        yield $this->redis_pool->getCoroutine()->zunion('testZset2', ['testZset', 'testZset1'], [1, 2], 'SUM');
-        $value = yield $this->redis_pool->getCoroutine()->zRange('testZset2', 0, -1);
+        yield $this->redisPool->getCoroutine()->zunion('testZset2', ['testZset', 'testZset1'], [1, 2], 'SUM');
+        $value = yield $this->redisPool->getCoroutine()->zRange('testZset2', 0, -1);
         $this->assertCount(6, $value, 'redis ZUnion 失败');
     }
 
@@ -998,18 +998,18 @@ class ServerRedisTest extends TestCase
      */
     public function testRedisZInter()
     {
-        yield $this->redis_pool->getCoroutine()->del('testZset');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 0, 'vol0');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 5, 'vol3');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset', 2, 'vol4');
+        yield $this->redisPool->getCoroutine()->del('testZset');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 0, 'vol0');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 5, 'vol3');
+        yield $this->redisPool->getCoroutine()->zadd('testZset', 2, 'vol4');
 
-        yield $this->redis_pool->getCoroutine()->del('testZset1');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset1', 1, 'vol1');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset1', 3, 'vol3');
-        yield $this->redis_pool->getCoroutine()->zadd('testZset1', 4, 'vol4');
+        yield $this->redisPool->getCoroutine()->del('testZset1');
+        yield $this->redisPool->getCoroutine()->zadd('testZset1', 1, 'vol1');
+        yield $this->redisPool->getCoroutine()->zadd('testZset1', 3, 'vol3');
+        yield $this->redisPool->getCoroutine()->zadd('testZset1', 4, 'vol4');
 
-        yield $this->redis_pool->getCoroutine()->zInter('testZset2', ['testZset', 'testZset1'], [1, 2], 'SUM');
-        $value = yield $this->redis_pool->getCoroutine()->zRange('testZset2', 0, -1);
+        yield $this->redisPool->getCoroutine()->zInter('testZset2', ['testZset', 'testZset1'], [1, 2], 'SUM');
+        $value = yield $this->redisPool->getCoroutine()->zRange('testZset2', 0, -1);
         $this->assertCount(2, $value, 'redis zInter 失败');
     }
 }
