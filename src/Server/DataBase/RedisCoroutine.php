@@ -26,7 +26,7 @@ class RedisCoroutine extends CoroutineBase
         $this->arguments = $arguments;
         $this->request = "#redis: $name";
         $logId = $context->PGLog->logId;
-        get_instance()->coroutine->IOCallBack[$logId][] = $this;
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->send(function ($result) use ($logId) {
             $this->result = $result;
             $this->ioBack = true;

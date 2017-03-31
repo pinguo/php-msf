@@ -16,27 +16,27 @@ abstract class AsynPool implements IAsynPool
     /**
      * @var Config
      */
-    public $config;
+    public    $config;
     protected $commands;
     protected $pool;
     protected $callBacks;
-    protected $worker_id;
+    protected $workerId;
     protected $server;
-    protected $swoole_server;
+    protected $swooleServer;
     //避免爆发连接的锁
     protected $token = 0;
     protected $waitConnetNum = 0;
     /**
      * @var AsynPoolManager
      */
-    protected $asyn_manager;
+    protected $asynManager;
 
     public function __construct($config)
     {
         $this->callBacks = new \SplFixedArray(self::MAX_TOKEN);
-        $this->commands = new \SplQueue();
-        $this->pool = new \SplQueue();
-        $this->config = $config;
+        $this->commands  = new \SplQueue();
+        $this->pool      = new \SplQueue();
+        $this->config    = $config;
     }
 
     public function addTokenCallback($callback)
@@ -64,22 +64,22 @@ abstract class AsynPool implements IAsynPool
     }
 
     /**
-     * @param $swoole_server
-     * @param $asyn_manager
+     * @param $swooleServer
+     * @param $asynManager
      */
-    public function server_init($swoole_server, $asyn_manager)
+    public function serverInit($swooleServer, $asynManager)
     {
-        $this->swoole_server = $swoole_server;
-        $this->server = $swoole_server->server;
-        $this->asyn_manager = $asyn_manager;
+        $this->swooleServer = $swooleServer;
+        $this->server       = $swooleServer->server;
+        $this->asynManager  = $asynManager;
     }
 
     /**
      * @param $workerid
      */
-    public function worker_init($workerid)
+    public function workerInit($workerId)
     {
-        $this->worker_id = $workerid;
+        $this->workerId = $workerId;
     }
 
     /**

@@ -17,33 +17,33 @@ class AsynPoolManager
     /**
      * @var SwooleServer
      */
-    protected $swoole_server;
+    protected $swooleServer;
     protected $process;
     protected $registDir = [];
-    protected $not_event_add = false;
+    protected $notEventAdd = false;
 
-    public function __construct($process, $swoole_server)
+    public function __construct($process, $swooleServer)
     {
         $this->process = $process;
-        $this->swoole_server = $swoole_server;
+        $this->swooleServer = $swooleServer;
     }
 
     /**
      * 采用额外进程的方式
      * event_add
      */
-    public function event_add()
+    public function eventAdd()
     {
-        $this->not_event_add = false;
+        $this->notEventAdd = false;
         swoole_event_add($this->process->pipe, [$this, 'getPipeMessage']);
     }
 
     /**
      * 不采用进程通讯，每个进程都启用进程池
      */
-    public function no_event_add()
+    public function noEventAdd()
     {
-        $this->not_event_add = true;
+        $this->notEventAdd = true;
     }
 
     /**
@@ -75,22 +75,22 @@ class AsynPoolManager
     public function registAsyn(IAsynPool $asyn)
     {
         $this->registDir[$asyn->getAsynName()] = $asyn;
-        $asyn->server_init($this->swoole_server, $this);
+        $asyn->serverInit($this->swooleServer, $this);
     }
 
     /**
      * 写入管道
      * @param IAsynPool $asyn
      * @param $data
-     * @param $worker_id
+     * @param $workerId
      */
-    public function writePipe(IAsynPool $asyn, $data, $worker_id)
+    public function writePipe(IAsynPool $asyn, $data, $workerId)
     {
-        if ($this->not_event_add) {
+        if ($this->notEventAdd) {
             call_user_func([$asyn, 'execute'], $data);
         } else {
             $data['asyn_name'] = $asyn->getAsynName();
-            $data['worker_id'] = $worker_id;
+            $data['worker_id'] = $workerId;
             //写入管道
             $this->process->write(serialize($data));
         }
@@ -102,12 +102,12 @@ class AsynPoolManager
      */
     public function sendMessageToWorker(IAsynPool $asyn, $data)
     {
-        if ($this->not_event_add) {
+        if ($this->notEventAdd) {
             call_user_func([$asyn, 'distribute'], $data);
         } else {
             $workerID = $data['worker_id'];
-            $message = $this->swoole_server->packSerevrMessageBody(SwooleMarco::MSG_TYPR_ASYN, $data);
-            $this->swoole_server->server->sendMessage($message, $workerID);
+            $message = $this->swooleServer->packSerevrMessageBody(SwooleMarco::MSG_TYPR_ASYN, $data);
+            $this->swooleServer->server->sendMessage($message, $workerID);
         }
 
     }

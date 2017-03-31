@@ -15,13 +15,13 @@ class Loader
      * @var array
      */
     private $_tasks = [];
-    private $_task_proxy;
-    private $_model_factory;
+    private $_taskProxy;
+    private $_modelFactory;
 
     public function __construct()
     {
-        $this->_task_proxy = new TaskProxy();
-        $this->_model_factory = ModelFactory::getInstance();
+        $this->_taskProxy = new TaskProxy();
+        $this->_modelFactory = ModelFactory::getInstance();
     }
 
     /**
@@ -40,7 +40,7 @@ class Loader
         if (empty($model)) {
             return null;
         }
-        if ($model == $parent->core_name) {
+        if ($model == $parent->coreName) {
             return $parent;
         }
         $root = $parent;
@@ -51,10 +51,10 @@ class Loader
             $root = $root->parent??null;
         }
 
-        $model_instance = $this->_model_factory->getModel($model, $parent);
-        $parent->addChild($model_instance);
-        $model_instance->initialization($parent->getContext());
-        return $model_instance;
+        $modelInstance = $this->_modelFactory->getModel($model, $parent);
+        $parent->addChild($modelInstance);
+        $modelInstance->initialization($parent->getContext());
+        return $modelInstance;
     }
 
     /**
@@ -77,12 +77,12 @@ class Loader
                 throw new SwooleException("class task_class not exists");
             }
         }
-        if (!get_instance()->server->taskworker) {//工作进程返回taskproxy
-            $this->_task_proxy->core_name = $task;
+        if (!getInstance()->server->taskworker) {//工作进程返回taskproxy
+            $this->_taskProxy->coreName = $task;
             if ($parent != null) {
-                $this->_task_proxy->setContext($parent->getContext());
+                $this->_taskProxy->setContext($parent->getContext());
             }
-            return $this->_task_proxy;
+            return $this->_taskProxy;
         }
         if (key_exists($task, $this->_tasks)) {
             $task_instance = $this->_tasks[$task];
@@ -102,7 +102,7 @@ class Loader
      */
     public function view($template)
     {
-        $template = get_instance()->templateEngine->make($template);
+        $template = getInstance()->templateEngine->make($template);
         return $template;
     }
 }

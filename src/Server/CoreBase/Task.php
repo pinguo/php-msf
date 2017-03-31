@@ -24,10 +24,10 @@ class Task extends TaskProxy
         parent::__construct();
     }
 
-    public function initialization($task_id, $worker_pid, $task_name, $method_name, $context)
+    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
-        $this->task_id = $task_id;
-        get_instance()->tid_pid_table->set($this->task_id, ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'start_time' => time()]);
+        $this->taskId = $taskId;
+        getInstance()->tidPidTable->set($this->taskId, ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
         $this->start_run_time = microtime(true);
         if ($context) {
             $this->setContext($context);
@@ -35,7 +35,7 @@ class Task extends TaskProxy
             $this->PGLog = clone $this->logger;
             $this->PGLog->logId = $this->getContext()->logId;
             $this->PGLog->accessRecord['beginTime'] = microtime(true);
-            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $task_name . '/' . $method_name);
+            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $taskName . '/' . $methodName);
             defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME . '-task';
             $this->PGLog->init();
         }
@@ -44,9 +44,9 @@ class Task extends TaskProxy
     public function destroy()
     {
         $this->PGLog && $this->PGLog->appendNoticeLog();
-        get_instance()->tid_pid_table->del($this->task_id);
+        getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
-        $this->task_id = 0;
+        $this->taskId = 0;
     }
 
     /**
@@ -60,10 +60,10 @@ class Task extends TaskProxy
             return false;
         }
         //表总0获得值代表的是需要中断的id
-        $interrupted_task_id = get_instance()->tid_pid_table->get(0)['pid'];
+        $interrupted_task_id = getInstance()->tidPidTable->get(0)['pid'];
         //读取后可以释放锁了
-        get_instance()->task_lock->unlock();
-        if ($interrupted_task_id == $this->task_id) {
+        getInstance()->taskLock->unlock();
+        if ($interrupted_task_id == $this->taskId) {
             return true;
         }
 
@@ -78,7 +78,7 @@ class Task extends TaskProxy
     protected function sendToUid($uid, $data)
     {
         $data = $this->pack->pack($data);
-        get_instance()->sendToUid($uid, $data);
+        getInstance()->sendToUid($uid, $data);
     }
 
     /**
@@ -89,7 +89,7 @@ class Task extends TaskProxy
     protected function sendToUids($uids, $data)
     {
         $data = $this->pack->pack($data);
-        get_instance()->sendToUids($uids, $data);
+        getInstance()->sendToUids($uids, $data);
     }
 
     /**
@@ -99,7 +99,7 @@ class Task extends TaskProxy
     protected function sendToAll($data)
     {
         $data = $this->pack->pack($data);
-        get_instance()->sendToAll($data);
+        getInstance()->sendToAll($data);
     }
 
     /**
@@ -109,17 +109,17 @@ class Task extends TaskProxy
      */
     protected function getRedis()
     {
-        return get_instance()->getRedis();
+        return getInstance()->getRedis();
     }
 
     //运行完后清理下
 
     /**
      * 获取同步mysql
-     * @return \Server\DataBase\Miner
+     * @return \PG\MSF\Server\DataBase\Miner
      */
     protected function getMysql()
     {
-        return get_instance()->getMysql();
+        return getInstance()->getMysql();
     }
 }

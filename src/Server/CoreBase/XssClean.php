@@ -12,13 +12,13 @@ use voku\helper\AntiXSS;
 
 class XssClean
 {
-    protected static $xss_clean;
+    protected static $xssClean;
 
     public static function getXssClean()
     {
-        if (self::$xss_clean == null) {
-            self::$xss_clean = new AntiXSS();
+        if (self::$xssClean == null) {
+            self::$xssClean = new AntiXSS();
         }
-        return self::$xss_clean;
+        return self::$xssClean;
     }
 }

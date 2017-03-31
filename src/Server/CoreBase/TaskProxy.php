@@ -12,12 +12,12 @@ use PG\MSF\Server\SwooleMarco;
 
 class TaskProxy extends CoreBase
 {
-    protected $task_id;
+    protected $taskId;
     /**
      * task代理数据
      * @var mixed
      */
-    private $task_proxy_data;
+    private $taskProxyData;
 
     /**
      * TaskProxy constructor.
@@ -28,7 +28,7 @@ class TaskProxy extends CoreBase
         $this->afterConstruct();
     }
 
-    public function initialization($task_id, $worker_pid, $task_name, $method_name, $context)
+    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
         $this->setContext($context);
     }
@@ -41,25 +41,25 @@ class TaskProxy extends CoreBase
      */
     public function __call($name, $arguments)
     {
-        $this->task_id = get_instance()->task_atomic->add();
+        $this->taskId = getInstance()->taskAtomic->add();
         //这里设置重置标识，id=65536,便设置回1
-        $reset = get_instance()->task_atomic->cmpset(65536, 1);
+        $reset = getInstance()->taskAtomic->cmpset(65536, 1);
         if ($reset) {
-            $this->task_id = 1;
+            $this->taskId = 1;
         }
-        $this->task_proxy_data =
+        $this->taskProxyData =
             [
                 'type' => SwooleMarco::SERVER_TYPE_TASK,
                 'message' =>
                     [
-                        'task_name' => $this->core_name,
+                        'task_name' => $this->coreName,
                         'task_fuc_name' => $name,
                         'task_fuc_data' => $arguments,
-                        'task_id' => $this->task_id,
+                        'task_id' => $this->taskId,
                         'task_context' => $this->getContext(),
                     ]
             ];
-        return $this->task_id;
+        return $this->taskId;
     }
 
     /**
@@ -68,7 +68,7 @@ class TaskProxy extends CoreBase
      */
     public function startTask($callback = null)
     {
-        get_instance()->server->task($this->task_proxy_data, -1, $callback);
+        getInstance()->server->task($this->taskProxyData, -1, $callback);
     }
 
     /**
@@ -77,7 +77,7 @@ class TaskProxy extends CoreBase
      */
     public function coroutineSend()
     {
-        return new TaskCoroutine($this->task_proxy_data, -1);
+        return new TaskCoroutine($this->taskProxyData, -1);
     }
 
     /**
@@ -85,6 +85,6 @@ class TaskProxy extends CoreBase
      */
     public function startTaskWait($timeOut = 0.5)
     {
-        return get_instance()->server->taskwait($this->task_proxy_data, $timeOut, -1);
+        return getInstance()->server->taskwait($this->taskProxyData, $timeOut, -1);
     }
 }

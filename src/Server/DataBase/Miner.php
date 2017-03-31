@@ -144,7 +144,7 @@ class Miner
     /**
      * @var MysqlAsynPool
      */
-    public $mysql_pool;
+    public $mysqlPool;
     /**
      * @var array
      */
@@ -282,9 +282,9 @@ class Miner
 
     /**
      * Miner constructor.
-     * @param $mysql_pool
+     * @param $mysqlPool
      */
-    public function __construct($mysql_pool = null)
+    public function __construct($mysqlPool = null)
     {
         $this->option = array();
         $this->select = array();
@@ -304,7 +304,7 @@ class Miner
         $this->wherePlaceholderValues = array();
         $this->havingPlaceholderValues = array();
 
-        $this->mysql_pool = $mysql_pool;
+        $this->mysqlPool = $mysqlPool;
         $this->setAutoQuote(true);
     }
 
@@ -1847,36 +1847,36 @@ class Miner
 
     /**
      * 协程的方式
-     * @param null $bind_id
+     * @param null $bindId
      * @param null $sql
      * @return MySqlCoroutine
      */
-    public function coroutineSend($bind_id = null, $sql = null)
+    public function coroutineSend($bindId = null, $sql = null)
     {
         if ($sql == null) {
             $sql = $this->getStatement(false);
         }
-        if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            $this->mergeInto($this->mysql_pool->getSync());
+        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
+            $this->mergeInto($this->mysqlPool->getSync());
             $this->clear();
             $data = array();
             switch ($sql) {
                 case 'commit':
-                    $this->mysql_pool->getSync()->pdoCommitTrans();
+                    $this->mysqlPool->getSync()->pdoCommitTrans();
                     break;
                 case 'begin':
-                    $this->mysql_pool->getSync()->pdoBeginTrans();
+                    $this->mysqlPool->getSync()->pdoBeginTrans();
                     break;
                 case 'rollback':
-                    $this->mysql_pool->getSync()->pdoRollBackTrans();
+                    $this->mysqlPool->getSync()->pdoRollBackTrans();
                     break;
                 default:
-                    $data = $this->mysql_pool->getSync()->pdoQuery($sql);
+                    $data = $this->mysqlPool->getSync()->pdoQuery($sql);
             }
             return $data;
         } else {
             $this->clear();
-            return new MySqlCoroutine($this->mysql_pool, $bind_id, $sql);
+            return new MySqlCoroutine($this->mysqlPool, $bindId, $sql);
         }
     }
 

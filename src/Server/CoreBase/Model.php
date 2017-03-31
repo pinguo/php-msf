@@ -16,11 +16,11 @@ class Model extends CoreBase
     /**
      * @var \PG\MSF\Server\DataBase\RedisAsynPool
      */
-    public $redis_pool;
+    public $redisPool;
     /**
      * @var \PG\MSF\Server\DataBase\MysqlAsynPool
      */
-    public $mysql_pool;
+    public $mysqlPool;
 
     /**
      * @var \PG\MSF\Server\Client\Http\Client
@@ -40,8 +40,8 @@ class Model extends CoreBase
     final public function __construct()
     {
         parent::__construct();
-        $this->redis_pool = get_instance()->redis_pool;
-        $this->mysql_pool = get_instance()->mysql_pool;
+        $this->redisPool = getInstance()->redisPool;
+        $this->mysqlPool = getInstance()->mysqlPool;
     }
 
     /**

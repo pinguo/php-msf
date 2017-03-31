@@ -49,26 +49,26 @@ class ModelFactory
             $this->pool[$model] = [];
         }
         if (count($this->pool[$model]) > 0) {
-            $model_instance = array_pop($this->pool[$model]);
-            $model_instance->reUse();
-            return $model_instance;
+            $modelInstance = array_pop($this->pool[$model]);
+            $modelInstance->reUse();
+            return $modelInstance;
         }
         $class_name = "\\App\\Models\\$model";
         if (class_exists($class_name)) {
-            $model_instance = new $class_name;
-            $model_instance->core_name = $model;
-            $model_instance->afterConstruct();
+            $modelInstance = new $class_name;
+            $modelInstance->coreName = $model;
+            $modelInstance->afterConstruct();
         } else {
             $class_name = "\\PG\\MSF\\Server\\Models\\$model";
             if (class_exists($class_name)) {
-                $model_instance = new $class_name;
-                $model_instance->core_name = $model;
-                $model_instance->afterConstruct();
+                $modelInstance = new $class_name;
+                $modelInstance->coreName = $model;
+                $modelInstance->afterConstruct();
             } else {
                 throw new SwooleException("class $model is not exist");
             }
         }
-        return $model_instance;
+        return $modelInstance;
     }
 
     /**
@@ -77,9 +77,9 @@ class ModelFactory
      */
     public function revertModel($model)
     {
-        if (!$model->is_destroy) {
+        if (!$model->isDestroy) {
             $model->destroy();
         }
-        $this->pool[$model->core_name][] = $model;
+        $this->pool[$model->coreName][] = $model;
     }
 }

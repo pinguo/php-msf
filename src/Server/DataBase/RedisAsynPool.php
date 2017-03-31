@@ -17,10 +17,10 @@ class RedisAsynPool extends AsynPool
      * @var array
      */
     public $connect;
-    protected $redis_max_count = 0;
+    protected $redisMaxCount = 0;
     private $active;
     private $coroutineRedisHelp;
-    private $redis_client;
+    private $redisClient;
 
     public function __construct($config, $active)
     {
@@ -29,9 +29,9 @@ class RedisAsynPool extends AsynPool
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
     }
 
-    public function server_init($swoole_server, $asyn_manager)
+    public function serverInit($swooleServer, $asynManager)
     {
-        parent::server_init($swoole_server, $asyn_manager);
+        parent::serverInit($swooleServer, $asynManager);
     }
 
     /**
@@ -48,7 +48,7 @@ class RedisAsynPool extends AsynPool
         ];
         $data['token'] = $this->addTokenCallback($callback);
         //写入管道
-        $this->asyn_manager->writePipe($this, $data, $this->worker_id);
+        $this->asynManager->writePipe($this, $data, $this->workerId);
     }
 
     /**
@@ -62,7 +62,7 @@ class RedisAsynPool extends AsynPool
      */
     public function coroutineSend($context, $name, ...$arg)
     {
-        if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
+        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return call_user_func_array([$this->getSync(), $name], $arg);
         } else {
             return new RedisCoroutine($context, $this, $name, $arg);
@@ -76,25 +76,25 @@ class RedisAsynPool extends AsynPool
      */
     public function getSync()
     {
-        if (isset($this->redis_client)) {
-            return $this->redis_client;
+        if (isset($this->redisClient)) {
+            return $this->redisClient;
         }
         //同步redis连接，给task使用
-        $this->redis_client = new \Redis();
-        if ($this->redis_client->connect($this->config['redis'][$this->active]['ip'],
+        $this->redisClient = new \Redis();
+        if ($this->redisClient->connect($this->config['redis'][$this->active]['ip'],
                 $this->config['redis'][$this->active]['port']) == false
         ) {
-            throw new SwooleException($this->redis_client->getLastError());
+            throw new SwooleException($this->redisClient->getLastError());
         }
         if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
-            if ($this->redis_client->auth($this->config['redis'][$this->active]['password']) == false) {
-                throw new SwooleException($this->redis_client->getLastError());
+            if ($this->redisClient->auth($this->config['redis'][$this->active]['password']) == false) {
+                throw new SwooleException($this->redisClient->getLastError());
             }
         }
         if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
-            $this->redis_client->select($this->config['redis'][$this->active]['select']);
+            $this->redisClient->select($this->config['redis'][$this->active]['select']);
         }
-        return $this->redis_client;
+        return $this->redisClient;
     }
 
     /**
@@ -350,7 +350,7 @@ class RedisAsynPool extends AsynPool
                 unset($data['arguments']);
                 unset($data['name']);
                 //给worker发消息
-                $this->asyn_manager->sendMessageToWorker($this, $data);
+                $this->asynManager->sendMessageToWorker($this, $data);
                 //回归连接
                 $this->pushToPool($client);
             };
@@ -363,7 +363,7 @@ class RedisAsynPool extends AsynPool
      */
     public function prepareOne()
     {
-        if ($this->redis_max_count + $this->waitConnetNum >= $this->config->get('redis.asyn_max_count', 10)) {
+        if ($this->redisMaxCount + $this->waitConnetNum >= $this->config->get('redis.asyn_max_count', 10)) {
             return;
         }
         $this->prepareLock = true;
@@ -399,16 +399,16 @@ class RedisAsynPool extends AsynPool
                             }
                             $client->isClose = false;
                             if (!isset($client->client_id)) {
-                                $client->client_id = $this->redis_max_count;
-                                $this->redis_max_count++;
+                                $client->client_id = $this->redisMaxCount;
+                                $this->redisMaxCount++;
                             }
                             $this->pushToPool($client);
                         });
                     } else {
                         $client->isClose = false;
                         if (!isset($client->client_id)) {
-                            $client->client_id = $this->redis_max_count;
-                            $this->redis_max_count++;
+                            $client->client_id = $this->redisMaxCount;
+                            $this->redisMaxCount++;
                         }
                         $this->pushToPool($client);
                     }
@@ -421,16 +421,16 @@ class RedisAsynPool extends AsynPool
                         }
                         $client->isClose = false;
                         if (!isset($client->client_id)) {
-                            $client->client_id = $this->redis_max_count;
-                            $this->redis_max_count++;
+                            $client->client_id = $this->redisMaxCount;
+                            $this->redisMaxCount++;
                         }
                         $this->pushToPool($client);
                     });
                 } else {
                     $client->isClose = false;
                     if (!isset($client->client_id)) {
-                        $client->client_id = $this->redis_max_count;
-                        $this->redis_max_count++;
+                        $client->client_id = $this->redisMaxCount;
+                        $this->redisMaxCount++;
                     }
                     $this->pushToPool($client);
                 }

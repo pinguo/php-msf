@@ -14,7 +14,7 @@ class Child
      * 名称
      * @var string
      */
-    public $core_name;
+    public $coreName;
 
     /**
      * @var
@@ -25,7 +25,7 @@ class Child
      * 子集
      * @var array
      */
-    public $child_list = [];
+    public $childList = [];
 
     /**
      * 判断是否执行了__construct
@@ -53,7 +53,7 @@ class Child
     public function addChild($child)
     {
         $child->onAddChild($this);
-        $this->child_list[$child->core_name] = $child;
+        $this->childList[$child->coreName] = $child;
     }
 
     /**
@@ -72,7 +72,7 @@ class Child
      */
     public function hasChild($name)
     {
-        return key_exists($name, $this->child_list);
+        return key_exists($name, $this->childList);
     }
 
     /**
@@ -82,7 +82,7 @@ class Child
      */
     public function getChild($name)
     {
-        return $this->child_list[$name]??null;
+        return $this->childList[$name]??null;
     }
 
     /**
@@ -108,10 +108,10 @@ class Child
      */
     public function destroy()
     {
-        foreach ($this->child_list as $core_child) {
-            $core_child->destroy();
+        foreach ($this->childList as $coreChild) {
+            $coreChild->destroy();
         }
-        $this->child_list = [];
+        $this->childList = [];
         unset($this->parent);
         unset($this->context);
     }

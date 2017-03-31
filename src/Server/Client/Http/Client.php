@@ -26,40 +26,40 @@ class Client
      * @param $callBack
      * @throws \PG\MSF\Server\CoreBase\SwooleException
      */
-    public function getHttpClient($base_url, $callBack)
+    public function getHttpClient($baseUrl, $callBack)
     {
         $data = [];
-        $data['url'] = $base_url;
+        $data['url'] = $baseUrl;
         $data['callBack'] = $callBack;
         $data['port'] = 80;
         $data['ssl'] = false;
-        $parseBaseUrlResult = explode(":", $base_url);
+        $parseBaseUrlResult = explode(":", $baseUrl);
 
         if (count($parseBaseUrlResult) == 2) {
-            $url_head = $parseBaseUrlResult[0];
-            $url_host = $parseBaseUrlResult[1];
+            $urlHead = $parseBaseUrlResult[0];
+            $urlHost = $parseBaseUrlResult[1];
         } elseif (count($parseBaseUrlResult) == 3) {
-            $url_head = $parseBaseUrlResult[0];
-            $url_host = $parseBaseUrlResult[1];
-            $url_port = $parseBaseUrlResult[2];
+            $urlHead = $parseBaseUrlResult[0];
+            $urlHost = $parseBaseUrlResult[1];
+            $urlPort = $parseBaseUrlResult[2];
         } else {
-            throw new SwooleException($base_url . ' 不合法,请检查配置或者参数');
+            throw new SwooleException($baseUrl . ' 不合法,请检查配置或者参数');
         }
 
-        if (!empty($url_port)) {
-            $data['port'] = $url_port;
+        if (!empty($urlPort)) {
+            $data['port'] = $urlPort;
         } else {
-            if ($url_head == "https") {
+            if ($urlHead == "https") {
                 $data['port'] = 443;
             }
         }
 
-        if ($url_head == 'https') {
+        if ($urlHead == 'https') {
             $data['ssl'] = true;
         }
 
-        $url_host = substr($url_host, 2);
-        swoole_async_dns_lookup($url_host, function ($host, $ip) use (&$data) {
+        $urlHost = substr($urlHost, 2);
+        swoole_async_dns_lookup($urlHost, function ($host, $ip) use (&$data) {
             if (empty($ip)) {
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
                 $this->context->httpOutput->end();
@@ -79,14 +79,14 @@ class Client
     }
 
     /**
-     * 协程方式获取httpclient
+     * 协程方式获取httpClient
      *
-     * @param $base_url
+     * @param $baseUrl
      * @param int $timeout 协程超时时间
      * @return GetHttpClientCoroutine
      */
-    public function coroutineGetHttpClient($base_url, $timeout = 1000)
+    public function coroutineGetHttpClient($baseUrl, $timeout = 1000)
     {
-        return new GetHttpClientCoroutine($this, $base_url, $timeout);
+        return new GetHttpClientCoroutine($this, $baseUrl, $timeout);
     }
 }

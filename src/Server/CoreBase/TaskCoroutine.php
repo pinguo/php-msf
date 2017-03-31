@@ -11,16 +11,16 @@ namespace PG\MSF\Server\CoreBase;
 class TaskCoroutine extends CoroutineBase
 {
     public $id;
-    public $task_proxy_data;
+    public $taskProxyData;
 
-    public function __construct($task_proxy_data, $id)
+    public function __construct($taskProxyData, $id)
     {
         parent::__construct();
-        $this->task_proxy_data = $task_proxy_data;
+        $this->taskProxyData = $taskProxyData;
         $this->id = $id;
-        $logId    = $task_proxy_data['message']['task_context']->logId;
-        get_instance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($serv, $task_id, $data) use ($logId) {
+        $logId    = $taskProxyData['message']['task_context']->logId;
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($serv, $taskId, $data) use ($logId) {
             $this->result = $data;
             $this->ioBack = true;
             $this->nextRun($logId);
@@ -29,6 +29,6 @@ class TaskCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-        get_instance()->server->task($this->task_proxy_data, $this->id, $callback);
+        getInstance()->server->task($this->taskProxyData, $this->id, $callback);
     }
 }

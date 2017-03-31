@@ -30,23 +30,23 @@ class Client
     public function __construct()
     {
         $this->context = new Context();
-        $this->set = get_instance()->config->get('tcpClient.set', []);
+        $this->set = getInstance()->config->get('tcpClient.set', []);
     }
 
     /**
      * 获取一个tcp客户端
-     * @param $base_url
+     * @param $baseUrl
      * @param $callBack
      * @param $timeOut
      * @throws SwooleException
      */
-    public function getTcpClient($base_url, $callBack, $timeOut)
+    public function getTcpClient($baseUrl, $callBack, $timeOut)
     {
         $data = [];
-        $parseBaseUrlResult = explode(":", $base_url);
+        $parseBaseUrlResult = explode(":", $baseUrl);
 
         if (count($parseBaseUrlResult) != 2) {
-            throw new SwooleException($base_url . ' must be an ip:port string');
+            throw new SwooleException($baseUrl . ' must be an ip:port string');
         }
 
         $data['host'] = $parseBaseUrlResult[0];
@@ -77,12 +77,12 @@ class Client
 
     /**
      * 协程方式获取 TcpClient
-     * @param $base_url 127.0.0.1:8000
+     * @param $baseUrl 127.0.0.1:8000
      * @param int $timeout
      * @return GetTcpClientCoroutine
      */
-    public function coroutineGetTcpClient($base_url, $timeout = 1000)
+    public function coroutineGetTcpClient($baseUrl, $timeout = 1000)
     {
-        return new GetTcpClientCoroutine($this, $base_url, $timeout);
+        return new GetTcpClientCoroutine($this, $baseUrl, $timeout);
     }
 }

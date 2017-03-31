@@ -19,24 +19,24 @@ class Lock
      * 锁的标识
      * @var int|string
      */
-    protected $lock_id;
+    protected $lockId;
     /**
      * @var RedisAsynPool
      */
-    protected $redis_pool;
+    protected $redisPool;
 
     /**
      * Lock constructor.
-     * @param $lock_id
+     * @param $lockId
      * @param null $redisPoolName
      */
-    public function __construct($lock_id, $redisPoolName = null)
+    public function __construct($lockId, $redisPoolName = null)
     {
-        $this->lock_id = $lock_id;
+        $this->lockId = $lockId;
         if (empty($redisPoolName)) {
-            $this->redis_pool = get_instance()->redis_pool;
+            $this->redisPool = getInstance()->redisPool;
         } else {
-            $this->redis_pool = get_instance()->getAsynPool($redisPoolName);
+            $this->redisPool = getInstance()->getAsynPool($redisPoolName);
         }
     }
 
@@ -50,14 +50,14 @@ class Lock
     {
         $count = 0;
         do {
-            $isLock = yield $this->redis_pool->getCoroutine()->setnx(self::LOCK_PREFIX . $this->lock_id, 0);
+            $isLock = yield $this->redisPool->getCoroutine()->setnx(self::LOCK_PREFIX . $this->lockId, 0);
             if ($maxTime > 0 && $count >= $maxTime) {
                 break;
             }
             $count++;
         } while (!$isLock);
         if (!$isLock) {
-            throw new SwooleException("lock[$this->lock_id] time out!");
+            throw new SwooleException("lock[$this->lockId] time out!");
         }
         return true;
     }
@@ -68,7 +68,7 @@ class Lock
      */
     public function coroutineTrylock()
     {
-        $result = yield $this->redis_pool->getCoroutine()->setnx(self::LOCK_PREFIX . $this->lock_id, 1);
+        $result = yield $this->redisPool->getCoroutine()->setnx(self::LOCK_PREFIX . $this->lockId, 1);
         return $result;
     }
 
@@ -78,7 +78,7 @@ class Lock
      */
     public function coroutineUnlock()
     {
-        $result = yield $this->redis_pool->getCoroutine()->del(self::LOCK_PREFIX . $this->lock_id);
+        $result = yield $this->redisPool->getCoroutine()->del(self::LOCK_PREFIX . $this->lockId);
         return $result;
     }
 
@@ -88,6 +88,6 @@ class Lock
      */
     public function getLockId()
     {
-        return $this->lock_id;
+        return $this->lockId;
     }
 }

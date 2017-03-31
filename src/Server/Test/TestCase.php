@@ -18,17 +18,17 @@ abstract class TestCase extends CoreBase
     /**
      * @var \Server\DataBase\RedisAsynPool
      */
-    public $redis_pool;
+    public $redisPool;
     /**
      * @var \Server\DataBase\MysqlAsynPool
      */
-    public $mysql_pool;
+    public $mysqlPool;
 
     public function __construct()
     {
         parent::__construct();
-        $this->redis_pool = get_instance()->redis_pool;
-        $this->mysql_pool = get_instance()->mysql_pool;
+        $this->redisPool = getInstance()->redisPool;
+        $this->mysqlPool = getInstance()->mysqlPool;
     }
 
     /**

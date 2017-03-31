@@ -10,9 +10,9 @@
  * 获取实例
  * @return \PG\MSF\Server\SwooleDistributedServer
  */
-function &get_instance()
+function &getInstance()
 {
-    return \PG\MSF\Server\SwooleDistributedServer::get_instance();
+    return \PG\MSF\Server\SwooleDistributedServer::getInstance();
 }
 
 /**
@@ -21,7 +21,7 @@ function &get_instance()
  */
 function getTickTime()
 {
-    return \PG\MSF\Server\SwooleDistributedServer::get_instance()->tickTime;
+    return \PG\MSF\Server\SwooleDistributedServer::getInstance()->tickTime;
 }
 
 function getMillisecond()
@@ -30,7 +30,7 @@ function getMillisecond()
     return (float)sprintf('%.0f', (floatval($t1) + floatval($t2)) * 1000);
 }
 
-function shell_read()
+function shellRead()
 {
     $fp = fopen('/dev/stdin', 'r');
     $input = fgets($fp, 255);
@@ -58,9 +58,9 @@ function httpEndFile($path, $request, $response)
         $response->end();
         return true;
     }
-    $extension = get_extension($path);
-    $normalHeaders = get_instance()->config->get("fileHeader.normal", ['Content-Type: application/octet-stream']);
-    $headers = get_instance()->config->get("fileHeader.$extension", $normalHeaders);
+    $extension = getExtension($path);
+    $normalHeaders = getInstance()->config->get("fileHeader.normal", ['Content-Type: application/octet-stream']);
+    $headers = getInstance()->config->get("fileHeader.$extension", $normalHeaders);
     foreach ($headers as $value) {
         list($hk, $hv) = explode(': ', $value);
         $response->header($hk, $hv);
@@ -75,7 +75,7 @@ function httpEndFile($path, $request, $response)
  * @param $file
  * @return mixed
  */
-function get_extension($file)
+function getExtension($file)
 {
     $info = pathinfo($file);
     return strtolower($info['extension']??'');
@@ -86,10 +86,10 @@ function get_extension($file)
  * @param $path
  * @return string
  */
-function get_www($path)
+function getWww($path)
 {
-    $normal = 'http://localhost:' . get_instance()->config['http_server']['port'];
-    return get_instance()->config->get('http.domain', $normal) . '/' . $path;
+    $normal = 'http://localhost:' . getInstance()->config['http_server']['port'];
+    return getInstance()->config->get('http.domain', $normal) . '/' . $path;
 }
 
 function isMac()

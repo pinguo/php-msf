@@ -32,7 +32,7 @@ class TcpClient
      * @var IPack
      */
     protected $pack;
-    protected $package_length_type_length;
+    protected $packageLengthTypeLength;
 
     public function __construct(\swoole_client $client, $ip, $port, $timeOut)
     {
@@ -41,10 +41,10 @@ class TcpClient
         $this->port = $port;
         $this->timeOut = $timeOut * 1000;
 
-        $this->set = get_instance()->config->get('tcpClient.set', []);
-        $packTool = get_instance()->config->get('tcpClient.pack_tool', 'JsonPack');
+        $this->set = getInstance()->config->get('tcpClient.set', []);
+        $packTool = getInstance()->config->get('tcpClient.pack_tool', 'JsonPack');
 
-        $this->package_length_type_length = strlen(pack($this->set['package_length_type'], 1));
+        $this->packageLengthTypeLength = strlen(pack($this->set['package_length_type'], 1));
         //pack class
         $pack_class_name = "\\App\\Pack\\" . $packTool;
         if (class_exists($pack_class_name)) {
@@ -96,7 +96,7 @@ class TcpClient
     private function encode($buffer)
     {
         if ($this->set['open_length_check']??0 == 1) {
-            $total_length = $this->package_length_type_length + strlen($buffer) - $this->set['package_body_offset'];
+            $total_length = $this->packageLengthTypeLength + strlen($buffer) - $this->set['package_body_offset'];
             return pack($this->set['package_length_type'], $total_length) . $buffer;
         } else {
             if ($this->set['open_eof_check']??0 == 1) {
@@ -110,7 +110,7 @@ class TcpClient
     private function decode($buffer)
     {
         if ($this->set['open_length_check']??0 == 1) {
-            $data = substr($buffer, $this->package_length_type_length);
+            $data = substr($buffer, $this->packageLengthTypeLength);
             return $data;
         } else {
             if ($this->set['open_eof_check']??0 == 1) {

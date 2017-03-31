@@ -15,7 +15,7 @@ class Server extends BaseController
         $data = [
             'coroutine' => [],
         ];
-        $routineList = get_instance()->coroutine->routineList;
+        $routineList = getInstance()->coroutine->routineList;
         /**
          * @var $routine \PG\MSF\Server\CoreBase\CoroutineTask
          */
@@ -41,7 +41,7 @@ class Server extends BaseController
     {
         $client = yield $this->client->coroutineGetHttpClient('http://localhost');
         $data   = yield $client->coroutineGet('/');
-        $this->http_output->end('ok');
+        $this->httpOutput->end('ok');
     }
 
     /**

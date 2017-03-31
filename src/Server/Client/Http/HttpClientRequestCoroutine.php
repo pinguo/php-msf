@@ -30,7 +30,7 @@ class HttpClientRequestCoroutine extends CoroutineBase
         $this->data       = $data;
         $profileName      =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
         $this->httpClient->context->PGLog->profileStart($profileName);
-        get_instance()->coroutine->IOCallBack[$this->httpClient->context->PGLog->logId][] = $this;
+        getInstance()->coroutine->IOCallBack[$this->httpClient->context->PGLog->logId][] = $this;
         $this->send(function ($client) use ($profileName) {
             $this->result       = (array)$client;
             $this->responseTime = microtime(true);

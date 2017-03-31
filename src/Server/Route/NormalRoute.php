@@ -10,11 +10,11 @@ namespace PG\MSF\Server\Route;
 
 class NormalRoute implements IRoute
 {
-    private $client_data;
+    private $clientData;
 
     public function __construct()
     {
-        $this->client_data = new \stdClass();
+        $this->clientData = new \stdClass();
     }
 
     /**
@@ -24,9 +24,9 @@ class NormalRoute implements IRoute
      */
     public function handleClientData($data)
     {
-        $this->client_data = $data;
+        $this->clientData = $data;
         $this->parsePath($data->path);
-        return $this->client_data;
+        return $this->clientData;
     }
 
     /**
@@ -35,8 +35,8 @@ class NormalRoute implements IRoute
      */
     public function handleClientRequest($request)
     {
-        $this->client_data->path = $request->server['path_info'];
-        $this->parsePath($this->client_data->path);
+        $this->clientData->path = $request->server['path_info'];
+        $this->parsePath($this->clientData->path);
     }
 
     /**
@@ -52,9 +52,9 @@ class NormalRoute implements IRoute
             $name = ucfirst($name);
             return $name;
         }, $route);
-        $method_name = array_pop($route);
-        $this->client_data->controller_name = ltrim(implode("\\", $route), "\\")??null;
-        $this->client_data->method_name = $method_name;
+        $methodName = array_pop($route);
+        $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
+        $this->clientData->methodName = $methodName;
     }
 
     /**
@@ -63,7 +63,7 @@ class NormalRoute implements IRoute
      */
     public function getControllerName()
     {
-        return $this->client_data->controller_name;
+        return $this->clientData->controllerName;
     }
 
     /**
@@ -72,26 +72,26 @@ class NormalRoute implements IRoute
      */
     public function getMethodName()
     {
-        return $this->client_data->method_name;
+        return $this->clientData->methodName;
     }
 
     public function getPath()
     {
-        return $this->client_data->path;
+        return $this->clientData->path;
     }
 
     public function getParams()
     {
-        return $this->client_data->params??null;
+        return $this->clientData->params??null;
     }
 
     public function setControllerName($name)
     {
-        $this->client_data->controller_name = $name;
+        $this->clientData->controllerName = $name;
     }
 
     public function setMethodName($name)
     {
-        $this->client_data->method_name = $name;
+        $this->clientData->methodName = $name;
     }
 }

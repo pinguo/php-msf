@@ -18,7 +18,7 @@ class CoreBase extends Child
      * 销毁标志
      * @var bool
      */
-    public $is_destroy = false;
+    public $isDestroy = false;
 
     /**
      * @var Loader
@@ -49,12 +49,12 @@ class CoreBase extends Child
      */
     public function __construct()
     {
-        if (!empty(get_instance())) {
-            $this->loader = get_instance()->loader;
-            $this->logger = get_instance()->log;
-            $this->server = get_instance()->server;
-            $this->config = get_instance()->config;
-            $this->pack = get_instance()->pack;
+        if (!empty(getInstance())) {
+            $this->loader = getInstance()->loader;
+            $this->logger = getInstance()->log;
+            $this->server = getInstance()->server;
+            $this->config = getInstance()->config;
+            $this->pack = getInstance()->pack;
         }
     }
 
@@ -64,7 +64,7 @@ class CoreBase extends Child
     public function destroy()
     {
         parent::destroy();
-        $this->is_destroy = true;
+        $this->isDestroy = true;
     }
 
     /**
@@ -72,6 +72,6 @@ class CoreBase extends Child
      */
     public function reUse()
     {
-        $this->is_destroy = false;
+        $this->isDestroy = false;
     }
 }

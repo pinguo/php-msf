@@ -24,7 +24,7 @@ class TestHttpCoroutine extends CoroutineBase
         $this->testRequest = $testRequest;
         $this->request = '#TestRequest:' . $testRequest->server['path_info'];
         $this->testResponse = new TestResponse();
-        get_instance()->onSwooleRequest($this->testRequest, $this->testResponse);
+        getInstance()->onSwooleRequest($this->testRequest, $this->testResponse);
     }
 
     public function send($callback)
