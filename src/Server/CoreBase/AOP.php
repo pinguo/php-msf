@@ -37,10 +37,6 @@ class AOP
 
     public function __call($method, $arguments)
     {
-        if (!method_exists($this->instance, $method)) {
-            throw new SwooleException('undefined method: ' . $method);
-        }
-
         $this->data['method'] = $method;
         $this->data['arguments'] = $arguments;
 
@@ -55,7 +51,7 @@ class AOP
             $this->data = call_user_func_array($func, $this->data);
         }
 
-        return $this->data;
+        return $this->data['result'];
     }
 
     public function registerOnBefore(callable $callback)
