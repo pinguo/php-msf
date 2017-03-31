@@ -9,7 +9,7 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\Helpers\Log\PGLog;
+use PG\Log\PGLog;
 
 class Model extends CoreBase
 {
