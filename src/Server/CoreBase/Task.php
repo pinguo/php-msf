@@ -24,10 +24,10 @@ class Task extends TaskProxy
         parent::__construct();
     }
 
-    public function initialization($taskId, $worker_pid, $task_name, $methodName, $context)
+    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
         $this->taskId = $taskId;
-        getInstance()->tidPidTable->set($this->taskId, ['pid' => $worker_pid, 'des' => "$task_name::$methodName", 'start_time' => time()]);
+        getInstance()->tidPidTable->set($this->taskId, ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
         $this->start_run_time = microtime(true);
         if ($context) {
             $this->setContext($context);
@@ -35,7 +35,7 @@ class Task extends TaskProxy
             $this->PGLog = clone $this->logger;
             $this->PGLog->logId = $this->getContext()->logId;
             $this->PGLog->accessRecord['beginTime'] = microtime(true);
-            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $task_name . '/' . $methodName);
+            $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $taskName . '/' . $methodName);
             defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME . '-task';
             $this->PGLog->init();
         }

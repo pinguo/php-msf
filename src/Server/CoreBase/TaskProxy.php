@@ -28,7 +28,7 @@ class TaskProxy extends CoreBase
         $this->afterConstruct();
     }
 
-    public function initialization($taskId, $worker_pid, $task_name, $methodName, $context)
+    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
         $this->setContext($context);
     }
