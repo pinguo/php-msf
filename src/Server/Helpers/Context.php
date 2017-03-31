@@ -9,8 +9,10 @@
 namespace PG\MSF\Server\Helpers;
 
 use PG\MSF\Server\{
-    CoreBase\Input, CoreBase\Output, Helpers\Log\PGLog
+    CoreBase\Input, CoreBase\Output
 };
+
+use PG\Log\PGLog;
 
 class Context implements \ArrayAccess
 {
