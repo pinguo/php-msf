@@ -26,7 +26,7 @@ class Client
      * @param $callBack
      * @throws \PG\MSF\Server\CoreBase\SwooleException
      */
-    public function getHttpClient($baseUrl, $callBack)
+    public function getHttpClient($baseUrl, $callBack, array $headers = [])
     {
         $data = [];
         $data['url'] = $baseUrl;
@@ -59,7 +59,7 @@ class Client
         }
 
         $urlHost = substr($urlHost, 2);
-        swoole_async_dns_lookup($urlHost, function ($host, $ip) use (&$data) {
+        swoole_async_dns_lookup($urlHost, function ($host, $ip) use (&$data, &$headers) {
             if (empty($ip)) {
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
                 $this->context->output->end();
@@ -67,10 +67,10 @@ class Client
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
                 $httpClient          = new HttpClient($client);
                 $httpClient->context = $this->context;
-                $headers = [
+                $headers = array_merge($headers, [
                     'Host'        => $host,
                     'X-Ngx-LogId' => $this->context->PGLog->logId,
-                ];
+                ]);
 
                 $httpClient->setHeaders($headers);
                 call_user_func($data['callBack'], $httpClient);
@@ -85,8 +85,8 @@ class Client
      * @param int $timeout 协程超时时间
      * @return GetHttpClientCoroutine
      */
-    public function coroutineGetHttpClient($baseUrl, $timeout = 1000)
+    public function coroutineGetHttpClient($baseUrl, $timeout = 1000, $headers = [])
     {
-        return new GetHttpClientCoroutine($this, $baseUrl, $timeout);
+        return new GetHttpClientCoroutine($this, $baseUrl, $timeout, $headers);
     }
 }

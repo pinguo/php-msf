@@ -18,12 +18,14 @@ class GetHttpClientCoroutine extends CoroutineBase
      */
     public $client;
     public $baseUrl;
+    public $headers;
 
-    public function __construct(Client $client, $baseUrl, $timeout)
+    public function __construct(Client $client, $baseUrl, $timeout, $headers = [])
     {
         parent::__construct($timeout);
         $this->baseUrl = $baseUrl;
-        $this->client   = $client;
+        $this->client  = $client;
+        $this->headers = $headers;
         $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
         $this->client->context->PGLog->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
@@ -38,6 +40,6 @@ class GetHttpClientCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-        $this->client->getHttpClient($this->baseUrl, $callback);
+        $this->client->getHttpClient($this->baseUrl, $callback, $this->headers);
     }
 }

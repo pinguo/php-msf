@@ -20,14 +20,16 @@ class HttpClientRequestCoroutine extends CoroutineBase
     public $data;
     public $path;
     public $method;
+    public $headers;
 
-    public function __construct(HttpClient $httpClient, $method, $path, $data, $timeout)
+    public function __construct(HttpClient $httpClient, $method, $path, $data, $timeout, $headers = [])
     {
         parent::__construct($timeout);
         $this->httpClient = $httpClient;
         $this->path       = $path;
         $this->method     = $method;
         $this->data       = $data;
+        $this->headers    = $headers;
         $profileName      =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
         $this->httpClient->context->PGLog->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$this->httpClient->context->PGLog->logId][] = $this;
