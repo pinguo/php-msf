@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Server;
 
-use PG\MSF\Server\Client\{
+use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
 use PG\MSF\Server\Test\TestModule;
