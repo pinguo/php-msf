@@ -82,9 +82,9 @@ class HttpClient
      * @param $timeout int 超时时间
      * @return HttpClientRequestCoroutine
      */
-    public function coroutineGet($path, $query = null, $timeout = 1000, $headers = [])
+    public function coroutineGet($path, $query = null, $timeout = 1000)
     {
-        return new HttpClientRequestCoroutine($this, 'GET', $path, $query, $timeout, $headers);
+        return new HttpClientRequestCoroutine($this, 'GET', $path, $query, $timeout);
     }
 
     /**
@@ -104,8 +104,8 @@ class HttpClient
      * @param $timeout int 超时时间
      * @return HttpClientRequestCoroutine
      */
-    public function coroutinePost($path, $data, $timeout = 1000, $headers = [])
+    public function coroutinePost($path, $data, $timeout = 1000)
     {
-        return new HttpClientRequestCoroutine($this, 'POST', $path, $data, $timeout, $headers);
+        return new HttpClientRequestCoroutine($this, 'POST', $path, $data, $timeout);
     }
 }
