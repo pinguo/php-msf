@@ -29,14 +29,21 @@ class TcpClientRequestCoroutine extends CoroutineBase
             $this->result = $recData;
             $this->responseTime = microtime(true);
             $cli->close();
-            $this->tcpClient->context->PGLog->profileEnd($profileName);
-            $this->ioBack = true;
-            $this->nextRun($this->tcpClient->context->PGLog->logId);
+            if (!empty($this->tcpClient->context->PGLog)) {
+                $this->tcpClient->context->PGLog->profileEnd($profileName);
+                $this->ioBack = true;
+                $this->nextRun($this->tcpClient->context->PGLog->logId);
+            }
         });
     }
 
     public function send($callback)
     {
         $this->tcpClient->send($this->data, $callback);
+    }
+
+    public function delCallBackForKernel()
+    {
+        $this->tcpClient->client->close();
     }
 }

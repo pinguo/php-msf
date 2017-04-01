@@ -106,6 +106,10 @@ class CoroutineTask
                 $routine->throw($runTaskException);
             }
 
+            if (!empty($value) && $value instanceof ICoroutineBase && method_exists($value, 'delCallBackForKernel')) {
+                $value->delCallBackForKernel();
+            }
+
             $this->destroy();
         }
     }

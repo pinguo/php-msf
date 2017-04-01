@@ -22,7 +22,7 @@ class TcpClient
     /**
      * @var \swoole_client
      */
-    private $client;
+    public $client;
 
     private $ip;
     private $port;
