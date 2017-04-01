@@ -9,7 +9,7 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\Helpers\Log\PGLog;
+use PG\Log\PGLog;
 
 class Model extends CoreBase
 {
@@ -23,12 +23,12 @@ class Model extends CoreBase
     public $mysqlPool;
 
     /**
-     * @var \PG\MSF\Server\Client\Http\Client
+     * @var \PG\MSF\Client\Http\Client
      */
     public $client;
 
     /**
-     * @var \PG\MSF\Server\Client\Tcp\Client
+     * @var \PG\MSF\Client\Tcp\Client
      */
     public $tcpClient;
 
@@ -40,7 +40,7 @@ class Model extends CoreBase
     final public function __construct()
     {
         parent::__construct();
-        $this->redisPool = getInstance()->redisPool;
+        $this->redisPool = AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(), $this);
         $this->mysqlPool = getInstance()->mysqlPool;
     }
 

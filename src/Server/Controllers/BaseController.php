@@ -9,8 +9,10 @@
 namespace PG\MSF\Server\Controllers;
 
 use PG\MSF\Server\{
-    CoreBase\Controller, Helpers\Log\PGLog, SwooleMarco, Helpers\Context
+    CoreBase\Controller, SwooleMarco, Helpers\Context
 };
+
+use PG\Log\PGLog;
 
 class BaseController extends Controller
 {

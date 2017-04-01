@@ -41,7 +41,7 @@ class Server extends BaseController
     {
         $client = yield $this->client->coroutineGetHttpClient('http://localhost');
         $data   = yield $client->coroutineGet('/');
-        $this->output->end('ok');
+        $this->output->end($data);
     }
 
     /**
@@ -57,5 +57,12 @@ class Server extends BaseController
         $tcpClient = yield $this->tcpClient->coroutineGetTcpClient('localhost:8000');
         $data      = yield $tcpClient->coroutineSend(['path' => 'server/status', 'data' => 1234]);
         $this->outputJson($data);
+    }
+
+    public function HttpRedis()
+    {
+        yield $this->redisPool->incrBy('key', 1);
+        $value = yield $this->redisPool->cache('key');
+        $this->outputJson($value);
     }
 }

@@ -37,11 +37,11 @@ class Controller extends CoreBase
      */
     public $requestType;
     /**
-     * @var \PG\MSF\Server\Client\Http\Client
+     * @var \PG\MSF\Client\Http\Client
      */
     public $client;
     /**
-     * @var \PG\MSF\Server\Client\Tcp\Client
+     * @var \PG\MSF\Client\Tcp\Client
      */
     public $tcpClient;
     /**
@@ -90,7 +90,7 @@ class Controller extends CoreBase
         parent::__construct();
         $this->input      = new Input();
         $this->output     = new Output($this);
-        $this->redisPool  = getInstance()->redisPool;
+        $this->redisPool  = AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(), $this);
         $this->mysqlPool  = getInstance()->mysqlPool;
         $this->client     = clone getInstance()->client;
         $this->tcpClient  = clone getInstance()->tcpClient;
@@ -248,6 +248,7 @@ class Controller extends CoreBase
      * sendToUid
      * @param $uid
      * @param $data
+     * @param bool $destroy
      * @throws SwooleException
      */
     protected function sendToUid($uid, $data, $destroy = true)

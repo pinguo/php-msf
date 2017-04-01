@@ -9,17 +9,18 @@
 namespace PG\MSF\Server;
 
 use Noodlehaus\Config;
+use PG\Log\PGLog;
 use PG\MSF\Server\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Server\CoreBase\{
     Child, ControllerFactory, GeneratorContext, Loader, SwooleException
 };
 use PG\MSF\Server\{
-    Pack\IPack, Route\IRoute, Helpers\Log\PGLog
+    Pack\IPack, Route\IRoute
 };
 
 abstract class SwooleServer extends Child
 {
-    const version = "1.7.8";
+    const version = "2.0.0_alpha";
     /**
      * Daemonize.
      *
