@@ -88,12 +88,13 @@ class Controller extends CoreBase
     final public function __construct()
     {
         parent::__construct();
-        $this->input      = new Input();
-        $this->output     = new Output($this);
-        $this->redisPool  = AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(), $this);
-        $this->mysqlPool  = getInstance()->mysqlPool;
-        $this->client     = clone getInstance()->client;
-        $this->tcpClient  = clone getInstance()->tcpClient;
+        $this->input = new Input();
+        $this->output = new Output($this);
+        $this->redisPool = getInstance()->redisPool && AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(),
+                $this);
+        $this->mysqlPool = getInstance()->mysqlPool;
+        $this->client = clone getInstance()->client;
+        $this->tcpClient = clone getInstance()->tcpClient;
     }
 
     /**
@@ -241,134 +242,6 @@ class Controller extends CoreBase
             $this->output->end($template->render());
         } else {
             throw new SwooleException('method not exist');
-        }
-    }
-
-    /**
-     * sendToUid
-     * @param $uid
-     * @param $data
-     * @param bool $destroy
-     * @throws SwooleException
-     */
-    protected function sendToUid($uid, $data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToUid', 'uid' => $this->uid, 'data' => $data];
-        } else {
-            getInstance()->sendToUid($uid, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * sendToUids
-     * @param $uids
-     * @param $data
-     * @param $destroy
-     * @throws SwooleException
-     */
-    protected function sendToUids($uids, $data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToUids', 'uids' => $uids, 'data' => $data];
-        } else {
-            getInstance()->sendToUids($uids, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * sendToAll
-     * @param $data
-     * @param $destroy
-     * @throws SwooleException
-     */
-    protected function sendToAll($data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToAll', 'data' => $data];
-        } else {
-            getInstance()->sendToAll($data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * 发送给群
-     * @param $groupId
-     * @param $data
-     * @param bool $destroy
-     * @throws SwooleException
-     */
-    protected function sendToGroup($groupId, $data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToGroup', 'groupId' => $groupId, 'data' => $data];
-        } else {
-            getInstance()->sendToGroup($groupId, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * 踢用户
-     * @param $uid
-     */
-    protected function kickUid($uid)
-    {
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'kickUid', 'uid' => $uid];
-        } else {
-            getInstance()->kickUid($uid);
-        }
-    }
-
-    /**
-     * bindUid
-     * @param $fd
-     * @param $uid
-     * @param bool $isKick
-     */
-    protected function bindUid($fd, $uid, $isKick = true)
-    {
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'bindUid', 'fd' => $fd, 'uid' => $uid];
-        } else {
-            getInstance()->bindUid($fd, $uid, $isKick);
-        }
-    }
-
-    /**
-     * unBindUid
-     * @param $uid
-     */
-    protected function unBindUid($uid)
-    {
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'unBindUid', 'uid' => $uid];
-        } else {
-            getInstance()->unBindUid($uid);
         }
     }
 

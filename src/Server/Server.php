@@ -478,7 +478,7 @@ abstract class Server extends Child
         echo "\033[2J";
         echo "\033[1A\n\033[K-------------\033[47;30m SWOOLE_DISTRIBUTED \033[0m--------------\n\033[0m";
         echo 'System:', PHP_OS, "\n";
-        echo 'SwooleDistributed version:', self::version, "\n";
+        echo 'MSF version:', self::version, "\n";
         echo 'Swoole version: ', SWOOLE_VERSION, "\n";
         echo 'PHP version: ', PHP_VERSION, "\n";
         echo 'worker_num: ', $setConfig['worker_num'], "\n";
