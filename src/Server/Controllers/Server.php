@@ -15,9 +15,9 @@ class Server extends BaseController
         $data = [
             'coroutine' => [],
         ];
-        $routineList = getInstance()->coroutine->routineList;
+        $routineList = getInstance()->coroutine->taskMap;
         /**
-         * @var $routine \PG\MSF\Server\CoreBase\CoroutineTask
+         * @var $routine \PG\MSF\Server\Coroutine\CoroutineTask
          */
         foreach ($routineList as $routine) {
             $logId = $routine->generatorContext->getController()->PGLog->logId;
