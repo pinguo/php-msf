@@ -10,7 +10,7 @@
 namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\{
-    Marco, Server, DataBase\RedisAsynPool, DataBase\MysqlAsynPool
+    Marco, Server, DataBase\RedisAsynPool, DataBase\MysqlAsynPool, Coroutine\GeneratorContext
 };
 
 class Controller extends CoreBase

@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Server;
 
-use PG\MSF\Server\CoreBase\{
-    ControllerFactory, GeneratorContext
+use PG\MSF\Server\{
+    CoreBase\ControllerFactory, Coroutine\GeneratorContext
 };
 
 abstract class WebSocketServer extends HttpServer

@@ -13,8 +13,8 @@ use PG\MSF\Client\{
 };
 use PG\MSF\Server\Test\TestModule;
 use PG\MSF\Server\Coroutine\CoroutineTask;
-use PG\MSF\Server\CoreBase\{
-    GeneratorContext, InotifyProcess, SwooleException
+use PG\MSF\Server\{
+    Coroutine\GeneratorContext, CoreBase\InotifyProcess, CoreBase\SwooleException
 };
 use PG\MSF\Server\DataBase\{
     AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool

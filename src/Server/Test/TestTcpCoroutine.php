@@ -8,13 +8,13 @@
 
 namespace PG\MSF\Server\Test;
 
-use PG\MSF\Server\CoreBase\CoroutineBase;
-use PG\MSF\Server\CoreBase\CoroutineNull;
+use PG\MSF\Server\Coroutine\CoroutineBase;
+use PG\MSF\Server\Coroutine\CoroutineNull;
 
 class TestTcpCoroutine extends CoroutineBase
 {
     /**
-     * @var PG\MSF\Server\CoreBase\Controller|void
+     * @var \PG\MSF\Server\CoreBase\Controller|void
      */
     private $controller;
 

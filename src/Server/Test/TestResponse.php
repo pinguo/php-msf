@@ -9,7 +9,7 @@
 namespace PG\MSF\Server\Test;
 
 
-use PG\MSF\Server\CoreBase\CoroutineNull;
+use PG\MSF\Server\Coroutine\CoroutineNull;
 
 class TestResponse
 {

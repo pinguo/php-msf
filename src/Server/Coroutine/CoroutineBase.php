@@ -6,9 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\CoreBase;
-
-use PG\MSF\Server\Coroutine\CoroutineTask;
+namespace PG\MSF\Server\Coroutine;
 
 abstract class CoroutineBase implements ICoroutineBase
 {
