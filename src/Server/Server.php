@@ -18,7 +18,7 @@ use PG\MSF\Server\{
     Pack\IPack, Route\IRoute
 };
 
-abstract class SwooleServer extends Child
+abstract class Server extends Child
 {
     const version = "2.0.0_alpha";
     /**
@@ -64,7 +64,7 @@ abstract class SwooleServer extends Child
     /**
      * worker instance.
      *
-     * @var SwooleServer
+     * @var Server
      */
     protected static $_worker = null;
     /**
@@ -476,9 +476,9 @@ abstract class SwooleServer extends Child
     {
         $setConfig = self::$_worker->setServerSet();
         echo "\033[2J";
-        echo "\033[1A\n\033[K-------------\033[47;30m SWOOLE_DISTRIBUTED \033[0m--------------\n\033[0m";
+        echo "\033[1A\n\033[K-------------\033[47;30m MSF \033[0m--------------\n\033[0m";
         echo 'System:', PHP_OS, "\n";
-        echo 'SwooleDistributed version:', self::version, "\n";
+        echo 'MSF version:', self::version, "\n";
         echo 'Swoole version: ', SWOOLE_VERSION, "\n";
         echo 'PHP version: ', PHP_VERSION, "\n";
         echo 'worker_num: ', $setConfig['worker_num'], "\n";
@@ -489,7 +489,7 @@ abstract class SwooleServer extends Child
             self::$_maxShowLength - strlen('socket')), "\033[47;30mport\033[0m", str_pad('',
             self::$_maxShowLength - strlen('port')), "\033[47;30m", "status\033[0m\n";
         switch (self::$_worker->name) {
-            case SwooleDispatchClient::SERVER_NAME:
+            case DispatchClient::SERVER_NAME:
                 echo str_pad('TCP',
                     self::$_maxShowLength), str_pad(self::$_worker->config->get('dispatch_server.socket', '--'),
                     self::$_maxShowLength), str_pad(self::$_worker->config->get('dispatch_server.port', '--'),
@@ -500,7 +500,7 @@ abstract class SwooleServer extends Child
                     echo " \033[32;40m [OPEN] \033[0m\n";
                 }
                 break;
-            case SwooleDistributedServer::SERVER_NAME:
+            case MSFServer::SERVER_NAME:
                 echo str_pad('TCP',
                     self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.socket', '--'),
                     self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.port', '--'),
@@ -689,7 +689,7 @@ abstract class SwooleServer extends Child
         }
         
         if ($controllerInstance != null) {
-            if (SwooleServer::$testUnity) {
+            if (Server::$testUnity) {
                 $fd = 'self';
                 $uid = $fd;
             } else {

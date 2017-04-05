@@ -8,11 +8,11 @@
 
 /**
  * 获取实例
- * @return \PG\MSF\Server\SwooleDistributedServer
+ * @return \PG\MSF\Server\MSFServer
  */
 function &getInstance()
 {
-    return \PG\MSF\Server\SwooleDistributedServer::getInstance();
+    return \PG\MSF\Server\MSFServer::getInstance();
 }
 
 /**
@@ -21,7 +21,7 @@ function &getInstance()
  */
 function getTickTime()
 {
-    return \PG\MSF\Server\SwooleDistributedServer::getInstance()->tickTime;
+    return \PG\MSF\Server\MSFServer::getInstance()->tickTime;
 }
 
 function getMillisecond()

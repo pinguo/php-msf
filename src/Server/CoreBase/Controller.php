@@ -10,7 +10,7 @@
 namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\{
-    SwooleMarco, SwooleServer, DataBase\RedisAsynPool, DataBase\MysqlAsynPool
+    Marco, Server, DataBase\RedisAsynPool, DataBase\MysqlAsynPool
 };
 
 class Controller extends CoreBase
@@ -88,12 +88,13 @@ class Controller extends CoreBase
     final public function __construct()
     {
         parent::__construct();
-        $this->input      = new Input();
-        $this->output     = new Output($this);
-        $this->redisPool  = AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(), $this);
-        $this->mysqlPool  = getInstance()->mysqlPool;
-        $this->client     = clone getInstance()->client;
-        $this->tcpClient  = clone getInstance()->tcpClient;
+        $this->input = new Input();
+        $this->output = new Output($this);
+        $this->redisPool = getInstance()->redisPool && AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(),
+                $this);
+        $this->mysqlPool = getInstance()->mysqlPool;
+        $this->client = clone getInstance()->client;
+        $this->tcpClient = clone getInstance()->tcpClient;
     }
 
     /**
@@ -110,7 +111,7 @@ class Controller extends CoreBase
         $this->fd = $fd;
         $this->clientData = $clientData;
         $this->input->set($clientData);
-        $this->requestType = SwooleMarco::TCP_REQUEST;
+        $this->requestType = Marco::TCP_REQUEST;
         $this->initialization($controllerName, $methodName);
     }
 
@@ -136,7 +137,7 @@ class Controller extends CoreBase
         $this->response = $response;
         $this->input->set($request);
         $this->output->set($request, $response);
-        $this->requestType = SwooleMarco::HTTP_REQUEST;
+        $this->requestType = Marco::HTTP_REQUEST;
         $this->initialization($controllerName, $methodName);
     }
 
@@ -170,11 +171,11 @@ class Controller extends CoreBase
     public function onExceptionHandle(\Throwable $e)
     {
         switch ($this->requestType) {
-            case SwooleMarco::HTTP_REQUEST:
+            case Marco::HTTP_REQUEST:
                 $this->output->setStatusHeader(500);
                 $this->output->end($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
                 break;
-            case SwooleMarco::TCP_REQUEST:
+            case Marco::TCP_REQUEST:
                 $this->send($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
                 break;
         }
@@ -192,7 +193,7 @@ class Controller extends CoreBase
             throw new SwooleException('controller is destroy can not send data');
         }
         $data = getInstance()->encode($this->pack->pack($data));
-        if (SwooleServer::$testUnity) {
+        if (Server::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'send', 'fd' => $this->fd, 'data' => $data];
         } else {
             getInstance()->send($this->fd, $data);
@@ -235,140 +236,12 @@ class Controller extends CoreBase
      */
     public function defaultMethod()
     {
-        if ($this->requestType == SwooleMarco::HTTP_REQUEST) {
+        if ($this->requestType == Marco::HTTP_REQUEST) {
             $this->output->setHeader('HTTP/1.1', '404 Not Found');
             $template = $this->loader->view('server::error_404');
             $this->output->end($template->render());
         } else {
             throw new SwooleException('method not exist');
-        }
-    }
-
-    /**
-     * sendToUid
-     * @param $uid
-     * @param $data
-     * @param bool $destroy
-     * @throws SwooleException
-     */
-    protected function sendToUid($uid, $data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToUid', 'uid' => $this->uid, 'data' => $data];
-        } else {
-            getInstance()->sendToUid($uid, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * sendToUids
-     * @param $uids
-     * @param $data
-     * @param $destroy
-     * @throws SwooleException
-     */
-    protected function sendToUids($uids, $data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToUids', 'uids' => $uids, 'data' => $data];
-        } else {
-            getInstance()->sendToUids($uids, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * sendToAll
-     * @param $data
-     * @param $destroy
-     * @throws SwooleException
-     */
-    protected function sendToAll($data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToAll', 'data' => $data];
-        } else {
-            getInstance()->sendToAll($data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * 发送给群
-     * @param $groupId
-     * @param $data
-     * @param bool $destroy
-     * @throws SwooleException
-     */
-    protected function sendToGroup($groupId, $data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
-        }
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'sendToGroup', 'groupId' => $groupId, 'data' => $data];
-        } else {
-            getInstance()->sendToGroup($groupId, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * 踢用户
-     * @param $uid
-     */
-    protected function kickUid($uid)
-    {
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'kickUid', 'uid' => $uid];
-        } else {
-            getInstance()->kickUid($uid);
-        }
-    }
-
-    /**
-     * bindUid
-     * @param $fd
-     * @param $uid
-     * @param bool $isKick
-     */
-    protected function bindUid($fd, $uid, $isKick = true)
-    {
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'bindUid', 'fd' => $fd, 'uid' => $uid];
-        } else {
-            getInstance()->bindUid($fd, $uid, $isKick);
-        }
-    }
-
-    /**
-     * unBindUid
-     * @param $uid
-     */
-    protected function unBindUid($uid)
-    {
-        if (SwooleServer::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'unBindUid', 'uid' => $uid];
-        } else {
-            getInstance()->unBindUid($uid);
         }
     }
 
@@ -379,7 +252,7 @@ class Controller extends CoreBase
      */
     protected function close($fd, $autoDestroy = true)
     {
-        if (SwooleServer::$testUnity) {
+        if (Server::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'close', 'fd' => $fd];
         } else {
             getInstance()->close($fd);
