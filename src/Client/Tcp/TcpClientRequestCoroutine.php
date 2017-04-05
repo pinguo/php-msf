@@ -9,7 +9,7 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\Coroutine\CoroutineBase;
 
 class TcpClientRequestCoroutine extends CoroutineBase
 {

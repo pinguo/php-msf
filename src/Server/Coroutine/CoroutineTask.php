@@ -7,10 +7,7 @@
  */
 
 namespace PG\MSF\Server\Coroutine;
-use PG\MSF\Server\CoreBase\GeneratorContext;
-use PG\MSF\Server\CoreBase\ICoroutineBase;
-use PG\MSF\Server\CoreBase\CoroutineNull;
-use PG\MSF\Server\CoreBase\CoroutineException;
+
 use PG\MSF\Server\CoreBase\SwooleException;
 
 class CoroutineTask

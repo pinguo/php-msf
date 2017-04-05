@@ -6,9 +6,6 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 namespace PG\MSF\Server\Coroutine;
-use PG\MSF\Server\CoreBase\GeneratorContext;
-use PG\MSF\Server\CoreBase\ICoroutineBase;
-use Protobuf\Compiler\Generator;
 
 class Scheduler
 {

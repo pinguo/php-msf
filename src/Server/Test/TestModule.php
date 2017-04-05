@@ -10,7 +10,7 @@ namespace PG\MSF\Server\Test;
 
 use PG\MSF\Server\CoreBase\Coroutine;
 use PG\MSF\Server\CoreBase\CoroutineTask;
-use PG\MSF\Server\CoreBase\GeneratorContext;
+use PG\MSF\Server\Coroutine\GeneratorContext;
 
 class TestModule
 {
