@@ -476,7 +476,7 @@ abstract class Server extends Child
     {
         $setConfig = self::$_worker->setServerSet();
         echo "\033[2J";
-        echo "\033[1A\n\033[K-------------\033[47;30m SWOOLE_DISTRIBUTED \033[0m--------------\n\033[0m";
+        echo "\033[1A\n\033[K-------------\033[47;30m MSF \033[0m--------------\n\033[0m";
         echo 'System:', PHP_OS, "\n";
         echo 'MSF version:', self::version, "\n";
         echo 'Swoole version: ', SWOOLE_VERSION, "\n";
