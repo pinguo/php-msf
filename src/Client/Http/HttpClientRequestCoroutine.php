@@ -34,9 +34,11 @@ class HttpClientRequestCoroutine extends CoroutineBase
         $this->send(function ($client) use ($profileName) {
             $this->result       = (array)$client;
             $this->responseTime = microtime(true);
-            $this->httpClient->context->PGLog->profileEnd($profileName);
-            $this->ioBack = true;
-            $this->nextRun($this->httpClient->context->PGLog->logId);
+            if (!empty($this->httpClient->context->PGLog)) {
+                $this->httpClient->context->PGLog->profileEnd($profileName);
+                $this->ioBack = true;
+                $this->nextRun($this->httpClient->context->PGLog->logId);
+            }
         });
     }
 
@@ -50,6 +52,11 @@ class HttpClientRequestCoroutine extends CoroutineBase
                 $this->httpClient->get($this->path, $this->data, $callback);
                 break;
         }
+    }
+
+    public function delCallBackForKernel()
+    {
+        $this->httpClient->client->close();
     }
 
 }
