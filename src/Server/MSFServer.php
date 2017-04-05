@@ -148,26 +148,7 @@ abstract class MSFServer extends WebSocketServer
 
     public function start()
     {
-        // @todo 更好的实现方式 by xudianyang
-        // $this->clearState();
         return parent::start();
-    }
-
-    /**
-     * 清除状态
-     * @throws SwooleException
-     */
-    public function clearState()
-    {
-        print("是否清除Redis上的用户状态信息(y/n)？");
-        $clearRedis = shellRead();
-        if (strtolower($clearRedis) == 'y') {
-            echo "[初始化] 清除Redis上用户状态。\n";
-            $redisPool = new RedisAsynPool($this->config, $this->config->get('redis.active'));
-            $redisPool->getSync()->del(Marco::redis_uid_usid_hash_name);
-            $redisPool->getSync()->close();
-            unset($redisPool);
-        }
     }
 
     /**
@@ -222,7 +203,9 @@ abstract class MSFServer extends WebSocketServer
                 $this->asnyPoolManager->event_add();
                 $this->initAsynPools();
                 foreach ($this->asynPools as $pool) {
-                    $this->asnyPoolManager->registAsyn($pool);
+                    if ($pool) {
+                        $this->asnyPoolManager->registAsyn($pool);
+                    }
                 }
             }, false, 2);
             $this->server->addProcess($this->poolProcess);
@@ -299,8 +282,10 @@ abstract class MSFServer extends WebSocketServer
     public function initAsynPools()
     {
         $this->asynPools = [
-            'redisPool' => new RedisAsynPool($this->config, $this->config->get('redis.active')),
-            'mysqlPool' => new MysqlAsynPool($this->config, $this->config->get('database.active')),
+            'redisPool' => $this->config->get('redis.active') ? new RedisAsynPool($this->config,
+                $this->config->get('redis.active')) : null,
+            'mysqlPool' => $this->config->get('database.active') ? new MysqlAsynPool($this->config,
+                $this->config->get('database.active')) : null,
         ];
     }
 
@@ -338,54 +323,6 @@ abstract class MSFServer extends WebSocketServer
     }
 
     /**
-     * 向uid发送消息
-     * @param $uid
-     * @param $data
-     * @param $fromDispatch
-     */
-    public function sendToUid($uid, $data, $fromDispatch = false)
-    {
-        if (!$fromDispatch) {
-            $data = $this->encode($this->pack->pack($data));
-        }
-        if ($this->uidFdTable->exist($uid)) {//本机处理
-            $fd = $this->uidFdTable->get($uid)['fd'];
-            $this->send($fd, $data);
-        } else {
-            if ($fromDispatch) {
-                return;
-            }
-            $this->sendToDispatchMessage(Marco::MSG_TYPE_SEND, ['data' => $data, 'uid' => $uid]);
-        }
-    }
-
-    /**
-     * 随机选择一个dispatch发送消息
-     * @param $data
-     */
-    private function sendToDispatchMessage($type, $data)
-    {
-        $sendData = $this->packSerevrMessageBody($type, $data);
-        $fd = null;
-        if (count($this->dispatchClientFds) > 0) {
-            $fd = $this->dispatchClientFds[array_rand($this->dispatchClientFds)];
-        }
-        if ($fd != null) {
-            $this->server->send($fd, $this->encode($sendData));
-        } else {
-            //如果没有dispatch那么MSG_TYPE_SEND_BATCH这个消息不需要发出，因为本机已经处理过可以发送的uid了
-            if ($type == Marco::MSG_TYPE_SEND_BATCH) {
-                return;
-            }
-            if ($this->isTaskWorker()) {
-                $this->onSwooleTask($this->server, 0, 0, $sendData);
-            } else {
-                $this->server->task($sendData);
-            }
-        }
-    }
-
-    /**
      * task异步任务
      * @param $serv
      * @param $taskId
@@ -404,28 +341,6 @@ abstract class MSFServer extends WebSocketServer
         $type = $unserializeData['type']??'';
         $message = $unserializeData['message']??'';
         switch ($type) {
-            case Marco::MSG_TYPE_SEND_BATCH://发送消息
-                foreach ($message['fd'] as $fd) {
-                    $this->send($fd, $message['data']);
-                }
-                return null;
-            case Marco::MSG_TYPE_SEND_ALL://发送广播
-                foreach ($serv->connections as $fd) {
-                    if (in_array($fd, $this->dispatchClientFds)) {
-                        continue;
-                    }
-                    $this->send($fd, $message['data']);
-                }
-                return null;
-            case Marco::MSG_TYPE_SEND_GROUP://群组
-                $uids = $this->getRedis()->sMembers(Marco::redis_group_hash_name_prefix . $message['groupId']);
-                foreach ($uids as $uid) {
-                    if ($this->uidFdTable->exist($uid)) {
-                        $fd = $this->uidFdTable->get($uid)['fd'];
-                        $this->send($fd, $message['data']);
-                    }
-                }
-                return null;
             case Marco::SERVER_TYPE_TASK://task任务
                 $taskName = $message['task_name'];
                 $task = $this->loader->task($taskName, $this);
@@ -467,66 +382,6 @@ abstract class MSFServer extends WebSocketServer
     public function getRedis()
     {
         return $this->redisPool->getSync();
-    }
-
-    /**
-     * 批量发送消息
-     * @param $uids
-     * @param $data
-     * @param $fromDispatch
-     */
-    public function sendToUids($uids, $data, $fromDispatch = false)
-    {
-        if (!$fromDispatch) {
-            $data = $this->encode($this->pack->pack($data));
-        }
-        $currentFds = [];
-        foreach ($uids as $key => $uid) {
-            if ($this->uidFdTable->exist($uid)) {
-                $currentFds[] = $this->uidFdTable->get($uid)['fd'];
-                unset($uids[$key]);
-            }
-        }
-        if (count($currentFds) > $this->sendUseTaskNum) {//过多人就通过task
-            $taskData = $this->packSerevrMessageBody(Marco::MSG_TYPE_SEND_BATCH,
-                ['data' => $data, 'fd' => $currentFds]);
-            if ($this->isTaskWorker()) {
-                $this->onSwooleTask($this->server, 0, 0, $taskData);
-            } else {
-                $this->server->task($taskData);
-            }
-        } else {
-            foreach ($currentFds as $fd) {
-                $this->send($fd, $data);
-            }
-        }
-        if ($fromDispatch) {
-            return;
-        }
-        //本机处理不了的发给dispatch
-        if (count($uids) > 0) {
-            $this->sendToDispatchMessage(Marco::MSG_TYPE_SEND_BATCH,
-                ['data' => $data, 'uids' => array_values($uids)]);
-        }
-    }
-
-    /**
-     * 踢用户下线
-     * @param $uid
-     * @param bool $fromDispatch
-     */
-    public function kickUid($uid, $fromDispatch = false)
-    {
-        if ($this->uidFdTable->exist($uid)) {//本机处理
-            $fd = $this->uidFdTable->get($uid)['fd'];
-            $this->close($fd);
-        } else {
-            if ($fromDispatch) {
-                return;
-            }
-            $usid = $this->getRedis()->hGet(Marco::redis_uid_usid_hash_name, $uid);
-            $this->sendToDispatchMessage(Marco::MSG_TYPE_KICK_UID, ['usid' => $usid, 'uid' => $uid]);
-        }
     }
 
     /**
@@ -595,9 +450,10 @@ abstract class MSFServer extends WebSocketServer
                 $this->asnyPoolManager->noEventAdd();
             }
             foreach ($this->asynPools as $pool) {
-
-                $pool->workerInit($workerId);
-                $this->asnyPoolManager->registAsyn($pool);
+                if ($pool) {
+                    $pool->workerInit($workerId);
+                    $this->asnyPoolManager->registAsyn($pool);
+                }
             }
             //初始化异步Client
             $this->client = new HttpClient();
@@ -678,49 +534,6 @@ abstract class MSFServer extends WebSocketServer
      */
     public function onOpenServiceInitialization()
     {
-        if ($this->config->get('autoClearGroup', false)) {
-            $this->delAllGroups();
-            print_r("[初始化] 清除redis上所有群信息。\n");
-        }
-    }
-
-    /**
-     * 删除所有的群
-     */
-    public function delAllGroups()
-    {
-        if ($this->isTaskWorker()) {
-            $groups = $this->getAllGroups(null);
-            foreach ($groups as $key => $groupId) {
-                $groups[$key] = Marco::redis_group_hash_name_prefix . $groupId;
-            }
-            $groups[] = Marco::redis_groups_hash_name;
-            //删除所有的群和群管理
-            $this->getRedis()->del($groups);
-        } else {
-            $this->getAllGroups(function ($groups) {
-                foreach ($groups as $key => $groupId) {
-                    $groups[$key] = Marco::redis_group_hash_name_prefix . $groupId;
-                }
-                $groups[] = Marco::redis_groups_hash_name;
-                //删除所有的群和群管理
-                $this->redisPool->del($groups, null);
-            });
-        }
-    }
-
-    /**
-     * 获取所有的群id(异步时候需要提供callback,task可以直接返回结果)
-     * @param $callback
-     * @return array
-     */
-    public function getAllGroups($callback)
-    {
-        if ($this->isTaskWorker()) {
-            return $this->getRedis()->sMembers(Marco::redis_groups_hash_name);
-        } else {
-            $this->redisPool->sMembers(Marco::redis_groups_hash_name, $callback);
-        }
     }
 
     /**
@@ -795,167 +608,6 @@ abstract class MSFServer extends WebSocketServer
      * @param $uid
      */
     abstract public function onUidCloseClear($uid);
-
-    /**
-     * 解绑uid，链接断开自动解绑
-     * @param $uid
-     */
-    public function unBindUid($uid)
-    {
-        //更新共享内存
-        $ok = $this->uidFdTable->del($uid);
-        //更新映射表
-        if ($ok) {//说明是本机绑定的uid
-            $this->getRedis()->hDel(Marco::redis_uid_usid_hash_name, $uid);
-        }
-    }
-
-    /**
-     * 将fd绑定到uid,uid不能为0
-     * @param $fd
-     * @param $uid
-     * @param bool $isKick 是否踢掉uid上一个的链接
-     */
-    public function bindUid($fd, $uid, $isKick = true)
-    {
-        if ($isKick) {
-            $this->kickUid($uid, false);
-        }
-        $this->getRedis()->hSet(Marco::redis_uid_usid_hash_name, $uid, $this->USID);
-        //将这个fd与当前worker进行绑定
-        $this->server->bind($fd, $uid);
-        //加入共享内存
-        $this->uidFdTable->set($uid, ['fd' => $fd]);
-    }
-
-    /**
-     * uid是否在线(协程)
-     * @param $uid
-     * @return int
-     * @throws SwooleException
-     */
-    public function coroutineUidIsOnline($uid)
-    {
-        return yield $this->redisPool->getCoroutine()->hExists(Marco::redis_uid_usid_hash_name, $uid);
-    }
-
-
-    /**
-     * 获取在线人数(协程)
-     * @return int
-     * @throws SwooleException
-     */
-    public function coroutineCountOnline()
-    {
-        return yield $this->redisPool->getCoroutine()->hLen(Marco::redis_uid_usid_hash_name);
-    }
-
-    /**
-     * 获取所有的群id（协程）
-     * @return array
-     * @throws SwooleException
-     */
-    public function coroutineGetAllGroups()
-    {
-        return yield $this->redisPool->getCoroutine()->sMembers(Marco::redis_groups_hash_name);
-    }
-
-    /**
-     * 添加到群(可以支持批量,实际是否支持根据sdk版本测试)
-     * @param $uid int | array
-     * @param $groupId int
-     */
-    public function addToGroup($uid, $groupId)
-    {
-        if ($this->isTaskWorker()) {
-            //放入群管理中
-            $this->getRedis()->sAdd(Marco::redis_groups_hash_name, $groupId);
-            //放入对应的群中
-            $this->getRedis()->sAdd(Marco::redis_group_hash_name_prefix . $groupId, $uid);
-        } else {
-            //放入群管理中
-            $this->redisPool->sAdd(Marco::redis_groups_hash_name, $groupId, null);
-            //放入对应的群中
-            $this->redisPool->sAdd(Marco::redis_group_hash_name_prefix . $groupId, $uid, null);
-        }
-    }
-
-
-    /**
-     * 从群里移除(可以支持批量,实际是否支持根据sdk版本测试)
-     * @param $uid int | array
-     * @param $groupId
-     */
-    public function removeFromGroup($uid, $groupId)
-    {
-        if ($this->isTaskWorker()) {
-            $this->getRedis()->sRem(Marco::redis_group_hash_name_prefix . $groupId, $uid);
-        } else {
-            $this->redisPool->sRem(Marco::redis_group_hash_name_prefix . $groupId, $uid, null);
-        }
-    }
-
-    /**
-     * 删除群
-     * @param $groupId
-     */
-    public function delGroup($groupId)
-    {
-        if ($this->isTaskWorker()) {
-            //从群管理中删除
-            $this->getRedis()->sRem(Marco::redis_groups_hash_name, $groupId);
-            //删除这个群
-            $this->getRedis()->del(Marco::redis_group_hash_name_prefix . $groupId);
-        } else {
-            //从群管理中删除
-            $this->redisPool->sRem(Marco::redis_groups_hash_name, $groupId, null);
-            //删除这个群
-            $this->redisPool->del(Marco::redis_group_hash_name_prefix . $groupId, null);
-        }
-    }
-
-    /**
-     * 获取群的人数（协程）
-     * @param $groupId
-     * @return int
-     * @throws SwooleException
-     */
-    public function coroutineGetGroupCount($groupId)
-    {
-        return yield $this->redisPool->getCoroutine()->sCard(Marco::redis_group_hash_name_prefix . $groupId);
-    }
-
-    /**
-     * 获取群成员uids (协程)
-     * @param $groupId
-     * @return array
-     * @throws SwooleException
-     */
-    public function coroutineGetGroupUids($groupId)
-    {
-        return yield $this->redisPool->getCoroutine()->sMembers(Marco::redis_group_hash_name_prefix . $groupId);
-    }
-
-    /**
-     * 广播
-     * @param $data
-     */
-    public function sendToAll($data)
-    {
-        $data = $this->encode($this->pack->pack($data));
-        $this->sendToDispatchMessage(Marco::MSG_TYPE_SEND_ALL, ['data' => $data]);
-    }
-
-    /**
-     * 发送给群
-     * @param $groupId
-     * @param $data
-     */
-    public function sendToGroup($groupId, $data)
-    {
-        $data = $this->encode($this->pack->pack($data));
-        $this->sendToDispatchMessage(Marco::MSG_TYPE_SEND_GROUP, ['data' => $data, 'groupId' => $groupId]);
-    }
 
     /**
      * 向task发送中断信号
