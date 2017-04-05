@@ -11,6 +11,7 @@ namespace PG\MSF\Server;
 use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
+use PG\MSF\Server\Memory\Pool;
 use PG\MSF\Server\Test\TestModule;
 use PG\MSF\Server\Coroutine\CoroutineTask;
 use PG\MSF\Server\{
@@ -28,6 +29,12 @@ abstract class MSFServer extends WebSocketServer
      * @var Server
      */
     private static $instance;
+
+    /**
+     * @var Pool
+     */
+    public $objectPool;
+
     /**
      * @var RedisAsynPool
      */
@@ -274,6 +281,8 @@ abstract class MSFServer extends WebSocketServer
             });
         }
         $this->initLock = new \swoole_lock(SWOOLE_RWLOCK);
+        //初始化对象池
+        $this->objectPool = Pool::getInstance();
     }
 
     /**

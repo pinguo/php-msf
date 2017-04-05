@@ -83,6 +83,12 @@ class Controller extends CoreBase
     protected $generatorContext;
 
     /**
+     * @var AOP|\PG\MSF\Server\Memory\Pool
+     */
+    public $objectPool;
+    public $objectPoolBuckets = [];
+
+    /**
      * Controller constructor.
      */
     final public function __construct()
@@ -92,6 +98,7 @@ class Controller extends CoreBase
         $this->output = new Output($this);
         $this->redisPool = getInstance()->redisPool && AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(),
                 $this);
+        $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
         $this->mysqlPool = getInstance()->mysqlPool;
         $this->client = clone getInstance()->client;
         $this->tcpClient = clone getInstance()->tcpClient;
@@ -217,6 +224,12 @@ class Controller extends CoreBase
         unset($this->generatorContext);
         $this->input->reset();
         $this->output->reset();
+        //销毁对象池
+        foreach ($this->objectPoolBuckets as $objName => $obj) {
+            $this->objectPool->push($obj);
+            unset($this->objectPoolBuckets[$objName]);
+        }
+
         ControllerFactory::getInstance()->revertController($this);
     }
 

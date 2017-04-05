@@ -43,7 +43,6 @@ class CoreBase extends Child
 
     protected $start_run_time;
 
-
     /**
      * Task constructor.
      */

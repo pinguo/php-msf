@@ -42,7 +42,7 @@ class BaseController extends Controller
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
 
-        $context                           = new Context();
+        $context                           = $this->objectPool->get(Context::class);
         $context->logId                    = $this->logId;
         $context->PGLog                    = $this->PGLog;
         $context->input                    = $this->input;
