@@ -16,6 +16,8 @@ use PG\Log\PGLog;
 
 class Context implements \ArrayAccess
 {
+    public $useCount;
+    public $genTime;
     /**
      * @var string
      */
