@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\Coroutine\CoroutineBase;
 use PG\MSF\Server\Coroutine\Scheduler;
 
 class GetHttpClientCoroutine extends CoroutineBase

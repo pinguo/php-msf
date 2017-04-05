@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\MSF\Server\Coroutine\CoroutineBase;
+
 class TaskCoroutine extends CoroutineBase
 {
     public $id;
