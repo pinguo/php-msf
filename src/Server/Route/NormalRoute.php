@@ -10,7 +10,10 @@ namespace PG\MSF\Server\Route;
 
 class NormalRoute implements IRoute
 {
-    private $clientData;
+    /**
+     * @var \stdClass
+     */
+    protected $clientData;
 
     public function __construct()
     {
@@ -78,6 +81,11 @@ class NormalRoute implements IRoute
     public function getPath()
     {
         return $this->clientData->path;
+    }
+
+    public function getIsRpc()
+    {
+        return $this->clientData->isRpc??false;
     }
 
     public function getParams()

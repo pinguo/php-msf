@@ -183,7 +183,7 @@ abstract class Server extends Child
         $this->onErrorHandel = [$this, 'onErrorHandel'];
         self::$_worker = $this;
         // 加载配置 支持加载环境子目录配置
-        $this->config = new Config([ROOT_PATH . '/config', ROOT_PATH . '/config/' . APPLICATION_ENV]);
+        $this->config = new Config(defined('CONFIG_DIR') ? CONFIG_DIR : [ROOT_PATH . '/config', ROOT_PATH . '/config/' . APPLICATION_ENV]);
         $this->probufSet = $this->config->get('server.probuf_set', $this->probufSet);
         $this->packageLengthType = $this->probufSet['package_length_type'];
         $this->packageLengthTypeLength = strlen(pack($this->packageLengthType, 1));

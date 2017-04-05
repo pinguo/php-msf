@@ -39,12 +39,17 @@ class ControllerFactory
     /**
      * 获取一个Controller
      * @param $controller string
+     * @param $isRpc bool 是否为 rpc 请求，inner 请求也将标记为 rpc
      * @return Controller
      */
-    public function getController($controller)
+    public function getController($controller, $isRpc = false)
     {
         if ($controller == null) {
             return null;
+        }
+        $pureController = $controller;
+        if ($isRpc) {
+            $controller = 'Handlers/' . $controller;
         }
         $controllers = $this->pool[$controller]??null;
         if ($controllers == null) {
@@ -55,15 +60,22 @@ class ControllerFactory
             $controllerInstance->reUse();
             return $controllerInstance;
         }
-        $class_name = "\\App\\Controllers\\$controller";
+        if ($isRpc) {
+            $class_name = "\\App\\Handlers\\$pureController";
+        } else {
+            $class_name = "\\App\\Controllers\\$controller";
+        }
         if (class_exists($class_name)) {
             $controllerInstance = new $class_name;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();
             return $controllerInstance;
         }
-
-        $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
+        if ($isRpc) {
+            $class_name = "\\PG\\MSF\\Server\\Handlers\\$pureController";
+        } else {
+            $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
+        }
         if (class_exists($class_name)) {
             $controllerInstance = new $class_name;
             $controllerInstance->coreName = $controller;
