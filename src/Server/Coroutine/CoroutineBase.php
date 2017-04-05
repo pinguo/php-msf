@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Server\Coroutine;
 
+use PG\MSF\Server\CoreBase\SwooleException;
+
 abstract class CoroutineBase implements ICoroutineBase
 {
     public static $MAX_TIMERS = 0;
