@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\SwooleMarco;
+use PG\MSF\Server\Marco;
 
 class TaskProxy extends CoreBase
 {
@@ -49,7 +49,7 @@ class TaskProxy extends CoreBase
         }
         $this->taskProxyData =
             [
-                'type' => SwooleMarco::SERVER_TYPE_TASK,
+                'type' => Marco::SERVER_TYPE_TASK,
                 'message' =>
                     [
                         'task_name' => $this->coreName,

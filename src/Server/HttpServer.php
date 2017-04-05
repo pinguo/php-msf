@@ -13,7 +13,7 @@ use PG\MSF\Server\CoreBase\{
     ControllerFactory, GeneratorContext
 };
 
-abstract class SwooleHttpServer extends SwooleServer
+abstract class HttpServer extends Server
 {
     /**
      * http host
