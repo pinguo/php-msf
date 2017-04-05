@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\SwooleMarco;
+use PG\MSF\Server\Marco;
 
 class Output
 {
@@ -119,7 +119,7 @@ class Output
         ];
 
         switch ($this->controller->requestType) {
-            case SwooleMarco::HTTP_REQUEST:
+            case Marco::HTTP_REQUEST:
                 $callback = $this->getCallback($callback);
                 if (!is_null($callback)) {
                     $output = $callback . '(' . json_encode($result) . ');';
@@ -132,7 +132,7 @@ class Output
                     $this->end($output);
                 }
                 break;
-            case SwooleMarco::TCP_REQUEST:
+            case Marco::TCP_REQUEST:
                 $output = json_encode($result);
                 $this->controller->send($output);
                 break;

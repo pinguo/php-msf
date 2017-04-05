@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Server;
 
-class SwooleMarco
+class Marco
 {
     /**
      * 获取服务器ID

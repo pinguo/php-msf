@@ -12,7 +12,7 @@ use PG\MSF\Server\CoreBase\{
     ControllerFactory, GeneratorContext
 };
 
-abstract class SwooleWebSocketServer extends SwooleHttpServer
+abstract class WebSocketServer extends HttpServer
 {
     /**
      * opcode

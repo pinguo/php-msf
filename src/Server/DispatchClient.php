@@ -13,7 +13,7 @@ use PG\MSF\Server\DataBase\{
     AsynPoolManager, RedisAsynPool
 };
 
-class SwooleDispatchClient extends SwooleServer
+class DispatchClient extends Server
 {
     const SERVER_NAME = 'Dispatch';
     /**
@@ -169,7 +169,7 @@ class SwooleDispatchClient extends SwooleServer
                 if ($i == $server->workerId) {
                     continue;
                 }
-                $data = $this->packSerevrMessageBody(SwooleMarco::ADD_SERVER, $client_info['address']);
+                $data = $this->packSerevrMessageBody(Marco::ADD_SERVER, $client_info['address']);
                 $server->sendMessage($data, $i);
             }
             $this->addServerClient($client_info['address']);
@@ -207,11 +207,11 @@ class SwooleDispatchClient extends SwooleServer
         parent::onSwoolePipeMessage($serv, $from_worker_id, $message);
         $data = unserialize($message);
         switch ($data['type']) {
-            case SwooleMarco::ADD_SERVER:
+            case Marco::ADD_SERVER:
                 $address = $data['message'];
                 $this->addServerClient($address);
                 break;
-            case SwooleMarco::MSG_TYPR_ASYN:
+            case Marco::MSG_TYPR_ASYN:
                 $this->asnyPoolManager->distribute($data['message']);
                 break;
         }
@@ -226,11 +226,11 @@ class SwooleDispatchClient extends SwooleServer
         print_r("connect\n");
         $usid = ip2long($cli->address);
         $write_data = ['wid' => $this->server->workerId, 'usid' => $usid];
-        $data = $this->packSerevrMessageBody(SwooleMarco::MSG_TYPE_USID, serialize($write_data));
+        $data = $this->packSerevrMessageBody(Marco::MSG_TYPE_USID, serialize($write_data));
         $cli->usid = $usid;
         $cli->send($this->encode($data));
         //心跳包
-        $heartData = $this->encode($this->packSerevrMessageBody(SwooleMarco::MSG_TYPE_HEART, null));
+        $heartData = $this->encode($this->packSerevrMessageBody(Marco::MSG_TYPE_HEART, null));
         if (!isset($cli->tick)) {
             $cli->tick = swoole_timer_tick(60000, function () use ($cli, $heartData) {
                 $cli->send($heartData);
@@ -250,12 +250,12 @@ class SwooleDispatchClient extends SwooleServer
         $type = $unserialize_data['type']??'';
         $message = $unserialize_data['message']??'';
         switch ($type) {
-            case SwooleMarco::MSG_TYPE_SEND_GROUP://发送群消息
+            case Marco::MSG_TYPE_SEND_GROUP://发送群消息
                 //转换为batch
-                $this->redisPool->sMembers(SwooleMarco::redis_group_hash_name_prefix . $message['groupId'],
+                $this->redisPool->sMembers(Marco::redis_group_hash_name_prefix . $message['groupId'],
                     function ($uids) use ($message) {
                         if ($uids != null && count($uids) > 0) {
-                            $this->redisPool->hMGet(SwooleMarco::redis_uid_usid_hash_name, $uids,
+                            $this->redisPool->hMGet(Marco::redis_uid_usid_hash_name, $uids,
                                 function ($usids) use ($message) {
                                     $temp_dic = [];
                                     foreach ($usids as $uid => $usid) {
@@ -268,7 +268,7 @@ class SwooleDispatchClient extends SwooleServer
                                         if ($client == null) {
                                             continue;
                                         }
-                                        $client->send($this->encode($this->packSerevrMessageBody(SwooleMarco::MSG_TYPE_SEND_BATCH,
+                                        $client->send($this->encode($this->packSerevrMessageBody(Marco::MSG_TYPE_SEND_BATCH,
                                             [
                                                 'data' => $message['data'],
                                                 'uids' => $uids
@@ -278,8 +278,8 @@ class SwooleDispatchClient extends SwooleServer
                         }
                     });
                 break;
-            case SwooleMarco::MSG_TYPE_SEND_BATCH://发送消息
-                $this->redisPool->hMGet(SwooleMarco::redis_uid_usid_hash_name, $message['uids'],
+            case Marco::MSG_TYPE_SEND_BATCH://发送消息
+                $this->redisPool->hMGet(Marco::redis_uid_usid_hash_name, $message['uids'],
                     function ($usids) use ($message) {
                         $temp_dic = [];
                         foreach ($usids as $uid => $usid) {
@@ -292,20 +292,20 @@ class SwooleDispatchClient extends SwooleServer
                             if ($client == null) {
                                 continue;
                             }
-                            $client->send($this->encode($this->packSerevrMessageBody(SwooleMarco::MSG_TYPE_SEND_BATCH, [
+                            $client->send($this->encode($this->packSerevrMessageBody(Marco::MSG_TYPE_SEND_BATCH, [
                                 'data' => $message['data'],
                                 'uids' => $uids
                             ])));
                         }
                     });
                 break;
-            case SwooleMarco::MSG_TYPE_SEND_ALL://发送广播
+            case Marco::MSG_TYPE_SEND_ALL://发送广播
                 foreach ($this->serverClients as $client) {
                     $client->send($clientData);
                 }
                 break;
-            case SwooleMarco::MSG_TYPE_SEND://发送给uid
-                $this->redisPool->hGet(SwooleMarco::redis_uid_usid_hash_name, $message['uid'],
+            case Marco::MSG_TYPE_SEND://发送给uid
+                $this->redisPool->hGet(Marco::redis_uid_usid_hash_name, $message['uid'],
                     function ($usid) use ($clientData) {
                         if (empty($usid) || !key_exists($usid, $this->serverClients)) {
                             return;
@@ -314,7 +314,7 @@ class SwooleDispatchClient extends SwooleServer
                         $client->send($clientData);
                     });
                 break;
-            case SwooleMarco::MSG_TYPE_KICK_UID://踢人
+            case Marco::MSG_TYPE_KICK_UID://踢人
                 $usid = $message['usid'];
                 if (empty($usid) || !key_exists($usid, $this->serverClients)) {
                     return;
