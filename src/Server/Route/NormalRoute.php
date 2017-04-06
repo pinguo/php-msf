@@ -33,6 +33,24 @@ class NormalRoute implements IRoute
     }
 
     /**
+     * 解析path
+     *
+     * @param $path
+     */
+    public function parsePath($path)
+    {
+        $route = explode('/', $path);
+        $route = array_map(function ($name) {
+            $name = strtolower($name);
+            $name = ucfirst($name);
+            return $name;
+        }, $route);
+        $methodName = array_pop($route);
+        $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
+        $this->clientData->methodName = $methodName;
+    }
+
+    /**
      * 处理http request
      * @param $request
      */
@@ -50,24 +68,6 @@ class NormalRoute implements IRoute
         } else {
             $this->parsePath($this->clientData->path);
         }
-    }
-
-    /**
-     * 解析path
-     *
-     * @param $path
-     */
-    public function parsePath($path)
-    {
-        $route = explode('/', $path);
-        $route = array_map(function ($name) {
-            $name = strtolower($name);
-            $name = ucfirst($name);
-            return $name;
-        }, $route);
-        $methodName = array_pop($route);
-        $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
-        $this->clientData->methodName = $methodName;
     }
 
     /**

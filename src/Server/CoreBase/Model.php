@@ -51,8 +51,8 @@ class Model extends CoreBase
     public function initialization($context)
     {
         $this->setContext($context);
-        $this->PGLog     = $context->PGLog;
-        $this->client    = $context->controller->client;
+        $this->PGLog = $context->PGLog;
+        $this->client = $context->controller->client;
         $this->tcpClient = $context->controller->tcpClient;
     }
 
@@ -61,9 +61,9 @@ class Model extends CoreBase
      */
     public function destroy()
     {
+        unset($this->PGLog, $this->client->context->PGLog);
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
-        unset($this->PGLog, $this->client->context->PGLog);
     }
 
 }

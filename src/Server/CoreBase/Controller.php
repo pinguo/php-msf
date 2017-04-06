@@ -10,7 +10,7 @@
 namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\{
-    Marco, Server, DataBase\RedisAsynPool, DataBase\MysqlAsynPool, Coroutine\GeneratorContext
+    Coroutine\GeneratorContext, DataBase\MysqlAsynPool, DataBase\RedisAsynPool, Marco, Server
 };
 
 class Controller extends CoreBase
@@ -45,6 +45,11 @@ class Controller extends CoreBase
      */
     public $tcpClient;
     /**
+     * @var AOP|\PG\MSF\Server\Memory\Pool
+     */
+    public $objectPool;
+    public $objectPoolBuckets = [];
+    /**
      * fd
      * @var int
      */
@@ -69,24 +74,16 @@ class Controller extends CoreBase
      * @var \swoole_http_response
      */
     protected $response;
-
     /**
      * 用于单元测试模拟捕获服务器发出的消息
      * @var array
      */
     protected $testUnitSendStack = [];
-
     /**
      * 协程上正文对象
      * @var GeneratorContext
      */
     protected $generatorContext;
-
-    /**
-     * @var AOP|\PG\MSF\Server\Memory\Pool
-     */
-    public $objectPool;
-    public $objectPoolBuckets = [];
 
     /**
      * Controller constructor.
@@ -149,6 +146,16 @@ class Controller extends CoreBase
     }
 
     /**
+     * 返回协程上下文对象
+     *
+     * @return GeneratorContext
+     */
+    public function getGeneratorContext()
+    {
+        return $this->generatorContext;
+    }
+
+    /**
      * 设置协程上下文对象
      *
      * @param GeneratorContext $generatorContext
@@ -158,16 +165,6 @@ class Controller extends CoreBase
     {
         $this->generatorContext = $generatorContext;
         return $this;
-    }
-
-    /**
-     * 返回协程上下文对象
-     *
-     * @return GeneratorContext
-     */
-    public function getGeneratorContext()
-    {
-        return $this->generatorContext;
     }
 
     /**
@@ -225,9 +222,9 @@ class Controller extends CoreBase
         $this->input->reset();
         $this->output->reset();
         //销毁对象池
-        foreach ($this->objectPoolBuckets as $objName => $obj) {
+        foreach ($this->objectPoolBuckets as $k => $obj) {
             $this->objectPool->push($obj);
-            unset($this->objectPoolBuckets[$objName]);
+            unset($this->objectPoolBuckets[$k]);
         }
 
         ControllerFactory::getInstance()->revertController($this);

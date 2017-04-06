@@ -20,7 +20,7 @@ class TaskCoroutine extends CoroutineBase
         parent::__construct();
         $this->taskProxyData = $taskProxyData;
         $this->id = $id;
-        $logId    = $taskProxyData['message']['task_context']->logId;
+        $logId = $taskProxyData['message']['task_context']->logId;
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->send(function ($serv, $taskId, $data) use ($logId) {
             $this->result = $data;

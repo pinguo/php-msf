@@ -163,7 +163,7 @@ function dumpCoroutineTaskMessage(&$output, $var, $level)
                 if ('__PHP_Incomplete_Class' !== get_class($var) && method_exists($var, '__debugInfo')) {
                     $dumpValues = $var->__debugInfo();
                 } else {
-                    $dumpValues = (array) $var;
+                    $dumpValues = (array)$var;
                 }
                 foreach ($dumpValues as $key => $value) {
                     $keyDisplay = strtr(trim($key), "\0", ':');

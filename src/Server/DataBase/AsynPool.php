@@ -16,7 +16,7 @@ abstract class AsynPool implements IAsynPool
     /**
      * @var Config
      */
-    public    $config;
+    public $config;
     protected $commands;
     protected $pool;
     protected $callBacks;
@@ -34,9 +34,9 @@ abstract class AsynPool implements IAsynPool
     public function __construct($config)
     {
         $this->callBacks = new \SplFixedArray(self::MAX_TOKEN);
-        $this->commands  = new \SplQueue();
-        $this->pool      = new \SplQueue();
-        $this->config    = $config;
+        $this->commands = new \SplQueue();
+        $this->pool = new \SplQueue();
+        $this->config = $config;
     }
 
     public function addTokenCallback($callback)
@@ -70,8 +70,8 @@ abstract class AsynPool implements IAsynPool
     public function serverInit($swooleServer, $asynManager)
     {
         $this->swooleServer = $swooleServer;
-        $this->server       = $swooleServer->server;
-        $this->asynManager  = $asynManager;
+        $this->server = $swooleServer->server;
+        $this->asynManager = $asynManager;
     }
 
     /**

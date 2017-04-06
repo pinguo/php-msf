@@ -26,7 +26,7 @@ class HttpClient
      * @var Context
      */
     public $context;
-    
+
     /**
      * HttpClient constructor.
      * @param $client
@@ -37,21 +37,21 @@ class HttpClient
     }
 
     /**
-     * @param $headers
-     */
-    public function setHeaders($headers)
-    {
-        $this->headers = $headers;
-        $this->client->setHeaders($headers);
-    }
-
-    /**
      * @param void
      * @return array
      */
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * @param $headers
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+        $this->client->setHeaders($headers);
     }
 
     /**

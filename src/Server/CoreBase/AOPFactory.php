@@ -43,20 +43,13 @@ class AOPFactory
         $pool = new AOP($pool);
 
         $pool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
-            //如果请求bucket内有，则直接返回
-            if ($method === 'get' &&
-                isset(($coreBase->objectPoolBuckets)[$arguments[0]]) &&
-                is_object(($coreBase->objectPoolBuckets)[$arguments[0]])
-            ) {
-                $data['result'] = ($coreBase->objectPoolBuckets)[$arguments[0]];
-            }
-            //返还时调用destroy方法
             if ($method === 'push') {
-                //判断是否还返还对象：使用时间超过1小时或者使用次数大于1000则不返还，直接销毁
-                if (($arguments[0]->genTime + 3600) < time() || $arguments[0]->useCount > 1000) {
+                //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
+                if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
                     $data['result'] = false;
                     unset($arguments[0]);
                 } else {
+                    //返还时调用destroy方法
                     method_exists($arguments[0], 'destroy') && ($arguments[0])->destroy();
                 }
             }
@@ -65,24 +58,14 @@ class AOPFactory
             return $data;
         });
 
-        //取得对象后放入请求内部bucket
         $pool->registerOnAfter(function ($method, $arguments, $result) use ($coreBase) {
-            if ($method === 'get' && is_object($result)) {
-                $objName = $arguments[0];
-                $coreBase->objectPoolBuckets[$objName] = $result;
-            }
-            $data['method'] = $method;
-            $data['arguments'] = $arguments;
-            $data['result'] = $result;
-            return $data;
-        });
-
-        //获得对象后调用initialization方法
-        $pool->registerOnBoth(function ($method, $arguments, $result = null) use ($coreBase) {
+            //取得对象后放入请求内部bucket
             if ($method === 'get' && is_object($result)) {
                 //使用次数+1
                 $result->useCount++;
+                //获得对象后调用initialization方法
                 method_exists($result, 'initialization') && $result->initialization();
+                $coreBase->objectPoolBuckets[] = $result;
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;
