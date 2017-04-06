@@ -7,7 +7,7 @@
  */
 namespace PG\MSF\Server\DataBase;
 
-use PG\MSF\Server\CoreBase\CoroutineBase;
+use PG\MSF\Server\Coroutine\CoroutineBase;
 
 class RedisCoroutine extends CoroutineBase
 {

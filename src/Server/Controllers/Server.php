@@ -15,14 +15,13 @@ class Server extends BaseController
         $data = [
             'coroutine' => [],
         ];
-        $routineList = getInstance()->coroutine->routineList;
+        $routineList = getInstance()->coroutine->taskMap;
         /**
-         * @var $routine \PG\MSF\Server\CoreBase\CoroutineTask
+         * @var $routine \PG\MSF\Server\Coroutine\CoroutineTask
          */
         foreach ($routineList as $routine) {
             $logId = $routine->generatorContext->getController()->PGLog->logId;
             $name  = get_class($routine->getRoutine()->current()) . '#' . spl_object_hash($routine->getRoutine()->current());
-            $data['coroutine'][$logId][$name]['get_result_count'] = $routine->getRoutine()->current()->getCount;
             $data['coroutine'][$logId][$name]['timeout']          = $routine->getRoutine()->current()->timeout;
             $data['coroutine'][$logId][$name]['run_time']         = strval(number_format(1000*(microtime(true) - $routine->getRoutine()->current()->requestTime), 4, '.', ''));
             $data['coroutine'][$logId][$name]['request_time']     = strval(number_format(1000*(microtime(true) - $routine->generatorContext->getController()->requestStartTime), 4, '.', ''));

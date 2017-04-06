@@ -42,7 +42,10 @@ class Pool
         if ($pool->count()) {
             return $pool->shift();
         } else {
-            return new $class;
+            $obj = new $class;
+            $obj->useCount = 0;
+            $obj->genTime = time();
+            return $obj;
         }
     }
 

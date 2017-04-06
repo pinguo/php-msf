@@ -11,8 +11,8 @@ namespace PG\MSF\Server;
 use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\Server\Coroutine\Scheduler as Coroutine;
-use PG\MSF\Server\CoreBase\{
-    Child, ControllerFactory, GeneratorContext, Loader, SwooleException
+use PG\MSF\Server\{
+    CoreBase\Child, CoreBase\ControllerFactory, Coroutine\GeneratorContext, CoreBase\Loader, CoreBase\SwooleException
 };
 use PG\MSF\Server\{
     Pack\IPack, Route\IRoute

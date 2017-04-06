@@ -39,9 +39,15 @@ class AOP
     {
         $this->data['method'] = $method;
         $this->data['arguments'] = $arguments;
+        unset($this->data['result']);
 
         foreach ($this->onBeforeFunc as $func) {
             $this->data = call_user_func_array($func, $this->data);
+        }
+
+        //支持提前返回结果 不需要继续调用
+        if (isset($this->data['result'])) {
+            return $this->data['result'];
         }
 
         $this->data['result'] = call_user_func_array([$this->instance, $this->data['method']],

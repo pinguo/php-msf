@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Server\CoreBase;
+namespace PG\MSF\Server\Coroutine;
 
 class CoroutineNull
 {
