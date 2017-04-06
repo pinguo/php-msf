@@ -12,11 +12,11 @@ use PG\MSF\Server\CoreBase\SwooleException;
 
 class CoroutineTask
 {
+    public $routine;
+    public $generatorContext;
+    public $destroy = false;
+    public $asyncCallBack = [];
     protected $stack;
-    public    $routine;
-    public    $generatorContext;
-    public    $destroy = false;
-    public    $asyncCallBack = [];
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)
     {
@@ -112,20 +112,6 @@ class CoroutineTask
     }
 
     /**
-     * [isFinished 判断该task是否完成]
-     * @return boolean [description]
-     */
-    public function isFinished()
-    {
-        return !empty($this->stack) && $this->stack->isEmpty() && !$this->routine->valid();
-    }
-
-    public function getRoutine()
-    {
-        return $this->routine;
-    }
-
-    /**
      * 销毁
      */
     public function destroy()
@@ -142,5 +128,19 @@ class CoroutineTask
         } else {
             return false;
         }
+    }
+
+    /**
+     * [isFinished 判断该task是否完成]
+     * @return boolean [description]
+     */
+    public function isFinished()
+    {
+        return !empty($this->stack) && $this->stack->isEmpty() && !$this->routine->valid();
+    }
+
+    public function getRoutine()
+    {
+        return $this->routine;
     }
 }

@@ -30,16 +30,6 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * 处理http request
-     * @param $request
-     */
-    public function handleClientRequest($request)
-    {
-        $this->clientData->path = $request->server['path_info'];
-        $this->parsePath($this->clientData->path);
-    }
-
-    /**
      * 解析path
      *
      * @param $path
@@ -55,6 +45,16 @@ class NormalRoute implements IRoute
         $methodName = array_pop($route);
         $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
         $this->clientData->methodName = $methodName;
+    }
+
+    /**
+     * 处理http request
+     * @param $request
+     */
+    public function handleClientRequest($request)
+    {
+        $this->clientData->path = $request->server['path_info'];
+        $this->parsePath($this->clientData->path);
     }
 
     /**

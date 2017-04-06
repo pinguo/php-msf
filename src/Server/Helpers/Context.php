@@ -6,13 +6,13 @@
  * @date: 2017/3/17
  * @copyright All rights reserved.
  */
+
 namespace PG\MSF\Server\Helpers;
 
+use PG\Log\PGLog;
 use PG\MSF\Server\{
     CoreBase\Input, CoreBase\Output
 };
-
-use PG\Log\PGLog;
 
 class Context implements \ArrayAccess
 {
@@ -48,19 +48,23 @@ class Context implements \ArrayAccess
         return ['logId', 'input'];
     }
 
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         $this->{$offset} = $value;
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->{$offset});
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->{$offset});
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return isset($this->{$offset}) ? $this->{$offset} : null;
     }
 }

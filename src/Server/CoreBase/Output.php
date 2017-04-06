@@ -76,30 +76,6 @@ class Output
     }
 
     /**
-     * Set Content-Type Header
-     *
-     * @param    string $mime_type Extension of the file we're outputting
-     * @return    HttpOutPut
-     */
-    public function setContentType($mime_type)
-    {
-        $this->setHeader('Content-Type', $mime_type);
-        return $this;
-    }
-
-    /**
-     * set_header
-     * @param $key
-     * @param $value
-     * @return $this
-     */
-    public function setHeader($key, $value)
-    {
-        $this->response->header($key, $value);
-        return $this;
-    }
-
-    /**
      * 响应json格式数据
      *
      * @param null $data
@@ -112,9 +88,9 @@ class Output
     {
         $this->controller->PGLog->pushLog('status', $status);
         $result = [
-            'data'       => $data,
-            'status'     => $status,
-            'message'    => $message,
+            'data' => $data,
+            'status' => $status,
+            'message' => $message,
             'serverTime' => microtime(true),
         ];
 
@@ -158,6 +134,30 @@ class Output
         }
 
         return $callback;
+    }
+
+    /**
+     * Set Content-Type Header
+     *
+     * @param    string $mime_type Extension of the file we're outputting
+     * @return    HttpOutPut
+     */
+    public function setContentType($mime_type)
+    {
+        $this->setHeader('Content-Type', $mime_type);
+        return $this;
+    }
+
+    /**
+     * set_header
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function setHeader($key, $value)
+    {
+        $this->response->header($key, $value);
+        return $this;
     }
 
     /**

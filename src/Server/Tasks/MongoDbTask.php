@@ -56,17 +56,6 @@ class MongoDbTask extends Task
     }
 
     /**
-     * 独立选择db和collection
-     * @param string $dbName
-     * @param string $collectionName
-     * @return \MongoCollection
-     */
-    public function setDbCollection(string $dbName, string $collectionName) : \MongoCollection
-    {
-        return $this->mongoClient->selectDB($dbName)->selectCollection($collectionName);
-    }
-
-    /**
      * 初始化链接 每个task进程内只初始化一次
      * @param string $confKey
      * @param string $db
@@ -84,6 +73,17 @@ class MongoDbTask extends Task
         $this->mongoClient = new \MongoClient($conf['server'], $conf['options'], $conf['driverOptions']);
         $db && ($this->mongoDb = $this->mongoClient->selectDB($db));
         $collection && ($this->mongoCollection = $this->mongoDb->selectCollection($collection));
+    }
+
+    /**
+     * 独立选择db和collection
+     * @param string $dbName
+     * @param string $collectionName
+     * @return \MongoCollection
+     */
+    public function setDbCollection(string $dbName, string $collectionName): \MongoCollection
+    {
+        return $this->mongoClient->selectDB($dbName)->selectCollection($collectionName);
     }
 
     /**

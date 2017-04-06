@@ -27,7 +27,8 @@ class Task extends TaskProxy
     public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
         $this->taskId = $taskId;
-        getInstance()->tidPidTable->set($this->taskId, ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
+        getInstance()->tidPidTable->set($this->taskId,
+            ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
         $this->start_run_time = microtime(true);
         if ($context) {
             $this->setContext($context);

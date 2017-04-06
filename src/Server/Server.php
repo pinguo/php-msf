@@ -10,13 +10,13 @@ namespace PG\MSF\Server;
 
 use Noodlehaus\Config;
 use PG\Log\PGLog;
-use PG\MSF\Server\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Server\{
-    CoreBase\Child, CoreBase\ControllerFactory, Coroutine\GeneratorContext, CoreBase\Loader, CoreBase\SwooleException
+    CoreBase\Child, CoreBase\ControllerFactory, CoreBase\Loader, CoreBase\SwooleException, Coroutine\GeneratorContext
 };
 use PG\MSF\Server\{
     Pack\IPack, Route\IRoute
 };
+use PG\MSF\Server\Coroutine\Scheduler as Coroutine;
 
 abstract class Server extends Child
 {
@@ -605,17 +605,6 @@ abstract class Server extends Child
     }
 
     /**
-     * 数据包编码
-     * @param $buffer
-     * @return string
-     */
-    public function encode($buffer)
-    {
-        $totalLength = $this->packageLengthTypeLength + strlen($buffer) - $this->packageBodyOffset;
-        return pack($this->packageLengthType, $totalLength) . $buffer;
-    }
-
-    /**
      * onSwooleStart
      * @param $serv
      */
@@ -687,7 +676,7 @@ abstract class Server extends Child
             $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
             $this->route->setControllerName($controllerName);
         }
-        
+
         if ($controllerInstance != null) {
             if (Server::$testUnity) {
                 $fd = 'self';
@@ -697,9 +686,10 @@ abstract class Server extends Child
             }
             $methodName = $this->config->get('tcp.method_prefix', '') . $this->route->getMethodName();
             $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
-            
+
             if (!method_exists($controllerInstance, $methodName)) {
-                $methodName = $this->config->get('tcp.method_prefix', '') . $this->config->get('tcp.default_method', 'Index');
+                $methodName = $this->config->get('tcp.method_prefix', '') . $this->config->get('tcp.default_method',
+                        'Index');
                 $this->route->setMethodName($this->config->get('tcp.default_method', 'Index'));
             }
 
@@ -730,6 +720,17 @@ abstract class Server extends Child
             $response = getInstance()->encode($this->pack->pack(json_encode($response)));
             getInstance()->send($fd, $response);
         }
+    }
+
+    /**
+     * 数据包编码
+     * @param $buffer
+     * @return string
+     */
+    public function encode($buffer)
+    {
+        $totalLength = $this->packageLengthTypeLength + strlen($buffer) - $this->packageBodyOffset;
+        return pack($this->packageLengthType, $totalLength) . $buffer;
     }
 
     /**

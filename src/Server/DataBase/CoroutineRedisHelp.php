@@ -17,15 +17,6 @@ class CoroutineRedisHelp
         $this->redisAsynPool = $redisAsynPool;
     }
 
-    public function __call($name, $arguments)
-    {
-        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            return call_user_func_array([getInstance()->getRedis(), $name], $arguments);
-        } else {
-            return new RedisCoroutine($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
-        }
-    }
-
     /**
      * redis cache 操作封装
      *
@@ -51,5 +42,14 @@ class CoroutineRedisHelp
         }
 
         return $this->__call($command, $commandData);
+    }
+
+    public function __call($name, $arguments)
+    {
+        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
+            return call_user_func_array([getInstance()->getRedis(), $name], $arguments);
+        } else {
+            return new RedisCoroutine($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
+        }
     }
 }

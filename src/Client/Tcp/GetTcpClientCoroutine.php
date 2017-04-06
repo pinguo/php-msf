@@ -23,12 +23,12 @@ class GetTcpClientCoroutine extends CoroutineBase
     {
         parent::__construct($timeout);
         $this->baseUrl = $baseUrl;
-        $this->client   = $client;
-        $profileName    =  mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $this->client = $client;
+        $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
         $this->client->context->PGLog->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
         $this->send(function ($tcpClient) use ($profileName) {
-            $this->result       = $tcpClient;
+            $this->result = $tcpClient;
             $this->responseTime = microtime(true);
             if (!empty($this->client->context->PGLog)) {
                 $this->client->context->PGLog->profileEnd($profileName);

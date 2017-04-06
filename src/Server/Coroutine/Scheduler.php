@@ -5,6 +5,7 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 namespace PG\MSF\Server\Coroutine;
 
 class Scheduler
@@ -39,12 +40,6 @@ class Scheduler
         });
     }
 
-    public function schedule(CoroutineTask $task)
-    {
-        $this->taskQueue->enqueue($task);
-        return $this;
-    }
-
     public function run()
     {
         while (!$this->taskQueue->isEmpty()) {
@@ -64,11 +59,17 @@ class Scheduler
         }
     }
 
+    public function schedule(CoroutineTask $task)
+    {
+        $this->taskQueue->enqueue($task);
+        return $this;
+    }
+
     public function start(\Generator $routine, GeneratorContext $generatorContext)
     {
         $task = new CoroutineTask($routine, $generatorContext);
         $this->IOCallBack[$generatorContext->getController()->PGLog->logId] = [];
-        $this->taskMap[$generatorContext->getController()->PGLog->logId]    = $task;
+        $this->taskMap[$generatorContext->getController()->PGLog->logId] = $task;
         $this->taskQueue->enqueue($task);
     }
 }

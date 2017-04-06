@@ -5,11 +5,11 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Server\ {
-    CoreBase\SwooleException,
-    Helpers\Context
+use PG\MSF\Server\{
+    CoreBase\SwooleException, Helpers\Context
 };
 
 class Client
@@ -65,10 +65,10 @@ class Client
                 $this->context->output->end();
             } else {
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
-                $httpClient          = new HttpClient($client);
+                $httpClient = new HttpClient($client);
                 $httpClient->context = $this->context;
                 $headers = [
-                    'Host'        => $host,
+                    'Host' => $host,
                     'X-Ngx-LogId' => $this->context->PGLog->logId,
                 ];
 
