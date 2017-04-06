@@ -222,9 +222,9 @@ class Controller extends CoreBase
         $this->input->reset();
         $this->output->reset();
         //销毁对象池
-        foreach ($this->objectPoolBuckets as $objName => $obj) {
+        foreach ($this->objectPoolBuckets as $k => $obj) {
             $this->objectPool->push($obj);
-            unset($this->objectPoolBuckets[$objName]);
+            unset($this->objectPoolBuckets[$k]);
         }
 
         ControllerFactory::getInstance()->revertController($this);
