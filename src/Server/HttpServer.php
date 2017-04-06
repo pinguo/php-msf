@@ -10,7 +10,7 @@ namespace PG\MSF\Server;
 
 use League\Plates\Engine;
 use PG\MSF\Server\{
-    CoreBase\ControllerFactory, Coroutine\GeneratorContext
+    CoreBase\ControllerFactory, CoreBase\SwooleException, Coroutine\GeneratorContext
 };
 
 abstract class HttpServer extends Server
@@ -127,10 +127,15 @@ abstract class HttpServer extends Server
         $controllerInstance = null;
         $this->route->handleClientRequest($request);
         $isRpc = $this->route->getIsRpc();
+        if ($isRpc) {
+            $params = $request->post ?? $request->get ?? [];
+            $this->route->setParams($params);
+        }
         list($host) = explode(':', $request->header['host']??'');
+
         if (! $isRpc && $this->route->getPath() == '/') {
-            $www_path = $this->getHostRoot($host) . $this->getHostIndex($host);
-            $result = httpEndFile($www_path, $request, $response);
+            $wwwPath = $this->getHostRoot($host) . $this->getHostIndex($host);
+            $result = httpEndFile($wwwPath, $request, $response);
             if (! $result) {
                 $error = 'index not found';
             } else {
@@ -138,25 +143,24 @@ abstract class HttpServer extends Server
             }
         } else {
             $controllerName = $this->route->getControllerName();
-            $controllerInstance = ControllerFactory::getInstance()->getController($controllerName, $isRpc);
+            $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
             if ($controllerInstance == null) {
                 $controllerName = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
-                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName, $isRpc);
+                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
                 $this->route->setControllerName($controllerName);
             }
 
             if ($controllerInstance != null) {
-                $prefix = $isRpc ? 'rpc' : 'http';
-                $methodName = $this->config->get($prefix . '.method_prefix', '') . $this->route->getMethodName();
+                $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
                 if (! method_exists($controllerInstance, $methodName)) {
-                    $methodName = $this->config->get($prefix . '.method_prefix', '') . $this->config->get($prefix . '.default_method', 'Index');
-                    $this->route->setMethodName($this->config->get($prefix . '.default_method', 'Index'));
+                    $methodName = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+                    $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
 
                 try {
                     $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
                     if (! method_exists($controllerInstance, $methodName)) {
-                        $error = 'api not found(' . $methodName . ')';
+                        $error = 'api not found method(' . $methodName . ')';
                     } else {
                         $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                         if ($generator instanceof \Generator) {
@@ -171,7 +175,7 @@ abstract class HttpServer extends Server
                     call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
                 }
             } else {
-                $error = 'api not found(' . $controllerName . ')';
+                $error = 'api not found controller(' . $controllerName . ')';
             }
         }
 

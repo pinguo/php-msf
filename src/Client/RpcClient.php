@@ -2,7 +2,7 @@
 
 /**
  * Rpc 客户端
- * 使用方式如：RpcClient::serv('user')->handler('mobile')->getByUid($context, $uid);
+ * 使用方式如：RpcClient::serv('user')->handler('mobile')->getByUid($this, $uid);
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -10,8 +10,8 @@
 namespace PG\MSF\Client;
 
 use PG\Helper\SecurityHelper;
+use PG\MSF\Server\CoreBase\CoreBase;
 use PG\MSF\Server\CoreBase\SwooleException;
-use PG\MSF\Server\Helpers\Context;
 
 class RpcClient
 {
@@ -24,7 +24,7 @@ class RpcClient
     /**
      * @var string 当前版本
      */
-    public $version = '0.9';
+    public static $version = '0.9';
 
     /**
      * @var int 超时时间(单位毫秒)
@@ -88,11 +88,12 @@ class RpcClient
          *     'secret' => 'xxxxxx',
          * ]
          */
-        list($root, ) = explode('.', $service);
-        $commonConfig = getInstance()->config->get('params.service.' . $root, []);
         $config = getInstance()->config->get('params.service.' . $service, []);
-        $config = array_merge($commonConfig, $config);
-        if (empty($commonConfig) || empty($config)) {
+        list($root,) = explode('.', $service);
+        $config['host'] = getInstance()->config->get('params.service.' . $root . '.host', '');
+        $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
+        $config['secret'] = getInstance()->config->get('params.service.' . $root . '.secret', 0);
+        if (empty($config)) {
             throw new SwooleException($service . ' service configuration not found.');
         }
         if (! isset($config['host'])) {
@@ -100,6 +101,7 @@ class RpcClient
         }
 
         $this->useRpc = $config['useRpc'] ?? false;
+        $this->urlPath = $config['urlPath'] ?? null;
         if (isset($config['host'])) {
             $this->host = $config['host'];
             $scheme = substr($this->host, 0, strpos($this->host, ':'));
@@ -129,7 +131,7 @@ class RpcClient
     public static function serv($service)
     {
         if (! isset(self::$services[$service])) {
-            self::$services[$service] = new static($service);
+            self::$services[$service] = new RpcClient($service);
         }
 
         return self::$services[$service];
@@ -154,26 +156,20 @@ class RpcClient
      * @return mixed
      * @throws \Exception
      */
-    public function __call($method, array $args)
+    public function __call($method, $args)
     {
-        $context = $args[0];
+        if (! is_object($args[0]) || ! ($args[0] instanceof CoreBase)) {
+            throw new SwooleException('The first argument of ' . $method . ' must be instanceof CoreBase .');
+        }
+        $obj = $args[0];
         array_shift($args);
         if ($this->scheme == 'tcp') { // 使用 tcp 方式调用
-            $response = yield self::remoteTcpCall($context, $method, $args, $this);
+            $response = self::remoteTcpCall($obj, $method, $args, $this);
         } else {
-            $response = yield self::remoteHttpCall($context, $method, $args, $this);
+            $response = self::remoteHttpCall($obj, $method, $args, $this);
         }
 
         return $response;
-    }
-
-    /**
-     * 生成用于非 rpc 调用的 url
-     * @return string
-     */
-    protected function genUrl()
-    {
-        return $this->host . $this->urlPath;
     }
 
     /**
@@ -181,10 +177,10 @@ class RpcClient
      * @param string $url
      * @param mixed $args
      */
-    public static function remoteTcpCall(Context $context, $method, array $args, RpcClient $rpc)
+    public static function remoteTcpCall(CoreBase $obj, $method, array $args, RpcClient $rpc)
     {
         $reqParams = [
-            'version' => $rpc->version,
+            'version' => self::$version,
             'args' => $args,
             'time' => microtime(true),
             'handler' => $rpc->handler,
@@ -193,22 +189,22 @@ class RpcClient
         $reqParams['X-RPC'] = 1;
         $reqParams['sig'] = self::genSig($reqParams, $rpc->secret);
 
-        $tcpClient = yield $context->tcpClient->coroutineGetTcpClient($rpc->host);
-        $data = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
+        $tcpClient = yield $obj->tcpClient->coroutineGetTcpClient($rpc->host);
+        $response = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
 
-        return $data;
+        return $response;
     }
 
     /**
      * Rpc 模式执行远程调用
      * @param string $pack_data 打包好的数据
      */
-    public static function remoteHttpCall(Context $context, $method, array $args, RpcClient $rpc)
+    public static function remoteHttpCall(CoreBase $obj, $method, array $args, RpcClient $rpc)
     {
         $headers = [];
         if ($rpc->useRpc) {
             $reqParams = [
-                'version' => $rpc->version,
+                'version' => self::$version,
                 'args' => $args,
                 'time' => microtime(true),
                 'handler' => $rpc->handler,
@@ -226,15 +222,17 @@ class RpcClient
             $sendData['sig'] = self::genSig($args, $rpc->secret);
         }
 
-        $httpClient = yield $context->client->coroutineGetHttpClient($rpc->genUrl(), $rpc->timeout, $headers);
+        $httpClient = yield $obj->client->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
         if ($rpc->verb == 'GET') {
-            $query = http_build_query($sendData);
-            $data = yield $httpClient->coroutineGet($rpc->urlPath, $query, $rpc->timeout);
+            $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
         } else {
-            $data = yield $httpClient->coroutinePost($rpc->urlPath, $sendData, $rpc->timeout);
+            $response = yield $httpClient->coroutinePost($rpc->urlPath, $sendData, $rpc->timeout);
+        }
+        if (! isset($response['body'])) {
+            throw new SwooleException('The response of body is not found');
         }
 
-        return $data;
+        return json_decode($response['body'], true);
     }
 
     public static function genSig($params, $secret)
