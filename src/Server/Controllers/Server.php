@@ -36,6 +36,14 @@ class Server extends BaseController
     }
 
     /**
+     * Http 框架Hello World
+     */
+    public function HttpHelloWorld()
+    {
+        $this->outputJson('Hello World');
+    }
+    
+    /**
      * Http 服务状态探测
      */
     public function HttpStatus()
