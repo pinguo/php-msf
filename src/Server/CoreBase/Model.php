@@ -61,9 +61,9 @@ class Model extends CoreBase
      */
     public function destroy()
     {
+        unset($this->PGLog, $this->client->context->PGLog);
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
-        unset($this->PGLog, $this->client->context->PGLog);
     }
 
 }
