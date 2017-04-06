@@ -8,11 +8,10 @@
 
 namespace PG\MSF\Server\Controllers;
 
-use PG\MSF\Server\{
-    CoreBase\Controller, Marco, Helpers\Context
-};
-
 use PG\Log\PGLog;
+use PG\MSF\Server\{
+    CoreBase\Controller, Helpers\Context, Marco
+};
 
 class BaseController extends Controller
 {
@@ -42,21 +41,15 @@ class BaseController extends Controller
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
 
-        $context                           = $this->objectPool->get(Context::class);
-        $context->logId                    = $this->logId;
-        $context->PGLog                    = $this->PGLog;
-        $context->input                    = $this->input;
-        $context->output                   = $this->output;
-        $context->controller               = $this;
-        $this->client->context             = $context;
-        $this->tcpClient->context          = $context;
+        $context = $this->objectPool->get(Context::class);
+        $context->logId = $this->logId;
+        $context->PGLog = $this->PGLog;
+        $context->input = $this->input;
+        $context->output = $this->output;
+        $context->controller = $this;
+        $this->client->context = $context;
+        $this->tcpClient->context = $context;
         $this->setContext($context);
-    }
-
-    public function destroy()
-    {
-        $this->PGLog->appendNoticeLog();
-        parent::destroy();
     }
 
     /**
@@ -78,19 +71,10 @@ class BaseController extends Controller
         return $this->logId;
     }
 
-    /**
-     * 响应json格式数据
-     *
-     * @param null $data
-     * @param string $message
-     * @param int $status
-     * @param null $callback
-     * @return array
-     */
-
-    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    public function destroy()
     {
-        $this->output->outputJson($data, $message, $status, $callback);
+        $this->PGLog->appendNoticeLog();
+        parent::destroy();
     }
 
     /**
@@ -112,5 +96,20 @@ class BaseController extends Controller
         $this->PGLog->error($message);
 
         $this->outputJson([], 'error', 500);
+    }
+
+    /**
+     * 响应json格式数据
+     *
+     * @param null $data
+     * @param string $message
+     * @param int $status
+     * @param null $callback
+     * @return array
+     */
+
+    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    {
+        $this->output->outputJson($data, $message, $status, $callback);
     }
 }

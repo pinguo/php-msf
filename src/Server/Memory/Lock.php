@@ -6,6 +6,7 @@
  * @date: 2017/3/7
  * @copyright All rights reserved.
  */
+
 namespace PG\MSF\Server\Memory;
 
 use PG\MSF\Server\{

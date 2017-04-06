@@ -23,16 +23,14 @@ class TcpClient
      * @var \swoole_client
      */
     public $client;
-
-    private $ip;
-    private $port;
-    private $timeOut;
-
     /**
      * @var IPack
      */
     protected $pack;
     protected $packageLengthTypeLength;
+    private $ip;
+    private $port;
+    private $timeOut;
 
     public function __construct(\swoole_client $client, $ip, $port, $timeOut)
     {
@@ -66,10 +64,24 @@ class TcpClient
             throw new SwooleException('tcp data must has path');
         }
 
-        $path          = $data['path'];
+        $path = $data['path'];
         $data['logId'] = $this->context->PGLog->logId;
         $data = $this->encode($this->pack->pack($data));
-        return new TcpClientRequestCoroutine($this, $data, $path,$this->timeOut);
+        return new TcpClientRequestCoroutine($this, $data, $path, $this->timeOut);
+    }
+
+    private function encode($buffer)
+    {
+        if ($this->set['open_length_check']??0 == 1) {
+            $total_length = $this->packageLengthTypeLength + strlen($buffer) - $this->set['package_body_offset'];
+            return pack($this->set['package_length_type'], $total_length) . $buffer;
+        } else {
+            if ($this->set['open_eof_check']??0 == 1) {
+                return $buffer . $this->set['package_eof'];
+            } else {
+                throw new SwooleException("tcpClient won't support set");
+            }
+        }
     }
 
     public function send($data, $callback)
@@ -88,25 +100,6 @@ class TcpClient
         $this->connect();
     }
 
-    private function connect()
-    {
-        $this->client->connect($this->ip, $this->port, $this->timeOut);
-    }
-
-    private function encode($buffer)
-    {
-        if ($this->set['open_length_check']??0 == 1) {
-            $total_length = $this->packageLengthTypeLength + strlen($buffer) - $this->set['package_body_offset'];
-            return pack($this->set['package_length_type'], $total_length) . $buffer;
-        } else {
-            if ($this->set['open_eof_check']??0 == 1) {
-                return $buffer . $this->set['package_eof'];
-            } else {
-                throw new SwooleException("tcpClient won't support set");
-            }
-        }
-    }
-
     private function decode($buffer)
     {
         if ($this->set['open_length_check']??0 == 1) {
@@ -118,5 +111,10 @@ class TcpClient
                 return $data;
             }
         }
+    }
+
+    private function connect()
+    {
+        $this->client->connect($this->ip, $this->port, $this->timeOut);
     }
 }

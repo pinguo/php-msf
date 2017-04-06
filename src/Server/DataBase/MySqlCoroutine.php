@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Server\DataBase;
 
-use PG\MSF\Server\Coroutine\CoroutineBase;
 use PG\MSF\Server\CoreBase\SwooleException;
+use PG\MSF\Server\Coroutine\CoroutineBase;
 
 class MySqlCoroutine extends CoroutineBase
 {

@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Server\CoreBase;
 
-use PG\MSF\Server\Coroutine\CoroutineNull;
 use PG\MSF\Server\Coroutine\CoroutineBase;
+use PG\MSF\Server\Coroutine\CoroutineNull;
 
 class SelectCoroutine extends CoroutineBase
 {

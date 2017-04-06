@@ -147,7 +147,8 @@ abstract class HttpServer extends Server
             if ($controllerInstance != null) {
                 $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
                 if (!method_exists($controllerInstance, $methodName)) {
-                    $methodName = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+                    $methodName = $this->config->get('http.method_prefix',
+                            '') . $this->config->get('http.default_method', 'Index');
                     $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
 
@@ -172,7 +173,7 @@ abstract class HttpServer extends Server
                 $error = 'api not found(controller)';
             }
         }
-        
+
         if ($error) {
             if ($controllerInstance != null) {
                 $controllerInstance->destroy();

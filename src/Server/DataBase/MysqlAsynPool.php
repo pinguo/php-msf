@@ -191,7 +191,7 @@ class MysqlAsynPool extends AsynPool
         $this->query($callback, $id, 'begin');
         return $id;
     }
-    
+
     /**
      * 获取绑定值
      * @param $object

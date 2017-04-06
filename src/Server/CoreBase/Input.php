@@ -138,21 +138,6 @@ class Input
     }
 
     /**
-     * getRequestHeader
-     * @param $index
-     * @param $xssClean
-     * @return string
-     */
-    public function getRequestHeader($index, $xssClean = true)
-    {
-        if ($xssClean) {
-            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
-        } else {
-            return $this->request->header[$index]??'';
-        }
-    }
-
-    /**
      * 获取Server相关的数据
      * @param $index
      * @param bool $xssClean
@@ -197,8 +182,8 @@ class Input
     public function getRemoteAddr()
     {
         if ($ip = $this->getRequestHeader('x-real-ip')) {
-        } elseif ($ip  = $this->getRequestHeader('http_client_ip')) {
-        } elseif ($ip  = $this->getRequestHeader('x-forwarded-for')) {
+        } elseif ($ip = $this->getRequestHeader('http_client_ip')) {
+        } elseif ($ip = $this->getRequestHeader('x-forwarded-for')) {
         } elseif ($ip = $this->getRequestHeader('http_x_forwarded_for')) {
             $ip = explode(',', $ip);
             $ip = trim($ip[0]);
@@ -211,5 +196,20 @@ class Input
         }
 
         return $ip;
+    }
+
+    /**
+     * getRequestHeader
+     * @param $index
+     * @param $xssClean
+     * @return string
+     */
+    public function getRequestHeader($index, $xssClean = true)
+    {
+        if ($xssClean) {
+            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
+        } else {
+            return $this->request->header[$index]??'';
+        }
     }
 }
