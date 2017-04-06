@@ -39,7 +39,6 @@ class ControllerFactory
     /**
      * 获取一个Controller
      * @param $controller string
-     * @param $isRpc bool 是否为 rpc 请求，inner 请求也将标记为 rpc
      * @return Controller
      */
     public function getController($controller)
@@ -63,6 +62,7 @@ class ControllerFactory
             $controllerInstance->afterConstruct();
             return $controllerInstance;
         }
+
         $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
         if (class_exists($class_name)) {
             $controllerInstance = new $class_name;
