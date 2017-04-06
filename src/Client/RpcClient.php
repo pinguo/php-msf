@@ -54,7 +54,7 @@ class RpcClient
     /**
      * @var null url path，如 /path，当不使用 rpc 模式时，应设置本参数；
      */
-    protected $urlPath = null;
+    protected $urlPath = '/';
 
     /**
      * @var string 动作，如 GET/POST
@@ -101,7 +101,7 @@ class RpcClient
         }
 
         $this->useRpc = $config['useRpc'] ?? false;
-        $this->urlPath = $config['urlPath'] ?? null;
+        $this->urlPath = $config['urlPath'] ?? '/';
         if (isset($config['host'])) {
             $this->host = $config['host'];
             $scheme = substr($this->host, 0, strpos($this->host, ':'));
@@ -113,9 +113,6 @@ class RpcClient
         if (! $this->useRpc) {
             if ($this->scheme === 'tcp') {
                 throw new SwooleException('Non-rpc mode does not support tcp scheme.');
-            }
-            if ($this->urlPath === null) {
-                throw new SwooleException('Need to set urlpath when not using rpc mode.');
             }
         }
         $this->verb = $config['verb'] ?? 'POST';
