@@ -126,14 +126,9 @@ abstract class HttpServer extends Server
         $error = '';
         $controllerInstance = null;
         $this->route->handleClientRequest($request);
-        $isRpc = $this->route->getIsRpc();
-        if ($isRpc) {
-            $params = $request->post ?? $request->get ?? [];
-            $this->route->setParams($params);
-        }
         list($host) = explode(':', $request->header['host']??'');
 
-        if (! $isRpc && $this->route->getPath() == '/') {
+        if (! $this->route->getIsRpc() && $this->route->getPath() == '/') {
             $wwwPath = $this->getHostRoot($host) . $this->getHostIndex($host);
             $result = httpEndFile($wwwPath, $request, $response);
             if (! $result) {

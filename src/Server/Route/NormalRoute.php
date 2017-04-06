@@ -63,6 +63,7 @@ class NormalRoute implements IRoute
             if (! isset($request->post['data'])) {
                 throw new SwooleException('Rpc request but data params not set.');
             }
+            $this->clientData->params = $request->post ?? $request->get ?? [];
             $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
             $this->clientData->methodName = getInstance()->config->get('rpc.default_method');
         } else {
