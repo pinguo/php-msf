@@ -232,6 +232,9 @@ class RpcClient
 
     public static function genSig($params, $secret)
     {
+        if ($secret === '') {
+            return '';
+        }
         $sig = SecurityHelper::sign($params, $secret);
 
         return $sig;
