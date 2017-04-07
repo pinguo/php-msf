@@ -7,6 +7,7 @@
   "require": {
     "php": ">=7.0",
     "PGWireless/php-log": "dev-master",
+    "PGWireless/php-helper": "dev-master",
     "hassankhan/config": "~0.10",
     "voku/anti-xss": "2.0.1",
     "league/plates": "3.*",
@@ -18,6 +19,10 @@
     "php-log": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-log.git"
+    },
+    "php-helper": {
+      "type": "vcs",
+      "url": "http://182.150.28.13:3000/PGWireless/php-helper.git"
     }
   },
   "autoload": {
