@@ -82,40 +82,47 @@ class RpcClient
         // 获得配置信息
         /**
          * 'user' = [
-         *     'host' => 'http://10.1.90.10:80',
-         *     'useRpc' => false, // 是否真的使用 rpc 方式，为了兼容非 rpc 服务
-         *     'urlPath' => '/path',
-         *     'secret' => 'xxxxxx',
+         *     'host' => 'http://10.1.90.10:80', <必须>
+         *     'timeout' => 1000, <选填，可被下级覆盖>
+         *     'secret' => 'xxxxxx', <选填，可被下级覆盖>
+         *     '1' => [
+         *         'useRpc' => false, // 是否真的使用 rpc 方式，为了兼容非 rpc 服务 <选填>
+         *         'urlPath' => '/path', <选填>
+         *         'verb' => 'GET', <选填>
+         *         'timeout' => 2000, <选填，如果填写将会覆盖上级的timeout>
+         *         'secret' => 'yyyyyy', <选填，如果填写将会覆盖上级的secret>
+         *     ]
          * ]
          */
         $config = getInstance()->config->get('params.service.' . $service, []);
         list($root,) = explode('.', $service);
         $config['host'] = getInstance()->config->get('params.service.' . $root . '.host', '');
-        $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
-        $config['secret'] = getInstance()->config->get('params.service.' . $root . '.secret', 0);
-        if (empty($config)) {
-            throw new SwooleException($service . ' service configuration not found.');
-        }
-        if (! isset($config['host'])) {
+        if ($config['host'] === '') {
             throw new SwooleException('Host configuration not found.');
         }
-
+        if (! isset($config['timeout'])) {
+            $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
+        }
+        if (! isset($config['secret'])) {
+            $config['secret'] = getInstance()->config->get('params.service.' . $root . '.secret', '');
+        }
+        // 赋值到类属性中.
+        $this->host = $config['host'];
         $this->useRpc = $config['useRpc'] ?? false;
         $this->urlPath = $config['urlPath'] ?? '/';
-        $this->host = $config['host'];
         $scheme = substr($this->host, 0, strpos($this->host, ':'));
         if (! in_array($scheme, ['http', 'https', 'tcp'])) {
             throw new SwooleException('Host configuration invalid.');
         }
-        // 非 Rpc 模式
+        // 非 Rpc 模式.
         if (! $this->useRpc) {
             if ($this->scheme === 'tcp') {
                 throw new SwooleException('Non-rpc mode does not support tcp scheme.');
             }
         }
         $this->verb = $config['verb'] ?? 'POST';
-        $this->timeout = $config['timeout'] ?? 0;
-        $this->secret = $config['secret'] ?? '';
+        $this->timeout = $config['timeout'];
+        $this->secret = $config['secret'];
     }
 
     /**
