@@ -15,32 +15,26 @@ use PG\MSF\Server\CoreBase\SwooleException;
 
 class RpcClient
 {
-
     /**
-     * 所有服务
+     * @var array json 错误码
      */
-    private static $services;
+    protected static $jsonErrors = [
+        JSON_ERROR_NONE => null,
+        JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
+        JSON_ERROR_STATE_MISMATCH => 'Underflow or the modes mismatch',
+        JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
+        JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON',
+        JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+    ];
 
     /**
      * @var string 当前版本
      */
     public static $version = '0.9';
-
     /**
-     * @var int 超时时间(单位毫秒)
+     * @var array 所有服务
      */
-    public $timeout = 0;
-
-    /**
-     * 调用是否使用 rpc 方式，为了兼容还未 rpc 改造的内部服务；
-     * 已经支持 rpc 调用的服务，可设置为 true，默认为 false
-     */
-    protected $useRpc = false;
-
-    /**
-     * @var string 使用协议，http/tcp
-     */
-    protected $scheme = 'http';
+    protected static $services;
 
     /**
      * @var string host地址，支持 http/https/tcp 协议，支持域名地址，支持带端口.
@@ -50,35 +44,43 @@ class RpcClient
      * tcp://127.0.0.1 | tcp://hostname | tcp://127.0.0.1:8080 | tcp://hostname:8080
      */
     protected $host = 'http://127.0.0.1';
-
     /**
-     * @var null url path，如 /path，当不使用 rpc 模式时，应设置本参数；
+     * @var int 超时时间(单位毫秒)
      */
-    protected $urlPath = '/';
-
-    /**
-     * @var string 动作，如 GET/POST
-     */
-    protected $verb = 'POST';
-
-    /**
-     * @var string 服务名称
-     */
-    protected $service = null;
-
+    protected $timeout = 0;
     /**
      * @var string 服务加密秘钥
      */
     protected $secret = null;
-
+    /**
+     * 调用是否使用 rpc 方式，为了兼容还未 rpc 改造的内部服务；
+     * 已经支持 rpc 调用的服务，可设置为 true，默认为 false
+     */
+    protected $useRpc = false;
+    /**
+     * @var string 使用协议，http/tcp
+     */
+    protected $scheme = 'http';
+    /**
+     * @var null url path，如 /path，当不使用 rpc 模式时，应设置本参数；
+     */
+    protected $urlPath = '/';
+    /**
+     * @var string 动作，如 GET/POST
+     */
+    protected $verb = 'POST';
     /**
      * @var string 服务接收句柄，一般为控制器名称
      */
     protected $handler = null;
 
+    /**
+     * RpcClient constructor.
+     * @param $service 服务名称，如 'user.1'
+     * @throws SwooleException
+     */
     public function __construct($service)
     {
-        $this->service = $service;
         // 获得配置信息
         /**
          * 'user' = [
@@ -126,9 +128,9 @@ class RpcClient
     }
 
     /**
-     * 指定服务名称，如 user
+     * 指定服务名称，如 user.1
      * @param string $service
-     * @return $this
+     * @return RpcClient
      */
     public static function serv($service)
     {
@@ -142,7 +144,7 @@ class RpcClient
     /**
      * 指定服务句柄，一般为控制器
      * @param string $handler
-     * @return $this
+     * @return RpcClient
      */
     public function handler($handler)
     {
@@ -233,8 +235,13 @@ class RpcClient
         if (! isset($response['body'])) {
             throw new SwooleException('The response of body is not found');
         }
+        $body = json_decode($response['body'], true);
+        if ($body === null) {
+            $error = self::jsonLastErrorMsg();
+            throw new SwooleException('json decode failure: ' . $error . ' caused by ' . $response['body']);
+        }
 
-        return json_decode($response['body'], true);
+        return $body;
     }
 
     public static function genSig($params, $secret)
@@ -245,5 +252,11 @@ class RpcClient
         $sig = SecurityHelper::sign($params, $secret);
 
         return $sig;
+    }
+
+    protected static function jsonLastErrorMsg()
+    {
+        $error = json_last_error();
+        return array_key_exists($error, self::$jsonErrors) ? self::$jsonErrors[$error] : "Unknown error ({$error})";
     }
 }
