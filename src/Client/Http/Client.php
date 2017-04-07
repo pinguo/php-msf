@@ -46,7 +46,7 @@ class Client
             throw new SwooleException($baseUrl . ' 不合法,请检查配置或者参数');
         }
 
-        if (!empty($urlPort)) {
+        if (! empty($urlPort)) {
             $data['port'] = $urlPort;
         } else {
             if ($urlHead == "https") {
@@ -60,7 +60,9 @@ class Client
 
         $urlHost = substr($urlHost, 2);
         swoole_async_dns_lookup($urlHost, function ($host, $ip) use (&$data, &$headers) {
-            $ip = '127.0.0.1';
+            if ($ip === '127.0.0.0') { // fix bug
+                $ip = '127.0.0.1';
+            }
             if (empty($ip)) {
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
                 $this->context->output->end();
