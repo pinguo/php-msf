@@ -10,7 +10,10 @@ namespace PG\MSF\Server\Route;
 
 class NormalRoute implements IRoute
 {
-    private $clientData;
+    /**
+     * @var \stdClass
+     */
+    protected $clientData;
 
     public function __construct()
     {
@@ -54,7 +57,18 @@ class NormalRoute implements IRoute
     public function handleClientRequest($request)
     {
         $this->clientData->path = $request->server['path_info'];
-        $this->parsePath($this->clientData->path);
+
+        if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
+            $this->clientData->isRpc = true;
+            if (! isset($request->post['data'])) {
+                throw new SwooleException('Rpc request but data params not set.');
+            }
+            $this->clientData->params = $request->post ?? $request->get ?? [];
+            $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
+            $this->clientData->methodName = getInstance()->config->get('rpc.default_method');
+        } else {
+            $this->parsePath($this->clientData->path);
+        }
     }
 
     /**
@@ -80,6 +94,11 @@ class NormalRoute implements IRoute
         return $this->clientData->path;
     }
 
+    public function getIsRpc()
+    {
+        return $this->clientData->isRpc??false;
+    }
+
     public function getParams()
     {
         return $this->clientData->params??null;
@@ -93,5 +112,10 @@ class NormalRoute implements IRoute
     public function setMethodName($name)
     {
         $this->clientData->methodName = $name;
+    }
+
+    public function setParams($params)
+    {
+        $this->clientData->params = $params;
     }
 }
