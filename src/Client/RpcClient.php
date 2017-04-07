@@ -102,12 +102,10 @@ class RpcClient
 
         $this->useRpc = $config['useRpc'] ?? false;
         $this->urlPath = $config['urlPath'] ?? '/';
-        if (isset($config['host'])) {
-            $this->host = $config['host'];
-            $scheme = substr($this->host, 0, strpos($this->host, ':'));
-            if (! in_array($scheme, ['http', 'https', 'tcp'])) {
-                throw new SwooleException('Host configuration invalid.');
-            }
+        $this->host = $config['host'];
+        $scheme = substr($this->host, 0, strpos($this->host, ':'));
+        if (! in_array($scheme, ['http', 'https', 'tcp'])) {
+            throw new SwooleException('Host configuration invalid.');
         }
         // 非 Rpc 模式
         if (! $this->useRpc) {
