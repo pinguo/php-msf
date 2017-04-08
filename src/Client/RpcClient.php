@@ -196,7 +196,7 @@ class RpcClient
         $tcpClient = yield $obj->tcpClient->coroutineGetTcpClient($rpc->host);
         $response = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
 
-        return $response;
+        return self::parseResponse($response);
     }
 
     /**
@@ -241,9 +241,15 @@ class RpcClient
             throw new SwooleException('json decode failure: ' . $error . ' caused by ' . $response['body']);
         }
 
-        return $body;
+        return self::parseResponse($body);
     }
 
+    /**
+     * 生产秘钥
+     * @param $params
+     * @param $secret
+     * @return bool|string
+     */
     public static function genSig($params, $secret)
     {
         if ($secret === '') {
@@ -254,9 +260,23 @@ class RpcClient
         return $sig;
     }
 
+    /**
+     * 拿到 json 解析最后出现的错误信息
+     * @return mixed|string
+     */
     protected static function jsonLastErrorMsg()
     {
         $error = json_last_error();
         return array_key_exists($error, self::$jsonErrors) ? self::$jsonErrors[$error] : "Unknown error ({$error})";
+    }
+
+    /**
+     * 解析返回值，可被继承覆盖，用于根据自己具体业务进行分析
+     * @param mixed $response
+     * @return mixed
+     */
+    protected static function parseResponse($response)
+    {
+        return $response;
     }
 }
