@@ -47,18 +47,17 @@ class TaskProxy extends CoreBase
         if ($reset) {
             $this->taskId = 1;
         }
-        $this->taskProxyData =
-            [
-                'type' => Marco::SERVER_TYPE_TASK,
-                'message' =>
-                    [
-                        'task_name' => $this->coreName,
-                        'task_fuc_name' => $name,
-                        'task_fuc_data' => $arguments,
-                        'task_id' => $this->taskId,
-                        'task_context' => $this->getContext(),
-                    ]
-            ];
+        $this->taskProxyData = [
+            'type' => Marco::SERVER_TYPE_TASK,
+            'message' => [
+                'task_name' => $this->coreName,
+                'task_fuc_name' => $name,
+                'task_fuc_data' => $arguments,
+                'task_id' => $this->taskId,
+                'task_context' => $this->getContext(),
+            ]
+        ];
+
         return $this->taskId;
     }
 
