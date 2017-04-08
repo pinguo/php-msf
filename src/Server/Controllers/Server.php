@@ -74,4 +74,15 @@ class Server extends BaseController
         $value = yield $this->redisPool->cache('key');
         $this->outputJson($value);
     }
+
+    public function HttpTestCoroutine()
+    {
+        $client     = $this->client->coroutineGetHttpClient('http://phototask-feed-ms.360in.com');
+        $httpClient = yield $client;
+        $prePost    = $httpClient->coroutineGet(
+            '/feed/inner/feedInner/hotFeed?appVersion=8.3.2&platform=ios&locale=zh-Hans&C78818A7-26DD-4795-ACB6-663496AA5A32&ip=127.0.0.1&taskId=&longitude=104.0679504901092&30.53893220660016&channel=appstore&catIds=196608&catNums=100'
+        );
+        $data       = yield $prePost;
+        $this->outputJson($data['body']);
+    }
 }
