@@ -227,10 +227,10 @@ class RpcClient
         }
 
         $httpClient = yield $obj->client->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
-        if ($rpc->verb == 'GET') {
-            $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
-        } else {
+        if ($rpc->verb == 'POST') {
             $response = yield $httpClient->coroutinePost($rpc->urlPath, $sendData, $rpc->timeout);
+        } else {
+            $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
         }
         if (! isset($response['body'])) {
             throw new SwooleException('The response of body is not found');
