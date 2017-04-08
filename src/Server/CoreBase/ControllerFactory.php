@@ -55,17 +55,17 @@ class ControllerFactory
             $controllerInstance->reUse();
             return $controllerInstance;
         }
-        $class_name = "\\App\\Controllers\\$controller";
-        if (class_exists($class_name)) {
-            $controllerInstance = new $class_name;
+        $className = "\\App\\Controllers\\$controller";
+        if (class_exists($className)) {
+            $controllerInstance = new $className;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();
             return $controllerInstance;
         }
 
-        $class_name = "\\PG\\MSF\\Server\\Controllers\\$controller";
-        if (class_exists($class_name)) {
-            $controllerInstance = new $class_name;
+        $className = "\\PG\\MSF\\Server\\Controllers\\$controller";
+        if (class_exists($className)) {
+            $controllerInstance = new $className;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();
             return $controllerInstance;

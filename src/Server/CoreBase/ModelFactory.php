@@ -53,15 +53,15 @@ class ModelFactory
             $modelInstance->reUse();
             return $modelInstance;
         }
-        $class_name = "\\App\\Models\\$model";
-        if (class_exists($class_name)) {
-            $modelInstance = new $class_name;
+        $className = "\\App\\Models\\$model";
+        if (class_exists($className)) {
+            $modelInstance = new $className;
             $modelInstance->coreName = $model;
             $modelInstance->afterConstruct();
         } else {
-            $class_name = "\\PG\\MSF\\Server\\Models\\$model";
-            if (class_exists($class_name)) {
-                $modelInstance = new $class_name;
+            $className = "\\PG\\MSF\\Server\\Models\\$model";
+            if (class_exists($className)) {
+                $modelInstance = new $className;
                 $modelInstance->coreName = $model;
                 $modelInstance->afterConstruct();
             } else {
