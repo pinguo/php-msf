@@ -234,11 +234,11 @@ abstract class Server extends Child
         $this->port = $this->config->get('tcp.port', 9501);
         $this->user = $this->config->get('server.set.user', '');
 
-        //设置异步 IO 模式
+        //设置异步IO模式
         swoole_async_set([
             'thread_num' => $this->config->get('server.set.worker_num', 4),
             'aio_mode' => SWOOLE_AIO_BASE,
-            'use_async_resolver' => false,
+            'use_async_resolver' => true,
         ]);
     }
 
