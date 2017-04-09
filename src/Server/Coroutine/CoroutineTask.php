@@ -48,6 +48,7 @@ class CoroutineTask
             if ($value != null && $value instanceof ICoroutineBase) {
                 $result = $value->getResult();
                 if ($result !== CoroutineNull::getInstance()) {
+                    unset($value);
                     $routine->send($result);
                 }
                 //嵌套的协程返回
@@ -72,12 +73,14 @@ class CoroutineTask
             if ($flag) {
                 $this->generatorContext->addYieldStack($routine->key());
             }
+
             if (empty($value)) {
                 $value = "";
             }
 
             $logValue = "";
             dumpCoroutineTaskMessage($logValue, $value, 0);
+
             $message = 'yield ' . $logValue . ' message: ' . $e->getMessage();
             $runTaskException = new CoroutineException($message, $e->getCode(), $e);
             $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
@@ -106,6 +109,7 @@ class CoroutineTask
             if (!empty($value) && $value instanceof ICoroutineBase && method_exists($value, 'delCallBackForKernel')) {
                 $value->delCallBackForKernel();
             }
+            unset($value);
 
             $this->destroy();
         }
