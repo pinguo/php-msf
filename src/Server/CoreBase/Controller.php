@@ -48,6 +48,9 @@ class Controller extends CoreBase
      * @var AOP|\PG\MSF\Server\Memory\Pool
      */
     public $objectPool;
+    /**
+     * @var array
+     */
     public $objectPoolBuckets = [];
     /**
      * fd
