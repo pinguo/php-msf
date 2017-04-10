@@ -112,6 +112,11 @@ abstract class MSFServer extends WebSocketServer
      */
     protected $poolProcess;
     /**
+     * 连接池
+     * @var
+     */
+    protected $asynPools;
+    /**
      * 分布式系统服务器唯一标识符
      * @var int
      */
@@ -135,12 +140,6 @@ abstract class MSFServer extends WebSocketServer
      * @var \swoole_lock
      */
     private $initLock;
-    /**
-     * 连接池
-     * @var
-     */
-    protected $asynPools;
-
     /**
      * @var
      */

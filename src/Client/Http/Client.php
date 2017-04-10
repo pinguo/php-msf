@@ -46,7 +46,7 @@ class Client
             throw new SwooleException($baseUrl . ' 不合法,请检查配置或者参数');
         }
 
-        if (! empty($urlPort)) {
+        if (!empty($urlPort)) {
             $data['port'] = $urlPort;
         } else {
             if ($urlHead == "https") {

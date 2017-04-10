@@ -16,11 +16,9 @@ use PG\MSF\Server\Marco;
 
 class RedisProxy
 {
-    private $config;
-
-    private $proxy;
-
     public static $redisCoroutines = [];
+    private $config;
+    private $proxy;
 
     public function __construct($config)
     {

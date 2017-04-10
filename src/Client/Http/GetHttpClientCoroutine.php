@@ -23,7 +23,7 @@ class GetHttpClientCoroutine extends CoroutineBase
     {
         parent::__construct($timeout);
         $this->baseUrl = $baseUrl;
-        $this->client  = $client;
+        $this->client = $client;
         $this->headers = $headers;
         $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
         $this->client->context->PGLog->profileStart($profileName);
