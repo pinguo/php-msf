@@ -86,6 +86,24 @@ class Server extends BaseController
         $data[] = yield $this->redisProxy->cache('ccc');
         yield $this->redisProxy->incrBy('ddd', 1);
         $data[] = yield $this->redisProxy->cache('ddd');
+
+
+        $arr = [
+            'eee' => 'EEE',
+            'fff' => 'FFF',
+            'ggg' => 'GGG',
+            'hhh' => 'HHH',
+            'iii' => 'III',
+            'jjj' => 'JJJ',
+            'kkk' => 'KKK',
+            'lll' => 'LLL',
+            'mmm' => 'MMM',
+            'nnn' => 'NNN'
+        ];
+
+        yield $this->redisProxy->mset($arr);
+        $data[] = yield $this->redisProxy->mget(array_keys($arr));
+
         $this->outputJson($data);
     }
 
