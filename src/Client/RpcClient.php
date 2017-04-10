@@ -7,6 +7,7 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 namespace PG\MSF\Client;
 
 use PG\Helper\SecurityHelper;
@@ -15,6 +16,10 @@ use PG\MSF\Server\CoreBase\SwooleException;
 
 class RpcClient
 {
+    /**
+     * @var string 当前版本
+     */
+    public static $version = '0.9';
     /**
      * @var array json 错误码
      */
@@ -26,11 +31,6 @@ class RpcClient
         JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON',
         JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded'
     ];
-
-    /**
-     * @var string 当前版本
-     */
-    public static $version = '0.9';
     /**
      * @var array 所有服务
      */
@@ -102,10 +102,10 @@ class RpcClient
         if ($config['host'] === '') {
             throw new SwooleException('Host configuration not found.');
         }
-        if (! isset($config['timeout'])) {
+        if (!isset($config['timeout'])) {
             $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
         }
-        if (! isset($config['secret'])) {
+        if (!isset($config['secret'])) {
             $config['secret'] = getInstance()->config->get('params.service.' . $root . '.secret', '');
         }
         // 赋值到类属性中.
@@ -113,11 +113,11 @@ class RpcClient
         $this->useRpc = $config['useRpc'] ?? false;
         $this->urlPath = $config['urlPath'] ?? '/';
         $scheme = substr($this->host, 0, strpos($this->host, ':'));
-        if (! in_array($scheme, ['http', 'https', 'tcp'])) {
+        if (!in_array($scheme, ['http', 'https', 'tcp'])) {
             throw new SwooleException('Host configuration invalid.');
         }
         // 非 Rpc 模式.
-        if (! $this->useRpc) {
+        if (!$this->useRpc) {
             if ($this->scheme === 'tcp') {
                 throw new SwooleException('Non-rpc mode does not support tcp scheme.');
             }
@@ -134,7 +134,7 @@ class RpcClient
      */
     public static function serv($service)
     {
-        if (! isset(self::$services[$service])) {
+        if (!isset(self::$services[$service])) {
             self::$services[$service] = new RpcClient($service);
         }
 
@@ -162,7 +162,7 @@ class RpcClient
      */
     public function __call($method, $args)
     {
-        if (! is_object($args[0]) || ! ($args[0] instanceof CoreBase)) {
+        if (!is_object($args[0]) || !($args[0] instanceof CoreBase)) {
             throw new SwooleException('The first argument of ' . $method . ' must be instanceof CoreBase .');
         }
         $obj = $args[0];
@@ -200,6 +200,32 @@ class RpcClient
     }
 
     /**
+     * 生产秘钥
+     * @param $params
+     * @param $secret
+     * @return bool|string
+     */
+    public static function genSig($params, $secret)
+    {
+        if ($secret === '') {
+            return '';
+        }
+        $sig = SecurityHelper::sign($params, $secret);
+
+        return $sig;
+    }
+
+    /**
+     * 解析返回值，可被继承覆盖，用于根据自己具体业务进行分析
+     * @param mixed $response
+     * @return mixed
+     */
+    protected static function parseResponse($response)
+    {
+        return $response;
+    }
+
+    /**
      * Rpc 模式执行远程调用
      * @param string $pack_data 打包好的数据
      */
@@ -232,7 +258,7 @@ class RpcClient
         } else {
             $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
         }
-        if (! isset($response['body'])) {
+        if (!isset($response['body'])) {
             throw new SwooleException('The response of body is not found');
         }
         $body = json_decode($response['body'], true);
@@ -245,22 +271,6 @@ class RpcClient
     }
 
     /**
-     * 生产秘钥
-     * @param $params
-     * @param $secret
-     * @return bool|string
-     */
-    public static function genSig($params, $secret)
-    {
-        if ($secret === '') {
-            return '';
-        }
-        $sig = SecurityHelper::sign($params, $secret);
-
-        return $sig;
-    }
-
-    /**
      * 拿到 json 解析最后出现的错误信息
      * @return mixed|string
      */
@@ -268,15 +278,5 @@ class RpcClient
     {
         $error = json_last_error();
         return array_key_exists($error, self::$jsonErrors) ? self::$jsonErrors[$error] : "Unknown error ({$error})";
-    }
-
-    /**
-     * 解析返回值，可被继承覆盖，用于根据自己具体业务进行分析
-     * @param mixed $response
-     * @return mixed
-     */
-    protected static function parseResponse($response)
-    {
-        return $response;
     }
 }

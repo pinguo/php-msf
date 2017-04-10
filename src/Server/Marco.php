@@ -81,4 +81,9 @@ class Marco
      * HTTP请求
      */
     const HTTP_REQUEST = 'http_request';
+
+    const CLUSTER = 0;
+    const MASTER_SLAVE = 1;
+    const HASH_MD5 = 'md5';
+    const HASH_CRC32 = 'crc32';
 }
