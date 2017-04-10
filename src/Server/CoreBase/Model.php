@@ -17,10 +17,16 @@ class Model extends CoreBase
      * @var \PG\MSF\Server\DataBase\RedisAsynPool
      */
     public $redisPool;
+
     /**
      * @var \PG\MSF\Server\DataBase\MysqlAsynPool
      */
     public $mysqlPool;
+
+    /**
+     * @var \PG\MSF\Server\Memory\Pool
+     */
+    public $objectPool;
 
     /**
      * @var \PG\MSF\Client\Http\Client
@@ -54,6 +60,7 @@ class Model extends CoreBase
         $this->PGLog = $context->PGLog;
         $this->client = $context->controller->client;
         $this->tcpClient = $context->controller->tcpClient;
+        $this->objectPool = $context->controller->objectPool;
     }
 
     /**
@@ -65,5 +72,4 @@ class Model extends CoreBase
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
     }
-
 }

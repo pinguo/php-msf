@@ -137,7 +137,7 @@ abstract class MSFServer extends WebSocketServer
      * 连接池
      * @var
      */
-    private $asynPools;
+    protected $asynPools;
 
     /**
      * @var
@@ -149,7 +149,7 @@ abstract class MSFServer extends WebSocketServer
      */
     public function __construct()
     {
-        self::$instance =& $this;
+        self::$instance = &$this;
         $this->name = self::SERVER_NAME;
         parent::__construct();
     }
@@ -217,7 +217,7 @@ abstract class MSFServer extends WebSocketServer
             $this->poolProcess = new \swoole_process(function ($process) {
                 $process->name($this->config['server.process_title'] . '-ASYN');
                 $this->asnyPoolManager = new AsynPoolManager($process, $this);
-                $this->asnyPoolManager->event_add();
+                $this->asnyPoolManager->eventAdd();
                 $this->initAsynPools();
                 foreach ($this->asynPools as $pool) {
                     if ($pool) {
@@ -519,10 +519,10 @@ abstract class MSFServer extends WebSocketServer
         $this->initAsynPools();
         $this->redisPool = $this->asynPools['redisPool'];
         $this->mysqlPool = $this->asynPools['mysqlPool'];
-        if (!$serv->taskworker) {
+        if (! $serv->taskworker) {
             //注册
             $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);
-            if (!$this->config['asyn_process_enable']) {
+            if (! $this->config['asyn_process_enable']) {
                 $this->asnyPoolManager->noEventAdd();
             }
             foreach ($this->asynPools as $pool) {
@@ -541,7 +541,7 @@ abstract class MSFServer extends WebSocketServer
             });
         }
         //进程锁
-        if (!$this->isTaskWorker() && $this->initLock->trylock()) {
+        if (! $this->isTaskWorker() && $this->initLock->trylock()) {
             //进程启动后进行开服的初始化
             $generator = $this->onOpenServiceInitialization();
             if ($generator instanceof \Generator) {
@@ -568,17 +568,17 @@ abstract class MSFServer extends WebSocketServer
                     throw new SwooleException('定时任务配置错误，缺少task_name或者model_name.');
                 }
                 $methodName = $timerTask['method_name'];
-                if (!key_exists('start_time', $timerTask)) {
+                if (! key_exists('start_time', $timerTask)) {
                     $startTime = -1;
                 } else {
                     $startTime = strtotime(date($timerTask['start_time']));
                 }
-                if (!key_exists('end_time', $timerTask)) {
+                if (! key_exists('end_time', $timerTask)) {
                     $endTime = -1;
                 } else {
                     $endTime = strtotime(date($timerTask['end_time']));
                 }
-                if (!key_exists('delay', $timerTask)) {
+                if (! key_exists('delay', $timerTask)) {
                     $delay = false;
                 } else {
                     $delay = $timerTask['delay'];
@@ -640,7 +640,7 @@ abstract class MSFServer extends WebSocketServer
                     $timerTask['start_time'] = $time;
                 }
                 $timerTask['start_time'] += $timerTask['interval_time'];
-                if (!empty($timerTask['task_name'])) {
+                if (! empty($timerTask['task_name'])) {
                     $task = $this->loader->task($timerTask['task_name'], $this);
                     call_user_func([$task, $timerTask['method_name']]);
                     $task->startTask(null);
@@ -666,7 +666,7 @@ abstract class MSFServer extends WebSocketServer
     {
         $info = $serv->connection_info($fd, 0, true);
         $uid = $info['uid']??0;
-        if (!empty($uid)) {
+        if (! empty($uid)) {
             $generator = $this->onUidCloseClear($uid);
             if ($generator instanceof \Generator) {
                 $generatorContext = new GeneratorContext();

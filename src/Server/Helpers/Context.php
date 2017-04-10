@@ -16,8 +16,16 @@ use PG\MSF\Server\{
 
 class Context implements \ArrayAccess
 {
+    /**
+     * @var
+     */
     public $useCount;
+
+    /**
+     * @var
+     */
     public $genTime;
+
     /**
      * @var string
      */
@@ -48,21 +56,36 @@ class Context implements \ArrayAccess
         return ['logId', 'input'];
     }
 
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     */
     public function offsetSet($offset, $value)
     {
         $this->{$offset} = $value;
     }
 
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
     public function offsetExists($offset)
     {
         return isset($this->{$offset});
     }
 
+    /**
+     * @param mixed $offset
+     */
     public function offsetUnset($offset)
     {
         unset($this->{$offset});
     }
 
+    /**
+     * @param mixed $offset
+     * @return null
+     */
     public function offsetGet($offset)
     {
         return isset($this->{$offset}) ? $this->{$offset} : null;
