@@ -8,6 +8,7 @@
 
 namespace PG\MSF\Server;
 
+use Flexihash\Flexihash;
 use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
@@ -39,6 +40,10 @@ abstract class MSFServer extends WebSocketServer
      * @var RedisAsynPool
      */
     public $redisPool;
+    /**
+     * @var RedisAsynPool
+     */
+    public $redisProxy;
     /**
      * @var MysqlAsynPool
      */
@@ -135,6 +140,11 @@ abstract class MSFServer extends WebSocketServer
     private $asynPools;
 
     /**
+     * @var
+     */
+    private $redisProxyManager;
+
+    /**
      * SwooleDistributedServer constructor.
      */
     public function __construct()
@@ -214,6 +224,7 @@ abstract class MSFServer extends WebSocketServer
                         $this->asnyPoolManager->registAsyn($pool);
                     }
                 }
+                $this->initRedisProxies();
             }, false, 2);
             $this->server->addProcess($this->poolProcess);
         }
@@ -290,7 +301,7 @@ abstract class MSFServer extends WebSocketServer
      */
     public function initAsynPools()
     {
-        $redisPoolNameBase = 'redisPool';
+        $redisPoolBaseName = 'redisPool';
         $redisPools = [];
 
         if ($this->config->get('redis.active')) {
@@ -301,19 +312,57 @@ abstract class MSFServer extends WebSocketServer
 
             foreach ($activePools as $i => $poolKey) {
                 if ($i === 0) {
-                    $redisPools[$redisPoolNameBase] = new RedisAsynPool($this->config, $poolKey);
+                    $redisPools[$redisPoolBaseName] = new RedisAsynPool($this->config, $poolKey);
                 } else {
-                    $redisPools[$redisPoolNameBase . $i] = new RedisAsynPool($this->config, $poolKey);
+                    $redisPools[$redisPoolBaseName . $i] = new RedisAsynPool($this->config, $poolKey);
                 }
             }
         } else {
-            $redisPools[$redisPoolNameBase] = null;
+            $redisPools[$redisPoolBaseName] = null;
         }
 
         $this->asynPools = array_merge([
             'mysqlPool' => $this->config->get('database.active') ? new MysqlAsynPool($this->config,
                 $this->config->get('database.active')) : null,
         ], $redisPools);
+    }
+
+    /**
+     * 初始化redis代理客户端
+     */
+    public function initRedisProxies()
+    {
+        $redisProxyBaseName = 'redisProxy';
+
+        if ($this->config->get('redisProxy.active')) {
+            $activeProxies = $this->config->get('redis.active');
+            if (is_string($activeProxies)) {
+                $activeProxies = explode(',', $activeProxies);
+            }
+
+            foreach ($activeProxies as $i => $activeProxy) {
+                $model = $this->config['redisProxy'][$activeProxy]['model'];
+                $pools = $this->config['redisProxy'][$activeProxy]['pools'];
+                $hasher = $this->config->get("redisProxy.{$activeProxy}.hasher", Marco::HASH_MD5);
+
+                if (!class_exists($hasher)) {
+                    $hasher = ucfirst($hasher) . 'Hasher';
+                }
+                $hasher = new $hasher;
+
+                if ($model == Marco::CLUSTER) {
+                    $proxy = new Flexihash($hasher);
+                    foreach ($pools as $pool => $weight) {
+                        $proxy->addTarget($pool, $weight);
+                    }
+                } else {
+                    //todo: master-slave
+                }
+
+                $i === 0 ? ($this->redisProxyManager[$redisProxyBaseName] = $proxy)
+                    : ($this->redisProxyManager[$redisProxyBaseName . $i] = $proxy);
+            }
+        }
     }
 
     /**
