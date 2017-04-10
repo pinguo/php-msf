@@ -48,6 +48,9 @@ class Controller extends CoreBase
      * @var AOP|\PG\MSF\Server\Memory\Pool
      */
     public $objectPool;
+    /**
+     * @var array
+     */
     public $objectPoolBuckets = [];
     /**
      * fd
@@ -93,8 +96,7 @@ class Controller extends CoreBase
         parent::__construct();
         $this->input = new Input();
         $this->output = new Output($this);
-        $this->redisPool = getInstance()->redisPool && AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(),
-                $this);
+        $this->redisPool = getInstance()->redisPool && AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(), $this);
         $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
         $this->mysqlPool = getInstance()->mysqlPool;
         $this->client = clone getInstance()->client;
