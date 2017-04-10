@@ -72,5 +72,4 @@ class Model extends CoreBase
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
     }
-
 }
