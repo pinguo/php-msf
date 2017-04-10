@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Server\Proxy;
 
-
 use Flexihash\{
     Flexihash, Hasher\Md5Hasher
 };
