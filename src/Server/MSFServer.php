@@ -290,12 +290,30 @@ abstract class MSFServer extends WebSocketServer
      */
     public function initAsynPools()
     {
-        $this->asynPools = [
-            'redisPool' => $this->config->get('redis.active') ? new RedisAsynPool($this->config,
-                $this->config->get('redis.active')) : null,
+        $redisPoolNameBase = 'redisPool';
+        $redisPools = [];
+
+        if ($this->config->get('redis.active')) {
+            $activePools = $this->config->get('redis.active');
+            if (is_string($activePools)) {
+                $activePools = explode(',', $activePools);
+            }
+
+            foreach ($activePools as $i => $poolKey) {
+                if ($i === 0) {
+                    $redisPools[$redisPoolNameBase] = new RedisAsynPool($this->config, $poolKey);
+                } else {
+                    $redisPools[$redisPoolNameBase . $i] = new RedisAsynPool($this->config, $poolKey);
+                }
+            }
+        } else {
+            $redisPools[$redisPoolNameBase] = null;
+        }
+
+        $this->asynPools = array_merge([
             'mysqlPool' => $this->config->get('database.active') ? new MysqlAsynPool($this->config,
                 $this->config->get('database.active')) : null,
-        ];
+        ], $redisPools);
     }
 
     /**
@@ -425,7 +443,7 @@ abstract class MSFServer extends WebSocketServer
     public function addAsynPool($name, AsynPool $pool)
     {
         if (key_exists($name, $this->asynPools)) {
-            throw  new SwooleException('pool key is exists!');
+            throw new SwooleException('pool key is exists!');
         }
         $this->asynPools[$name] = $pool;
     }
