@@ -61,10 +61,10 @@ class Task extends TaskProxy
             return false;
         }
         //表总0获得值代表的是需要中断的id
-        $interrupted_task_id = getInstance()->tidPidTable->get(0)['pid'];
+        $interruptedTaskId = getInstance()->tidPidTable->get(0)['pid'];
         //读取后可以释放锁了
         getInstance()->taskLock->unlock();
-        if ($interrupted_task_id == $this->taskId) {
+        if ($interruptedTaskId == $this->taskId) {
             return true;
         }
 
