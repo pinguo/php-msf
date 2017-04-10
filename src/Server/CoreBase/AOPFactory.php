@@ -10,6 +10,7 @@ namespace PG\MSF\Server\CoreBase;
 
 use PG\MSF\Server\DataBase\CoroutineRedisHelp;
 use PG\MSF\Server\Memory\Pool;
+use PG\MSF\Server\Proxy\RedisProxyClusterHandle;
 
 class AOPFactory
 {
@@ -30,6 +31,27 @@ class AOPFactory
             return $data;
         });
         return $redisPoolCoroutine;
+    }
+
+    /**
+     * 获取redis proxy
+     * @param $redisProxy
+     * @param CoreBase $coreBase
+     * @return AOP
+     */
+    public static function getRedisProxy($redisProxy, CoreBase $coreBase)
+    {
+        $redis = new AOP($redisProxy);
+        $redis->registerOnBefore(function ($method, $arguments) use ($redisProxy, $coreBase) {
+            $context = $coreBase->getContext();
+            array_unshift($arguments, $context);
+            $data['method'] = $method;
+            $data['arguments'] = $arguments;
+            $data['result'] = RedisProxyClusterHandle::handle($redisProxy, $method, $arguments);
+            return $data;
+        });
+
+        return $redis;
     }
 
     /**

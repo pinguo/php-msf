@@ -8,23 +8,25 @@
 
 namespace PG\MSF\Server;
 
-use Flexihash\Flexihash;
 use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
-use PG\MSF\Server\{
-    CoreBase\InotifyProcess, CoreBase\SwooleException, Coroutine\GeneratorContext
+use PG\MSF\Server\CoreBase\{
+    InotifyProcess, SwooleException
 };
-use PG\MSF\Server\Coroutine\CoroutineTask;
+use PG\MSF\Server\Coroutine\{
+    CoroutineTask, GeneratorContext
+};
 use PG\MSF\Server\DataBase\{
     AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
 };
 use PG\MSF\Server\Memory\Pool;
+use PG\MSF\Server\Proxy\RedisProxy;
 use PG\MSF\Server\Test\TestModule;
 
 abstract class MSFServer extends WebSocketServer
 {
-    const SERVER_NAME = "SERVER";
+    const SERVER_NAME = 'SERVER';
     /**
      * 实例
      * @var Server
@@ -341,27 +343,13 @@ abstract class MSFServer extends WebSocketServer
             }
 
             foreach ($activeProxies as $i => $activeProxy) {
-                $model = $this->config['redisProxy'][$activeProxy]['model'];
-                $pools = $this->config['redisProxy'][$activeProxy]['pools'];
-                $hasher = $this->config->get("redisProxy.{$activeProxy}.hasher", Marco::HASH_MD5);
-
-                if (!class_exists($hasher)) {
-                    $hasher = ucfirst($hasher) . 'Hasher';
-                }
-                $hasher = new $hasher;
-
-                if ($model == Marco::CLUSTER) {
-                    $proxy = new Flexihash($hasher);
-                    foreach ($pools as $pool => $weight) {
-                        $proxy->addTarget($pool, $weight);
-                    }
-                } else {
-                    //todo: master-slave
-                }
+                $proxy = (new RedisProxy($this->config['redisProxy'][$activeProxy]))->getProxy();
 
                 $i === 0 ? ($this->redisProxyManager[$redisProxyBaseName] = $proxy)
                     : ($this->redisProxyManager[$redisProxyBaseName . $i] = $proxy);
             }
+        } else {
+            $this->redisProxyManager[$redisProxyBaseName] = null;
         }
     }
 
@@ -508,7 +496,31 @@ abstract class MSFServer extends WebSocketServer
     }
 
     /**
-     * 重写onSwooleWorkerStart方法，添加异步redis
+     * 添加redis代理
+     * @param $name
+     * @param $proxy
+     * @throws SwooleException
+     */
+    public function addRedisProxy($name, $proxy)
+    {
+        if (key_exists($name, $this->redisProxyManager)) {
+            throw new SwooleException('proxy key is exists!');
+        }
+        $this->redisProxyManager[$name] = $proxy;
+    }
+
+    /**
+     * 获取redis代理
+     * @param $name
+     * @return mixed
+     */
+    public function getRedisProxy($name)
+    {
+        return $this->redisProxyManager[$name];
+    }
+
+    /**
+     * 重写onSwooleWorkerStart方法，添加异步redis,添加redisProxy
      * @param $serv
      * @param $workerId
      * @throws SwooleException
@@ -517,12 +529,14 @@ abstract class MSFServer extends WebSocketServer
     {
         parent::onSwooleWorkerStart($serv, $workerId);
         $this->initAsynPools();
+        $this->initRedisProxies();
         $this->redisPool = $this->asynPools['redisPool'];
         $this->mysqlPool = $this->asynPools['mysqlPool'];
-        if (! $serv->taskworker) {
+        $this->redisProxy = $this->redisProxyManager['redisProxy'];
+        if (!$serv->taskworker) {
             //注册
             $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);
-            if (! $this->config['asyn_process_enable']) {
+            if (!$this->config['asyn_process_enable']) {
                 $this->asnyPoolManager->noEventAdd();
             }
             foreach ($this->asynPools as $pool) {
@@ -541,7 +555,7 @@ abstract class MSFServer extends WebSocketServer
             });
         }
         //进程锁
-        if (! $this->isTaskWorker() && $this->initLock->trylock()) {
+        if (!$this->isTaskWorker() && $this->initLock->trylock()) {
             //进程启动后进行开服的初始化
             $generator = $this->onOpenServiceInitialization();
             if ($generator instanceof \Generator) {
@@ -568,17 +582,17 @@ abstract class MSFServer extends WebSocketServer
                     throw new SwooleException('定时任务配置错误，缺少task_name或者model_name.');
                 }
                 $methodName = $timerTask['method_name'];
-                if (! key_exists('start_time', $timerTask)) {
+                if (!key_exists('start_time', $timerTask)) {
                     $startTime = -1;
                 } else {
                     $startTime = strtotime(date($timerTask['start_time']));
                 }
-                if (! key_exists('end_time', $timerTask)) {
+                if (!key_exists('end_time', $timerTask)) {
                     $endTime = -1;
                 } else {
                     $endTime = strtotime(date($timerTask['end_time']));
                 }
-                if (! key_exists('delay', $timerTask)) {
+                if (!key_exists('delay', $timerTask)) {
                     $delay = false;
                 } else {
                     $delay = $timerTask['delay'];
@@ -640,7 +654,7 @@ abstract class MSFServer extends WebSocketServer
                     $timerTask['start_time'] = $time;
                 }
                 $timerTask['start_time'] += $timerTask['interval_time'];
-                if (! empty($timerTask['task_name'])) {
+                if (!empty($timerTask['task_name'])) {
                     $task = $this->loader->task($timerTask['task_name'], $this);
                     call_user_func([$task, $timerTask['method_name']]);
                     $task->startTask(null);
@@ -666,7 +680,7 @@ abstract class MSFServer extends WebSocketServer
     {
         $info = $serv->connection_info($fd, 0, true);
         $uid = $info['uid']??0;
-        if (! empty($uid)) {
+        if (!empty($uid)) {
             $generator = $this->onUidCloseClear($uid);
             if ($generator instanceof \Generator) {
                 $generatorContext = new GeneratorContext();
