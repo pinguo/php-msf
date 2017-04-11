@@ -36,7 +36,7 @@ class RpcController extends BaseController
     /**
      * @var null
      */
-    public $args = null;
+    public $reqParams = null;
 
     /**
      * @var null
@@ -92,7 +92,7 @@ class RpcController extends BaseController
         $this->sig = $arguments['sig'] ?? null;
         $this->handler = $arguments['handler'];
         $this->method = $arguments['method'];
-        $this->args = (array)$arguments['args'];
+        $this->reqParams = (array)$arguments['args'];
         $this->rpcTime = $arguments['time'];
     }
 
@@ -121,7 +121,7 @@ class RpcController extends BaseController
         $this->version = $arguments['data']['version'] ?? null;
         $this->handler = $arguments['data']['handler'];
         $this->method = $arguments['data']['method'];
-        $this->args = (array)$arguments['data']['args'];
+        $this->reqParams = (array)$arguments['data']['args'];
         $this->rpcTime = $arguments['data']['time'];
         $this->sig = $arguments['sig'];
     }
@@ -136,8 +136,8 @@ class RpcController extends BaseController
         if (! method_exists($handlerInstance, $this->method)) {
             throw new SwooleException('Rpc method not found.');
         }
-        //$response = $handlerInstance->{$this->method}(...$this->args);
-        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->args);
+        //$response = $handlerInstance->{$this->method}(...$this->reqParams);
+        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->reqParams);
         
         $this->outputJson($response);
     }
