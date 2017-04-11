@@ -103,14 +103,10 @@ class RpcClient
         if ($config['host'] === '') {
             throw new SwooleException('Host configuration not found.');
         }
-<<<<<<< HEAD
         if (! isset($config['useRpc'])) {
             $config['useRpc'] = getInstance()->config->get('params.service.' . $root . '.useRpc', false);
         }
         if (! isset($config['timeout'])) {
-=======
-        if (!isset($config['timeout'])) {
->>>>>>> 9de8830182e6dca2fba3340b21a653ee17a09e41
             $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
         }
         if (!isset($config['secret'])) {
@@ -142,13 +138,8 @@ class RpcClient
      */
     public static function serv($service)
     {
-<<<<<<< HEAD
         if (! isset(static::$services[$service])) {
             static::$services[$service] = new static($service);
-=======
-        if (!isset(self::$services[$service])) {
-            self::$services[$service] = new RpcClient($service);
->>>>>>> 9de8830182e6dca2fba3340b21a653ee17a09e41
         }
 
         return static::$services[$service];
