@@ -102,20 +102,20 @@ class RpcController extends BaseController
      */
     protected function parseHttpArgument(&$arguments)
     {
-        if (! is_array($arguments) || ! isset($arguments['data']) || ! isset($arguments['sig'])) {
+        if (!is_array($arguments) || !isset($arguments['data']) || !isset($arguments['sig'])) {
             throw new SwooleException('Rpc argument invalid.');
         }
-        if (! is_array($arguments['data'])) {
+        if (!is_array($arguments['data'])) {
             $arguments['data'] = $this->pack->unPack($arguments['data']);
         }
         $arguments['data'] = (array)$arguments['data'];
-        if (! isset($arguments['data']['handler'])) {
+        if (!isset($arguments['data']['handler'])) {
             throw new SwooleException('Rpc argument of handler not set.');
         }
-        if (! isset($arguments['data']['method'])) {
+        if (!isset($arguments['data']['method'])) {
             throw new SwooleException('Rpc argument of method not set.');
         }
-        if (! isset($arguments['data']['args'])) {
+        if (!isset($arguments['data']['args'])) {
             throw new SwooleException('Rpc argument of args not set.');
         }
         $this->version = $arguments['data']['version'] ?? null;
@@ -133,7 +133,7 @@ class RpcController extends BaseController
     {
         $handlerClass = 'Handlers\\' . $this->handler;
         $handlerInstance = $this->loader->model($handlerClass, $this);
-        if (! method_exists($handlerInstance, $this->method)) {
+        if (!method_exists($handlerInstance, $this->method)) {
             throw new SwooleException('Rpc method not found.');
         }
         //$response = $handlerInstance->{$this->method}(...$this->reqParams);

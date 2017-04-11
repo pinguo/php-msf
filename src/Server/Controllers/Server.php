@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Server\Controllers;
 
+use PG\MSF\Server\CoreBase\AOPFactory;
+
 class Server extends BaseController
 {
     public function HttpInfo()
@@ -42,7 +44,7 @@ class Server extends BaseController
     {
         $this->outputJson('Hello World');
     }
-    
+
     /**
      * Http 服务状态探测
      */
@@ -75,14 +77,56 @@ class Server extends BaseController
         $this->outputJson($value);
     }
 
+    public function httpRedisProxy()
+    {
+        $data = [];
+        yield $this->redisProxy->incrBy('aaa', 1);
+        $data[] = yield $this->redisProxy->cache('aaa');
+        yield $this->redisProxy->incrBy('bbb', 1);
+        $data[] = yield $this->redisProxy->cache('bbb');
+        yield $this->redisProxy->incrBy('ccc', 1);
+        $data[] = yield $this->redisProxy->cache('ccc');
+        yield $this->redisProxy->incrBy('ddd', 1);
+        $data[] = yield $this->redisProxy->cache('ddd');
+
+
+        $arr = [
+            'eee' => 'EEE',
+            'fff' => 'FFF',
+            'ggg' => 'GGG',
+            'hhh' => 'HHH',
+            'iii' => 'III',
+            'jjj' => 'JJJ',
+            'kkk' => 'KKK',
+            'lll' => 'LLL',
+            'mmm' => 'MMM',
+            'nnn' => 'NNN'
+        ];
+
+        yield $this->redisProxy->mset($arr);
+        $data[] = yield $this->redisProxy->mget(array_keys($arr));
+
+        $this->outputJson($data);
+    }
+
+    public function httpRedisProxyMS()
+    {
+        $data = [];
+        $redis = AOPFactory::getRedisProxy(getInstance()->getRedisProxy('redisProxy1'), $this);
+        yield $redis->incrBy('rw', 1);
+        $data[] = yield $redis->get('rw');
+
+        $this->outputJson($data);
+    }
+
     public function HttpTestCoroutine()
     {
-        $client     = $this->client->coroutineGetHttpClient('http://phototask-feed-ms.360in.com');
+        $client = $this->client->coroutineGetHttpClient('http://phototask-feed-ms.360in.com');
         $httpClient = yield $client;
-        $prePost    = $httpClient->coroutineGet(
+        $prePost = $httpClient->coroutineGet(
             '/feed/inner/feedInner/hotFeed?appVersion=8.3.2&platform=ios&locale=zh-Hans&C78818A7-26DD-4795-ACB6-663496AA5A32&ip=127.0.0.1&taskId=&longitude=104.0679504901092&30.53893220660016&channel=appstore&catIds=196608&catNums=100'
         );
-        $data       = yield $prePost;
+        $data = yield $prePost;
         $this->outputJson($data['body']);
     }
 }

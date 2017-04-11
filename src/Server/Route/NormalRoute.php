@@ -60,7 +60,7 @@ class NormalRoute implements IRoute
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->clientData->isRpc = true;
-            if (! isset($request->post['data'])) {
+            if (!isset($request->post['data'])) {
                 throw new SwooleException('Rpc request but data params not set.');
             }
             $this->clientData->params = $request->post ?? $request->get ?? [];

@@ -15,6 +15,8 @@ use PG\MSF\Server\{
 
 class Controller extends CoreBase
 {
+    public $redisProxy;
+
     /**
      * @var RedisAsynPool
      */
@@ -99,6 +101,10 @@ class Controller extends CoreBase
         $this->redisPool = is_object(getInstance()->redisPool) ?
             AOPFactory::getRedisPoolCoroutine(getInstance()->redisPool->getCoroutine(), $this) :
             getInstance()->redisPool;
+
+        $this->redisProxy = getInstance()->redisProxy ?
+            AOPFactory::getRedisProxy(getInstance()->redisProxy, $this) :
+            getInstance()->redisProxy;
         $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
         $this->mysqlPool = getInstance()->mysqlPool;
         $this->client = clone getInstance()->client;

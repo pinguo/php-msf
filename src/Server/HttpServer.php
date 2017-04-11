@@ -41,7 +41,7 @@ abstract class HttpServer extends Server
         parent::__construct();
         //view dir
         $view_dir = APP_DIR . '/Views';
-        if (! is_dir($view_dir)) {
+        if (!is_dir($view_dir)) {
             echo "app目录下不存在Views目录，请创建。\n";
             exit();
         }
@@ -63,7 +63,7 @@ abstract class HttpServer extends Server
      */
     public function start()
     {
-        if (! $this->httpEnable) {
+        if (!$this->httpEnable) {
             parent::start();
             return;
         }
@@ -128,10 +128,10 @@ abstract class HttpServer extends Server
         $this->route->handleClientRequest($request);
         list($host) = explode(':', $request->header['host']??'');
 
-        if (! $this->route->getIsRpc() && $this->route->getPath() == '/') {
+        if (!$this->route->getIsRpc() && $this->route->getPath() == '/') {
             $wwwPath = $this->getHostRoot($host) . $this->getHostIndex($host);
             $result = httpEndFile($wwwPath, $request, $response);
-            if (! $result) {
+            if (!$result) {
                 $error = 'index not found';
             } else {
                 return;
@@ -147,14 +147,15 @@ abstract class HttpServer extends Server
 
             if ($controllerInstance != null) {
                 $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
-                if (! method_exists($controllerInstance, $methodName)) {
-                    $methodName = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+                if (!method_exists($controllerInstance, $methodName)) {
+                    $methodName = $this->config->get('http.method_prefix',
+                            '') . $this->config->get('http.default_method', 'Index');
                     $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
                 }
 
                 try {
                     $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
-                    if (! method_exists($controllerInstance, $methodName)) {
+                    if (!method_exists($controllerInstance, $methodName)) {
                         $error = 'api not found method(' . $methodName . ')';
                     } else {
                         $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
@@ -192,7 +193,7 @@ abstract class HttpServer extends Server
     public function getHostRoot($host)
     {
         $rootPath = $this->config['http']['root'][$host]['root']??'';
-        if (! empty($rootPath)) {
+        if (!empty($rootPath)) {
             $rootPath = WWW_DIR . "/$rootPath/";
         } else {
             $rootPath = WWW_DIR . "/";
