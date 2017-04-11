@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Server\Controllers;
 
+use PG\MSF\Server\CoreBase\AOPFactory;
+
 class Server extends BaseController
 {
     public function HttpInfo()
@@ -103,6 +105,16 @@ class Server extends BaseController
 
         yield $this->redisProxy->mset($arr);
         $data[] = yield $this->redisProxy->mget(array_keys($arr));
+
+        $this->outputJson($data);
+    }
+
+    public function httpRedisProxyMS()
+    {
+        $data = [];
+        $redis = AOPFactory::getRedisProxy(getInstance()->getRedisProxy('redisProxy1'), $this);
+        yield $redis->incrBy('rw', 1);
+        $data[] = yield $redis->get('rw');
 
         $this->outputJson($data);
     }

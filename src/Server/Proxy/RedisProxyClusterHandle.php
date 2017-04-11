@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Server\Proxy;
 
-class RedisProxyClusterHandle
+class RedisProxyClusterHandle implements IProxyHandle
 {
     /**
      * 处理入口

@@ -8,9 +8,11 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use Flexihash\Flexihash;
 use PG\MSF\Server\DataBase\CoroutineRedisHelp;
 use PG\MSF\Server\Memory\Pool;
 use PG\MSF\Server\Proxy\RedisProxyClusterHandle;
+use PG\MSF\Server\Proxy\RedisProxyMasterSlaveHandle;
 
 class AOPFactory
 {
@@ -47,7 +49,14 @@ class AOPFactory
             array_unshift($arguments, $context);
             $data['method'] = $method;
             $data['arguments'] = $arguments;
-            $data['result'] = RedisProxyClusterHandle::handle($redisProxy, $method, $arguments);
+            //分布式模式
+            if ($redisProxy instanceof Flexihash) {
+                $data['result'] = RedisProxyClusterHandle::handle($redisProxy, $method, $arguments);
+            } else {
+                //主从模式
+                $data['result'] = RedisProxyMasterSlaveHandle::handle($redisProxy, $method, $arguments);
+            }
+
             return $data;
         });
 
