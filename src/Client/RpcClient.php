@@ -87,12 +87,13 @@ class RpcClient
          *     'host' => 'http://10.1.90.10:80', <必须>
          *     'timeout' => 1000, <选填，可被下级覆盖>
          *     'secret' => 'xxxxxx', <选填，可被下级覆盖>
+         *     'useRpc' => false, <选填，可被下级覆盖>
          *     '1' => [
-         *         'useRpc' => false, // 是否真的使用 rpc 方式，为了兼容非 rpc 服务 <选填>
+         *         'useRpc' => false, // 是否真的使用 rpc 方式，为了兼容非 rpc 服务 <选填，如果填写将会覆盖上级的 useRpc>
          *         'urlPath' => '/path', <选填>
          *         'verb' => 'GET', <选填>
-         *         'timeout' => 2000, <选填，如果填写将会覆盖上级的timeout>
-         *         'secret' => 'yyyyyy', <选填，如果填写将会覆盖上级的secret>
+         *         'timeout' => 2000, <选填，如果填写将会覆盖上级的 timeout>
+         *         'secret' => 'yyyyyy', <选填，如果填写将会覆盖上级的 secret>
          *     ]
          * ]
          */
@@ -102,7 +103,10 @@ class RpcClient
         if ($config['host'] === '') {
             throw new SwooleException('Host configuration not found.');
         }
-        if (!isset($config['timeout'])) {
+        if (! isset($config['useRpc'])) {
+            $config['useRpc'] = getInstance()->config->get('params.service.' . $root . '.useRpc', false);
+        }
+        if (! isset($config['timeout'])) {
             $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
         }
         if (!isset($config['secret'])) {
@@ -134,11 +138,11 @@ class RpcClient
      */
     public static function serv($service)
     {
-        if (!isset(self::$services[$service])) {
-            self::$services[$service] = new RpcClient($service);
+        if (! isset(static::$services[$service])) {
+            static::$services[$service] = new static($service);
         }
 
-        return self::$services[$service];
+        return static::$services[$service];
     }
 
     /**
@@ -168,9 +172,9 @@ class RpcClient
         $obj = $args[0];
         array_shift($args);
         if ($this->scheme == 'tcp') { // 使用 tcp 方式调用
-            $response = self::remoteTcpCall($obj, $method, $args, $this);
+            $response = static::remoteTcpCall($obj, $method, $args, $this);
         } else {
-            $response = self::remoteHttpCall($obj, $method, $args, $this);
+            $response = static::remoteHttpCall($obj, $method, $args, $this);
         }
 
         return $response;
@@ -184,19 +188,19 @@ class RpcClient
     public static function remoteTcpCall(CoreBase $obj, $method, array $args, RpcClient $rpc)
     {
         $reqParams = [
-            'version' => self::$version,
+            'version' => static::$version,
             'args' => $args,
             'time' => microtime(true),
             'handler' => $rpc->handler,
             'method' => $method
         ];
         $reqParams['X-RPC'] = 1;
-        $reqParams['sig'] = self::genSig($reqParams, $rpc->secret);
+        $reqParams['sig'] = static::genSig($reqParams, $rpc->secret);
 
         $tcpClient = yield $obj->tcpClient->coroutineGetTcpClient($rpc->host);
         $response = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
 
-        return self::parseResponse($response);
+        return static::parseResponse($response);
     }
 
     /**
@@ -234,7 +238,7 @@ class RpcClient
         $headers = [];
         if ($rpc->useRpc) {
             $reqParams = [
-                'version' => self::$version,
+                'version' => static::$version,
                 'args' => $args,
                 'time' => microtime(true),
                 'handler' => $rpc->handler,
@@ -242,14 +246,14 @@ class RpcClient
             ];
             $sendData = [
                 'data' => getInstance()->pack->pack($reqParams),
-                'sig' => self::genSig($reqParams, $rpc->secret),
+                'sig' => static::genSig($reqParams, $rpc->secret),
             ];
             $headers = [
                 'X-RPC' => 1,
             ];
         } else {
             $sendData = $args;
-            $sendData['sig'] = self::genSig($args, $rpc->secret);
+            $sendData['sig'] = static::genSig($args, $rpc->secret);
         }
 
         $httpClient = yield $obj->client->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
@@ -263,11 +267,11 @@ class RpcClient
         }
         $body = json_decode($response['body'], true);
         if ($body === null) {
-            $error = self::jsonLastErrorMsg();
+            $error = static::jsonLastErrorMsg();
             throw new SwooleException('json decode failure: ' . $error . ' caused by ' . $response['body']);
         }
 
-        return self::parseResponse($body);
+        return static::parseResponse($body);
     }
 
     /**
@@ -277,6 +281,6 @@ class RpcClient
     protected static function jsonLastErrorMsg()
     {
         $error = json_last_error();
-        return array_key_exists($error, self::$jsonErrors) ? self::$jsonErrors[$error] : "Unknown error ({$error})";
+        return array_key_exists($error, static::$jsonErrors) ? static::$jsonErrors[$error] : "Unknown error ({$error})";
     }
 }
