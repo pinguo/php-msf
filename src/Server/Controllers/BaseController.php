@@ -8,9 +8,6 @@
 
 namespace PG\MSF\Server\Controllers;
 
-use PG\Exception\Errno;
-use PG\Exception\ParameterValidationExpandException;
-use PG\Exception\PrivilegeException;
 use PG\Log\PGLog;
 use PG\MSF\Server\{
     CoreBase\Controller, Helpers\Context, Marco
@@ -95,15 +92,9 @@ class BaseController extends Controller
             $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
         }
         $stdClass = new \stdClass();
-        if ($e instanceof ParameterValidationExpandException) {
-            $this->PGLog->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
-            $this->outputJson($stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
-        } elseif ($e instanceof PrivilegeException) {
-            $this->PGLog->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-            $this->outputJson($stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
-        } elseif ($e instanceof \MongoException) {
+        if ($e instanceof \MongoException) {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson($stdClass, 'Network Error.', Errno::FATAL);
+            $this->outputJson($stdClass, 'Network Error.', 500);
         } else {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
             $this->outputJson($stdClass, $e->getMessage(), $e->getCode());

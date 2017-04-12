@@ -8,7 +8,6 @@
     "php": ">=7.0",
     "PGWireless/php-log": "dev-master",
     "PGWireless/php-helper": "dev-master",
-    "PGWireless/php-exception": "dev-master",
     "hassankhan/config": "~0.10",
     "voku/anti-xss": "2.0.1",
     "league/plates": "3.*",
@@ -25,10 +24,6 @@
     "php-helper": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-helper.git"
-    },
-    "php-exception": {
-      "type": "vcs",
-      "url": "http://182.150.28.13:3000/PGWireless/php-exception.git"
     }
   },
   "autoload": {
