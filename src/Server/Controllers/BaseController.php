@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /**
  * @desc: 控制器基类
  * @author: leandre <niulingyun@camera360.com>
@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Server\Controllers;
 
+use PG\Exception\BusinessException;
+use PG\Exception\Errno;
+use PG\Exception\ParameterValidationExpandException;
+use PG\Exception\PrivilegeException;
 use PG\Log\PGLog;
 use PG\MSF\Server\{
     CoreBase\Controller, Helpers\Context, Marco
@@ -86,16 +90,28 @@ class BaseController extends Controller
      */
     public function onExceptionHandle(\Throwable $e)
     {
-        $message = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
-        $message .= ' Trace: ' . $e->getTraceAsString();
-
+        $errMsg = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+        $errMsg .= ' Trace: ' . $e->getTraceAsString();
         if (!empty($e->getPrevious())) {
-            $message .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
+            $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
         }
 
-        $this->PGLog->error($message);
-
-        $this->outputJson([], 'error', 500);
+        if ($e instanceof ParameterValidationExpandException) {
+            $this->PGLog->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
+            $this->outputJson([], $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
+        } elseif ($e instanceof PrivilegeException) {
+            $this->PGLog->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
+            $this->outputJson([], $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
+        } elseif ($e instanceof BusinessException) {
+            $this->PGLog->warning($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson([], $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
+        } elseif ($e instanceof \MongoException) {
+            $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson([], 'Network Error.', Errno::FATAL);
+        } elseif ($e instanceof \Exception) {
+            $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson([], $e->getMessage(), $e->getCode());
+        }
     }
 
     /**
@@ -107,9 +123,12 @@ class BaseController extends Controller
      * @param null $callback
      * @return array
      */
-
-    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
-    {
+    public function outputJson(
+        $data = null,
+        $message = '',
+        $status = 200,
+        $callback = null
+    ) {
         $this->output->outputJson($data, $message, $status, $callback);
     }
 }
