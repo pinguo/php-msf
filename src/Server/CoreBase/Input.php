@@ -181,15 +181,14 @@ class Input
      */
     public function getRemoteAddr()
     {
-        if ($ip = $this->getRequestHeader('x-real-ip')) {
-        } elseif ($ip = $this->getRequestHeader('http_client_ip')) {
-        } elseif ($ip = $this->getRequestHeader('x-forwarded-for')) {
-        } elseif ($ip = $this->getRequestHeader('http_x_forwarded_for')) {
+        if (($ip = $this->getRequestHeader('x-forwarded-for')) || ($ip = $this->getRequestHeader('http_x_forwarded_for'))
+             || ($ip = $this->getRequestHeader('http_forwarded')) || ($ip = $this->getRequestHeader('http_forwarded_for'))
+             || ($ip = $this->getRequestHeader('http_forwarded'))
+        ) {
             $ip = explode(',', $ip);
             $ip = trim($ip[0]);
-        } elseif ($ip = $this->getRequestHeader('http_x_forwarded')) {
-        } elseif ($ip = $this->getRequestHeader('http_forwarded_for')) {
-        } elseif ($ip = $this->getRequestHeader('http_forwarded')) {
+        } elseif ($ip = $this->getRequestHeader('http_client_ip')) {
+        } elseif ($ip = $this->getRequestHeader('x-real-ip')) {
         } elseif ($ip = $this->getRequestHeader('remote_addr')) {
         } elseif ($ip = $this->request->server['remote_addr']) {
             // todo
