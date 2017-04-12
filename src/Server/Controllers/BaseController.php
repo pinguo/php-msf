@@ -108,7 +108,7 @@ class BaseController extends Controller
         } elseif ($e instanceof \MongoException) {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
             $this->outputJson($stdClass, 'Network Error.', Errno::FATAL);
-        } elseif ($e instanceof \Exception) {
+        } else {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
             $this->outputJson($stdClass, $e->getMessage(), $e->getCode());
         }
