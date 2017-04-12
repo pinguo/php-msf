@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Server\Controllers;
 
-use PG\Exception\BusinessException;
 use PG\Exception\Errno;
 use PG\Exception\ParameterValidationExpandException;
 use PG\Exception\PrivilegeException;
@@ -101,9 +100,6 @@ class BaseController extends Controller
             $this->outputJson($stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
         } elseif ($e instanceof PrivilegeException) {
             $this->PGLog->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-            $this->outputJson($stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
-        } elseif ($e instanceof BusinessException) {
-            $this->PGLog->warning($errMsg . ' with code ' . $e->getCode());
             $this->outputJson($stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
         } elseif ($e instanceof \MongoException) {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
