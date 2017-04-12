@@ -210,18 +210,20 @@ abstract class Server extends Child
                 throw new SwooleException("class {$this->config['server']['pack_tool']} is not exist.");
             }
         }
-        //route class
-        $routeClassName = "\\App\\Route\\" . $this->config['server']['route_tool'];
-        if (class_exists($routeClassName)) {
-            $this->route = new $routeClassName;
+        // route class
+        $routeTool = $this->config['server']['route_tool'];
+        if (class_exists($routeTool)) {
+            $routeClassName = $routeTool;
         } else {
-            $routeClassName = "\\PG\\MSF\\Server\\Route\\" . $this->config['server']['route_tool'];
-            if (class_exists($routeClassName)) {
-                $this->route = new $routeClassName;
-            } else {
-                throw new SwooleException("class {$this->config['server']['route_tool']} is not exist.");
+            $routeClassName = "\\App\\Route\\" . $routeTool;
+            if (!class_exists($routeClassName)) {
+                $routeClassName = "\\PG\\MSF\\Server\\Route\\" . $routeTool;
+                if (!class_exists($routeClassName)) {
+                    throw new SwooleException("class {$routeTool} is not exist.");
+                }
             }
         }
+        $this->route = new $routeClassName;
         $this->loader = new Loader();
     }
 
