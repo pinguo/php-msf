@@ -581,7 +581,7 @@ abstract class MSFServer extends WebSocketServer
             //重新读入timerTask配置
             $timerTaskConfig = $this->config->load(ROOT_PATH . '/config/timerTask.php');
             $timerTasks = $timerTaskConfig->get('timerTask');
-            $this->timerTasksUsed = array();
+            $this->timerTasksUsed = [];
 
             foreach ($timerTasks as $timerTask) {
                 $taskName = $timerTask['task_name']??'';
