@@ -12,6 +12,8 @@ namespace PG\MSF\Server\Proxy;
 interface IProxy
 {
     public function check($pools);
+
     public function handle($method, $arguments);
+
     public function startCheck($pools);
 }

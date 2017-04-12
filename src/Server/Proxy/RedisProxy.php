@@ -33,7 +33,6 @@ class RedisProxy
     }
 
 
-
     public function refreshProxy()
     {
         $redisProxyManager = getInstance()->getRedisProxies();

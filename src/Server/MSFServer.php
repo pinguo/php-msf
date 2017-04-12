@@ -509,15 +509,6 @@ abstract class MSFServer extends WebSocketServer
     }
 
     /**
-     * 获取所有的redisProxy
-     * @return array
-     */
-    public function &getRedisProxies()
-    {
-        return $this->redisProxyManager;
-    }
-
-    /**
      * 重新设置redis代理
      * @param $name
      * @param $proxy
@@ -525,6 +516,15 @@ abstract class MSFServer extends WebSocketServer
     public function setRedisProxy($name, $proxy)
     {
         $this->redisProxyManager[$name] = $proxy;
+    }
+
+    /**
+     * 获取所有的redisProxy
+     * @return array
+     */
+    public function &getRedisProxies()
+    {
+        return $this->redisProxyManager;
     }
 
     /**
