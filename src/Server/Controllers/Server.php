@@ -81,13 +81,13 @@ class Server extends BaseController
     {
         $data = [];
         yield $this->redisProxy->incrBy('aaa', 1);
-        $data[] = yield $this->redisProxy->cache('aaa');
+        $data[] = yield $this->redisProxy->get('aaa');
         yield $this->redisProxy->incrBy('bbb', 1);
-        $data[] = yield $this->redisProxy->cache('bbb');
+        $data[] = yield $this->redisProxy->get('bbb');
         yield $this->redisProxy->incrBy('ccc', 1);
-        $data[] = yield $this->redisProxy->cache('ccc');
+        $data[] = yield $this->redisProxy->get('ccc');
         yield $this->redisProxy->incrBy('ddd', 1);
-        $data[] = yield $this->redisProxy->cache('ddd');
+        $data[] = yield $this->redisProxy->get('ddd');
 
 
         $arr = [
