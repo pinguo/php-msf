@@ -210,18 +210,20 @@ abstract class Server extends Child
                 throw new SwooleException("class {$this->config['server']['pack_tool']} is not exist.");
             }
         }
-        //route class
-        $routeClassName = "\\App\\Route\\" . $this->config['server']['route_tool'];
-        if (class_exists($routeClassName)) {
-            $this->route = new $routeClassName;
+        // route class
+        $routeTool = $this->config['server']['route_tool'];
+        if (class_exists($routeTool)) {
+            $routeClassName = $routeTool;
         } else {
-            $routeClassName = "\\PG\\MSF\\Server\\Route\\" . $this->config['server']['route_tool'];
-            if (class_exists($routeClassName)) {
-                $this->route = new $routeClassName;
-            } else {
-                throw new SwooleException("class {$this->config['server']['route_tool']} is not exist.");
+            $routeClassName = "\\App\\Route\\" . $routeTool;
+            if (! class_exists($routeClassName)) {
+                $routeClassName = "\\PG\\MSF\\Server\\Route\\" . $routeTool;
+                if (! class_exists($routeClassName)) {
+                    throw new SwooleException("class {$routeTool} is not exist.");
+                }
             }
         }
+        $this->route = new $routeClassName;
         $this->loader = new Loader();
     }
 
@@ -288,7 +290,7 @@ abstract class Server extends Child
         if (empty(self::$pidFile)) {
             self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_',
                     self::$_startFile) . ".pid";
-            if (!is_dir(self::$_worker->config->get('server.pid_path'))) {
+            if (! is_dir(self::$_worker->config->get('server.pid_path'))) {
                 mkdir(self::$_worker->config->get('server.pid_path'), 0777, true);
             }
         }
@@ -306,7 +308,7 @@ abstract class Server extends Child
     public static function setProcessTitle($title)
     {
         // >=php 5.5
-        if (function_exists('cli_set_process_title') && !isMac()) {
+        if (function_exists('cli_set_process_title') && ! isMac()) {
             @cli_set_process_title($title);
         } // Need proctitle when php<=5.5 .
         else {
@@ -325,7 +327,7 @@ abstract class Server extends Child
         global $argv;
         // Check argv;
         $startFile = $argv[0];
-        if (!isset($argv[1])) {
+        if (! isset($argv[1])) {
             $argv[1] = 'start';
             echo("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
         }
@@ -631,7 +633,7 @@ abstract class Server extends Child
             apc_clear_cache();
         }
         file_put_contents(self::$pidFile, ',' . $serv->worker_pid, FILE_APPEND);
-        if (!$serv->taskworker) {//worker进程
+        if (! $serv->taskworker) {//worker进程
             if ($this->needCoroutine) {//启动协程调度器
                 $this->coroutine = new Coroutine();
             }
@@ -690,13 +692,13 @@ abstract class Server extends Child
             $methodName = $this->config->get('tcp.method_prefix', '') . $this->route->getMethodName();
             $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
-            if (!method_exists($controllerInstance, $methodName)) {
+            if (! method_exists($controllerInstance, $methodName)) {
                 $methodName = $this->config->get('tcp.method_prefix', '') . $this->config->get('tcp.default_method',
                         'Index');
                 $this->route->setMethodName($this->config->get('tcp.default_method', 'Index'));
             }
 
-            if (!method_exists($controllerInstance, $methodName)) {
+            if (! method_exists($controllerInstance, $methodName)) {
                 $error = 'api not found(action)';
             } else {
                 try {
@@ -909,13 +911,13 @@ abstract class Server extends Child
                     $log .= "$message ($file:$line)\nStack trace:\n";
                     $trace = debug_backtrace();
                     foreach ($trace as $i => $t) {
-                        if (!isset($t['file'])) {
+                        if (! isset($t['file'])) {
                             $t['file'] = 'unknown';
                         }
-                        if (!isset($t['line'])) {
+                        if (! isset($t['line'])) {
                             $t['line'] = 0;
                         }
-                        if (!isset($t['function'])) {
+                        if (! isset($t['function'])) {
                             $t['function'] = 'unknown';
                         }
                         $log .= "#$i {$t['file']}({$t['line']}): ";
