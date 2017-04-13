@@ -42,7 +42,7 @@ abstract class HttpServer extends Server
         //view dir
         $view_dir = APP_DIR . '/Views';
         if (!is_dir($view_dir)) {
-            echo "app目录下不存在Views目录，请创建。\n";
+            echo "App directory does not exist Views directory, please create.\n";
             exit();
         }
     }
@@ -184,13 +184,14 @@ abstract class HttpServer extends Server
                 $controllerInstance->destroy();
             }
 
-            $res = [
-                'data' => [],
+            $res = json_encode([
+                'data' => parent::$stdClass,
                 'message' => $error,
                 'status' => $code,
                 'serverTime' => microtime(true)
-            ];
-            $response->end(json_encode($res));
+            ]);
+            $this->log->warning($res);
+            $response->end($res);
         }
     }
 
