@@ -13,7 +13,7 @@ use PG\Exception\ParameterValidationExpandException;
 use PG\Exception\PrivilegeException;
 use PG\Log\PGLog;
 use PG\MSF\Server\{
-    CoreBase\Controller, Helpers\Context, Marco
+    CoreBase\Controller, Coroutine\CoroutineException, Helpers\Context, Marco
 };
 
 class BaseController extends Controller
@@ -104,6 +104,9 @@ class BaseController extends Controller
         } elseif ($e instanceof \MongoException) {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
             $this->outputJson($stdClass, 'Network Error.', Errno::FATAL);
+        } elseif ($e instanceof CoroutineException) {
+            $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson($stdClass, $e->getPreviousMessage(), $e->getCode());
         } else {
             $this->PGLog->error($errMsg . ' with code ' . $e->getCode());
             $this->outputJson($stdClass, $e->getMessage(), $e->getCode());
