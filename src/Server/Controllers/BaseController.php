@@ -39,10 +39,13 @@ class BaseController extends Controller
         $this->PGLog = null;
         $this->PGLog = clone $this->logger;
         $this->PGLog->accessRecord['beginTime'] = $this->requestStartTime;
-        $this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $controllerName . '/' . $methodName);
+        //$this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $controllerName . '/' . $methodName);
+        $this->PGLog->accessRecord['uri'] = $this->input->getPathInfo();
         $this->PGLog->logId = $this->genLogId();
         defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME;
         $this->PGLog->init();
+        $this->PGLog->pushLog('controller', $controllerName);
+        $this->PGLog->pushLog('method', $methodName);
 
         $context = $this->objectPool->get(Context::class);
         $context->logId = $this->logId;
