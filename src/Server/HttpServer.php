@@ -124,6 +124,7 @@ abstract class HttpServer extends Server
     public function onSwooleRequest($request, $response)
     {
         $error = '';
+        $code = 500;
         $controllerInstance = null;
         $this->route->handleClientRequest($request);
         list($host) = explode(':', $request->header['host']??'');
@@ -132,7 +133,8 @@ abstract class HttpServer extends Server
             $wwwPath = $this->getHostRoot($host) . $this->getHostIndex($host);
             $result = httpEndFile($wwwPath, $request, $response);
             if (!$result) {
-                $error = 'index not found';
+                $error = 'Index not found';
+                $code = 404;
             } else {
                 return;
             }
@@ -156,7 +158,8 @@ abstract class HttpServer extends Server
                 try {
                     $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
                     if (!method_exists($controllerInstance, $methodName)) {
-                        $error = 'api not found method(' . $methodName . ')';
+                        $error = 'Api not found method(' . $methodName . ')';
+                        $code = 404;
                     } else {
                         $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                         if ($generator instanceof \Generator) {
@@ -171,16 +174,22 @@ abstract class HttpServer extends Server
                     call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
                 }
             } else {
-                $error = 'api not found controller(' . $controllerName . ')';
+                $error = 'Api not found controller(' . $controllerName . ')';
+                $code = 404;
             }
         }
 
-        if ($error) {
+        if ($error !== '') {
             if ($controllerInstance != null) {
                 $controllerInstance->destroy();
             }
 
-            $res = ['data' => [], 'message' => $error, 'status' => 500, 'serverTime' => microtime(true)];
+            $res = [
+                'data' => [],
+                'message' => $error,
+                'status' => $code,
+                'serverTime' => microtime(true)
+            ];
             $response->end(json_encode($res));
         }
     }
