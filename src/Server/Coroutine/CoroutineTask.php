@@ -78,7 +78,7 @@ class CoroutineTask
                 $value = "";
             }
 
-            $logValue = "";
+            $logValue = '';
             dumpCoroutineTaskMessage($logValue, $value, 0);
 
             $message = 'yield ' . $logValue . ' message: ' . $e->getMessage();
