@@ -23,10 +23,8 @@ class RedisProxyFactory
     {
         $model = $config['model'];
         if ($model == Marco::CLUSTER) {
-            echo "cluster\n";
             return new RedisProxyCluster($config);
         } elseif ($model == Marco::MASTER_SLAVE) {
-            echo "master-slave\n";
             return new RedisProxyMasterSlave($config);
         } else {
             return false;

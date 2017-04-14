@@ -204,7 +204,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
         foreach ($this->pools as $pool => $weight) {
             try {
                 if (getInstance()->getAsynPool($pool)->getSync()
-                    ->set('msf_active_cluster_check', 1, 30)
+                    ->set('msf_active_cluster_check', 1, 5)
                 ) {
                     $this->goodPools[$pool] = $weight;
                 } else {
@@ -212,7 +212,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
                     $port = getInstance()->getAsynPool($pool)->getSync()->getPort();
                     getInstance()->getAsynPool($pool)->getSync()->connect($host, $port, 0.05);
                 }
-            } catch (\RedisException $e) {
+            } catch (\Exception $e) {
                 echo RedisProxyFactory::getLogTitle() . $e->getMessage() . "\t {$pool}\n";
             }
         }
@@ -237,7 +237,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
                     }
                     return false;
                 }
-                $client->set('msf_active_cluster_check', 1,
+                $client->setex('msf_active_cluster_check', 5, 1,
                     function ($client, $result) use ($pool, $weight) {
                         if ($result != 'OK') {
                             //移除

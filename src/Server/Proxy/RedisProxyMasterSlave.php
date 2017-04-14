@@ -17,6 +17,8 @@ class RedisProxyMasterSlave implements IProxy
     private $master;
     private $slaves;
 
+    private $asyncCheckResult;
+
     public function __construct($config)
     {
         $this->pools = $config['pools'];
@@ -27,6 +29,7 @@ class RedisProxyMasterSlave implements IProxy
             }
 
             if (empty($this->slaves)) {
+                echo 111;
                 throw new SwooleException('No slave redis server in master-slave config!');
             }
         } catch (SwooleException $e) {
@@ -44,7 +47,7 @@ class RedisProxyMasterSlave implements IProxy
         foreach ($this->pools as $pool) {
             try {
                 if (getInstance()->getAsynPool($pool)->getSync()
-                    ->set('msf_active_master_slave_check', 1, 30)
+                    ->set('msf_active_master_slave_check', 1, 5)
                 ) {
                     $this->master = $pool;
                     break;
@@ -60,16 +63,20 @@ class RedisProxyMasterSlave implements IProxy
         }
 
         //探测从节点
-        foreach ($this->pools as $pool) {
-            if ($pool != $this->master) {
-                try {
-                    if (getInstance()->getAsynPool($pool)->getSync()
-                            ->get('msf_active_master_slave_check') == 1
-                    ) {
-                        $this->slaves[] = $pool;
+        if (count($this->pools) === 1) {
+            $this->slaves[] = $this->master;
+        } else {
+            foreach ($this->pools as $pool) {
+                if ($pool != $this->master) {
+                    try {
+                        if (getInstance()->getAsynPool($pool)->getSync()
+                                ->get('msf_active_master_slave_check') == 1
+                        ) {
+                            $this->slaves[] = $pool;
+                        }
+                    } catch (\RedisException $e) {
+                        // do nothing
                     }
-                } catch (\RedisException $e) {
-                    // do nothing
                 }
             }
         }
@@ -121,7 +128,7 @@ class RedisProxyMasterSlave implements IProxy
         if (getInstance()->isTaskWorker()) {
             $this->syncCheck();
         } else {
-            $this->syncCheck();
+            $this->asyncCheck();
         }
     }
 
@@ -133,7 +140,7 @@ class RedisProxyMasterSlave implements IProxy
             foreach ($this->pools as $pool) {
                 try {
                     if (getInstance()->getAsynPool($pool)->getSync()
-                        ->set('msf_active_master_slave_check', 1, 30)
+                        ->set('msf_active_master_slave_check', 1, 5)
                     ) {
                         $newMaster = $pool;
                         break;
@@ -154,19 +161,28 @@ class RedisProxyMasterSlave implements IProxy
 
             //探测从节点
             $newSlaves = [];
-            foreach ($this->pools as $pool) {
-                if ($pool != $this->master) {
-                    try {
-                        if (getInstance()->getAsynPool($pool)->getSync()
-                                ->get('msf_active_master_slave_check') == 1
-                        ) {
-                            $newSlaves[] = $pool;
+            if (count($this->pools) === 1) {
+                $newSlaves[] = $this->master;
+            } else {
+                if (count($this->pools) == 1) {
+                    $newSlaves[] = $this->master;
+                } else {
+                    foreach ($this->pools as $pool) {
+                        if ($pool != $this->master) {
+                            try {
+                                if (getInstance()->getAsynPool($pool)->getSync()
+                                        ->get('msf_active_master_slave_check') == 1
+                                ) {
+                                    $newSlaves[] = $pool;
+                                }
+                            } catch (\RedisException $e) {
+                                // do nothing
+                            }
                         }
-                    } catch (\RedisException $e) {
-                        // do nothing
                     }
                 }
             }
+
 
             if (empty($newSlaves)) {
                 throw new SwooleException('No slave redis server in master-slave config!');
@@ -195,6 +211,81 @@ class RedisProxyMasterSlave implements IProxy
 
     private function asyncCheck()
     {
+        $this->asyncCheckResult = [];
+        $this->asyncCheckResult['pools'] = [];
+        $this->asyncCheckResult['master'] = '';
+        $this->asyncCheckResult['slaves'] = [];
 
+        try {
+            foreach ($this->pools as $pool) {
+                $conf = getInstance()->config->get('redis.' . $pool);
+
+                $client = new \swoole_redis;
+
+                $this->asyncCheckResult['pools'][$pool] = $client;
+
+                $client->connect($conf['ip'], $conf['port'], function ($client, $result) use ($pool) {
+                    if ($result != false) {
+                        //探测主节点
+                        $client->setex('msf_active_master_slave_check', 5, 1, function ($client, $result) use ($pool) {
+                            if ($result == 'OK') {
+                                $this->asyncCheckResult['master'] = $pool;
+
+                                //有主节点 检查从
+                                if (count($this->pools) > 1) {
+                                    foreach ($this->asyncCheckResult['pools'] as $p => $cli) {
+                                        if ($p !== $this->asyncCheckResult['master']) {
+                                            $cli->get('msf_active_master_slave_check',
+                                                function ($client, $result) use ($p) {
+                                                    if ($result == 1) {
+                                                        $this->asyncCheckResult['slaves'][] = $p;
+                                                    }
+                                                });
+                                        }
+
+                                    }
+                                } else {
+                                    $this->asyncCheckResult['slaves'][] = $pool;
+                                }
+
+                            }
+                        });
+                    }
+                });
+            }
+
+            //50ms就关闭连接
+            swoole_timer_after(50, function () {
+                if ($this->asyncCheckResult['master'] === '') {
+                    echo RedisProxyFactory::getLogTitle() . 'No master redis server in master-slave config!';
+                }
+                if ($this->master !== $this->asyncCheckResult['master']) {
+                    $this->master = $this->asyncCheckResult['master'];
+                    echo RedisProxyFactory::getLogTitle() . 'master node change to ' . $this->master;
+                }
+
+                $losts = array_diff($this->slaves, $this->asyncCheckResult['slaves']);
+                if ($losts) {
+                    $this->slaves = $this->asyncCheckResult['slaves'];
+                    echo RedisProxyFactory::getLogTitle() . 'slave nodes change to ( ' . implode(',',
+                            $this->slaves) . ' ), lost ( ' . implode(',', $losts) . ' )';
+                }
+
+                $adds = array_diff($this->asyncCheckResult['slaves'], $this->slaves);
+                if ($adds) {
+                    $this->slaves = $this->asyncCheckResult['slaves'];
+                    echo RedisProxyFactory::getLogTitle() . 'slave nodes change to ( ' . implode(',',
+                            $this->slaves) . ' ), add ( ' . implode(',', $adds) . ' )';
+                }
+
+                foreach ($this->asyncCheckResult['pools'] as $pool => $client) {
+                    $client->close();
+                    unset($this->asyncCheckResult['pools'][$pool]);
+                }
+            });
+        } catch (SwooleException $e) {
+            echo RedisProxyFactory::getLogTitle() . $e->getMessage();
+            return false;
+        }
     }
 }
