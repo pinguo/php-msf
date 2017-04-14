@@ -227,6 +227,8 @@ class Controller extends CoreBase
         unset($this->request);
         unset($this->response);
         unset($this->generatorContext);
+        unset($this->redisProxies);
+        unset($this->redisPools);
         $this->input->reset();
         $this->output->reset();
         //销毁对象池

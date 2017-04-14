@@ -37,15 +37,6 @@ abstract class MSFServer extends WebSocketServer
      * @var Pool
      */
     public $objectPool;
-
-    /**
-     * @var RedisAsynPool
-     */
-    public $redisPool;
-    /**
-     * @var RedisAsynPool
-     */
-    public $redisProxy;
     /**
      * @var MysqlAsynPool
      */
@@ -313,8 +304,6 @@ abstract class MSFServer extends WebSocketServer
             foreach ($activePools as $poolKey) {
                 $redisPools[$poolKey] = new RedisAsynPool($this->config, $poolKey);
             }
-        } else {
-            $redisPools['redisPool'] = null;
         }
 
         $this->asynPools = array_merge([
@@ -337,8 +326,6 @@ abstract class MSFServer extends WebSocketServer
             foreach ($activeProxies as $activeProxy) {
                 $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy($this->config['redisProxy'][$activeProxy]);
             }
-        } else {
-            $this->redisProxyManager['redisProxy'] = null;
         }
     }
 
@@ -425,16 +412,6 @@ abstract class MSFServer extends WebSocketServer
             default:
                 return parent::onSwooleTask($serv, $taskId, $fromId, $data);
         }
-    }
-
-    /**
-     * 获取同步redis
-     * @return \Redis
-     * @throws SwooleException
-     */
-    public function getRedis()
-    {
-        return $this->redisPool->getSync();
     }
 
     /**
@@ -538,9 +515,7 @@ abstract class MSFServer extends WebSocketServer
         parent::onSwooleWorkerStart($serv, $workerId);
         $this->initAsynPools();
         $this->initRedisProxies();
-        $this->redisPool = $this->asynPools['redisPool'];
         $this->mysqlPool = $this->asynPools['mysqlPool'];
-        $this->redisProxy = $this->redisProxyManager['redisProxy'];
         if (!$serv->taskworker) {
             //注册
             $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);

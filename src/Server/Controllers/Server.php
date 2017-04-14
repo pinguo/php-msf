@@ -8,8 +8,6 @@
 
 namespace PG\MSF\Server\Controllers;
 
-use PG\MSF\Server\CoreBase\AOPFactory;
-
 class Server extends BaseController
 {
     public function HttpInfo()
