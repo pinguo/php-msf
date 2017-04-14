@@ -46,6 +46,7 @@ class ControllerFactory
         if ($controller == null) {
             return null;
         }
+        $controller = ltrim($controller, '\\');
         $controllers = $this->pool[$controller]??null;
         if ($controllers == null) {
             $controllers = $this->pool[$controller] = new \SplQueue();

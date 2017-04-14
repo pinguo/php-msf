@@ -7,7 +7,6 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
-
 namespace PG\MSF\Client;
 
 use PG\Helper\SecurityHelper;
@@ -167,7 +166,7 @@ class RpcClient
     public function __call($method, $args)
     {
         if (!is_object($args[0]) || !($args[0] instanceof CoreBase)) {
-            throw new SwooleException('The first argument of ' . $method . ' must be instanceof CoreBase .');
+            throw new SwooleException('The first argument of ' . $method . ' must be instanceof CoreBase.');
         }
         $obj = $args[0];
         array_shift($args);
