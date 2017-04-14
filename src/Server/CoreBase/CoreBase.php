@@ -44,6 +44,11 @@ class CoreBase extends Child
     protected $start_run_time;
 
     /**
+     * @var null
+     */
+    public static $stdClass = null;
+
+    /**
      * Task constructor.
      */
     public function __construct()

@@ -42,7 +42,7 @@ abstract class HttpServer extends Server
         //view dir
         $view_dir = APP_DIR . '/Views';
         if (!is_dir($view_dir)) {
-            echo "app目录下不存在Views目录，请创建。\n";
+            echo "App directory does not exist Views directory, please create.\n";
             exit();
         }
     }
@@ -124,6 +124,7 @@ abstract class HttpServer extends Server
     public function onSwooleRequest($request, $response)
     {
         $error = '';
+        $code = 500;
         $controllerInstance = null;
         $this->route->handleClientRequest($request);
         list($host) = explode(':', $request->header['host']??'');
@@ -132,7 +133,8 @@ abstract class HttpServer extends Server
             $wwwPath = $this->getHostRoot($host) . $this->getHostIndex($host);
             $result = httpEndFile($wwwPath, $request, $response);
             if (!$result) {
-                $error = 'index not found';
+                $error = 'Index not found';
+                $code = 404;
             } else {
                 return;
             }
@@ -156,7 +158,8 @@ abstract class HttpServer extends Server
                 try {
                     $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
                     if (!method_exists($controllerInstance, $methodName)) {
-                        $error = 'api not found method(' . $methodName . ')';
+                        $error = 'Api not found method(' . $methodName . ')';
+                        $code = 404;
                     } else {
                         $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                         if ($generator instanceof \Generator) {
@@ -171,17 +174,24 @@ abstract class HttpServer extends Server
                     call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
                 }
             } else {
-                $error = 'api not found controller(' . $controllerName . ')';
+                $error = 'Api not found controller(' . $controllerName . ')';
+                $code = 404;
             }
         }
 
-        if ($error) {
+        if ($error !== '') {
             if ($controllerInstance != null) {
                 $controllerInstance->destroy();
             }
 
-            $res = ['data' => [], 'message' => $error, 'status' => 500, 'serverTime' => microtime(true)];
-            $response->end(json_encode($res));
+            $res = json_encode([
+                'data' => parent::$stdClass,
+                'message' => $error,
+                'status' => $code,
+                'serverTime' => microtime(true)
+            ]);
+            $this->log->warning($res);
+            $response->end($res);
         }
     }
 

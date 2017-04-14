@@ -8,6 +8,7 @@
 
 namespace PG\MSF\Server\CoreBase;
 
+use PG\Exception\BusinessException;
 use PG\MSF\Server\Controllers\BaseController;
 
 class SwooleException extends \Exception
@@ -24,6 +25,10 @@ class SwooleException extends \Exception
      */
     public function setShowOther($others, $controller = null)
     {
+        //  BusinessException 不打印在终端.
+        if ($this->getPrevious() instanceof BusinessException) {
+            return;
+        }
         if (!empty($others)) {
             print_r($others . "\n");
         } else {

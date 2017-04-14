@@ -14,7 +14,7 @@ use PG\MSF\Server\{
     CoreBase\Child, CoreBase\ControllerFactory, CoreBase\Loader, CoreBase\SwooleException, Coroutine\GeneratorContext
 };
 use PG\MSF\Server\{
-    Pack\IPack, Route\IRoute
+    CoreBase\CoreBase, Pack\IPack, Route\IRoute
 };
 use PG\MSF\Server\Coroutine\Scheduler as Coroutine;
 
@@ -177,6 +177,11 @@ abstract class Server extends Child
      */
     protected $needCoroutine = true;
 
+    /**
+     * @var null
+     */
+    protected static $stdClass = null;
+
     public function __construct()
     {
         $this->afterConstruct();
@@ -271,7 +276,7 @@ abstract class Server extends Child
     {
         // Only for cli.
         if (php_sapi_name() != "cli") {
-            exit("only run in command line mode \n");
+            exit("Only run in command line mode \n");
         }
     }
 
@@ -297,6 +302,9 @@ abstract class Server extends Child
 
         // Process title.
         self::setProcessTitle(self::$_worker->config->get('server.process_title'));
+        // stdClass
+        self::$stdClass = new \stdClass();
+        CoreBase::$stdClass = self::$stdClass;
     }
 
     /**
@@ -663,6 +671,7 @@ abstract class Server extends Child
     public function onSwooleReceive($serv, $fd, $fromId, $data)
     {
         $error = '';
+        $code = 500;
         $data = substr($data, $this->packageLengthTypeLength);
         //反序列化，出现异常断开连接
         try {
@@ -699,7 +708,8 @@ abstract class Server extends Child
             }
 
             if (!method_exists($controllerInstance, $methodName)) {
-                $error = 'api not found(action)';
+                $error = 'Api not found method(' . $methodName . ')';
+                $code = 404;
             } else {
                 try {
                     $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
@@ -713,16 +723,23 @@ abstract class Server extends Child
                 }
             }
         } else {
-            $error = 'api not found(controller)';
+            $error = 'Api not found controller(' . $controllerName . ')';
+            $code = 404;
         }
 
-        if ($error) {
+        if ($error !== '') {
             if ($controllerInstance != null) {
                 $controllerInstance->destroy();
             }
 
-            $response = ['data' => [], 'message' => $error, 'status' => 500, 'serverTime' => microtime(true)];
-            $response = getInstance()->encode($this->pack->pack(json_encode($response)));
+            $response = json_encode([
+                'data' => self::$stdClass,
+                'message' => $error,
+                'status' => $code,
+                'serverTime' => microtime(true)
+            ]);
+            $this->log->warning($response);
+            $response = getInstance()->encode($this->pack->pack($response));
             getInstance()->send($fd, $response);
         }
     }

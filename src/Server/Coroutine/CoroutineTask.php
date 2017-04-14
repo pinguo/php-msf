@@ -78,10 +78,10 @@ class CoroutineTask
                 $value = "";
             }
 
-            $logValue = "";
+            $logValue = '';
             dumpCoroutineTaskMessage($logValue, $value, 0);
 
-            $message = 'yield ' . $logValue . ' message: ' . $e->getMessage();
+            $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
             $runTaskException = new CoroutineException($message, $e->getCode(), $e);
             $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
             $this->generatorContext->setErrorMessage($message);
