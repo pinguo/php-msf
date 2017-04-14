@@ -21,7 +21,7 @@ class RedisProxyMasterSlave implements IProxy
     {
         $this->pools = $config['pools'];
         try {
-            $this->startCheck($this->pools);
+            $this->startCheck();
             if (!$this->master) {
                 throw new SwooleException('No master redis server in master-slave config!');
             }
@@ -29,20 +29,19 @@ class RedisProxyMasterSlave implements IProxy
             if (empty($this->slaves)) {
                 throw new SwooleException('No slave redis server in master-slave config!');
             }
-        } catch (SwooleException $ex) {
-            echo $ex->getMessage() . "\n";
+        } catch (SwooleException $e) {
+            echo RedisProxyFactory::getLogTitle() . $e->getMessage();
         }
     }
 
     /**
      * 前置检测
-     * @param $pools
      * @return bool
      */
-    public function startCheck($pools)
+    public function startCheck()
     {
         //探测主节点
-        foreach ($pools as $pool) {
+        foreach ($this->pools as $pool) {
             try {
                 if (getInstance()->getAsynPool($pool)->getSync()
                     ->set('msf_active_master_slave_check', 1, 30)
@@ -61,7 +60,7 @@ class RedisProxyMasterSlave implements IProxy
         }
 
         //探测从节点
-        foreach ($pools as $pool) {
+        foreach ($this->pools as $pool) {
             if ($pool != $this->master) {
                 try {
                     if (getInstance()->getAsynPool($pool)->getSync()
@@ -117,8 +116,85 @@ class RedisProxyMasterSlave implements IProxy
         }
     }
 
-    public function check($pools)
+    public function check()
     {
-        // TODO: Implement check() method.
+        if (getInstance()->isTaskWorker()) {
+            $this->syncCheck();
+        } else {
+            $this->syncCheck();
+        }
+    }
+
+    private function syncCheck()
+    {
+        try {
+            //探测主节点
+            $newMaster = '';
+            foreach ($this->pools as $pool) {
+                try {
+                    if (getInstance()->getAsynPool($pool)->getSync()
+                        ->set('msf_active_master_slave_check', 1, 30)
+                    ) {
+                        $newMaster = $pool;
+                        break;
+                    }
+                } catch (\RedisException $e) {
+                    // do nothing
+                }
+
+            }
+
+            if ($newMaster === '') {
+                throw new SwooleException('No master redis server in master-slave config!');
+            }
+            if ($this->master !== $newMaster) {
+                $this->master = $newMaster;
+                echo RedisProxyFactory::getLogTitle() . 'master node change to ' . $newMaster;
+            }
+
+            //探测从节点
+            $newSlaves = [];
+            foreach ($this->pools as $pool) {
+                if ($pool != $this->master) {
+                    try {
+                        if (getInstance()->getAsynPool($pool)->getSync()
+                                ->get('msf_active_master_slave_check') == 1
+                        ) {
+                            $newSlaves[] = $pool;
+                        }
+                    } catch (\RedisException $e) {
+                        // do nothing
+                    }
+                }
+            }
+
+            if (empty($newSlaves)) {
+                throw new SwooleException('No slave redis server in master-slave config!');
+            }
+
+            $losts = array_diff($this->slaves, $newSlaves);
+            if ($losts) {
+                $this->slaves = $newSlaves;
+                echo RedisProxyFactory::getLogTitle() . 'slave nodes change to ( ' . implode(',',
+                        $newSlaves) . ' ), lost ( ' . implode(',', $losts) . ' )';
+            }
+
+            $adds = array_diff($newSlaves, $this->slaves);
+            if ($adds) {
+                $this->slaves = $newSlaves;
+                echo RedisProxyFactory::getLogTitle() . 'slave nodes change to ( ' . implode(',',
+                        $newSlaves) . ' ), add ( ' . implode(',', $adds) . ' )';
+            }
+
+            return true;
+        } catch (SwooleException $e) {
+            echo RedisProxyFactory::getLogTitle() . $e->getMessage();
+            return false;
+        }
+    }
+
+    private function asyncCheck()
+    {
+
     }
 }

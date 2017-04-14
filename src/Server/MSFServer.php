@@ -310,7 +310,7 @@ abstract class MSFServer extends WebSocketServer
                 $activePools = explode(',', $activePools);
             }
 
-            foreach ($activePools as $i => $poolKey) {
+            foreach ($activePools as $poolKey) {
                 $redisPools[$poolKey] = new RedisAsynPool($this->config, $poolKey);
             }
         } else {
@@ -334,7 +334,7 @@ abstract class MSFServer extends WebSocketServer
                 $activeProxies = explode(',', $activeProxies);
             }
 
-            foreach ($activeProxies as $i => $activeProxy) {
+            foreach ($activeProxies as $activeProxy) {
                 $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy($this->config['redisProxy'][$activeProxy]);
             }
         } else {
@@ -624,6 +624,15 @@ abstract class MSFServer extends WebSocketServer
                 $serv->tick(1000, [$this, 'timerTask']);
             }
         }
+
+        //redis proxy监测
+        $this->server->tick('5000', function () {
+            if (!empty($this->redisProxyManager)) {
+                foreach ($this->redisProxyManager as $proxy) {
+                    $proxy->check();
+                }
+            }
+        });
     }
 
     /**

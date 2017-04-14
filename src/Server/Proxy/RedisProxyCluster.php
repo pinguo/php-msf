@@ -15,48 +15,39 @@ use PG\MSF\Server\CoreBase\SwooleException;
 
 class RedisProxyCluster extends Flexihash implements IProxy
 {
+    private $pools;
+
+    private $goodPools = [];
+
+    private $asyncCheckResult = [];
+
     public function __construct($config)
     {
-
-        $pools = $config['pools'];
+        $this->pools = $config['pools'];
         $hasher = $config['hasher'] ?? Md5Hasher::class;
         $hasher = new $hasher;
         try {
             parent::__construct($hasher);;
-            $pools = $this->startCheck($pools);
-            if (empty($pools)) {
+            $this->startCheck();
+            if (empty($this->goodPools)) {
                 throw new SwooleException('No redis server can write in cluster');
             } else {
-                foreach ($pools as $pool => $weight) {
+                foreach ($this->goodPools as $pool => $weight) {
                     $this->addTarget($pool, $weight);
                 }
             }
         } catch (SwooleException $e) {
-            echo $e->getMessage() . "\n";
+            echo RedisProxyFactory::getLogTitle() . $e->getMessage();
         }
     }
 
     /**
      * 检查可用的pools
-     * @param $pools
      * @return array
      */
-    public function startCheck($pools)
+    public function startCheck()
     {
-        $goodPools = [];
-        foreach ($pools as $pool => $weight) {
-            try {
-                if (getInstance()->getAsynPool($pool)->getSync()
-                    ->set('msf_active_cluster_check', 1, 30)
-                ) {
-                    $goodPools[$pool] = $weight;
-                }
-            } catch (\RedisException $e) {
-                echo $e->getMessage() . "\t {$pool}\n";
-            }
-        }
-
-        return $goodPools;
+        $this->syncCheck();
     }
 
     /**
@@ -179,8 +170,104 @@ class RedisProxyCluster extends Flexihash implements IProxy
         return $opData;
     }
 
-    public function check($pools)
+    public function check()
     {
-        // TODO: Implement check() method.
+        if (getInstance()->isTaskWorker()) {
+            $this->syncCheck();
+
+            $nowPools = $this->getAllTargets();
+            $newPools = array_keys($this->goodPools);
+            $losts = array_diff($nowPools, $newPools);
+            if (!empty($losts)) {
+                foreach ($losts as $lost) {
+                    $this->removeTarget($lost);
+                }
+                echo RedisProxyFactory::getLogTitle() . ' Remove ( ' . implode(',', $losts) . ' ) from Cluster';
+            }
+
+            $adds = array_diff($newPools, $nowPools);
+            if (!empty($adds)) {
+                foreach ($adds as $add) {
+                    $this->addTarget($add, $this->pools[$add]);
+                }
+                echo RedisProxyFactory::getLogTitle() . ' Add ( ' . implode(',', $adds) . ' ) into Cluster';
+            }
+
+        } else {
+            $this->asyncCheck();
+        }
+    }
+
+    private function syncCheck()
+    {
+        $this->goodPools = [];
+        foreach ($this->pools as $pool => $weight) {
+            try {
+                if (getInstance()->getAsynPool($pool)->getSync()
+                    ->set('msf_active_cluster_check', 1, 30)
+                ) {
+                    $this->goodPools[$pool] = $weight;
+                } else {
+                    $host = getInstance()->getAsynPool($pool)->getSync()->getHost();
+                    $port = getInstance()->getAsynPool($pool)->getSync()->getPort();
+                    getInstance()->getAsynPool($pool)->getSync()->connect($host, $port, 0.05);
+                }
+            } catch (\RedisException $e) {
+                echo RedisProxyFactory::getLogTitle() . $e->getMessage() . "\t {$pool}\n";
+            }
+        }
+    }
+
+    private function asyncCheck()
+    {
+        foreach ($this->pools as $pool => $weight) {
+            $this->asyncCheckResult[$pool] = false;
+
+            $conf = getInstance()->config->get('redis.' . $pool);
+
+            $client = new \swoole_redis;
+
+            $client->connect($conf['ip'], $conf['port'], function ($client, $result) use ($pool, $weight) {
+                $this->asyncCheckResult[$pool] = true;
+                if ($result == false) {
+                    //移除
+                    if (in_array($pool, $this->getAllTargets())) {
+                        $this->removeTarget($pool);
+                        echo RedisProxyFactory::getLogTitle() . "\t Remove {$pool} from cluster\n";
+                    }
+                    return false;
+                }
+                $client->set('msf_active_cluster_check', 1,
+                    function ($client, $result) use ($pool, $weight) {
+                        if ($result != 'OK') {
+                            //移除
+                            if (in_array($pool, $this->getAllTargets())) {
+                                $this->removeTarget($pool);
+                                echo RedisProxyFactory::getLogTitle() . "\t Remove {$pool} from cluster\n";
+                            }
+                            return false;
+                        }
+                        //增加
+                        if (!in_array($pool, $this->getAllTargets())) {
+                            $this->addTarget($pool, $weight);
+                            echo RedisProxyFactory::getLogTitle() . "\t Add {$pool} into cluster\n";
+                        }
+                        return true;
+                    });
+                return true;
+            });
+
+            //50ms就关闭连接
+            swoole_timer_after(50, function () use ($client, $pool) {
+                if ($this->asyncCheckResult[$pool] === false) {
+                    //移除
+                    if (in_array($pool, $this->getAllTargets())) {
+                        $this->removeTarget($pool);
+                        echo RedisProxyFactory::getLogTitle() . "\t Remove {$pool} from cluster\n";
+                    }
+                }
+                $client->close();
+            });
+        }
     }
 }

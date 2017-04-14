@@ -83,7 +83,7 @@ class RedisAsynPool extends AsynPool
         //同步redis连接，给task使用
         $this->redisClient = new \Redis();
         if ($this->redisClient->connect($this->config['redis'][$this->active]['ip'],
-                $this->config['redis'][$this->active]['port']) == false
+                $this->config['redis'][$this->active]['port'], 0.05) == false
         ) {
             throw new SwooleException($this->redisClient->getLastError());
         }
@@ -376,11 +376,15 @@ class RedisAsynPool extends AsynPool
      */
     public function reconnect($client = null)
     {
+        $check = new \stdClass();
+        $check->isKill = true;
+
         $this->waitConnetNum++;
         if ($client == null) {
             $client = new \swoole_redis();
         }
-        $callback = function ($client, $result) {
+        $callback = function ($client, $result) use ($check) {
+            $check->isKill = false;
             $this->waitConnetNum--;
             if (!$result) {
                 throw new SwooleException($client->errMsg);
@@ -440,6 +444,14 @@ class RedisAsynPool extends AsynPool
         $this->connect = [$this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']];
         $client->on('Close', [$this, 'onClose']);
         $client->connect($this->connect[0], $this->connect[1], $callback);
+
+        swoole_timer_after(50, function () use ($client, $check) {
+            if ($check->isKill) {
+                $this->waitConnetNum--;
+                $client = null;
+                throw new SwooleException('Took 50ms to connect redis, redis server went away');
+            }
+        });
     }
 
     /**
