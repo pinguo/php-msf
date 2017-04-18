@@ -16,16 +16,17 @@ class RedisProxyFactory
 
     /**
      * 生成proxy对象
+     * @param $name
      * @param $config
      * @return bool|RedisProxyCluster|RedisProxyMasterSlave
      */
-    public static function makeProxy($config)
+    public static function makeProxy($name, $config)
     {
-        $model = $config['model'];
-        if ($model == Marco::CLUSTER) {
-            return new RedisProxyCluster($config);
-        } elseif ($model == Marco::MASTER_SLAVE) {
-            return new RedisProxyMasterSlave($config);
+        $mode = $config['mode'];
+        if ($mode == Marco::CLUSTER) {
+            return new RedisProxyCluster($name, $config);
+        } elseif ($mode == Marco::MASTER_SLAVE) {
+            return new RedisProxyMasterSlave($name, $config);
         } else {
             return false;
         }

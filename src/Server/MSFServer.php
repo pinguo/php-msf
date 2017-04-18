@@ -12,7 +12,7 @@ use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
 use PG\MSF\Server\CoreBase\{
-    InotifyProcess, SwooleException
+    ConfigProcess, InotifyProcess, SwooleException
 };
 use PG\MSF\Server\Coroutine\{
     CoroutineTask, GeneratorContext
@@ -230,6 +230,15 @@ abstract class MSFServer extends WebSocketServer
             $this->server->addProcess($reloadProcess);
         }
 
+        //配置管理进程
+        if ($this->config->get('config_manage_enable', false)) {
+            $configProcess = new \swoole_process(function ($process) {
+                $process->name($this->config['server.process_title'] . '-CONFIG');
+                new ConfigProcess($this->config);
+            }, false, 2);
+            $this->server->addProcess($configProcess);
+        }
+
         if ($this->config->get('use_dispatch')) {
             //创建dispatch端口用于连接dispatch
             $this->dispatchPort = $this->server->listen($this->config['tcp']['socket'],
@@ -324,7 +333,8 @@ abstract class MSFServer extends WebSocketServer
             }
 
             foreach ($activeProxies as $activeProxy) {
-                $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy($this->config['redisProxy'][$activeProxy]);
+                $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy($activeProxy,
+                    $this->config['redisProxy'][$activeProxy]);
             }
         }
     }

@@ -13,14 +13,15 @@ use PG\MSF\Server\CoreBase\SwooleException;
 
 class RedisProxyMasterSlave implements IProxy
 {
+    private $name;
     private $pools;
     private $master;
     private $slaves;
+    private $goodPools;
 
-    private $asyncCheckResult;
-
-    public function __construct($config)
+    public function __construct($name, $config)
     {
+        $this->name = $name;
         $this->pools = $config['pools'];
         try {
             $this->startCheck();
@@ -29,7 +30,6 @@ class RedisProxyMasterSlave implements IProxy
             }
 
             if (empty($this->slaves)) {
-                echo 111;
                 throw new SwooleException('No slave redis server in master-slave config!');
             }
         } catch (SwooleException $e) {
@@ -123,66 +123,31 @@ class RedisProxyMasterSlave implements IProxy
         }
     }
 
+    /**
+     * 检测 用于定时检测
+     * @return bool
+     */
     public function check()
     {
-        if (getInstance()->isTaskWorker()) {
-            $this->syncCheck();
-        } else {
-            $this->asyncCheck();
-        }
-    }
-
-    private function syncCheck()
-    {
         try {
-            //探测主节点
-            $newMaster = '';
-            foreach ($this->pools as $pool) {
-                try {
-                    if (getInstance()->getAsynPool($pool)->getSync()
-                        ->set('msf_active_master_slave_check', 1, 5)
-                    ) {
-                        $newMaster = $pool;
-                        break;
-                    }
-                } catch (\RedisException $e) {
-                    // do nothing
-                }
+            $yac = new \Yac('msf_config_redis_proxy_');
+            $this->goodPools = $yac->get($this->name) ?? [];
 
+            if (empty($this->goodPools)) {
+                return false;
             }
 
-            if ($newMaster === '') {
+            $newMaster = $this->goodPools['master'];
+            $newSlaves = $this->goodPools['slaves'];
+
+            if (empty($newMaster)) {
                 throw new SwooleException('No master redis server in master-slave config!');
             }
+
             if ($this->master !== $newMaster) {
                 $this->master = $newMaster;
                 echo RedisProxyFactory::getLogTitle() . 'master node change to ' . $newMaster;
             }
-
-            //探测从节点
-            $newSlaves = [];
-            if (count($this->pools) === 1) {
-                $newSlaves[] = $this->master;
-            } else {
-                if (count($this->pools) == 1) {
-                    $newSlaves[] = $this->master;
-                } else {
-                    foreach ($this->pools as $pool) {
-                        if ($pool != $this->master) {
-                            try {
-                                if (getInstance()->getAsynPool($pool)->getSync()
-                                        ->get('msf_active_master_slave_check') == 1
-                                ) {
-                                    $newSlaves[] = $pool;
-                                }
-                            } catch (\RedisException $e) {
-                                // do nothing
-                            }
-                        }
-                    }
-                }
-            }
-
 
             if (empty($newSlaves)) {
                 throw new SwooleException('No slave redis server in master-slave config!');
@@ -203,86 +168,7 @@ class RedisProxyMasterSlave implements IProxy
             }
 
             return true;
-        } catch (SwooleException $e) {
-            echo RedisProxyFactory::getLogTitle() . $e->getMessage();
-            return false;
-        }
-    }
 
-    private function asyncCheck()
-    {
-        $this->asyncCheckResult = [];
-        $this->asyncCheckResult['pools'] = [];
-        $this->asyncCheckResult['master'] = '';
-        $this->asyncCheckResult['slaves'] = [];
-
-        try {
-            foreach ($this->pools as $pool) {
-                $conf = getInstance()->config->get('redis.' . $pool);
-
-                $client = new \swoole_redis;
-
-                $this->asyncCheckResult['pools'][$pool] = $client;
-
-                $client->connect($conf['ip'], $conf['port'], function ($client, $result) use ($pool) {
-                    if ($result != false) {
-                        //探测主节点
-                        $client->setex('msf_active_master_slave_check', 5, 1, function ($client, $result) use ($pool) {
-                            if ($result == 'OK') {
-                                $this->asyncCheckResult['master'] = $pool;
-
-                                //有主节点 检查从
-                                if (count($this->pools) > 1) {
-                                    foreach ($this->asyncCheckResult['pools'] as $p => $cli) {
-                                        if ($p !== $this->asyncCheckResult['master']) {
-                                            $cli->get('msf_active_master_slave_check',
-                                                function ($client, $result) use ($p) {
-                                                    if ($result == 1) {
-                                                        $this->asyncCheckResult['slaves'][] = $p;
-                                                    }
-                                                });
-                                        }
-
-                                    }
-                                } else {
-                                    $this->asyncCheckResult['slaves'][] = $pool;
-                                }
-
-                            }
-                        });
-                    }
-                });
-            }
-
-            //50ms就关闭连接
-            swoole_timer_after(50, function () {
-                if ($this->asyncCheckResult['master'] === '') {
-                    echo RedisProxyFactory::getLogTitle() . 'No master redis server in master-slave config!';
-                }
-                if ($this->master !== $this->asyncCheckResult['master']) {
-                    $this->master = $this->asyncCheckResult['master'];
-                    echo RedisProxyFactory::getLogTitle() . 'master node change to ' . $this->master;
-                }
-
-                $losts = array_diff($this->slaves, $this->asyncCheckResult['slaves']);
-                if ($losts) {
-                    $this->slaves = $this->asyncCheckResult['slaves'];
-                    echo RedisProxyFactory::getLogTitle() . 'slave nodes change to ( ' . implode(',',
-                            $this->slaves) . ' ), lost ( ' . implode(',', $losts) . ' )';
-                }
-
-                $adds = array_diff($this->asyncCheckResult['slaves'], $this->slaves);
-                if ($adds) {
-                    $this->slaves = $this->asyncCheckResult['slaves'];
-                    echo RedisProxyFactory::getLogTitle() . 'slave nodes change to ( ' . implode(',',
-                            $this->slaves) . ' ), add ( ' . implode(',', $adds) . ' )';
-                }
-
-                foreach ($this->asyncCheckResult['pools'] as $pool => $client) {
-                    $client->close();
-                    unset($this->asyncCheckResult['pools'][$pool]);
-                }
-            });
         } catch (SwooleException $e) {
             echo RedisProxyFactory::getLogTitle() . $e->getMessage();
             return false;
