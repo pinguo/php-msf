@@ -19,6 +19,7 @@ class GeneratorContext
     protected $controllerName;
     protected $methodName;
     protected $stack;
+    protected $i = 0;
 
     public function __construct()
     {
@@ -31,9 +32,18 @@ class GeneratorContext
     public function addYieldStack($number)
     {
         $number++;
-        $i = count($this->stack);
-        $this->stack[] = "| #第 $i 层嵌套出错在第 $number 个yield后";
+        $this->i++;
 
+        $this->stack[$this->i][] = "| #第 {$this->i} 层嵌套出错在第 $number 个yield后";
+    }
+
+    /**
+     * @param $number
+     */
+    public function setStackMessage($number)
+    {
+        $number++;
+        $this->stack[$this->i][] = "| #第 {$this->i} 层嵌套出错在第 $number 个yield后";
     }
 
     /**
@@ -50,7 +60,7 @@ class GeneratorContext
      */
     public function setErrorFile($file, $line)
     {
-        $this->stack[] = "| #出错文件: $file($line)";
+        $this->stack[$this->i][] = "| #出错文件: $file($line)";
     }
 
     /**
@@ -58,7 +68,7 @@ class GeneratorContext
      */
     public function setErrorMessage($message)
     {
-        $this->stack[] = "| #报错消息: $message";
+        $this->stack[$this->i][] = "| #报错消息: $message";
     }
 
     /**
@@ -79,7 +89,7 @@ class GeneratorContext
         $this->controller = $controller;
         $this->controllerName = $controllerName;
         $this->methodName = $methodName;
-        $this->stack[] = "| #目标函数： $controllerName -> $methodName";
+        $this->stack[$this->i][] = "| #目标函数： $controllerName -> $methodName";
     }
 
     /**
@@ -88,8 +98,10 @@ class GeneratorContext
     public function getTraceStack()
     {
         $trace = "协程错误指南: \n";
-        for ($i = 0; $i < count($this->stack); $i++) {
-            $trace .= "{$this->stack[$i]}\n";
+        foreach ($this->stack as $i => $v) {
+            foreach ($v as $value) {
+                $trace .= "{$value}\n";
+            }
         }
 
         $trace = trim($trace);

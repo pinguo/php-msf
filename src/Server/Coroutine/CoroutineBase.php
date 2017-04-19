@@ -71,12 +71,8 @@ abstract class CoroutineBase implements ICoroutineBase
 
     public function getResult()
     {
-        if ($this->result !== CoroutineNull::getInstance()) {
-            return $this->result;
-        }
-
-        if (1000 * (microtime(true) - $this->requestTime) > $this->timeout) {
-            $this->throwSwooleException();
+        if ($this->isTimeout() && !$this->ioBack) {
+            return null;
         }
 
         return $this->result;
@@ -89,7 +85,7 @@ abstract class CoroutineBase implements ICoroutineBase
 
     public function isTimeout()
     {
-        if (1000 * (microtime(true) - $this->requestTime) > $this->timeout) {
+        if (!$this->ioBack && (1000 * (microtime(true) - $this->requestTime) > $this->timeout)) {
             return true;
         }
 

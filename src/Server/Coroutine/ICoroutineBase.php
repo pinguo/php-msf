@@ -11,6 +11,8 @@ namespace PG\MSF\Server\Coroutine;
 
 interface ICoroutineBase
 {
+    function isTimeout();
+    
     function send($callback);
 
     function getResult();
