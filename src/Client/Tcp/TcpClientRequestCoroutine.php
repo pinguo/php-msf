@@ -42,8 +42,11 @@ class TcpClientRequestCoroutine extends CoroutineBase
         $this->tcpClient->send($this->data, $callback);
     }
 
-    public function delCallBackForKernel()
+    public function destroy()
     {
         $this->tcpClient->client->close();
+        $this->tcpClient->context = null;
+        unset($this->tcpClient->client);
+        unset($this->tcpClient);
     }
 }

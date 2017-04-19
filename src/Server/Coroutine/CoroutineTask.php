@@ -31,27 +31,36 @@ class CoroutineTask
     public function run()
     {
         $routine = &$this->routine;
-        $flag = false;
         try {
             if (!$routine) {
                 return;
             }
             $value = $routine->current();
-            $flag = true;
             //嵌套的协程
             if ($value instanceof \Generator) {
-                $this->generatorContext->addYieldStack($routine->key());
+                $this->generatorContext->addYieldStack($value->key());
                 $this->stack->push($routine);
                 $routine = $value;
                 return;
             }
+
             if ($value != null && $value instanceof ICoroutineBase) {
-                $result = $value->getResult();
-                if ($result !== CoroutineNull::getInstance()) {
+                if ($value->isTimeout()) {
+                    try {
+                        $value->throwSwooleException();
+                    } catch (\Exception $e) {
+                        $this->handleTaskTimeout($e, $value);
+                    }
                     unset($value);
-                    $routine->send($result);
+                    $routine->send(null);
+                } else {
+                    $result = $value->getResult();
+                    if ($result !== CoroutineNull::getInstance()) {
+                        unset($value);
+                        $routine->send($result);
+                    }
                 }
-                //嵌套的协程返回
+
                 while (!$routine->valid() && !$this->stack->isEmpty()) {
                     $result = $routine->getReturn();
                     $this->routine = $this->stack->pop();
@@ -70,49 +79,83 @@ class CoroutineTask
                 }
             }
         } catch (\Exception $e) {
-            if ($flag) {
-                $this->generatorContext->addYieldStack($routine->key());
-            }
-
             if (empty($value)) {
                 $value = "";
             }
 
-            $logValue = '';
-            dumpCoroutineTaskMessage($logValue, $value, 0);
+            $runTaskException = $this->handleTaskException($e, $value);
 
-            $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
-            $runTaskException = new CoroutineException($message, $e->getCode(), $e);
-            $this->generatorContext->setErrorFile($runTaskException->getFile(), $runTaskException->getLine());
-            $this->generatorContext->setErrorMessage($message);
-
-            while (!$this->stack->isEmpty()) {
-                $this->routine = $this->stack->pop();
-                try {
-                    $this->routine->throw($runTaskException);
-                    break;
-                } catch (\Exception $e) {
-
-                }
-            }
-
-            if ($runTaskException instanceof SwooleException) {
-                $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
-                    $this->generatorContext->getController());
-            }
             if ($this->generatorContext->getController() != null) {
                 call_user_func([$this->generatorContext->getController(), 'onExceptionHandle'], $runTaskException);
             } else {
                 $routine->throw($runTaskException);
             }
-
-            if (!empty($value) && $value instanceof ICoroutineBase && method_exists($value, 'delCallBackForKernel')) {
-                $value->delCallBackForKernel();
-            }
             unset($value);
-
-            $this->destroy();
         }
+    }
+
+    public function handleTaskTimeout(\Exception $e, $value)
+    {
+        if ($value != '') {
+            $logValue = '';
+            dumpCoroutineTaskMessage($logValue, $value, 0);
+            $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
+        } else {
+            $message = 'message: ' . $e->getMessage();
+        }
+
+        $runTaskException = new CoroutineException($message, $e->getCode(), $e);
+        $this->generatorContext->setStackMessage($this->routine->key());
+        $this->generatorContext->setErrorFile($e->getFile(), $e->getLine());
+        $this->generatorContext->setErrorMessage($message);
+
+        if ($runTaskException instanceof SwooleException) {
+            $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
+                $this->generatorContext->getController());
+        }
+        $this->generatorContext->getController()->PGLog->warning($message);
+
+        if (!empty($value) && $value instanceof ICoroutineBase && method_exists($value, 'destroy')) {
+            $value->destroy();
+        }
+
+        return $runTaskException;
+    }
+
+    public function handleTaskException(\Exception $e, $value)
+    {
+        if ($value != '') {
+            $logValue = '';
+            dumpCoroutineTaskMessage($logValue, $value, 0);
+            $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
+        } else {
+            $message = 'message: ' . $e->getMessage();
+        }
+
+        $runTaskException = new CoroutineException($message, $e->getCode(), $e);
+        $this->generatorContext->setErrorFile($e->getFile(), $e->getLine());
+        $this->generatorContext->setErrorMessage($message);
+
+        while (!$this->stack->isEmpty()) {
+            $this->routine = $this->stack->pop();
+            try {
+                $this->routine->throw($runTaskException);
+                break;
+            } catch (\Exception $e) {
+
+            }
+        }
+
+        if ($runTaskException instanceof SwooleException) {
+            $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
+                $this->generatorContext->getController());
+        }
+
+        if (!empty($value) && $value instanceof ICoroutineBase && method_exists($value, 'destroy')) {
+            $value->destroy();
+        }
+
+        return $runTaskException;
     }
 
     /**

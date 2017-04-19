@@ -54,9 +54,11 @@ class HttpClientRequestCoroutine extends CoroutineBase
         }
     }
 
-    public function delCallBackForKernel()
+    public function destroy()
     {
         $this->httpClient->client->close();
+        $this->httpClient->context = null;
+        unset($this->httpClient->client);
+        unset($this->httpClient);
     }
-
 }
