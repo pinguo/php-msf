@@ -151,7 +151,8 @@ function dumpCoroutineTaskMessage(&$output, $var, $level)
             }
             break;
         case 'object':
-            if ($var instanceof \PG\MSF\Server\Helpers\Context || $var instanceof \PG\MSF\Server\CoreBase\Controller) {
+            if ($var instanceof \PG\MSF\Server\Helpers\Context || $var instanceof \PG\MSF\Server\CoreBase\Controller
+                || $var instanceof \PG\MSF\Server\DataBase\RedisAsynPool || $var instanceof \PG\MSF\Server\DataBase\MysqlAsynPool) {
                 $output .= '..., ';
                 break;
             }
