@@ -234,7 +234,7 @@ abstract class MSFServer extends WebSocketServer
         if ($this->config->get('config_manage_enable', false)) {
             $configProcess = new \swoole_process(function ($process) {
                 $process->name($this->config['server.process_title'] . '-CONFIG');
-                new ConfigProcess($this->config);
+                new ConfigProcess($this->config, $this->server);
             }, false, 2);
             $this->server->addProcess($configProcess);
         }

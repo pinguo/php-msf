@@ -82,8 +82,18 @@ class Marco
      */
     const HTTP_REQUEST = 'http_request';
 
+    /**
+     * Redis分布式模式
+     */
     const CLUSTER = 0;
+
+    /**
+     * Redis主从模式
+     */
     const MASTER_SLAVE = 1;
-    const HASH_MD5 = 'md5';
-    const HASH_CRC32 = 'crc32';
+
+    /**
+     * Server统计key
+     */
+    const SERVER_STATS = 'msf_server_stats_';
 }
