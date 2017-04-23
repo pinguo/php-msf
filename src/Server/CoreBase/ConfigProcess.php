@@ -15,11 +15,75 @@ class ConfigProcess
 {
     public $config;
 
-    public function __construct(Config $config)
+    public $server;
+
+    public $cache;
+
+    public function __construct(Config $config, \swoole_server $server)
     {
         echo "启动了configManager\n";
         $this->config = $config;
+        $this->server = $server;
+        $this->cache  = new \Yac();
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
+        swoole_timer_tick(1000, [$this, 'stats']);
+    }
+
+    public function stats()
+    {
+        $data = [
+            'worker' => [
+                // 协程统计信息
+                // 'coroutine' => [
+                    // 当前正在处理的请求数
+                    // 'total' => 0,
+                //],
+                // 内存使用
+                // 'memory' => [
+                    // 峰值
+                    // 'peak'  => '',
+                    // 当前使用
+                    // 'usage' => '',
+                //],
+                // 请求信息
+                //'request' => [
+                    // 当前Worker进程收到的请求次数
+                    //'worker_request_count' => 0,
+                //],
+            ],
+            'tcp'    => [
+                // 服务器启动的时间
+                'start_time'           => '',
+                // 当前连接的数量
+                'connection_num'       => 0,
+                // 接受了多少个连接
+                'accept_count'         => 0,
+                // 关闭的连接数量
+                'close_count'          => 0,
+                // 当前正在排队的任务数
+                'tasking_num'          => 0,
+                // Server收到的请求次数
+                'request_count'        => 0,
+                // 消息队列中的Task数量
+                'task_queue_num'       => 0,
+                // 消息队列的内存占用字节数
+                'task_queue_bytes'     => 0,
+            ],
+        ];
+
+        $workerIds   = range(0, $this->server->setting['worker_num'] - 1);
+        foreach ($workerIds as $workerId) {
+            $workerInfo = $this->cache->get(Marco::SERVER_STATS . $workerId);
+            if ($workerInfo) {
+                $data['worker']['worker#' . $workerId] =  $workerInfo;
+            } else {
+                $data['worker']['worker#' . $workerId] = [];
+            }
+        }
+
+        $data['tcp'] = $this->server->stats();
+        unset($data['tcp']['worker_request_count']);
+        $this->cache->set(Marco::SERVER_STATS, $data);
     }
 
     public function checkRedisProxy()
