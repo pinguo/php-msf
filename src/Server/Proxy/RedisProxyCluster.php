@@ -176,8 +176,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
      */
     public function check()
     {
-        $yac = new \Yac('msf_config_redis_proxy_');
-        $this->goodPools = $yac->get($this->name) ?? [];
+        $this->goodPools = getInstance()->sysCache->get($this->name) ?? [];
 
         $nowPools = $this->getAllTargets();
         $newPools = array_keys($this->goodPools);

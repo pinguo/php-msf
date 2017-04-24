@@ -10,21 +10,19 @@ namespace PG\MSF\Server\CoreBase;
 
 use Noodlehaus\Config;
 use PG\MSF\Server\Marco;
+use PG\MSF\Server\MSFServer;
 
 class ConfigProcess
 {
     public $config;
 
-    public $server;
+    public $MSFServer;
 
-    public $cache;
-
-    public function __construct(Config $config, \swoole_server $server)
+    public function __construct(Config $config,  MSFServer $MSFServer)
     {
         echo "启动了configManager\n";
         $this->config = $config;
-        $this->server = $server;
-        $this->cache  = new \Yac();
+        $this->MSFServer = $MSFServer;
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
     }
@@ -71,9 +69,9 @@ class ConfigProcess
             ],
         ];
 
-        $workerIds   = range(0, $this->server->setting['worker_num'] - 1);
+        $workerIds   = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
         foreach ($workerIds as $workerId) {
-            $workerInfo = $this->cache->get(Marco::SERVER_STATS . $workerId);
+            $workerInfo = $this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
             if ($workerInfo) {
                 $data['worker']['worker#' . $workerId] =  $workerInfo;
             } else {
@@ -81,24 +79,18 @@ class ConfigProcess
             }
         }
 
-        $data['tcp'] = $this->server->stats();
+        $data['tcp'] = $this->MSFServer->server->stats();
         unset($data['tcp']['worker_request_count']);
-        $this->cache->set(Marco::SERVER_STATS, $data);
+        $this->MSFServer->sysCache->set(Marco::SERVER_STATS, $data);
     }
 
     public function checkRedisProxy()
     {
-        $lock = new \swoole_lock(SWOOLE_MUTEX, __METHOD__);
-        // 抢锁失败
-        if (!$lock->trylock()) {
-            return false;
-        }
-
+        var_dump(111);
         $redisProxyConfig = $this->config->get('redisProxy', null);
         $redisConfig = $this->config->get('redis', null);
 
         if ($redisProxyConfig) {
-            $yac = new \Yac('msf_config_redis_proxy_');
             foreach ($redisProxyConfig as $proxyName => $proxyConfig) {
                 if ($proxyName != 'active') {
                     //分布式
@@ -117,7 +109,7 @@ class ConfigProcess
                             }
                             $redis->close();
                         }
-                        $yac->set($proxyName, $goodPools);
+                        $this->MSFServer->sysCache->set($proxyName, $goodPools);
                     } elseif ($proxyConfig['mode'] == Marco::MASTER_SLAVE) { //主从
                         $pools = $proxyConfig['pools'];
                         $master = '';
@@ -160,14 +152,12 @@ class ConfigProcess
                             }
                         }
 
-                        $yac->set($proxyName, ['master' => $master, 'slaves' => $slaves]);
+                        $this->MSFServer->sysCache->set($proxyName, ['master' => $master, 'slaves' => $slaves]);
                     }
                 }
             }
         }
 
-        $lock->unlock();
-        unset($lock);
         return true;
     }
 }

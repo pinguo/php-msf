@@ -130,8 +130,7 @@ class RedisProxyMasterSlave implements IProxy
     public function check()
     {
         try {
-            $yac = new \Yac('msf_config_redis_proxy_');
-            $this->goodPools = $yac->get($this->name) ?? [];
+            $this->goodPools = getInstance()->sysCache->get($this->name) ?? [];
 
             if (empty($this->goodPools)) {
                 return false;

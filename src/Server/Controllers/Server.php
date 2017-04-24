@@ -14,9 +14,14 @@ class Server extends BaseController
 {
     public function HttpInfo()
     {
-        $cache = new \Yac();
-        $data  = $cache->get(Marco::SERVER_STATS);
+        $data  = getInstance()->sysCache->get(Marco::SERVER_STATS);
+
         if ($data) {
+            $concurrency = 0;
+            foreach ($data['worker'] as $id => $worker) {
+                $concurrency += $worker['coroutine']['total'];
+            }
+            $data['running']['concurrency'] = $concurrency;
             $this->outputJson($data, 'Server Information');
         } else {
             $this->outputJson([],    'Server Information Not OK');

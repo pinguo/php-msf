@@ -182,6 +182,11 @@ abstract class Server extends Child
      */
     protected static $stdClass = null;
 
+    /**
+     * @var \Yac
+     */
+    public $sysCache;
+
     public function __construct()
     {
         $this->afterConstruct();
@@ -228,8 +233,9 @@ abstract class Server extends Child
                 }
             }
         }
-        $this->route = new $routeClassName;
-        $this->loader = new Loader();
+        $this->route     = new $routeClassName;
+        $this->loader    = new Loader();
+        $this->sysCache  = new \Yac('sys_cache_');
     }
 
     /**
