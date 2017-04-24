@@ -29,7 +29,7 @@ class Server extends BaseController
         } else {
             $data                           = [];
             $data['sys_cache']              = getInstance()->sysCache->info();
-            $this->outputJson([],    'Server Information Not OK');
+            $this->outputJson($data,    'Server Information Not OK');
         }
     }
 
