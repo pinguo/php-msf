@@ -18,11 +18,14 @@ class ConfigProcess
 
     public $MSFServer;
 
+    public $lastMinute;
+
     public function __construct(Config $config,  MSFServer $MSFServer)
     {
         echo "启动了configManager\n";
         $this->config = $config;
-        $this->MSFServer = $MSFServer;
+        $this->MSFServer  = $MSFServer;
+        $this->lastMinute = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
     }
@@ -33,20 +36,20 @@ class ConfigProcess
             'worker' => [
                 // 协程统计信息
                 // 'coroutine' => [
-                    // 当前正在处理的请求数
-                    // 'total' => 0,
+                // 当前正在处理的请求数
+                // 'total' => 0,
                 //],
                 // 内存使用
                 // 'memory' => [
-                    // 峰值
-                    // 'peak'  => '',
-                    // 当前使用
-                    // 'usage' => '',
+                // 峰值
+                // 'peak'  => '',
+                // 当前使用
+                // 'usage' => '',
                 //],
                 // 请求信息
                 //'request' => [
-                    // 当前Worker进程收到的请求次数
-                    //'worker_request_count' => 0,
+                // 当前Worker进程收到的请求次数
+                //'worker_request_count' => 0,
                 //],
             ],
             'tcp'    => [
@@ -79,7 +82,20 @@ class ConfigProcess
             }
         }
 
-        $data['tcp'] = $this->MSFServer->server->stats();
+        $lastStats              = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
+        $data['tcp']            = $this->MSFServer->server->stats();
+        $data['running']['qps'] = $data['tcp']['request_count'] - $lastStats['tcp']['request_count'];
+        if ($this->lastMinute >= ceil(time() / 60)) {
+            if (!empty($lastStats) && !isset($lastStats['running']['qpm'])) {
+                $lastStats['running']['qpm'] = 0;
+            }
+
+            $data['running']['qpm'] = $lastStats['running']['qpm'] + $data['running']['qps'];
+        } else {
+            $data['running']['qpm'] = $data['running']['qps'];
+            $this->lastMinute = ceil(time() / 60);
+        }
+
         unset($data['tcp']['worker_request_count']);
         $this->MSFServer->sysCache->set(Marco::SERVER_STATS, $data);
     }

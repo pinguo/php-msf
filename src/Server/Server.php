@@ -235,7 +235,6 @@ abstract class Server extends Child
         }
         $this->route     = new $routeClassName;
         $this->loader    = new Loader();
-        $this->sysCache  = new \Yac('sys_cache_');
     }
 
     /**

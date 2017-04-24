@@ -19,12 +19,15 @@ class Server extends BaseController
         if ($data) {
             $concurrency = 0;
             foreach ($data['worker'] as $id => $worker) {
-                $concurrency += $worker['coroutine']['total'];
+                if (!empty($worker['coroutine']['total'])) {
+                    $concurrency += $worker['coroutine']['total'];
+                }
             }
             $data['running']['concurrency'] = $concurrency;
             $data['sys_cache']              = getInstance()->sysCache->info();
             $this->outputJson($data, 'Server Information');
         } else {
+            $data                           = [];
             $data['sys_cache']              = getInstance()->sysCache->info();
             $this->outputJson([],    'Server Information Not OK');
         }
