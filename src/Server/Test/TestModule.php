@@ -68,7 +68,7 @@ class TestModule
             }
         }
         $generatorContext = new GeneratorContext();
-        $generatorContext->setController($this, 'SwooleDistributedServer', 'TestModule');
+        $generatorContext->setController($this, 'MSFServer', 'TestModule');
         if ($coroutine != null) {
             $coroutine->start($this->runTests(), $generatorContext);
         } else {

@@ -1,6 +1,6 @@
 <?php
 /**
- * SwooleDistributedServer
+ * MSFServer
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -137,7 +137,7 @@ abstract class MSFServer extends WebSocketServer
     private $redisProxyManager;
 
     /**
-     * SwooleDistributedServer constructor.
+     * MSFServer constructor.
      */
     public function __construct()
     {
@@ -185,6 +185,9 @@ abstract class MSFServer extends WebSocketServer
     public function beforeSwooleStart()
     {
         parent::beforeSwooleStart();
+
+        // 初始化Yac共享内存
+        $this->sysCache  = new \Yac('sys_cache_');
 
         //创建uid->fd共享内存表
         $this->uidFdTable = new \swoole_table(65536);
@@ -686,7 +689,7 @@ abstract class MSFServer extends WebSocketServer
             $generator = $this->onUidCloseClear($uid);
             if ($generator instanceof \Generator) {
                 $generatorContext = new GeneratorContext();
-                $generatorContext->setController(null, 'SwooleDistributedServer', 'onSwooleClose');
+                $generatorContext->setController(null, 'MSFServer', 'onSwooleClose');
                 $this->coroutine->start($generator, $generatorContext);
             }
             $this->unBindUid($uid);
