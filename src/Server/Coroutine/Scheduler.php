@@ -20,7 +20,6 @@ class Scheduler
     public function __construct()
     {
         $this->taskQueue = new \SplQueue();
-        $this->cache     = new \Yac();
         swoole_timer_tick(1, function ($timerId) {
             $this->run();
         });
@@ -70,10 +69,10 @@ class Scheduler
         ];
         $routineList = getInstance()->coroutine->taskMap;
         $data['coroutine']['total'] = count($routineList);
-        $data['memory']['peak']  = strval(number_format(memory_get_peak_usage() / 1024 / 1024, 3, '.', '')) . 'M';
-        $data['memory']['usage'] = strval(number_format(memory_get_usage() / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['memory']['peak']     = strval(number_format(memory_get_peak_usage() / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['memory']['usage']    = strval(number_format(memory_get_usage() / 1024 / 1024, 3, '.', '')) . 'M';
         $data['request']['worker_request_count'] = getInstance()->server->stats()['worker_request_count'];
-        $this->cache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
+        getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
     public function run()
