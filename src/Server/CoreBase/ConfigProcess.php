@@ -86,7 +86,6 @@ class ConfigProcess
 
     public function checkRedisProxy()
     {
-        var_dump(111);
         $redisProxyConfig = $this->config->get('redisProxy', null);
         $redisConfig = $this->config->get('redis', null);
 
