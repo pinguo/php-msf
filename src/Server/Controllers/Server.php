@@ -22,8 +22,10 @@ class Server extends BaseController
                 $concurrency += $worker['coroutine']['total'];
             }
             $data['running']['concurrency'] = $concurrency;
+            $data['sys_cache']              = getInstance()->sysCache->info();
             $this->outputJson($data, 'Server Information');
         } else {
+            $data['sys_cache']              = getInstance()->sysCache->info();
             $this->outputJson([],    'Server Information Not OK');
         }
     }
