@@ -507,17 +507,6 @@ abstract class Server extends Child
             self::$_maxShowLength - strlen('socket')), "\033[47;30mport\033[0m", str_pad('',
             self::$_maxShowLength - strlen('port')), "\033[47;30m", "status\033[0m\n";
         switch (self::$_worker->name) {
-            case DispatchClient::SERVER_NAME:
-                echo str_pad('TCP',
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('dispatch_server.socket', '--'),
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('dispatch_server.port', '--'),
-                    self::$_maxShowLength - 2);
-                if (self::$_worker->config->get('dispatch_server.port') == null) {
-                    echo " \033[31;40m [CLOSE] \033[0m\n";
-                } else {
-                    echo " \033[32;40m [OPEN] \033[0m\n";
-                }
-                break;
             case MSFServer::SERVER_NAME:
                 echo str_pad('TCP',
                     self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.socket', '--'),
