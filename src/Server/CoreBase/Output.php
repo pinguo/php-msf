@@ -60,7 +60,6 @@ class Output
     {
         unset($this->response);
         unset($this->request);
-        unset($this->controller);
     }
 
     /**
