@@ -72,7 +72,7 @@ class AOPFactory
                     unset($arguments[0]);
                 } else {
                     //返还时调用destroy方法
-                    method_exists($arguments[0], 'destroy') && ($arguments[0])->destroy();
+                    method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
                 }
             }
             $data['method'] = $method;

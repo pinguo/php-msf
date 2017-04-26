@@ -15,7 +15,6 @@ class CoroutineTask
     public $routine;
     public $generatorContext;
     public $destroy = false;
-    public $asyncCallBack = [];
     protected $stack;
 
     public function __construct(\Generator $routine, GeneratorContext $generatorContext)

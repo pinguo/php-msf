@@ -49,11 +49,12 @@ class ControllerFactory
         $controller = ltrim($controller, '\\');
         $controllers = $this->pool[$controller]??null;
         if ($controllers == null) {
-            $controllers = $this->pool[$controller] = new \SplQueue();
+            $controllers = $this->pool[$controller] = new \SplStack();
         }
         if (!$controllers->isEmpty()) {
             $controllerInstance = $controllers->shift();
             $controllerInstance->reUse();
+            $controllerInstance->useCount++;
             return $controllerInstance;
         }
         $className = "\\App\\Controllers\\$controller";
@@ -61,6 +62,8 @@ class ControllerFactory
             $controllerInstance = new $className;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();
+            $controllerInstance->genTime  = time();
+            $controllerInstance->useCount = 1;
             return $controllerInstance;
         }
 
@@ -69,6 +72,8 @@ class ControllerFactory
             $controllerInstance = new $className;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();
+            $controllerInstance->genTime  = time();
+            $controllerInstance->useCount = 1;
             return $controllerInstance;
         }
 
@@ -84,6 +89,13 @@ class ControllerFactory
         if (!$controller->isDestroy) {
             $controller->destroy();
         }
-        $this->pool[$controller->coreName]->push($controller);
+
+
+        //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
+        if (($controller->genTime + 7200) < time() || $controller->useCount > 10000) {
+            unset($controller);
+        } else {
+            $this->pool[$controller->coreName]->push($controller);
+        }
     }
 }
