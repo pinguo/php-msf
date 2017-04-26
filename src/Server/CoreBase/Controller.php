@@ -20,11 +20,11 @@ class Controller extends CoreBase
      */
     public $mysqlPool;
     /**
-     * @var HttpInPut
+     * @var Input
      */
     public $input;
     /**
-     * @var HttpOutPut
+     * @var Output
      */
     public $output;
     /**

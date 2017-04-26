@@ -14,7 +14,7 @@ class ModelFactory
      * @var ModelFactory
      */
     private static $instance;
-    private $pool = [];
+    public $pool = [];
 
     /**
      * ModelFactory constructor.
@@ -45,14 +45,19 @@ class ModelFactory
     public function getModel($model)
     {
         $model = str_replace('/', '\\', $model);
-        if (!key_exists($model, $this->pool)) {
-            $this->pool[$model] = [];
+
+        $models = $this->pool[$model]??null;
+        if ($models == null) {
+            $models = $this->pool[$model] = new \SplStack();
         }
-        if (count($this->pool[$model]) > 0) {
-            $modelInstance = array_pop($this->pool[$model]);
+
+        if (!$models->isEmpty()) {
+            $modelInstance = $models->shift();
             $modelInstance->reUse();
+            $modelInstance->useCount++;
             return $modelInstance;
         }
+
         $className = "\\App\\Models\\$model";
         if (class_exists($className)) {
             $modelInstance = new $className;
@@ -68,6 +73,10 @@ class ModelFactory
                 throw new SwooleException("class $model is not exist");
             }
         }
+
+        $modelInstance->genTime = time();
+        $modelInstance->useCount   = 1;
+
         return $modelInstance;
     }
 
@@ -80,6 +89,12 @@ class ModelFactory
         if (!$model->isDestroy) {
             $model->destroy();
         }
-        $this->pool[$model->coreName][] = $model;
+
+        //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
+        if (($model->genTime + 7200) < time() || $model->useCount > 10000) {
+            unset($model);
+        } else {
+            $this->pool[$model->coreName]->push($model);
+        }
     }
 }

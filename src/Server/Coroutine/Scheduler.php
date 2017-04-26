@@ -9,6 +9,8 @@
 namespace PG\MSF\Server\Coroutine;
 
 use PG\MSF\Server\Marco;
+use PG\MSF\Server\CoreBase\ControllerFactory;
+use PG\MSF\Server\CoreBase\ModelFactory;
 
 class Scheduler
 {
@@ -66,12 +68,45 @@ class Scheduler
                 // 当前Worker进程收到的请求次数
                 'worker_request_count' => 0,
             ],
+            // 其他对象池
+            'object_poll' => [
+                // 'xxx' => 22
+            ],
+            // 控制器对象池
+            'controller_poll' => [
+                // 'xxx' => 22
+            ],
+            // Model对象池
+            'model_poll' => [
+                // 'xxx' => 22
+            ],
         ];
         $routineList = getInstance()->coroutine->taskMap;
-        $data['coroutine']['total'] = count($routineList);
-        $data['memory']['peak']     = strval(number_format(memory_get_peak_usage() / 1024 / 1024, 3, '.', '')) . 'M';
-        $data['memory']['usage']    = strval(number_format(memory_get_usage() / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['coroutine']['total']   = count($routineList);
+        $data['memory']['peak_byte']  = memory_get_peak_usage();
+        $data['memory']['usage_byte'] = memory_get_usage();
+        $data['memory']['peak']       = strval(number_format($data['memory']['peak_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['memory']['usage']      = strval(number_format($data['memory']['usage_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
         $data['request']['worker_request_count'] = getInstance()->server->stats()['worker_request_count'];
+
+        if (!empty(getInstance()->objectPool->map)) {
+            foreach (getInstance()->objectPool->map as $class => $objects) {
+                $data['object_poll'][$class] = $objects->count();
+            }
+        }
+
+        if (!empty(ControllerFactory::getInstance()->pool)) {
+            foreach (ControllerFactory::getInstance()->pool as $class => $objects) {
+                $data['controller_poll'][$class] = $objects->count();
+            }
+        }
+
+        if (!empty(ModelFactory::getInstance()->pool)) {
+            foreach (ModelFactory::getInstance()->pool as $class => $objects) {
+                $data['controller_poll'][$class] = $objects->count();
+            }
+        }
+
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 

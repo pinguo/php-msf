@@ -80,6 +80,8 @@ class BaseController extends Controller
     public function destroy()
     {
         $this->PGLog->appendNoticeLog();
+        unset($this->PGLog);
+        unset($this->logId);
         parent::destroy();
     }
 
