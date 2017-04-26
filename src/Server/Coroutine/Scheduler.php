@@ -103,7 +103,7 @@ class Scheduler
 
         if (!empty(ModelFactory::getInstance()->pool)) {
             foreach (ModelFactory::getInstance()->pool as $class => $objects) {
-                $data['controller_poll'][$class] = $objects->count();
+                $data['model_poll'][$class] = $objects->count();
             }
         }
 
