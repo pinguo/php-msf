@@ -57,6 +57,10 @@ class Client
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
                 $this->context->output->outputJson([], 'error', 500);
             } else {
+                if (empty($this->context)) {
+                    return true;
+                }
+                
                 $c = new \swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
                 $c->set($this->set);
 
@@ -80,7 +84,7 @@ class Client
      * @param int $timeout
      * @return GetTcpClientCoroutine
      */
-    public function coroutineGetTcpClient($baseUrl, $timeout = 1000)
+    public function coroutineGetTcpClient($baseUrl, $timeout = 30000)
     {
         return new GetTcpClientCoroutine($this, $baseUrl, $timeout);
     }

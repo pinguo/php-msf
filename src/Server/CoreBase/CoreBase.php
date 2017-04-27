@@ -15,6 +15,14 @@ use PG\MSF\Server\Pack\IPack;
 class CoreBase extends Child
 {
     /**
+     * @var int
+     */
+    public $useCount;
+    /**
+     * @var int
+     */
+    public $genTime;
+    /**
      * 销毁标志
      * @var bool
      */
@@ -29,7 +37,7 @@ class CoreBase extends Child
      */
     public $logger;
     /**
-     * @var swoole_server
+     * @var \swoole_server
      */
     public $server;
     /**

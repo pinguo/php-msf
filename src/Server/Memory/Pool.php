@@ -13,7 +13,7 @@ use PG\MSF\Server\CoreBase\SwooleException;
 class Pool
 {
     private static $instance;
-    private $map;
+    public $map;
 
     private function __construct()
     {

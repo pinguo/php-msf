@@ -67,6 +67,10 @@ class Client
                 $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
                 $this->context->output->end();
             } else {
+                if (empty($this->context) || empty($this->context->PGLog)) {
+                    return true;
+                }
+                
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
                 $httpClient = new HttpClient($client);
                 $httpClient->context = $this->context;
@@ -88,7 +92,7 @@ class Client
      * @param int $timeout 协程超时时间
      * @return GetHttpClientCoroutine
      */
-    public function coroutineGetHttpClient($baseUrl, $timeout = 1000, $headers = [])
+    public function coroutineGetHttpClient($baseUrl, $timeout = 30000, $headers = [])
     {
         return new GetHttpClientCoroutine($this, $baseUrl, $timeout, $headers);
     }

@@ -68,7 +68,7 @@ abstract class HttpServer extends Server
             return;
         }
         //开启一个http服务器
-        $this->server = new \swoole_http_server($this->httpSocketName, $this->httpPort);
+        $this->server = new \swoole_http_server($this->httpSocketName, $this->httpPort, SWOOLE_BASE);
         $this->server->on('Start', [$this, 'onSwooleStart']);
         $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
         $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
@@ -90,6 +90,7 @@ abstract class HttpServer extends Server
             $this->port->on('close', [$this, 'onSwooleClose']);
             $this->port->on('Packet', [$this, 'onSwoolePacket']);
         }
+
         $this->beforeSwooleStart();
         $this->server->start();
     }

@@ -116,5 +116,8 @@ class GeneratorContext
     {
         unset($this->controller);
         unset($this->stack);
+        unset($this->controllerName);
+        unset($this->methodName);
+        unset($this->i);
     }
 }

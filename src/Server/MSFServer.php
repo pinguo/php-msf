@@ -83,21 +83,6 @@ abstract class MSFServer extends WebSocketServer
      */
     protected $mysqlClient;
     /**
-     * dispatch fd
-     * @var array
-     */
-    protected $dispatchClientFds = [];
-    /**
-     * dispatch 端口
-     * @var int
-     */
-    protected $dispatchPort;
-    /**
-     * 共享内存表
-     * @var \swoole_table
-     */
-    protected $uidFdTable;
-    /**
      * 连接池进程
      * @var
      */
@@ -108,29 +93,9 @@ abstract class MSFServer extends WebSocketServer
      */
     protected $asynPools;
     /**
-     * 分布式系统服务器唯一标识符
-     * @var int
-     */
-    private $USID;
-    /**
      * @var AsynPoolManager
      */
     private $asnyPoolManager;
-    /**
-     * 多少人启用task进行发送
-     * @var
-     */
-    private $sendUseTaskNum;
-    /**
-     * 定时器
-     * @var array
-     */
-    private $timerTasksUsed;
-    /**
-     * 初始化的锁
-     * @var \swoole_lock
-     */
-    private $initLock;
     /**
      * @var array
      */
@@ -176,7 +141,6 @@ abstract class MSFServer extends WebSocketServer
     public function setConfig()
     {
         parent::setConfig();
-        $this->sendUseTaskNum = $this->config['server']['send_use_task_num'];
     }
 
     /**
@@ -189,15 +153,10 @@ abstract class MSFServer extends WebSocketServer
         // 初始化Yac共享内存
         $this->sysCache  = new \Yac('sys_cache_');
 
-        //创建uid->fd共享内存表
-        $this->uidFdTable = new \swoole_table(65536);
-        $this->uidFdTable->column('fd', \swoole_table::TYPE_INT, 8);
-        $this->uidFdTable->create();
-
         //创建task用的Atomic
         $this->taskAtomic = new \swoole_atomic(0);
 
-        //创建task用的id->pid共享内存表不至于同时超过1024个任务吧
+        //创建task用的id->pid共享内存表不至于同时超过1024个任务
         $this->tidPidTable = new \swoole_table(1024);
         $this->tidPidTable->column('pid', \swoole_table::TYPE_INT, 8);
         $this->tidPidTable->column('des', \swoole_table::TYPE_STRING, 50);
@@ -242,60 +201,6 @@ abstract class MSFServer extends WebSocketServer
             $this->server->addProcess($configProcess);
         }
 
-        if ($this->config->get('use_dispatch')) {
-            //创建dispatch端口用于连接dispatch
-            $this->dispatchPort = $this->server->listen($this->config['tcp']['socket'],
-                $this->config['server']['dispatch_port'], SWOOLE_SOCK_TCP);
-            $this->dispatchPort->set($this->setServerSet());
-            $this->dispatchPort->on('close', function ($serv, $fd) {
-                print_r("Remove a dispatcher.\n");
-                for ($i = 0; $i < $this->workerNum + $this->taskNum; $i++) {
-                    if ($i == $serv->workerId) {
-                        continue;
-                    }
-                    $data = $this->packSerevrMessageBody(Marco::REMOVE_DISPATCH_CLIENT, $fd);
-                    $serv->sendMessage($data, $i);
-                }
-                $this->removeDispatch($fd);
-            });
-
-            $this->dispatchPort->on('receive', function ($serv, $fd, $fromId, $data) {
-                $data = unpack($this->packageLengthType . "1length/a*data", $data)['data'];
-                $unserializeData = unserialize($data);
-                $type = $unserializeData['type'];
-                $message = $unserializeData['message'];
-                switch ($type) {
-                    case Marco::MSG_TYPE_USID://获取服务器唯一id
-                        print_r("Find a new dispatcher.\n");
-                        $unsData = unserialize($message);
-                        $unsData['fd'] = $fd;
-                        $fdinfo = $this->server->connection_info($fd);
-                        $unsData['remote_ip'] = $fdinfo['remote_ip'];
-                        $sendData = $this->packSerevrMessageBody($type, $unsData);
-                        for ($i = 0; $i < $this->workerNum + $this->taskNum; $i++) {
-                            if ($i == $serv->workerId) {
-                                continue;
-                            }
-                            $serv->sendMessage($sendData, $i);
-                        }
-                        $this->addDispatch($unsData);
-                        break;
-                    case Marco::MSG_TYPE_SEND://发送消息
-                        $this->sendToUid($message['uid'], $message['data'], true);
-                        break;
-                    case Marco::MSG_TYPE_SEND_BATCH://批量消息
-                        $this->sendToUids($message['uids'], $message['data'], true);
-                        break;
-                    case Marco::MSG_TYPE_SEND_ALL://广播消息
-                        $serv->task($data);
-                        break;
-                    case Marco::MSG_TYPE_KICK_UID://踢人
-                        $this->kickUid($message['uid'], true);
-                        break;
-                }
-            });
-        }
-        $this->initLock = new \swoole_lock(SWOOLE_RWLOCK);
         //初始化对象池
         $this->objectPool = Pool::getInstance();
     }
@@ -354,25 +259,6 @@ abstract class MSFServer extends WebSocketServer
         $this->workerNum = $set['worker_num'];
         $this->taskNum = $set['task_worker_num'];
         return $set;
-    }
-
-    /**
-     * 移除dispatch
-     * @param $fd
-     */
-    public function removeDispatch($fd)
-    {
-        unset($this->dispatchClientFds[$fd]);
-    }
-
-    /**
-     * 添加一个dispatch
-     * @param $data
-     */
-    public function addDispatch($data)
-    {
-        $this->USID = $data['usid'];
-        $this->dispatchClientFds[$data['fd']] = $data['fd'];
     }
 
     /**
@@ -438,12 +324,6 @@ abstract class MSFServer extends WebSocketServer
         parent::onSwoolePipeMessage($serv, $fromWorkerId, $message);
         $data = unserialize($message);
         switch ($data['type']) {
-            case Marco::MSG_TYPE_USID:
-                $this->addDispatch($data['message']);
-                break;
-            case Marco::REMOVE_DISPATCH_CLIENT:
-                $this->removeDispatch($data['message']);
-                break;
             case Marco::MSG_TYPR_ASYN:
                 $this->asnyPoolManager->distribute($data['message']);
                 break;
@@ -529,7 +409,7 @@ abstract class MSFServer extends WebSocketServer
         $this->initAsynPools();
         $this->initRedisProxies();
         $this->mysqlPool = $this->asynPools['mysqlPool'];
-        if (!$serv->taskworker) {
+        if (!$serv->taskworker && !empty($this->asynPools)) {
             //注册
             $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);
             if (!$this->config['asyn_process_enable']) {
@@ -550,71 +430,9 @@ abstract class MSFServer extends WebSocketServer
 
             });
         }
-        //进程锁
-        if (!$this->isTaskWorker() && $this->initLock->trylock()) {
-            //进程启动后进行开服的初始化
-            $generator = $this->onOpenServiceInitialization();
-            if ($generator instanceof \Generator) {
-                $generatorContext = new GeneratorContext();
-                $generatorContext->setController(null, 'MSFServer', 'onSwooleWorkerStart');
-                $this->coroutine->start($generator, $generatorContext);
-            }
-            if (Server::$testUnity) {
-                new TestModule(Server::$testUnityDir, $this->coroutine);
-            }
-            $this->initLock->lock_read();
-        }
-        //最后一个worker处理启动定时器
-        if ($workerId == $this->workerNum - 1) {
-            //重新读入timerTask配置
-            $timerTaskConfig = $this->config->load(ROOT_PATH . '/config/timerTask.php');
-            $timerTasks = $timerTaskConfig->get('timerTask');
-            $this->timerTasksUsed = [];
-
-            foreach ($timerTasks as $timerTask) {
-                $taskName = $timerTask['task_name']??'';
-                $modelName = $timerTask['model_name']??'';
-                if (empty($taskName) && empty($modelName)) {
-                    throw new SwooleException('定时任务配置错误，缺少task_name或者model_name.');
-                }
-                $methodName = $timerTask['method_name'];
-                if (!key_exists('start_time', $timerTask)) {
-                    $startTime = -1;
-                } else {
-                    $startTime = strtotime(date($timerTask['start_time']));
-                }
-                if (!key_exists('end_time', $timerTask)) {
-                    $endTime = -1;
-                } else {
-                    $endTime = strtotime(date($timerTask['end_time']));
-                }
-                if (!key_exists('delay', $timerTask)) {
-                    $delay = false;
-                } else {
-                    $delay = $timerTask['delay'];
-                }
-                $intervalTime = $timerTask['interval_time'] < 1 ? 1 : $timerTask['interval_time'];
-                $maxExec = $timerTask['max_exec']??-1;
-                $this->timerTasksUsed[] = [
-                    'task_name' => $taskName,
-                    'model_name' => $modelName,
-                    'method_name' => $methodName,
-                    'start_time' => $startTime,
-                    'end_time' => $endTime,
-                    'interval_time' => $intervalTime,
-                    'max_exec' => $maxExec,
-                    'now_exec' => 0,
-                    'delay' => $delay
-                ];
-            }
-            if (count($this->timerTasksUsed) > 0) {
-                $this->timerTask();
-                $serv->tick(1000, [$this, 'timerTask']);
-            }
-        }
 
         //redis proxy监测
-        $this->server->tick('5000', function () {
+        $this->server->tick(5000, function () {
             if (!empty($this->redisProxyManager)) {
                 foreach ($this->redisProxyManager as $proxy) {
                     $proxy->check();
@@ -632,77 +450,14 @@ abstract class MSFServer extends WebSocketServer
     }
 
     /**
-     * 定时任务
-     */
-    public function timerTask()
-    {
-        $time = time();
-        foreach ($this->timerTasksUsed as &$timerTask) {
-            if ($timerTask['start_time'] < $time && $timerTask['start_time'] != -1) {
-                $count = round(($time - $timerTask['start_time']) / $timerTask['interval_time']);
-                $timerTask['start_time'] += $count * $timerTask['interval_time'];
-            }
-            if (($time == $timerTask['start_time'] || $timerTask['start_time'] == -1) &&
-                ($time < $timerTask['end_time'] || $timerTask['end_time'] = -1) &&
-                ($timerTask['now_exec'] < $timerTask['max_exec'] || $timerTask['max_exec'] == -1)
-            ) {
-                if ($timerTask['delay']) {
-                    if ($timerTask['start_time'] == -1) {
-                        $timerTask['start_time'] = $time;
-                    }
-                    $timerTask['start_time'] += $timerTask['interval_time'];
-                    $timerTask['delay'] = false;
-                    continue;
-                }
-                $timerTask['now_exec']++;
-                if ($timerTask['start_time'] == -1) {
-                    $timerTask['start_time'] = $time;
-                }
-                $timerTask['start_time'] += $timerTask['interval_time'];
-                if (!empty($timerTask['task_name'])) {
-                    $task = $this->loader->task($timerTask['task_name'], $this);
-                    call_user_func([$task, $timerTask['method_name']]);
-                    $task->startTask(null);
-                } else {
-                    $model = $this->loader->model($timerTask['model_name'], $this);
-                    $generator = call_user_func([$model, $timerTask['method_name']]);
-                    if ($generator instanceof \Generator) {
-                        $generatorContext = new GeneratorContext();
-                        $generatorContext->setController(null, $timerTask['model_name'], $timerTask['method_name']);
-                        $this->coroutine->start($generator, $generatorContext);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * 连接断开
      * @param $serv
      * @param $fd
      */
     public function onSwooleClose($serv, $fd)
     {
-        $info = $serv->connection_info($fd, 0, true);
-        $uid = $info['uid']??0;
-        if (!empty($uid)) {
-            $generator = $this->onUidCloseClear($uid);
-            if ($generator instanceof \Generator) {
-                $generatorContext = new GeneratorContext();
-                $generatorContext->setController(null, 'MSFServer', 'onSwooleClose');
-                $this->coroutine->start($generator, $generatorContext);
-            }
-            $this->unBindUid($uid);
-        }
         parent::onSwooleClose($serv, $fd);
     }
-
-    /**
-     * 当一个绑定uid的连接close后的清理
-     * 支持协程
-     * @param $uid
-     */
-    abstract public function onUidCloseClear($uid);
 
     /**
      * 向task发送中断信号

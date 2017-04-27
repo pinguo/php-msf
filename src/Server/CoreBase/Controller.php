@@ -20,11 +20,11 @@ class Controller extends CoreBase
      */
     public $mysqlPool;
     /**
-     * @var HttpInPut
+     * @var Input
      */
     public $input;
     /**
-     * @var HttpOutPut
+     * @var Output
      */
     public $output;
     /**
@@ -101,12 +101,12 @@ class Controller extends CoreBase
     final public function __construct()
     {
         parent::__construct();
-        $this->input = new Input();
-        $this->output = new Output($this);
+        $this->input      = new Input();
+        $this->output     = new Output($this);
         $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
-        $this->mysqlPool = getInstance()->mysqlPool;
-        $this->client = clone getInstance()->client;
-        $this->tcpClient = clone getInstance()->tcpClient;
+        $this->mysqlPool  = getInstance()->mysqlPool;
+        $this->client     = clone getInstance()->client;
+        $this->tcpClient  = clone getInstance()->tcpClient;
     }
 
     /**

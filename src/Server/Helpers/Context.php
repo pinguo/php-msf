@@ -90,4 +90,13 @@ class Context implements \ArrayAccess
     {
         return isset($this->{$offset}) ? $this->{$offset} : null;
     }
+
+    public function destroy()
+    {
+        unset($this->logId);
+        unset($this->PGLog);
+        unset($this->input);
+        unset($this->output);
+        unset($this->controller);
+    }
 }
