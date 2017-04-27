@@ -54,7 +54,7 @@ abstract class CoroutineBase implements ICoroutineBase
     public function __construct($timeout = 0)
     {
         if (self::$MAX_TIMERS == 0) {
-            self::$MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 1000);
+            self::$MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 30000);
         }
 
         if ($timeout > 0) {

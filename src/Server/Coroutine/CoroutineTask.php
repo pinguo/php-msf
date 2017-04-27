@@ -165,6 +165,8 @@ class CoroutineTask
         if (!$this->destroy) {
             unset(getInstance()->coroutine->taskMap[$this->generatorContext->getController()->PGLog->logId]);
             unset(getInstance()->coroutine->IOCallBack[$this->generatorContext->getController()->PGLog->logId]);
+            unset($this->generatorContext->getController()->PGLog);
+            unset($this->generatorContext->getController()->logId);
             $this->generatorContext->destroy();
             unset($this->generatorContext);
             unset($this->stack);

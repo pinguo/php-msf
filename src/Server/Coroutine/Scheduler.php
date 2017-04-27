@@ -91,19 +91,49 @@ class Scheduler
 
         if (!empty(getInstance()->objectPool->map)) {
             foreach (getInstance()->objectPool->map as $class => $objects) {
-                $data['object_poll'][$class] = $objects->count();
+                if (APPLICATION_ENV == 'docker') {
+                    foreach ($objects as $object) {
+                        $data['object_poll'][$class][] = [
+                            'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
+                            'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
+                            'ref_count' => refcount($object),
+                        ];
+                    }
+                } else {
+                    $data['object_poll'][$class] = $objects->count();
+                }
             }
         }
 
         if (!empty(ControllerFactory::getInstance()->pool)) {
             foreach (ControllerFactory::getInstance()->pool as $class => $objects) {
-                $data['controller_poll'][$class] = $objects->count();
+                if (APPLICATION_ENV == 'docker') {
+                    foreach ($objects as $object) {
+                        $data['controller_poll'][$class][] = [
+                            'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
+                            'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
+                            'ref_count' => refcount($object),
+                        ];
+                    }
+                } else {
+                    $data['controller_poll'][$class] = $objects->count();
+                }
             }
         }
 
         if (!empty(ModelFactory::getInstance()->pool)) {
             foreach (ModelFactory::getInstance()->pool as $class => $objects) {
-                $data['model_poll'][$class] = $objects->count();
+                if (APPLICATION_ENV == 'docker') {
+                    foreach ($objects as $object) {
+                        $data['model_poll'][$class][] = [
+                            'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
+                            'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
+                            'ref_count' => refcount($object),
+                        ];
+                    }
+                } else {
+                    $data['model_poll'][$class] = $objects->count();
+                }
             }
         }
 
