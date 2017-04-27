@@ -430,6 +430,15 @@ abstract class MSFServer extends WebSocketServer
 
             });
         }
+
+        //redis proxy监测
+        $this->server->tick(5000, function () {
+            if (!empty($this->redisProxyManager)) {
+                foreach ($this->redisProxyManager as $proxy) {
+                    $proxy->check();
+                }
+            }
+        });
     }
 
     /**

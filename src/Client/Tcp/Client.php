@@ -84,7 +84,7 @@ class Client
      * @param int $timeout
      * @return GetTcpClientCoroutine
      */
-    public function coroutineGetTcpClient($baseUrl, $timeout = 1000)
+    public function coroutineGetTcpClient($baseUrl, $timeout = 30000)
     {
         return new GetTcpClientCoroutine($this, $baseUrl, $timeout);
     }
