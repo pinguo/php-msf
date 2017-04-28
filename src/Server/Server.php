@@ -732,7 +732,6 @@ abstract class Server extends Child
                 'status' => $code,
                 'serverTime' => microtime(true)
             ]);
-            $this->log->warning($response);
             $response = getInstance()->encode($this->pack->pack($response));
             getInstance()->send($fd, $response);
         }

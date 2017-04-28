@@ -191,7 +191,6 @@ abstract class HttpServer extends Server
                 'status' => $code,
                 'serverTime' => microtime(true)
             ]);
-            $this->log->warning($res);
             $response->end($res);
         }
     }
