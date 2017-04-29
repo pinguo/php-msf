@@ -45,39 +45,52 @@ class ModelFactory
     public function getModel($model)
     {
         $model = str_replace('/', '\\', $model);
-
-        $models = $this->pool[$model]??null;
-        if ($models == null) {
-            $models = $this->pool[$model] = new \SplStack();
-        }
-
-        if (!$models->isEmpty()) {
-            $modelInstance = $models->shift();
-            $modelInstance->reUse();
-            $modelInstance->useCount++;
-            return $modelInstance;
-        }
-
         $className = "\\App\\Models\\$model";
+
         if (class_exists($className)) {
+            $models = $this->pool[$model]??null;
+            if ($models == null) {
+                $models = $this->pool[$model] = new \SplStack();
+            }
+
+            if (!$models->isEmpty()) {
+                $modelInstance = $models->shift();
+                $modelInstance->reUse();
+                $modelInstance->useCount++;
+                return $modelInstance;
+            }
+
             $modelInstance = new $className;
             $modelInstance->coreName = $model;
             $modelInstance->afterConstruct();
-        } else {
-            $className = "\\PG\\MSF\\Server\\Models\\$model";
-            if (class_exists($className)) {
-                $modelInstance = new $className;
-                $modelInstance->coreName = $model;
-                $modelInstance->afterConstruct();
-            } else {
-                throw new SwooleException("class $model is not exist");
-            }
+            $modelInstance->genTime  = time();
+            $modelInstance->useCount = 1;
+            return $modelInstance;
         }
 
-        $modelInstance->genTime = time();
-        $modelInstance->useCount   = 1;
+        $className = "\\PG\\MSF\\Server\\Models\\$model";
+        if (class_exists($className)) {
+            $models = $this->pool[$model]??null;
+            if ($models == null) {
+                $models = $this->pool[$model] = new \SplStack();
+            }
 
-        return $modelInstance;
+            if (!$models->isEmpty()) {
+                $modelInstance = $models->shift();
+                $modelInstance->reUse();
+                $modelInstance->useCount++;
+                return $modelInstance;
+            }
+
+            $modelInstance = new $className;
+            $modelInstance->coreName = $model;
+            $modelInstance->afterConstruct();
+            $modelInstance->genTime  = time();
+            $modelInstance->useCount = 1;
+            return $modelInstance;
+        } else {
+            throw new SwooleException("class $model is not exist");
+        }
     }
 
     /**
