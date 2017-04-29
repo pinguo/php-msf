@@ -51,6 +51,8 @@ class Scheduler
     public function stat()
     {
         $data = [
+            // 进程ID
+            'pid' => 0,
             // 协程统计信息
             'coroutine' => [
                 // 当前正在处理的请求数
@@ -82,6 +84,7 @@ class Scheduler
             ],
         ];
         $routineList = getInstance()->coroutine->taskMap;
+        $data['pid'] = getInstance()->server->worker_pid;
         $data['coroutine']['total']   = count($routineList);
         $data['memory']['peak_byte']  = memory_get_peak_usage();
         $data['memory']['usage_byte'] = memory_get_usage();

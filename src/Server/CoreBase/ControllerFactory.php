@@ -46,19 +46,22 @@ class ControllerFactory
         if ($controller == null) {
             return null;
         }
-        $controller = ltrim($controller, '\\');
-        $controllers = $this->pool[$controller]??null;
-        if ($controllers == null) {
-            $controllers = $this->pool[$controller] = new \SplStack();
-        }
-        if (!$controllers->isEmpty()) {
-            $controllerInstance = $controllers->shift();
-            $controllerInstance->reUse();
-            $controllerInstance->useCount++;
-            return $controllerInstance;
-        }
+        $controller  = ltrim($controller, '\\');
         $className = "\\App\\Controllers\\$controller";
+
         if (class_exists($className)) {
+            $controllers = $this->pool[$controller]??null;
+            if ($controllers == null) {
+                $controllers = $this->pool[$controller] = new \SplStack();
+            }
+
+            if (!$controllers->isEmpty()) {
+                $controllerInstance = $controllers->shift();
+                $controllerInstance->reUse();
+                $controllerInstance->useCount++;
+                return $controllerInstance;
+            }
+
             $controllerInstance = new $className;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();
@@ -69,6 +72,18 @@ class ControllerFactory
 
         $className = "\\PG\\MSF\\Server\\Controllers\\$controller";
         if (class_exists($className)) {
+            $controllers = $this->pool[$controller]??null;
+            if ($controllers == null) {
+                $controllers = $this->pool[$controller] = new \SplStack();
+            }
+
+            if (!$controllers->isEmpty()) {
+                $controllerInstance = $controllers->shift();
+                $controllerInstance->reUse();
+                $controllerInstance->useCount++;
+                return $controllerInstance;
+            }
+
             $controllerInstance = new $className;
             $controllerInstance->coreName = $controller;
             $controllerInstance->afterConstruct();

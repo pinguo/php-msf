@@ -25,7 +25,7 @@ class ConfigProcess
         echo "启动了configManager\n";
         $this->config = $config;
         $this->MSFServer  = $MSFServer;
-        $this->lastMinute = ceil(time() / 60);
+        $this->lastMinute     = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
     }
@@ -71,7 +71,7 @@ class ConfigProcess
                 'task_queue_bytes'     => 0,
             ],
         ];
-
+        
         $workerIds   = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
         foreach ($workerIds as $workerId) {
             $workerInfo = $this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
@@ -85,6 +85,13 @@ class ConfigProcess
         $lastStats              = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
         $data['tcp']            = $this->MSFServer->server->stats();
         $data['running']['qps'] = $data['tcp']['request_count'] - $lastStats['tcp']['request_count'];
+
+        if (!isset($lastStats['running']['last_qpm'])) {
+            $data['running']['last_qpm'] = 0;
+        } else {
+            $data['running']['last_qpm'] = $lastStats['running']['last_qpm'];
+        }
+
         if ($this->lastMinute >= ceil(time() / 60)) {
             if (!empty($lastStats) && !isset($lastStats['running']['qpm'])) {
                 $lastStats['running']['qpm'] = 0;
@@ -92,7 +99,10 @@ class ConfigProcess
 
             $data['running']['qpm'] = $lastStats['running']['qpm'] + $data['running']['qps'];
         } else {
-            $data['running']['qpm'] = $data['running']['qps'];
+            if (!empty($lastStats['running']['qpm'])) {
+                $data['running']['last_qpm'] = $lastStats['running']['qpm'];
+            }
+            $data['running']['qpm']          = $data['running']['qps'];
             $this->lastMinute = ceil(time() / 60);
         }
 
