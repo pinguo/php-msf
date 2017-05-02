@@ -21,7 +21,7 @@ class RedisCoroutine extends CoroutineBase
 
     public function __construct($context, $redisAsynPool, $name, $arguments)
     {
-        parent::__construct();
+        parent::__construct(3000);
         $this->redisAsynPool = $redisAsynPool;
         $this->name = $name;
         $this->arguments = $arguments;
