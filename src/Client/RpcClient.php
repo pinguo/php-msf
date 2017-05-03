@@ -10,7 +10,7 @@
 namespace PG\MSF\Client;
 
 use PG\Helper\SecurityHelper;
-use PG\MSF\Base\Base;
+use PG\MSF\Base\Core;
 use PG\MSF\Base\Exception;
 
 class RpcClient

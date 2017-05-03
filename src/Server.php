@@ -14,7 +14,7 @@ use PG\MSF\{
     Base\Child, Controllers\ControllerFactory, Base\Loader, Base\Exception, Coroutine\GeneratorContext
 };
 use PG\MSF\{
-    Base\Base, Pack\IPack, Route\IRoute
+    Base\Core, Pack\IPack, Route\IRoute
 };
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 
