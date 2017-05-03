@@ -9,7 +9,7 @@
 namespace PG\MSF\Client\Tcp;
 
 use PG\MSF\{
-    Base\Exception, Helpers\Context, Pack\IPack
+    Base\Exception, Helpers\Context, Pack\IPack, Coroutine\TcpClientRequest
 };
 
 class TcpClient

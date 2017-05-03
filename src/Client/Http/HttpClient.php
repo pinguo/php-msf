@@ -8,7 +8,9 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Helpers\Context;
+use PG\MSF\{
+    Helpers\Context, Coroutine\HttpClientRequest
+};
 
 class HttpClient
 {

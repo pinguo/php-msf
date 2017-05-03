@@ -9,7 +9,7 @@
 namespace PG\MSF\Client\Http;
 
 use PG\MSF\{
-    Base\Exception, Helpers\Context
+    Base\Exception, Helpers\Context, Coroutine\GetHttpClient
 };
 
 class Client
