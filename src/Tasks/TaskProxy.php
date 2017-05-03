@@ -10,6 +10,7 @@ namespace PG\MSF\Tasks;
 
 use PG\MSF\Marco;
 use PG\MSF\Base\Core;
+use PG\MSF\Coroutine\CTask;
 
 class TaskProxy extends Core
 {
