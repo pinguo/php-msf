@@ -8,6 +8,8 @@
 
 namespace PG\MSF\DataBase;
 
+use PG\MSF\Coroutine\Redis;
+
 class CoroutineRedisHelp
 {
     private $redisAsynPool;
