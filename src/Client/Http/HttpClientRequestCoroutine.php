@@ -8,9 +8,9 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Server\Coroutine\CoroutineBase;
+use PG\MSF\Coroutine\Base;
 
-class HttpClientRequestCoroutine extends CoroutineBase
+class HttpClientRequestCoroutine extends Base
 {
     /**
      * @var HttpClient

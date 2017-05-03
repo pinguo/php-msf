@@ -9,9 +9,9 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\Server\Coroutine\CoroutineBase;
+use PG\MSF\Coroutine\Base;
 
-class TcpClientRequestCoroutine extends CoroutineBase
+class TcpClientRequestCoroutine extends Base
 {
     public $tcpClient;
     public $data;

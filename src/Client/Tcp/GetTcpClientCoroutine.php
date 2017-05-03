@@ -9,9 +9,9 @@
 namespace PG\MSF\Client\Tcp;
 
 
-use PG\MSF\Server\Coroutine\CoroutineBase;
+use PG\MSF\Coroutine\Base;
 
-class GetTcpClientCoroutine extends CoroutineBase
+class GetTcpClientCoroutine extends Base
 {
     /**
      * @var Client

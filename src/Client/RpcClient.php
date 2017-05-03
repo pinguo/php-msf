@@ -10,8 +10,8 @@
 namespace PG\MSF\Client;
 
 use PG\Helper\SecurityHelper;
-use PG\MSF\Server\CoreBase\CoreBase;
-use PG\MSF\Server\CoreBase\SwooleException;
+use PG\MSF\Base\Base;
+use PG\MSF\Base\SwooleException;
 
 class RpcClient
 {

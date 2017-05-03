@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\Server\{
-    CoreBase\SwooleException, Helpers\Context, Pack\IPack
+use PG\MSF\{
+    Base\SwooleException, Helpers\Context, Pack\IPack
 };
 
 class TcpClient
@@ -48,7 +48,7 @@ class TcpClient
         if (class_exists($pack_class_name)) {
             $this->pack = new $pack_class_name;
         } else {
-            $pack_class_name = "\\PG\\MSF\\Server\\Pack\\" . $packTool;
+            $pack_class_name = "\\PG\\MSF\\Pack\\" . $packTool;
             if (class_exists($pack_class_name)) {
                 $this->pack = new $pack_class_name;
             } else {

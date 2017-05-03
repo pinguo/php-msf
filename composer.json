@@ -35,6 +35,7 @@
     "psr-4": {
       "PG\\MSF\\Server\\": "src/Server",
       "PG\\MSF\\Client\\": "src/Client",
+      "PG\\MSF\\Command\\": "src/Command",
       "PG\\MSF\\Test\\": "src/test"
     },
     "files": [

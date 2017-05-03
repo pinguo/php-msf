@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Server\{
-    CoreBase\SwooleException, Helpers\Context
+use PG\MSF\{
+    Base\SwooleException, Helpers\Context
 };
 
 class Client
@@ -24,7 +24,7 @@ class Client
      * 获取一个http客户端
      * @param $baseUrl
      * @param $callBack
-     * @throws \PG\MSF\Server\CoreBase\SwooleException
+     * @throws \PG\MSF\Base\SwooleException
      */
     public function getHttpClient($baseUrl, $callBack, array $headers = [])
     {

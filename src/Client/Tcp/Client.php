@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\Server\{
-    CoreBase\SwooleException, Helpers\Context
+use PG\MSF\{
+    Base\SwooleException, Helpers\Context
 };
 
 class Client
