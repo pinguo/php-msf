@@ -8,11 +8,11 @@
 
 namespace PG\MSF\Process;
 
-use Noodlehaus\Config;
+use Noodlehaus\Config as Conf;
 use PG\MSF\Marco;
 use PG\MSF\MSFServer;
 
-class ConfigProcess
+class Config
 {
     public $config;
 
@@ -20,7 +20,7 @@ class ConfigProcess
 
     public $lastMinute;
 
-    public function __construct(Config $config,  MSFServer $MSFServer)
+    public function __construct(Conf $config,  MSFServer $MSFServer)
     {
         echo "启动了configManager\n";
         $this->config = $config;

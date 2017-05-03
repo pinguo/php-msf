@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Process;
 
-class InotifyProcess
+class Inotify
 {
     const RELOAD_SIG = 'reload_sig';
     // 监控的目录，默认是src

@@ -12,7 +12,7 @@ use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
 use PG\MSF\Process\{
-    ConfigProcess, InotifyProcess
+    Config, Inotify
 };
 use PG\MSF\Coroutine\{
     Task, GeneratorContext
@@ -187,7 +187,7 @@ abstract class MSFServer extends WebSocketServer
         if ($this->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理
             $reloadProcess = new \swoole_process(function ($process) {
                 $process->name($this->config['server.process_title'] . '-RELOAD');
-                new InotifyProcess($this->server);
+                new Inotify($this->server);
             }, false, 2);
             $this->server->addProcess($reloadProcess);
         }
@@ -196,7 +196,7 @@ abstract class MSFServer extends WebSocketServer
         if ($this->config->get('config_manage_enable', false)) {
             $configProcess = new \swoole_process(function ($process) {
                 $process->name($this->config['server.process_title'] . '-CONFIG');
-                new ConfigProcess($this->config, $this);
+                new Config($this->config, $this);
             }, false, 2);
             $this->server->addProcess($configProcess);
         }
