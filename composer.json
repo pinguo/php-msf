@@ -30,13 +30,10 @@
   },
   "autoload": {
     "psr-4": {
-      "PG\\MSF\\Server\\": "src/Server",
-      "PG\\MSF\\Client\\": "src/Client",
-      "PG\\MSF\\Command\\": "src/Command",
-      "PG\\MSF\\Test\\": "src/test"
+      "PG\\MSF\\": "src/"
     },
     "files": [
-      "src/Server/Helpers/Common.php"
+      "src/Helpers/Common.php"
     ]
   },
   "minimum-stability": "dev",
