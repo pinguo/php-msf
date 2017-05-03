@@ -9,6 +9,7 @@
 namespace PG\MSF\DataBase;
 
 use PG\MSF\Base\Exception;
+use PG\MSF\Coroutine\Mysql;
 
 class MysqlAsynPool extends AsynPool
 {

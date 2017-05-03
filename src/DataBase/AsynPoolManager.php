@@ -9,8 +9,8 @@
 namespace PG\MSF\DataBase;
 
 
-use Server\SwooleMarco;
-use Server\SwooleServer;
+use PG\MSF\Marco;
+use PG\MSF\Server;
 
 class AsynPoolManager
 {
@@ -106,7 +106,7 @@ class AsynPoolManager
             call_user_func([$asyn, 'distribute'], $data);
         } else {
             $workerID = $data['worker_id'];
-            $message = $this->swooleServer->packSerevrMessageBody(SwooleMarco::MSG_TYPR_ASYN, $data);
+            $message = $this->swooleServer->packSerevrMessageBody(Marco::MSG_TYPR_ASYN, $data);
             $this->swooleServer->server->sendMessage($message, $workerID);
         }
 

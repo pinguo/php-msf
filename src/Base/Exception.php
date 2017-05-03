@@ -25,6 +25,9 @@ class Exception extends \Exception
      */
     public function setShowOther($others, $controller = null)
     {
+        if (!empty($controller)) {
+            echo date('Y/m/d H:i:s') . ' [server] [logid:' . $controller->PGLog->logId . '] ';
+        }
         //  BusinessException 不打印在终端.
         if ($this->getPrevious() instanceof BusinessException) {
             return;

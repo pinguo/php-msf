@@ -10,7 +10,7 @@ namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Exception;
 
-class Exception extends Exception
+class CException extends Exception
 {
     /**
      * @return string

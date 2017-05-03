@@ -135,7 +135,7 @@ abstract class Server extends Child
     public $config;
     /**
      * 日志
-     * @var Logger
+     * @var PGLog
      */
     public $log;
     /**
