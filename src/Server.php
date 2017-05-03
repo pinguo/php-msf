@@ -309,7 +309,7 @@ abstract class Server extends Child
         self::setProcessTitle(self::$_worker->config->get('server.process_title'));
         // stdClass
         self::$stdClass = new \stdClass();
-        CoreBase::$stdClass = self::$stdClass;
+        Core::$stdClass = self::$stdClass;
     }
 
     /**

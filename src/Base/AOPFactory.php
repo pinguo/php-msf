@@ -17,10 +17,10 @@ class AOPFactory
     /**
      * 获取协程redis
      * @param CoroutineRedisHelp $redisPoolCoroutine
-     * @param CoreBase $coreBase
+     * @param Core $coreBase
      * @return AOP|CoroutineRedisHelp
      */
-    public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, CoreBase $coreBase)
+    public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, Core $coreBase)
     {
         $redisPoolCoroutine = new AOP($redisPoolCoroutine);
         $redisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
@@ -36,10 +36,10 @@ class AOPFactory
     /**
      * 获取redis proxy
      * @param $redisProxy
-     * @param CoreBase $coreBase
+     * @param Core $coreBase
      * @return AOP
      */
-    public static function getRedisProxy(IProxy $redisProxy, CoreBase $coreBase)
+    public static function getRedisProxy(IProxy $redisProxy, Core $coreBase)
     {
         $redis = new AOP($redisProxy);
         $redis->registerOnBefore(function ($method, $arguments) use ($redisProxy, $coreBase) {
@@ -57,10 +57,10 @@ class AOPFactory
     /**
      * 获取对象池实例
      * @param Pool $pool
-     * @param CoreBase $coreBase
+     * @param Core $coreBase
      * @return AOP|Pool
      */
-    public static function getObjectPool(Pool $pool, CoreBase $coreBase)
+    public static function getObjectPool(Pool $pool, Core $coreBase)
     {
         $pool = new AOP($pool);
 

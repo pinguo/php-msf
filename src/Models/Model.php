@@ -9,10 +9,10 @@
 
 namespace PG\MSF\Models;
 
-use PG\MSF\Base\CoreBase;
+use PG\MSF\Base\Core;
 use PG\Log\PGLog;
 
-class Model extends CoreBase
+class Model extends Core
 {
     /**
      * @var \PG\MSF\DataBase\RedisAsynPool

@@ -236,7 +236,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 开启一个协程事务
      * @param $object
-     * @return MySqlCoroutine
+     * @return MySql
      */
     public function coroutineBegin($object)
     {
@@ -258,7 +258,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 协程Commit
      * @param $id
-     * @return MySqlCoroutine
+     * @return MySql
      */
     public function coroutineCommit($id)
     {
@@ -278,7 +278,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 协程Rollback
      * @param $id
-     * @return MySqlCoroutine
+     * @return MySql
      */
     public function coroutineRollback($id)
     {

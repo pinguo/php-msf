@@ -1849,7 +1849,7 @@ class Miner
      * 协程的方式
      * @param null $bindId
      * @param null $sql
-     * @return MySqlCoroutine
+     * @return MySql
      */
     public function coroutineSend($bindId = null, $sql = null)
     {
@@ -1876,7 +1876,7 @@ class Miner
             return $data;
         } else {
             $this->clear();
-            return new MySqlCoroutine($this->mysqlPool, $bindId, $sql);
+            return new MySql($this->mysqlPool, $bindId, $sql);
         }
     }
 

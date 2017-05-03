@@ -9,9 +9,9 @@
 namespace PG\MSF\Tasks;
 
 use PG\MSF\Marco;
-use PG\MSF\Base\CoreBase;
+use PG\MSF\Base\Core;
 
-class TaskProxy extends CoreBase
+class TaskProxy extends Core
 {
     protected $taskId;
     /**
@@ -73,11 +73,11 @@ class TaskProxy extends CoreBase
 
     /**
      * 异步的协程模式
-     * @return TaskCoroutine
+     * @return CTask
      */
     public function coroutineSend()
     {
-        return new TaskCoroutine($this->taskProxyData, -1);
+        return new CTask($this->taskProxyData, -1);
     }
 
     /**

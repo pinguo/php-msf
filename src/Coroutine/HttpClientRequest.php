@@ -6,11 +6,11 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Client\Http;
+namespace PG\MSF\Coroutine;
 
-use PG\MSF\Coroutine\Base;
+use PG\MSF\Client\Http\HttpClient;
 
-class HttpClientRequestCoroutine extends Base
+class HttpClientRequest extends Base
 {
     /**
      * @var HttpClient

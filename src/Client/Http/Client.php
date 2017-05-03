@@ -90,10 +90,10 @@ class Client
      *
      * @param $baseUrl
      * @param int $timeout 协程超时时间
-     * @return GetHttpClientCoroutine
+     * @return GetHttpClient
      */
     public function coroutineGetHttpClient($baseUrl, $timeout = 30000, $headers = [])
     {
-        return new GetHttpClientCoroutine($this, $baseUrl, $timeout, $headers);
+        return new GetHttpClient($this, $baseUrl, $timeout, $headers);
     }
 }

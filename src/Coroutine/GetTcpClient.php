@@ -1,35 +1,33 @@
 <?php
 /**
- * 协程http客户端
- *
- * @author camera360_server@camera360.com
- * @copyright Chengdu pinguo Technology Co.,Ltd.
+ * @desc: 协程Tcp客户端
+ * @author: leandre <niulingyun@camera360.com>
+ * @date: 2017/3/21
+ * @copyright All rights reserved.
  */
 
-namespace PG\MSF\Client\Http;
+namespace PG\MSF\Coroutine;
 
-use PG\MSF\Coroutine\Base;
+use PG\MSF\Client\Tcp\Client;
 
-class GetHttpClientCoroutine extends Base
+class GetTcpClient extends Base
 {
     /**
      * @var Client
      */
     public $client;
     public $baseUrl;
-    public $headers;
 
-    public function __construct(Client $client, $baseUrl, $timeout, $headers = [])
+    public function __construct(Client $client, $baseUrl, $timeout)
     {
         parent::__construct($timeout);
         $this->baseUrl = $baseUrl;
         $this->client = $client;
-        $this->headers = $headers;
         $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
         $this->client->context->PGLog->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
-        $this->send(function ($httpClient) use ($profileName) {
-            $this->result = $httpClient;
+        $this->send(function ($tcpClient) use ($profileName) {
+            $this->result = $tcpClient;
             $this->responseTime = microtime(true);
             if (!empty($this->client->context->PGLog)) {
                 $this->client->context->PGLog->profileEnd($profileName);
@@ -41,6 +39,6 @@ class GetHttpClientCoroutine extends Base
 
     public function send($callback)
     {
-        $this->client->getHttpClient($this->baseUrl, $callback, $this->headers);
+        $this->client->getTcpClient($this->baseUrl, $callback, $this->timeout);
     }
 }

@@ -24,7 +24,7 @@ class CoroutineRedisHelp
      * @param $key
      * @param string $value
      * @param int $expire
-     * @return mixed|RedisCoroutine
+     * @return mixed|Redis
      */
     public function cache($context, $key, $value = '', $expire = 0)
     {
@@ -49,7 +49,7 @@ class CoroutineRedisHelp
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return call_user_func_array([getInstance()->getRedis(), $name], $arguments);
         } else {
-            return new RedisCoroutine($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
+            return new Redis($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
         }
     }
 }

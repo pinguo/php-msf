@@ -165,8 +165,8 @@ class RpcClient
      */
     public function __call($method, $args)
     {
-        if (!is_object($args[0]) || !($args[0] instanceof CoreBase)) {
-            throw new Exception('The first argument of ' . $method . ' must be instanceof CoreBase.');
+        if (!is_object($args[0]) || !($args[0] instanceof Core)) {
+            throw new Exception('The first argument of ' . $method . ' must be instanceof Core.');
         }
         $obj = $args[0];
         array_shift($args);
@@ -184,7 +184,7 @@ class RpcClient
      * @param string $url
      * @param mixed $args
      */
-    public static function remoteTcpCall(CoreBase $obj, $method, array $args, RpcClient $rpc)
+    public static function remoteTcpCall(Core $obj, $method, array $args, RpcClient $rpc)
     {
         $reqParams = [
             'version' => static::$version,
@@ -232,7 +232,7 @@ class RpcClient
      * Rpc 模式执行远程调用
      * @param string $pack_data 打包好的数据
      */
-    public static function remoteHttpCall(CoreBase $obj, $method, array $args, RpcClient $rpc)
+    public static function remoteHttpCall(Core $obj, $method, array $args, RpcClient $rpc)
     {
         $headers = [];
         if ($rpc->useRpc) {

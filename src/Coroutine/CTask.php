@@ -1,16 +1,14 @@
 <?php
 /**
- * TaskCoroutine
+ * CTask
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Tasks;
+namespace PG\MSF\Coroutine;
 
-use PG\MSF\Coroutine\Base;
-
-class TaskCoroutine extends Base
+class CTask extends Base
 {
     public $id;
     public $taskProxyData;

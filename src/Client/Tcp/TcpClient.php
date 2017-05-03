@@ -67,7 +67,7 @@ class TcpClient
         $path = $data['path'];
         $data['logId'] = $this->context->PGLog->logId;
         $data = $this->encode($this->pack->pack($data));
-        return new TcpClientRequestCoroutine($this, $data, $path, $this->timeOut);
+        return new TcpClientRequest($this, $data, $path, $this->timeOut);
     }
 
     private function encode($buffer)

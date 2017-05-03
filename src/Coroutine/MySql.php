@@ -1,17 +1,17 @@
 <?php
 /**
- * MySqlCoroutine
+ * MySql
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Exception;
-use PG\MSF\Coroutine\Base;
+use PG\MSF\DataBase\MysqlAsynPool;
 
-class MySqlCoroutine extends Base
+class MySql extends Base
 {
     /**
      * @var MysqlAsynPool

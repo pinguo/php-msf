@@ -12,7 +12,7 @@ use Monolog\Logger;
 use Noodlehaus\Config;
 use PG\MSF\Pack\IPack;
 
-class CoreBase extends Child
+class Core extends Child
 {
     /**
      * @var int

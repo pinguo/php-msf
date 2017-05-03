@@ -82,10 +82,10 @@ class Client
      * 协程方式获取 TcpClient
      * @param $baseUrl 127.0.0.1:8000
      * @param int $timeout
-     * @return GetTcpClientCoroutine
+     * @return GetTcpClient
      */
     public function coroutineGetTcpClient($baseUrl, $timeout = 30000)
     {
-        return new GetTcpClientCoroutine($this, $baseUrl, $timeout);
+        return new GetTcpClient($this, $baseUrl, $timeout);
     }
 }

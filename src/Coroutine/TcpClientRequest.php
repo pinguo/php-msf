@@ -7,11 +7,11 @@
  * @copyright All rights reserved.
  */
 
-namespace PG\MSF\Client\Tcp;
+namespace PG\MSF\Coroutine;
 
-use PG\MSF\Coroutine\Base;
+use PG\MSF\Client\Tcp\TcpClient;
 
-class TcpClientRequestCoroutine extends Base
+class TcpClientRequest extends Base
 {
     public $tcpClient;
     public $data;

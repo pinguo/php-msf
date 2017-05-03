@@ -10,10 +10,10 @@
 namespace PG\MSF\Controllers;
 
 use PG\MSF\{
-    Base\CoreBase, Coroutine\GeneratorContext, DataBase\MysqlAsynPool, Marco, Server
+    Base\Core, Coroutine\GeneratorContext, DataBase\MysqlAsynPool, Marco, Server
 };
 
-class Controller extends CoreBase
+class Controller extends Core
 {
     /**
      * @var MysqlAsynPool

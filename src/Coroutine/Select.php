@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-class SelectCoroutine extends Base
+class Select extends Base
 {
 
     /**
@@ -26,7 +26,7 @@ class SelectCoroutine extends Base
 
     public static function Select($matchFunc, Base ...$coroutines)
     {
-        return new SelectCoroutine($matchFunc, $coroutines);
+        return new Select($matchFunc, $coroutines);
     }
 
     public function getResult()

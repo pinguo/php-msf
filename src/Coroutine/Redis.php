@@ -1,16 +1,16 @@
 <?php
 /**
- * RedisCoroutine
+ * Redis
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Coroutine;
 
-use PG\MSF\Coroutine\Base;
+use PG\MSF\DataBase\RedisAsynPool;
 
-class RedisCoroutine extends Base
+class Redis extends Base
 {
     /**
      * @var RedisAsynPool
