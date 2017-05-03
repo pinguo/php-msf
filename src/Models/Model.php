@@ -9,7 +9,9 @@
 
 namespace PG\MSF\Models;
 
-use PG\MSF\Base\Core;
+use PG\MSF\Base\{
+    Core, AOPFactory
+};
 use PG\Log\PGLog;
 
 class Model extends Core
@@ -68,9 +70,9 @@ class Model extends Core
     public function initialization($context)
     {
         $this->setContext($context);
-        $this->PGLog = $context->PGLog;
-        $this->client = $context->controller->client;
-        $this->tcpClient = $context->controller->tcpClient;
+        $this->PGLog      = $context->PGLog;
+        $this->client     = $context->controller->client;
+        $this->tcpClient  = $context->controller->tcpClient;
         $this->objectPool = $context->controller->objectPool;
     }
 
