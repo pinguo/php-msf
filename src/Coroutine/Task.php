@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class Task
 {
@@ -46,7 +46,7 @@ class Task
             if ($value != null && $value instanceof IBase) {
                 if ($value->isTimeout()) {
                     try {
-                        $value->throwSwooleException();
+                        $value->throwException();
                     } catch (\Exception $e) {
                         $this->handleTaskTimeout($e, $value);
                     }
@@ -108,7 +108,7 @@ class Task
         $this->generatorContext->setErrorFile($e->getFile(), $e->getLine());
         $this->generatorContext->setErrorMessage($message);
 
-        if ($runTaskException instanceof SwooleException) {
+        if ($runTaskException instanceof Exception) {
             $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
                 $this->generatorContext->getController());
         }
@@ -145,7 +145,7 @@ class Task
             }
         }
 
-        if ($runTaskException instanceof SwooleException) {
+        if ($runTaskException instanceof Exception) {
             $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
                 $this->generatorContext->getController());
         }

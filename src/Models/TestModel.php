@@ -9,8 +9,8 @@
 namespace PG\MSF\Models;
 
 
-use PG\MSF\Base\Model;
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Models\Model;
+use PG\MSF\Base\Exception;
 
 class TestModel extends Model
 {
@@ -46,7 +46,7 @@ class TestModel extends Model
 
     public function testException()
     {
-        throw new SwooleException('test');
+        throw new Exception('test');
     }
 
     public function testExceptionII()

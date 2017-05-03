@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Tasks;
 
 use PG\MSF\Coroutine\Base;
 

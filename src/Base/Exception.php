@@ -1,6 +1,6 @@
 <?php
 /**
- * SwooleException
+ * Exception
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -11,7 +11,7 @@ namespace PG\MSF\Base;
 use PG\Exception\BusinessException;
 use PG\MSF\Controllers\BaseController;
 
-class SwooleException extends \Exception
+class Exception extends \Exception
 {
     public function __construct($message, $code = 0, \Exception $previous = null)
     {

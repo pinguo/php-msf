@@ -11,7 +11,7 @@ namespace PG\MSF\Proxy;
 use Flexihash\{
     Flexihash, Hasher\Md5Hasher
 };
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class RedisProxyCluster extends Flexihash implements IProxy
 {
@@ -31,13 +31,13 @@ class RedisProxyCluster extends Flexihash implements IProxy
             parent::__construct($hasher);;
             $this->startCheck();
             if (empty($this->goodPools)) {
-                throw new SwooleException('No redis server can write in cluster');
+                throw new Exception('No redis server can write in cluster');
             } else {
                 foreach ($this->goodPools as $pool => $weight) {
                     $this->addTarget($pool, $weight);
                 }
             }
-        } catch (SwooleException $e) {
+        } catch (Exception $e) {
             echo RedisProxyFactory::getLogTitle() . $e->getMessage();
         }
     }

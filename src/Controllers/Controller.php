@@ -7,10 +7,10 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Controllers;
 
 use PG\MSF\{
-    Coroutine\GeneratorContext, DataBase\MysqlAsynPool, DataBase\RedisAsynPool, Marco, Server
+    Base\CoreBase, Coroutine\GeneratorContext, DataBase\MysqlAsynPool, Marco, Server
 };
 
 class Controller extends CoreBase
@@ -197,12 +197,12 @@ class Controller extends CoreBase
      * 向当前客户端发送消息
      * @param $data
      * @param $destroy
-     * @throws SwooleException
+     * @throws Exception
      */
     public function send($data, $destroy = true)
     {
         if ($this->isDestroy) {
-            throw new SwooleException('controller is destroy can not send data');
+            throw new Exception('controller is destroy can not send data');
         }
         $data = getInstance()->encode($this->pack->pack($data));
         if (Server::$testUnity) {
@@ -261,7 +261,7 @@ class Controller extends CoreBase
             $template = $this->loader->view('server::error_404');
             $this->output->end($template->render());
         } else {
-            throw new SwooleException('method not exist');
+            throw new Exception('method not exist');
         }
     }
 

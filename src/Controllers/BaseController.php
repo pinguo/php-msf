@@ -13,7 +13,7 @@ use PG\Exception\ParameterValidationExpandException;
 use PG\Exception\PrivilegeException;
 use PG\Log\PGLog;
 use PG\MSF\{
-    Base\Controller, Coroutine\Exception, Helpers\Context, Marco
+    Coroutine\Exception, Helpers\Context, Marco
 };
 
 class BaseController extends Controller
@@ -87,7 +87,7 @@ class BaseController extends Controller
      * 异常的回调
      *
      * @param \Throwable $e
-     * @throws \PG\MSF\Base\SwooleException
+     * @throws \PG\MSF\Base\Exception
      * @throws \Throwable
      */
     public function onExceptionHandle(\Throwable $e)

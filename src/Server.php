@@ -11,7 +11,7 @@ namespace PG\MSF;
 use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\{
-    Base\Child, Base\ControllerFactory, Base\Loader, Base\SwooleException, Coroutine\GeneratorContext
+    Base\Child, Controllers\ControllerFactory, Base\Loader, Base\Exception, Coroutine\GeneratorContext
 };
 use PG\MSF\{
     Base\Base, Pack\IPack, Route\IRoute
@@ -217,7 +217,7 @@ abstract class Server extends Child
             if (class_exists($packClassName)) {
                 $this->pack = new $packClassName;
             } else {
-                throw new SwooleException("class {$this->config['server']['pack_tool']} is not exist.");
+                throw new Exception("class {$this->config['server']['pack_tool']} is not exist.");
             }
         }
         // route class
@@ -229,7 +229,7 @@ abstract class Server extends Child
             if (!class_exists($routeClassName)) {
                 $routeClassName = "\\PG\\MSF\\Route\\" . $routeTool;
                 if (!class_exists($routeClassName)) {
-                    throw new SwooleException("class {$routeTool} is not exist.");
+                    throw new Exception("class {$routeTool} is not exist.");
                 }
             }
         }
@@ -660,7 +660,7 @@ abstract class Server extends Child
      * @param $fd
      * @param $fromId
      * @param $data
-     * @return Base\Controller|void
+     * @return Controllers\Controller|void
      */
     public function onSwooleReceive($serv, $fd, $fromId, $data)
     {

@@ -8,7 +8,7 @@
 
 namespace PG\MSF\DataBase;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class RedisAsynPool extends AsynPool
 {
@@ -59,7 +59,7 @@ class RedisAsynPool extends AsynPool
      * @param $name
      * @param array ...$arg
      * @return mixed|RedisCoroutine
-     * @throws SwooleException
+     * @throws Exception
      */
     public function coroutineSend($context, $name, ...$arg)
     {
@@ -73,7 +73,7 @@ class RedisAsynPool extends AsynPool
     /**
      * 获取同步
      * @return \Redis
-     * @throws SwooleException
+     * @throws Exception
      */
     public function getSync()
     {
@@ -85,11 +85,11 @@ class RedisAsynPool extends AsynPool
         if ($this->redisClient->connect($this->config['redis'][$this->active]['ip'],
                 $this->config['redis'][$this->active]['port'], 0.05) == false
         ) {
-            throw new SwooleException($this->redisClient->getLastError());
+            throw new Exception($this->redisClient->getLastError());
         }
         if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
             if ($this->redisClient->auth($this->config['redis'][$this->active]['password']) == false) {
-                throw new SwooleException($this->redisClient->getLastError());
+                throw new Exception($this->redisClient->getLastError());
             }
         }
         if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
@@ -387,19 +387,19 @@ class RedisAsynPool extends AsynPool
             $check->isKill = false;
             $this->waitConnetNum--;
             if (!$result) {
-                throw new SwooleException($client->errMsg);
+                throw new Exception($client->errMsg);
             }
             if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
                 $client->auth($this->config['redis'][$this->active]['password'], function ($client, $result) {
                     if (!$result) {
                         $errMsg = $client->errMsg;
                         unset($client);
-                        throw new SwooleException($errMsg);
+                        throw new Exception($errMsg);
                     }
                     if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
                         $client->select($this->config['redis'][$this->active]['select'], function ($client, $result) {
                             if (!$result) {
-                                throw new SwooleException($client->errMsg);
+                                throw new Exception($client->errMsg);
                             }
                             $client->isClose = false;
                             if (!isset($client->client_id)) {
@@ -421,7 +421,7 @@ class RedisAsynPool extends AsynPool
                 if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
                     $client->select($this->config['redis'][$this->active]['select'], function ($client, $result) {
                         if (!$result) {
-                            throw new SwooleException($client->errMsg);
+                            throw new Exception($client->errMsg);
                         }
                         $client->isClose = false;
                         if (!isset($client->client_id)) {
@@ -449,7 +449,7 @@ class RedisAsynPool extends AsynPool
             if ($check->isKill) {
                 $this->waitConnetNum--;
                 $client = null;
-                throw new SwooleException('Took 50ms to connect redis, redis server went away');
+                throw new Exception('Took 50ms to connect redis, redis server went away');
             }
         });
     }

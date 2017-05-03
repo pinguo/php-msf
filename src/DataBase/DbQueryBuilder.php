@@ -8,7 +8,7 @@
 
 namespace PG\MSF\DataBase;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class DbQueryBuilder
 {
@@ -328,13 +328,13 @@ class DbQueryBuilder
     protected function _maxMinAvgSum($select = '', $alias = '', $type = 'MAX')
     {
         if (!is_string($select) OR $select === '') {
-            throw new SwooleException('db_invalid_query');
+            throw new Exception('db_invalid_query');
         }
 
         $type = strtoupper($type);
 
         if (!in_array($type, array('MAX', 'MIN', 'AVG', 'SUM'))) {
-            throw new SwooleException('Invalid function type: ' . $type);
+            throw new Exception('Invalid function type: ' . $type);
         }
 
         if ($alias === '') {
@@ -1970,13 +1970,13 @@ class DbQueryBuilder
     protected function _validateInsert($table = '')
     {
         if (count($this->qbSet) === 0) {
-            throw new SwooleException('db_must_use_set');
+            throw new Exception('db_must_use_set');
         }
 
         if ($table !== '') {
             $this->qbFrom[0] = $table;
         } elseif (!isset($this->qbFrom[0])) {
-            throw new SwooleException('db_must_set_table');
+            throw new Exception('db_must_set_table');
         }
 
         return true;
@@ -2131,7 +2131,7 @@ class DbQueryBuilder
     public function query($sql, $callback)
     {
         if ($sql === '') {
-            throw new SwooleException('error', 'Invalid query: ' . $sql);
+            throw new Exception('error', 'Invalid query: ' . $sql);
         }
 
         // Verify table prefix and replace if necessary
@@ -2159,12 +2159,12 @@ class DbQueryBuilder
         }
 
         if (count($this->qbSet) === 0) {
-            throw new SwooleException('db_must_use_set');
+            throw new Exception('db_must_use_set');
         }
 
         if ($table === '') {
             if (!isset($this->qbFrom[0])) {
-                throw new SwooleException('db_must_set_table');
+                throw new Exception('db_must_set_table');
             }
 
             $table = $this->qbFrom[0];
@@ -2238,13 +2238,13 @@ class DbQueryBuilder
     protected function _validateUpdate($table)
     {
         if (count($this->qbSet) === 0) {
-            throw new SwooleException('db_must_use_set');
+            throw new Exception('db_must_use_set');
         }
 
         if ($table !== '') {
             $this->qbFrom = array($this->protectIdentifiers($table, true, null, false));
         } elseif (!isset($this->qbFrom[0])) {
-            throw new SwooleException('db_must_set_table');
+            throw new Exception('db_must_set_table');
         }
 
         return true;
@@ -2361,7 +2361,7 @@ class DbQueryBuilder
     {
         if ($table === '') {
             if (!isset($this->qbFrom[0])) {
-                throw new SwooleException('db_must_set_table');
+                throw new Exception('db_must_set_table');
             }
 
             $table = $this->qbFrom[0];
@@ -2406,7 +2406,7 @@ class DbQueryBuilder
     {
         if ($table === '') {
             if (!isset($this->qbFrom[0])) {
-                throw new SwooleException('db_must_set_table');
+                throw new Exception('db_must_set_table');
             }
 
             $table = $this->qbFrom[0];
@@ -2473,7 +2473,7 @@ class DbQueryBuilder
 
         if ($table === '') {
             if (!isset($this->qbFrom[0])) {
-                throw new SwooleException('db_must_set_table');
+                throw new Exception('db_must_set_table');
             }
 
             $table = $this->qbFrom[0];
@@ -2498,7 +2498,7 @@ class DbQueryBuilder
         }
 
         if (count($this->qbWhere) === 0) {
-            throw new SwooleException('db_del_must_use_where');
+            throw new Exception('db_del_must_use_where');
         }
 
         $sql = $this->_delete($table);
@@ -2521,7 +2521,7 @@ class DbQueryBuilder
     public function dbprefix($table = '')
     {
         if ($table === '') {
-            throw new SwooleException('db_table_name_required');
+            throw new Exception('db_table_name_required');
         }
 
         return $this->dbprefix . $table;

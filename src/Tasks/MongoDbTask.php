@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Tasks;
 
-use PG\MSF\Base\Task;
+use PG\MSF\Tasks\Task;
 
 class MongoDbTask extends Task
 {

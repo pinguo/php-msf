@@ -9,7 +9,7 @@
 namespace PG\MSF\Client\Tcp;
 
 use PG\MSF\{
-    Base\SwooleException, Helpers\Context, Pack\IPack
+    Base\Exception, Helpers\Context, Pack\IPack
 };
 
 class TcpClient
@@ -52,7 +52,7 @@ class TcpClient
             if (class_exists($pack_class_name)) {
                 $this->pack = new $pack_class_name;
             } else {
-                throw new SwooleException("class {$packTool} is not exist.");
+                throw new Exception("class {$packTool} is not exist.");
             }
         }
     }
@@ -61,7 +61,7 @@ class TcpClient
     public function coroutineSend($data)
     {
         if (!array_key_exists('path', $data)) {
-            throw new SwooleException('tcp data must has path');
+            throw new Exception('tcp data must has path');
         }
 
         $path = $data['path'];
@@ -79,7 +79,7 @@ class TcpClient
             if ($this->set['open_eof_check']??0 == 1) {
                 return $buffer . $this->set['package_eof'];
             } else {
-                throw new SwooleException("tcpClient won't support set");
+                throw new Exception("tcpClient won't support set");
             }
         }
     }

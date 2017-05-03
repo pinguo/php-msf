@@ -11,7 +11,7 @@ namespace PG\MSF\Client;
 
 use PG\Helper\SecurityHelper;
 use PG\MSF\Base\Base;
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class RpcClient
 {
@@ -76,7 +76,7 @@ class RpcClient
     /**
      * RpcClient constructor.
      * @param $service 服务名称，如 'user.1'
-     * @throws SwooleException
+     * @throws Exception
      */
     public function __construct($service)
     {
@@ -100,7 +100,7 @@ class RpcClient
         list($root,) = explode('.', $service);
         $config['host'] = getInstance()->config->get('params.service.' . $root . '.host', '');
         if ($config['host'] === '') {
-            throw new SwooleException('Host configuration not found.');
+            throw new Exception('Host configuration not found.');
         }
         if (! isset($config['useRpc'])) {
             $config['useRpc'] = getInstance()->config->get('params.service.' . $root . '.useRpc', false);
@@ -117,12 +117,12 @@ class RpcClient
         $this->urlPath = $config['urlPath'] ?? '/';
         $scheme = substr($this->host, 0, strpos($this->host, ':'));
         if (!in_array($scheme, ['http', 'https', 'tcp'])) {
-            throw new SwooleException('Host configuration invalid.');
+            throw new Exception('Host configuration invalid.');
         }
         // 非 Rpc 模式.
         if (!$this->useRpc) {
             if ($this->scheme === 'tcp') {
-                throw new SwooleException('Non-rpc mode does not support tcp scheme.');
+                throw new Exception('Non-rpc mode does not support tcp scheme.');
             }
         }
         $this->verb = $config['verb'] ?? 'POST';
@@ -166,7 +166,7 @@ class RpcClient
     public function __call($method, $args)
     {
         if (!is_object($args[0]) || !($args[0] instanceof CoreBase)) {
-            throw new SwooleException('The first argument of ' . $method . ' must be instanceof CoreBase.');
+            throw new Exception('The first argument of ' . $method . ' must be instanceof CoreBase.');
         }
         $obj = $args[0];
         array_shift($args);
@@ -262,12 +262,12 @@ class RpcClient
             $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
         }
         if (!isset($response['body'])) {
-            throw new SwooleException('The response of body is not found');
+            throw new Exception('The response of body is not found');
         }
         $body = json_decode($response['body'], true);
         if ($body === null) {
             $error = static::jsonLastErrorMsg();
-            throw new SwooleException('json decode failure: ' . $error . ' caused by ' . $response['body']);
+            throw new Exception('json decode failure: ' . $error . ' caused by ' . $response['body']);
         }
 
         return static::parseResponse($body);

@@ -10,7 +10,7 @@
 namespace PG\MSF\Memory;
 
 use PG\MSF\{
-    Base\SwooleException, DataBase\RedisAsynPool
+    Base\Exception, DataBase\RedisAsynPool
 };
 
 class Lock
@@ -45,7 +45,7 @@ class Lock
      * 获得锁可以设置超时时间单位ms,返回使用锁的次数
      * @param int $maxTime
      * @return mixed
-     * @throws SwooleException
+     * @throws Exception
      */
     public function coroutineLock($maxTime = 5000)
     {
@@ -58,7 +58,7 @@ class Lock
             $count++;
         } while (!$isLock);
         if (!$isLock) {
-            throw new SwooleException("lock[$this->lockId] time out!");
+            throw new Exception("lock[$this->lockId] time out!");
         }
         return true;
     }

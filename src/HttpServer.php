@@ -10,7 +10,7 @@ namespace PG\MSF;
 
 use League\Plates\Engine;
 use PG\MSF\{
-    Base\ControllerFactory, Coroutine\GeneratorContext
+    Controllers\ControllerFactory, Coroutine\GeneratorContext
 };
 
 abstract class HttpServer extends Server

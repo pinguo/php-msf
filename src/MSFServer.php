@@ -11,8 +11,8 @@ namespace PG\MSF;
 use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
-use PG\MSF\Base\{
-    ConfigProcess, InotifyProcess, SwooleException
+use PG\MSF\Process\{
+    ConfigProcess, InotifyProcess
 };
 use PG\MSF\Coroutine\{
     Task, GeneratorContext
@@ -22,7 +22,7 @@ use PG\MSF\DataBase\{
 };
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
-use PG\MSF\Test\TestModule;
+use PG\MSF\Base\Exception;
 
 abstract class MSFServer extends WebSocketServer
 {
@@ -128,7 +128,7 @@ abstract class MSFServer extends WebSocketServer
     /**
      * 获取同步mysql
      * @return Miner
-     * @throws SwooleException
+     * @throws Exception
      */
     public function getMysql()
     {
@@ -268,7 +268,7 @@ abstract class MSFServer extends WebSocketServer
      * @param $fromId
      * @param $data
      * @return mixed|null
-     * @throws SwooleException
+     * @throws Exception
      */
     public function onSwooleTask($serv, $taskId, $fromId, $data)
     {
@@ -304,7 +304,7 @@ abstract class MSFServer extends WebSocketServer
                         }
                     }
                 } else {
-                    throw new SwooleException("method $taskFucName not exist in $taskName");
+                    throw new Exception("method $taskFucName not exist in $taskName");
                 }
                 $task->destroy();
                 return $result;
@@ -334,12 +334,12 @@ abstract class MSFServer extends WebSocketServer
      * 添加AsynPool
      * @param $name
      * @param AsynPool $pool
-     * @throws SwooleException
+     * @throws Exception
      */
     public function addAsynPool($name, AsynPool $pool)
     {
         if (key_exists($name, $this->asynPools)) {
-            throw new SwooleException('pool key is exists!');
+            throw new Exception('pool key is exists!');
         }
         $this->asynPools[$name] = $pool;
     }
@@ -358,12 +358,12 @@ abstract class MSFServer extends WebSocketServer
      * 添加redis代理
      * @param $name
      * @param $proxy
-     * @throws SwooleException
+     * @throws Exception
      */
     public function addRedisProxy($name, $proxy)
     {
         if (key_exists($name, $this->redisProxyManager)) {
-            throw new SwooleException('proxy key is exists!');
+            throw new Exception('proxy key is exists!');
         }
         $this->redisProxyManager[$name] = $proxy;
     }
@@ -401,7 +401,7 @@ abstract class MSFServer extends WebSocketServer
      * 重写onSwooleWorkerStart方法，添加异步redis,添加redisProxy
      * @param $serv
      * @param $workerId
-     * @throws SwooleException
+     * @throws Exception
      */
     public function onSwooleWorkerStart($serv, $workerId)
     {
@@ -462,7 +462,7 @@ abstract class MSFServer extends WebSocketServer
     /**
      * 向task发送中断信号
      * @param $taskId
-     * @throws SwooleException
+     * @throws Exception
      */
     public function interruptedTask($taskId)
     {
@@ -472,13 +472,13 @@ abstract class MSFServer extends WebSocketServer
             $taskPid = getInstance()->tidPidTable->get($taskId)['pid'];
             if ($taskPid == false) {
                 $this->taskLock->unlock();
-                throw new SwooleException('中断Task 失败，可能是task已运行完，或者task_id不存在。');
+                throw new Exception('中断Task 失败，可能是task已运行完，或者task_id不存在。');
             }
             //发送信号
             posix_kill($taskPid, SIGUSR1);
             print_r("向TaskID=$taskId ,PID=$taskPid 的进程发送中断信号\n");
         } else {
-            throw new SwooleException('interruptedTask 获得锁失败，中断操作正在进行请稍后。');
+            throw new Exception('interruptedTask 获得锁失败，中断操作正在进行请稍后。');
         }
     }
 

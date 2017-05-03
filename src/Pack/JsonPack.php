@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Pack;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class JsonPack implements IPack
 {
@@ -21,7 +21,7 @@ class JsonPack implements IPack
     {
         $value = json_decode($data);
         if (empty($value)) {
-            throw new SwooleException('json unPack 失败');
+            throw new Exception('json unPack 失败');
         }
         return $value;
     }

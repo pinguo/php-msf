@@ -8,7 +8,7 @@
 
 namespace PG\MSF\DataBase;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 use PG\MSF\Coroutine\Base;
 
 class MySqlCoroutine extends Base
@@ -41,7 +41,7 @@ class MySqlCoroutine extends Base
     {
         $result = parent::getResult();
         if (is_array($result) && isset($result['error'])) {
-            throw new SwooleException($result['error']);
+            throw new Exception($result['error']);
         }
         return $result;
     }

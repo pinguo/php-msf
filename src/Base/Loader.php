@@ -8,6 +8,9 @@
 
 namespace PG\MSF\Base;
 
+use PG\MSF\Tasks\TaskProxy;
+use PG\MSF\Models\ModelFactory;
+
 class Loader
 {
     /**
@@ -29,13 +32,13 @@ class Loader
      * @param $model
      * @param Child $parent
      * @return mixed|null
-     * @throws SwooleException
+     * @throws Exception
      */
     public function model($model, Child $parent)
     {
         if (!$parent->isConstruct) {
             $parentName = get_class($parent);
-            throw new SwooleException("class:$parentName,error:loader model 方法不允许在__construct内使用！");
+            throw new Exception("class:$parentName,error:loader model 方法不允许在__construct内使用！");
         }
         if (empty($model)) {
             return null;
@@ -62,7 +65,7 @@ class Loader
      * @param $task
      * @param Child $parent
      * @return mixed|null|TaskProxy
-     * @throws SwooleException
+     * @throws Exception
      */
     public function task($task, Child $parent = null)
     {
@@ -74,7 +77,7 @@ class Loader
         if (!class_exists($task_class)) {
             $task_class = "\\PG\\MSF\\Tasks\\" . $task;
             if (!class_exists($task_class)) {
-                throw new SwooleException("class task_class not exists");
+                throw new Exception("class task_class not exists");
             }
         }
         if (!getInstance()->server->taskworker) {//工作进程返回taskproxy

@@ -7,8 +7,9 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Models;
 
+use PG\MSF\Base\CoreBase;
 use PG\Log\PGLog;
 
 class Model extends CoreBase

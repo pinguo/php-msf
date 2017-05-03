@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\Controller;
+use PG\MSF\Controllers\Controller;
 
 class GeneratorContext
 {

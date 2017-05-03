@@ -9,8 +9,8 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\Marco;
-use PG\MSF\Base\ControllerFactory;
-use PG\MSF\Base\ModelFactory;
+use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Models\ModelFactory;
 
 class Scheduler
 {

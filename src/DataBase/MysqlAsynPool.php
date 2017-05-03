@@ -8,7 +8,7 @@
 
 namespace PG\MSF\DataBase;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class MysqlAsynPool extends AsynPool
 {
@@ -37,7 +37,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 执行mysql命令
      * @param $data
-     * @throws SwooleException
+     * @throws Exception
      */
     public function execute($data)
     {
@@ -47,7 +47,7 @@ class MysqlAsynPool extends AsynPool
             $client = $this->bindPool[$bindId]['client']??null;
             $sql = strtolower($data['sql']);
             if ($sql != 'begin' && $client == null) {
-                throw new SwooleException('error mysql affairs not begin.');
+                throw new Exception('error mysql affairs not begin.');
                 return;
             }
         }
@@ -136,7 +136,7 @@ class MysqlAsynPool extends AsynPool
         $client->connect($set, function ($client, $result) {
             $this->waitConnetNum--;
             if (!$result) {
-                throw new SwooleException($client->connect_error);
+                throw new Exception($client->connect_error);
             } else {
                 $client->isClose = false;
                 if (!isset($client->client_id)) {
@@ -211,7 +211,7 @@ class MysqlAsynPool extends AsynPool
      * @param $callback
      * @param null $bindId
      * @param null $sql
-     * @throws SwooleException
+     * @throws Exception
      */
     public function query($callback, $bindId = null, $sql = null)
     {
@@ -220,7 +220,7 @@ class MysqlAsynPool extends AsynPool
             $this->dbQueryBuilder->clear();
         }
         if (empty($sql)) {
-            throw new SwooleException('sql empty');
+            throw new Exception('sql empty');
         }
         $data = [
             'sql' => $sql

@@ -9,7 +9,7 @@
 namespace PG\MSF\Client\Tcp;
 
 use PG\MSF\{
-    Base\SwooleException, Helpers\Context
+    Base\Exception, Helpers\Context
 };
 
 class Client
@@ -37,7 +37,7 @@ class Client
      * @param $baseUrl
      * @param $callBack
      * @param $timeOut
-     * @throws SwooleException
+     * @throws Exception
      */
     public function getTcpClient($baseUrl, $callBack, $timeOut)
     {
@@ -45,7 +45,7 @@ class Client
         $parseBaseUrlResult = explode(":", $baseUrl);
 
         if (count($parseBaseUrlResult) != 2) {
-            throw new SwooleException($baseUrl . ' must be an ip:port string');
+            throw new Exception($baseUrl . ' must be an ip:port string');
         }
 
         $data['host'] = $parseBaseUrlResult[0];
@@ -65,7 +65,7 @@ class Client
                 $c->set($this->set);
 
                 $c->on('error', function ($cli) use ($data) {
-                    throw new SwooleException($data['host'] . ':' . $data['port'] . ' Connect failed');
+                    throw new Exception($data['host'] . ':' . $data['port'] . ' Connect failed');
                 });
 
                 $c->on('close', function ($cli) {

@@ -6,9 +6,10 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Tasks;
 
 use PG\MSF\Marco;
+use PG\MSF\Base\CoreBase;
 
 class TaskProxy extends CoreBase
 {

@@ -9,7 +9,7 @@
 namespace PG\MSF;
 
 use PG\MSF\{
-    Base\ControllerFactory, Coroutine\GeneratorContext
+    Controllers\ControllerFactory, Coroutine\GeneratorContext
 };
 
 abstract class WebSocketServer extends HttpServer

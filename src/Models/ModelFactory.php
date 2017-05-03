@@ -6,7 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Models;
 
 class ModelFactory
 {
@@ -40,7 +40,7 @@ class ModelFactory
      * 获取一个model
      * @param $model
      * @return mixed
-     * @throws SwooleException
+     * @throws Exception
      */
     public function getModel($model)
     {
@@ -89,7 +89,7 @@ class ModelFactory
             $modelInstance->useCount = 1;
             return $modelInstance;
         } else {
-            throw new SwooleException("class $model is not exist");
+            throw new Exception("class $model is not exist");
         }
     }
 

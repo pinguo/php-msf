@@ -9,7 +9,7 @@
 
 namespace PG\MSF\Controllers;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class RpcController extends BaseController
 {
@@ -63,25 +63,25 @@ class RpcController extends BaseController
 
     /**
      * @param $arguments
-     * @throws SwooleException
+     * @throws Exception
      */
     protected function parseHttpArgument(&$arguments)
     {
         if (!is_array($arguments) || !isset($arguments['data']) || !isset($arguments['sig'])) {
-            throw new SwooleException('Rpc argument invalid.');
+            throw new Exception('Rpc argument invalid.');
         }
         if (!is_array($arguments['data'])) {
             $arguments['data'] = $this->pack->unPack($arguments['data']);
         }
         $arguments['data'] = (array)$arguments['data'];
         if (!isset($arguments['data']['handler'])) {
-            throw new SwooleException('Rpc argument of handler not set.');
+            throw new Exception('Rpc argument of handler not set.');
         }
         if (!isset($arguments['data']['method'])) {
-            throw new SwooleException('Rpc argument of method not set.');
+            throw new Exception('Rpc argument of method not set.');
         }
         if (!isset($arguments['data']['args'])) {
-            throw new SwooleException('Rpc argument of args not set.');
+            throw new Exception('Rpc argument of args not set.');
         }
         $this->version = $arguments['data']['version'] ?? null;
         $this->handler = $arguments['data']['handler'];
@@ -92,14 +92,14 @@ class RpcController extends BaseController
     }
 
     /**
-     * @throws SwooleException
+     * @throws Exception
      */
     protected function runMethod()
     {
         $handlerClass = 'Handlers\\' . $this->handler;
         $handlerInstance = $this->loader->model($handlerClass, $this);
         if (!method_exists($handlerInstance, $this->method)) {
-            throw new SwooleException('Rpc method not found.');
+            throw new Exception('Rpc method not found.');
         }
         //$response = $handlerInstance->{$this->method}(...$this->reqParams);
         $response = yield call_user_func_array([$handlerInstance, $this->method], $this->reqParams);
@@ -118,21 +118,21 @@ class RpcController extends BaseController
 
     /**
      * @param $arguments
-     * @throws SwooleException
+     * @throws Exception
      */
     protected function parseTcpArgument(&$arguments)
     {
         if (!is_array($arguments)) {
-            throw new SwooleException('Rpc argument invalid.');
+            throw new Exception('Rpc argument invalid.');
         }
         if (!isset($arguments['handler'])) {
-            throw new SwooleException('Rpc argument of handler not set.');
+            throw new Exception('Rpc argument of handler not set.');
         }
         if (!isset($arguments['method'])) {
-            throw new SwooleException('Rpc argument of method not set.');
+            throw new Exception('Rpc argument of method not set.');
         }
         if (!isset($arguments['args'])) {
-            throw new SwooleException('Rpc argument of args not set.');
+            throw new Exception('Rpc argument of args not set.');
         }
         $this->version = $arguments['version'] ?? null;
         $this->sig = $arguments['sig'] ?? null;

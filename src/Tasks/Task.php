@@ -8,7 +8,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Tasks;
 
 use PG\Log\PGLog;
 
@@ -109,7 +109,7 @@ class Task extends TaskProxy
     /**
      * 获取同步redis
      * @return \Redis
-     * @throws SwooleException
+     * @throws Exception
      */
     protected function getRedis()
     {

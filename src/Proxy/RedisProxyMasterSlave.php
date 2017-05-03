@@ -9,7 +9,7 @@
 namespace PG\MSF\Proxy;
 
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class RedisProxyMasterSlave implements IProxy
 {
@@ -26,13 +26,13 @@ class RedisProxyMasterSlave implements IProxy
         try {
             $this->startCheck();
             if (!$this->master) {
-                throw new SwooleException('No master redis server in master-slave config!');
+                throw new Exception('No master redis server in master-slave config!');
             }
 
             if (empty($this->slaves)) {
-                throw new SwooleException('No slave redis server in master-slave config!');
+                throw new Exception('No slave redis server in master-slave config!');
             }
-        } catch (SwooleException $e) {
+        } catch (Exception $e) {
             echo RedisProxyFactory::getLogTitle() . $e->getMessage();
         }
     }
@@ -140,7 +140,7 @@ class RedisProxyMasterSlave implements IProxy
             $newSlaves = $this->goodPools['slaves'];
 
             if (empty($newMaster)) {
-                throw new SwooleException('No master redis server in master-slave config!');
+                throw new Exception('No master redis server in master-slave config!');
             }
 
             if ($this->master !== $newMaster) {
@@ -149,7 +149,7 @@ class RedisProxyMasterSlave implements IProxy
             }
 
             if (empty($newSlaves)) {
-                throw new SwooleException('No slave redis server in master-slave config!');
+                throw new Exception('No slave redis server in master-slave config!');
             }
 
             $losts = array_diff($this->slaves, $newSlaves);
@@ -168,7 +168,7 @@ class RedisProxyMasterSlave implements IProxy
 
             return true;
 
-        } catch (SwooleException $e) {
+        } catch (Exception $e) {
             echo RedisProxyFactory::getLogTitle() . $e->getMessage();
             return false;
         }

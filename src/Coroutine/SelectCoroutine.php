@@ -6,10 +6,7 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Base;
-
-use PG\MSF\Coroutine\Base;
-use PG\MSF\Coroutine\CNull;
+namespace PG\MSF\Coroutine;
 
 class SelectCoroutine extends Base
 {

@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 abstract class Base implements IBase
 {
@@ -78,9 +78,9 @@ abstract class Base implements IBase
         return $this->result;
     }
 
-    public function throwSwooleException()
+    public function throwException()
     {
-        throw new SwooleException("[Task]: Time Out!, [Request]: $this->request");
+        throw new Exception("[Task]: Time Out!, [Request]: $this->request");
     }
 
     public function isTimeout()

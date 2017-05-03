@@ -8,9 +8,9 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
-class Exception extends SwooleException
+class Exception extends Exception
 {
     /**
      * @return string

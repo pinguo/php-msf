@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Memory;
 
-use PG\MSF\Base\SwooleException;
+use PG\MSF\Base\Exception;
 
 class Pool
 {
@@ -52,7 +52,7 @@ class Pool
     private function applyNewPool($class)
     {
         if (array_key_exists($class, $this->map)) {
-            throw new SwooleException('the name is exists in pool map');
+            throw new Exception('the name is exists in pool map');
         }
         $this->map[$class] = new \SplStack();
         return $this->map[$class];

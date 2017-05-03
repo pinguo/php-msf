@@ -6,7 +6,7 @@
  * @copyright All rights reserved.
  */
 
-namespace PG\MSF\Base;
+namespace PG\MSF\Process;
 
 use Noodlehaus\Config;
 use PG\MSF\Marco;

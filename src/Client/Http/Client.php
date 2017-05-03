@@ -9,7 +9,7 @@
 namespace PG\MSF\Client\Http;
 
 use PG\MSF\{
-    Base\SwooleException, Helpers\Context
+    Base\Exception, Helpers\Context
 };
 
 class Client
@@ -24,7 +24,7 @@ class Client
      * 获取一个http客户端
      * @param $baseUrl
      * @param $callBack
-     * @throws \PG\MSF\Base\SwooleException
+     * @throws \PG\MSF\Base\Exception
      */
     public function getHttpClient($baseUrl, $callBack, array $headers = [])
     {
@@ -43,7 +43,7 @@ class Client
             $urlHost = $parseBaseUrlResult[1];
             $urlPort = $parseBaseUrlResult[2];
         } else {
-            throw new SwooleException($baseUrl . ' 不合法,请检查配置或者参数');
+            throw new Exception($baseUrl . ' 不合法,请检查配置或者参数');
         }
 
         if (!empty($urlPort)) {
