@@ -50,34 +50,40 @@ abstract class WebSocketServer extends HttpServer
             parent::start();
             return;
         }
-        //开启一个websocket服务器
-        $this->server = new \swoole_websocket_server($this->httpSocketName, $this->httpPort);
-        $this->server->on('Start', [$this, 'onSwooleStart']);
-        $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
-        $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
-        $this->server->on('Task', [$this, 'onSwooleTask']);
-        $this->server->on('Finish', [$this, 'onSwooleFinish']);
-        $this->server->on('PipeMessage', [$this, 'onSwoolePipeMessage']);
-        $this->server->on('WorkerError', [$this, 'onSwooleWorkerError']);
-        $this->server->on('ManagerStart', [$this, 'onSwooleManagerStart']);
-        $this->server->on('ManagerStop', [$this, 'onSwooleManagerStop']);
-        $this->server->on('request', [$this, 'onSwooleRequest']);
-        $this->server->on('open', [$this, 'onSwooleWSOpen']);
-        $this->server->on('message', [$this, 'onSwooleWSMessage']);
-        $this->server->on('close', [$this, 'onSwooleWSClose']);
-        $set = $this->setServerSet();
-        $set['daemonize'] = self::$daemonize ? 1 : 0;
-        $this->server->set($set);
-        if ($this->tcpEnable) {
-            $this->port = $this->server->listen($this->socketName, $this->port, $this->socketType);
-            $this->port->set($set);
-            $this->port->on('connect', [$this, 'onSwooleConnect']);
-            $this->port->on('receive', [$this, 'onSwooleReceive']);
-            $this->port->on('close', [$this, 'onSwooleClose']);
-            $this->port->on('Packet', [$this, 'onSwoolePacket']);
+
+        if (self::mode == 'console') {
+            $this->beforeSwooleStart();
+            $this->onSwooleWorkerStart(null, null);
+        } else {
+            //开启一个websocket服务器
+            $this->server = new \swoole_websocket_server($this->httpSocketName, $this->httpPort);
+            $this->server->on('Start', [$this, 'onSwooleStart']);
+            $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
+            $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
+            $this->server->on('Task', [$this, 'onSwooleTask']);
+            $this->server->on('Finish', [$this, 'onSwooleFinish']);
+            $this->server->on('PipeMessage', [$this, 'onSwoolePipeMessage']);
+            $this->server->on('WorkerError', [$this, 'onSwooleWorkerError']);
+            $this->server->on('ManagerStart', [$this, 'onSwooleManagerStart']);
+            $this->server->on('ManagerStop', [$this, 'onSwooleManagerStop']);
+            $this->server->on('request', [$this, 'onSwooleRequest']);
+            $this->server->on('open', [$this, 'onSwooleWSOpen']);
+            $this->server->on('message', [$this, 'onSwooleWSMessage']);
+            $this->server->on('close', [$this, 'onSwooleWSClose']);
+            $set = $this->setServerSet();
+            $set['daemonize'] = self::$daemonize ? 1 : 0;
+            $this->server->set($set);
+            if ($this->tcpEnable) {
+                $this->port = $this->server->listen($this->socketName, $this->port, $this->socketType);
+                $this->port->set($set);
+                $this->port->on('connect', [$this, 'onSwooleConnect']);
+                $this->port->on('receive', [$this, 'onSwooleReceive']);
+                $this->port->on('close', [$this, 'onSwooleClose']);
+                $this->port->on('Packet', [$this, 'onSwoolePacket']);
+            }
+            $this->beforeSwooleStart();
+            $this->server->start();
         }
-        $this->beforeSwooleStart();
-        $this->server->start();
     }
 
     /**

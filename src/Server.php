@@ -20,7 +20,14 @@ use PG\MSF\Coroutine\Scheduler as Coroutine;
 
 abstract class Server extends Child
 {
+    /**
+     * 版本
+     */
     const version = "2.0.0_alpha";
+    /**
+     * 运行方式（web/console）
+     */
+    const mode = 'web';
     /**
      * Daemonize.
      *
@@ -577,29 +584,34 @@ abstract class Server extends Child
      */
     public function start()
     {
-        if ($this->tcpEnable) {
-            $this->server = new \swoole_server($this->socketName, $this->port, SWOOLE_PROCESS, $this->socketType);
-            $this->server->on('Start', [$this, 'onSwooleStart']);
-            $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
-            $this->server->on('connect', [$this, 'onSwooleConnect']);
-            $this->server->on('receive', [$this, 'onSwooleReceive']);
-            $this->server->on('close', [$this, 'onSwooleClose']);
-            $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
-            $this->server->on('Task', [$this, 'onSwooleTask']);
-            $this->server->on('Finish', [$this, 'onSwooleFinish']);
-            $this->server->on('PipeMessage', [$this, 'onSwoolePipeMessage']);
-            $this->server->on('WorkerError', [$this, 'onSwooleWorkerError']);
-            $this->server->on('ManagerStart', [$this, 'onSwooleManagerStart']);
-            $this->server->on('ManagerStop', [$this, 'onSwooleManagerStop']);
-            $this->server->on('Packet', [$this, 'onSwoolePacket']);
-            $set = $this->setServerSet();
-            $set['daemonize'] = self::$daemonize ? 1 : 0;
-            $this->server->set($set);
+        if (self::mode == 'console') {
             $this->beforeSwooleStart();
-            $this->server->start();
+            $this->onSwooleWorkerStart(null, null);
         } else {
-            print_r("没有任何服务启动\n");
-            exit(0);
+            if ($this->tcpEnable) {
+                $this->server = new \swoole_server($this->socketName, $this->port, SWOOLE_PROCESS, $this->socketType);
+                $this->server->on('Start', [$this, 'onSwooleStart']);
+                $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
+                $this->server->on('connect', [$this, 'onSwooleConnect']);
+                $this->server->on('receive', [$this, 'onSwooleReceive']);
+                $this->server->on('close', [$this, 'onSwooleClose']);
+                $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
+                $this->server->on('Task', [$this, 'onSwooleTask']);
+                $this->server->on('Finish', [$this, 'onSwooleFinish']);
+                $this->server->on('PipeMessage', [$this, 'onSwoolePipeMessage']);
+                $this->server->on('WorkerError', [$this, 'onSwooleWorkerError']);
+                $this->server->on('ManagerStart', [$this, 'onSwooleManagerStart']);
+                $this->server->on('ManagerStop', [$this, 'onSwooleManagerStop']);
+                $this->server->on('Packet', [$this, 'onSwoolePacket']);
+                $set = $this->setServerSet();
+                $set['daemonize'] = self::$daemonize ? 1 : 0;
+                $this->server->set($set);
+                $this->beforeSwooleStart();
+                $this->server->start();
+            } else {
+                print_r("没有任何服务启动\n");
+                exit(0);
+            }
         }
     }
 
