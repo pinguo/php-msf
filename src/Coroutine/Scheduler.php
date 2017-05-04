@@ -22,6 +22,11 @@ class Scheduler
     public function __construct()
     {
         $this->taskQueue = new \SplQueue();
+
+        if (getInstance()::mode == 'console') {
+            return true;
+        }
+
         swoole_timer_tick(1, function ($timerId) {
             $this->run();
         });
@@ -50,6 +55,10 @@ class Scheduler
 
     public function stat()
     {
+        if (getInstance()::mode == 'console') {
+            return true;
+        }
+
         $data = [
             // 进程ID
             'pid' => 0,
@@ -165,6 +174,9 @@ class Scheduler
     public function schedule(Task $task)
     {
         $this->taskQueue->enqueue($task);
+        if (getInstance()::mode == 'console') {
+            $this->run();
+        }
         return $this;
     }
 

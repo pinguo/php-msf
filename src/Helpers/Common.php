@@ -8,11 +8,11 @@
 
 /**
  * 获取实例
- * @return \PG\MSF\MSFServer
+ * @return \PG\MSF\MSFServer|\PG\MSF\MSFCli
  */
 function &getInstance()
 {
-    return \PG\MSF\MSFServer::getInstance();
+    return \PG\MSF\Server::getInstance();
 }
 
 /**

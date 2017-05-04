@@ -70,7 +70,7 @@ class Client
                 if (empty($this->context) || empty($this->context->PGLog)) {
                     return true;
                 }
-                
+
                 $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
                 $httpClient = new HttpClient($client);
                 $httpClient->context = $this->context;

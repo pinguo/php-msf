@@ -27,11 +27,6 @@ use PG\MSF\Base\Exception;
 abstract class MSFServer extends WebSocketServer
 {
     const SERVER_NAME = 'SERVER';
-    /**
-     * 实例
-     * @var Server
-     */
-    private static $instance;
 
     /**
      * @var Pool
@@ -106,18 +101,9 @@ abstract class MSFServer extends WebSocketServer
      */
     public function __construct()
     {
-        self::$instance = &$this;
+        self::$instance = $this;
         $this->name = self::SERVER_NAME;
         parent::__construct();
-    }
-
-    /**
-     * 获取实例
-     * @return MSFServer
-     */
-    public static function &getInstance()
-    {
-        return self::$instance;
     }
 
     public function start()

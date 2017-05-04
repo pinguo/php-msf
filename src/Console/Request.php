@@ -10,30 +10,33 @@ namespace PG\MSF\Console;
 
 class Request
 {
-    public $_params;
+    public $server;
+    public $get;
+    public $post;
+    public $header;
 
-    public function getParams()
+    public function getServer()
     {
-        if ($this->_params === null) {
+        if ($this->server === null) {
             if (isset($_SERVER['argv'])) {
-                $this->_params = $_SERVER['argv'];
-                array_shift($this->_params);
+                $this->server = $_SERVER['argv'];
+                array_shift($this->server);
             } else {
-                $this->_params = [];
+                $this->server = [];
             }
         }
 
-        return $this->_params;
+        return $this->server;
     }
 
-    public function setParams($params)
+    public function setServer($params)
     {
-        $this->_params = $params;
+        $this->server = $params;
     }
 
     public function resolve()
     {
-        $rawParams = $this->getParams();
+        $rawParams = $this->getServer();
         if (isset($rawParams[0])) {
             $route = $rawParams[0];
             array_shift($rawParams);
@@ -51,8 +54,10 @@ class Request
             }
         }
 
+        $this->server['path_info'] = $route;
+        $this->get                 = $params;
+        $this->post =              $params;
+
         return [$route, $params];
     }
-    
-    
 }

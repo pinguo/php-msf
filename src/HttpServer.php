@@ -68,7 +68,7 @@ abstract class HttpServer extends Server
             return;
         }
 
-        if (self::mode == 'console') {
+        if (static::mode == 'console') {
             $this->beforeSwooleStart();
             $this->onSwooleWorkerStart(null, null);
         } else {

@@ -106,6 +106,7 @@ abstract class Base implements IBase
                 break;
             }
         }
+
         return true;
     }
 }

@@ -96,6 +96,65 @@ class ControllerFactory
     }
 
     /**
+     * 获取一个Console Controller
+     * @param $controller string
+     * @return Controller
+     */
+    public function getConsoleController($controller)
+    {
+        if ($controller == null) {
+            return null;
+        }
+        $controller  = ltrim($controller, '\\');
+        $className = "\\App\\Console\\$controller";
+
+        if (class_exists($className)) {
+            $controllers = $this->pool[$controller]??null;
+            if ($controllers == null) {
+                $controllers = $this->pool[$controller] = new \SplStack();
+            }
+
+            if (!$controllers->isEmpty()) {
+                $controllerInstance = $controllers->shift();
+                $controllerInstance->reUse();
+                $controllerInstance->useCount++;
+                return $controllerInstance;
+            }
+
+            $controllerInstance = new $className;
+            $controllerInstance->coreName = $controller;
+            $controllerInstance->afterConstruct();
+            $controllerInstance->genTime  = time();
+            $controllerInstance->useCount = 1;
+            return $controllerInstance;
+        }
+
+        $className = "\\PG\\MSF\\Controllers\\$controller";
+        if (class_exists($className)) {
+            $controllers = $this->pool[$controller]??null;
+            if ($controllers == null) {
+                $controllers = $this->pool[$controller] = new \SplStack();
+            }
+
+            if (!$controllers->isEmpty()) {
+                $controllerInstance = $controllers->shift();
+                $controllerInstance->reUse();
+                $controllerInstance->useCount++;
+                return $controllerInstance;
+            }
+
+            $controllerInstance = new $className;
+            $controllerInstance->coreName = $controller;
+            $controllerInstance->afterConstruct();
+            $controllerInstance->genTime  = time();
+            $controllerInstance->useCount = 1;
+            return $controllerInstance;
+        }
+
+        return null;
+    }
+
+    /**
      * 归还一个controller
      * @param $controller Controller
      */

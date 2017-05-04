@@ -29,6 +29,11 @@ abstract class Server extends Child
      */
     const mode = 'web';
     /**
+     * 实例
+     * @var Server
+     */
+    protected static $instance;
+    /**
      * Daemonize.
      *
      * @var bool
@@ -245,6 +250,15 @@ abstract class Server extends Child
     }
 
     /**
+     * 获取实例
+     * @return MSFServer
+     */
+    public static function &getInstance()
+    {
+        return self::$instance;
+    }
+
+    /**
      * 设置配置
      * @return mixed
      */
@@ -272,11 +286,11 @@ abstract class Server extends Child
     public static function run()
     {
         self::checkSapiEnv();
-        self::init();
-        self::parseCommand();
-        self::initWorkers();
-        self::displayUI();
-        self::startSwooles();
+        static::init();
+        static::parseCommand();
+        static::initWorkers();
+        static::displayUI();
+        static::startSwooles();
     }
 
     /**
@@ -330,8 +344,7 @@ abstract class Server extends Child
         // >=php 5.5
         if (function_exists('cli_set_process_title') && !isMac()) {
             @cli_set_process_title($title);
-        } // Need proctitle when php<=5.5 .
-        else {
+        } else {
             @swoole_set_process_name($title);
         }
     }
@@ -584,7 +597,7 @@ abstract class Server extends Child
      */
     public function start()
     {
-        if (self::mode == 'console') {
+        if (static::mode == 'console') {
             $this->beforeSwooleStart();
             $this->onSwooleWorkerStart(null, null);
         } else {

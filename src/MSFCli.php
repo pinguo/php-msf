@@ -12,7 +12,7 @@ use PG\MSF\Client\{
     Http\Client as HttpClient, Tcp\Client as TcpClient
 };
 use PG\MSF\Coroutine\{
-    Task, GeneratorContext
+    Task, GeneratorContext, Scheduler as Coroutine
 };
 use PG\MSF\DataBase\{
     AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
@@ -23,20 +23,15 @@ use PG\MSF\Base\Exception;
 use PG\MSF\Console\{
     Request
 };
+use PG\MSF\Controllers\ControllerFactory;
 
-abstract class MSFCli extends WebSocketServer
+class MSFCli extends WebSocketServer
 {
     const SERVER_NAME = 'SERVER';
     /**
      * 运行方式（web/console）
      */
     const mode = 'console';
-    /**
-     * 实例
-     * @var Server
-     */
-    private static $instance;
-
     /**
      * @var Pool
      */
@@ -110,33 +105,53 @@ abstract class MSFCli extends WebSocketServer
      */
     public function __construct()
     {
-        self::$instance = &$this;
-        $this->name = self::SERVER_NAME;
+        self::$instance  = $this;
+        $this->name      = self::SERVER_NAME;
+        $this->coroutine = new Coroutine();
         parent::__construct();
     }
 
-    /**
-     * running
-     */
-    public static function run()
+    public function onConsoleRequest()
     {
+        parent::run();
         $request = new Request();
         $request->resolve();
-        parent::run();
-    }
 
-    /**
-     * 获取实例
-     * @return MSFServer
-     */
-    public static function &getInstance()
-    {
-        return self::$instance;
-    }
+        $controllerInstance = null;
+        $this->route->handleClientRequest($request);
 
-    public function start()
-    {
-        return parent::start();
+        $controllerName     = $this->route->getControllerName();
+        $controllerInstance = ControllerFactory::getInstance()->getConsoleController($controllerName);
+        if ($controllerInstance == null) {
+            $controllerName = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
+            $controllerInstance = ControllerFactory::getInstance()->getConsoleController($controllerName);
+            $this->route->setControllerName($controllerName);
+        }
+
+        if ($controllerInstance != null) {
+            $methodName = $this->route->getMethodName();
+
+            if (!method_exists($controllerInstance, $methodName)) {
+                $methodName = 'index';
+                $this->route->setMethodName($methodName);
+            }
+
+            $controllerInstance->setRequestResponse($request, null, $controllerName, $methodName);
+            if (!method_exists($controllerInstance, $methodName)) {
+                echo "not found method $controllerName->$methodName\n";
+            } else {
+                $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                if ($generator instanceof \Generator) {
+                    $generatorContext = new GeneratorContext();
+                    $generatorContext->setController($controllerInstance, $controllerName, $methodName);
+                    $controllerInstance->setGeneratorContext($generatorContext);
+                    $this->coroutine->start($generator, $generatorContext);
+                    $this->coroutine->run();
+                }
+            }
+        } else {
+            echo "not found controller $controllerName\n";
+        }
     }
 
     /**
@@ -317,12 +332,59 @@ abstract class MSFCli extends WebSocketServer
         $this->tcpClient = new TcpClient();
 
         //redis proxy监测
-        swoole_timer_tick(5000, function () {
-            if (!empty($this->redisProxyManager)) {
-                foreach ($this->redisProxyManager as $proxy) {
-                    $proxy->check();
-                }
+        if (!empty($this->redisProxyManager)) {
+            foreach ($this->redisProxyManager as $proxy) {
+                $proxy->check();
             }
-        });
+        }
+    }
+
+    /**
+     * 设置服务器配置参数
+     * @return mixed
+     */
+    public function setServerSet()
+    {
+        // TODO: Implement setServerSet() method.
+    }
+
+    /**
+     * Display staring UI.
+     *
+     * @return void
+     */
+    protected static function displayUI()
+    {
+        // TODO
+    }
+
+    /**
+     * Parse command.
+     *
+     * @return void
+     */
+    protected static function parseCommand()
+    {
+        // TODO
+    }
+
+    /**
+     * Init.
+     *
+     * @return void
+     */
+    protected static function init()
+    {
+        self::setProcessTitle(self::$_worker->config->get('server.process_title') . '-console');
+    }
+
+    /**
+     * Init All worker instances.
+     *
+     * @return void
+     */
+    protected static function initWorkers()
+    {
+        // TODO
     }
 }

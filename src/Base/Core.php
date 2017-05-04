@@ -66,7 +66,7 @@ class Core extends Child
             $this->logger = getInstance()->log;
             $this->server = getInstance()->server;
             $this->config = getInstance()->config;
-            $this->pack = getInstance()->pack;
+            $this->pack   = getInstance()->pack;
         }
     }
 

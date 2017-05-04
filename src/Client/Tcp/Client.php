@@ -29,7 +29,7 @@ class Client
     public function __construct()
     {
         $this->context = new Context();
-        $this->set = getInstance()->config->get('tcpClient.set', []);
+        $this->set     = getInstance()->config->get('tcpClient.set', []);
     }
 
     /**
