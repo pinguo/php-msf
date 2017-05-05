@@ -149,14 +149,16 @@ abstract class HttpServer extends Server
 
             $controllerName     = $this->route->getControllerName();
             $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+            $methodPrefix       = $this->config->get('http.method_prefix', '');
+            $methodDefault      = $this->config->get('http.default_method', 'Index');
             if ($controllerInstance == null) {
                 $controllerName     = $controllerName . "\\" . $this->route->getMethodName();
                 $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
                 $this->route->setControllerName($controllerName);
-                $methodName = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
-                $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
+                $methodName = $methodPrefix . $methodDefault;
+                $this->route->setMethodName($methodDefault);
             } else {
-                $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
+                $methodName = $methodPrefix . $this->route->getMethodName();
             }
 
             if ($controllerInstance == null) {

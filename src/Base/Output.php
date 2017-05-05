@@ -87,10 +87,11 @@ class Output
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
         $this->controller->PGLog->pushLog('status', $status);
+
         $result = [
-            'data' => $data,
-            'status' => $status,
-            'message' => $message,
+            'data'       => $data,
+            'status'     => $status,
+            'message'    => $message,
             'serverTime' => microtime(true),
         ];
 
