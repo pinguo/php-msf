@@ -53,9 +53,9 @@ abstract class HttpServer extends Server
     public function setConfig()
     {
         parent::setConfig();
-        $this->httpEnable = $this->config['http_server']['enable'];
+        $this->httpEnable     = $this->config['http_server']['enable'];
         $this->httpSocketName = $this->config['http_server']['socket'];
-        $this->httpPort = $this->config['http_server']['port'];
+        $this->httpPort       = $this->config['http_server']['port'];
     }
 
     /**
@@ -196,9 +196,9 @@ abstract class HttpServer extends Server
             }
 
             $res = json_encode([
-                'data' => parent::$stdClass,
-                'message' => $error,
-                'status' => $code,
+                'data'       => parent::$stdClass,
+                'message'    => $error,
+                'status'     => $code,
                 'serverTime' => microtime(true)
             ]);
             $response->end($res);
@@ -212,7 +212,7 @@ abstract class HttpServer extends Server
      */
     public function getHostRoot($host)
     {
-        $rootPath = $this->config['http']['root'][$host]['root']??'';
+        $rootPath = $this->config['http']['root'][$host]['root'] ?? '';
         if (!empty($rootPath)) {
             $rootPath = WWW_DIR . "/$rootPath/";
         } else {
@@ -228,7 +228,7 @@ abstract class HttpServer extends Server
      */
     public function getHostIndex($host)
     {
-        $index = $this->config['http']['root'][$host]['index']??'index.html';
+        $index = $this->config['http']['root'][$host]['index'] ?? 'index.html';
         return $index;
     }
 }

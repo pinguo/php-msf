@@ -56,7 +56,7 @@ class NormalRoute implements IRoute
             }, $route);
             $methodName = array_pop($route);
             $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
-            $this->clientData->methodName = $methodName;
+            $this->clientData->methodName     = $methodName;
         }
     }
 
