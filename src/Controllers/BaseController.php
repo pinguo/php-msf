@@ -47,13 +47,13 @@ class BaseController extends Controller
         $this->PGLog->pushLog('controller', $controllerName);
         $this->PGLog->pushLog('method', $methodName);
 
-        $context = $this->objectPool->get(Context::class);
-        $context->logId = $this->logId;
-        $context->PGLog = $this->PGLog;
-        $context->input = $this->input;
-        $context->output = $this->output;
-        $context->controller = $this;
-        $this->client->context = $context;
+        $context                  = $this->objectPool->get(Context::class);
+        $context->logId           = $this->logId;
+        $context->PGLog           = $this->PGLog;
+        $context->input           = $this->input;
+        $context->output          = $this->output;
+        $context->controller      = $this;
+        $this->client->context    = $context;
         $this->tcpClient->context = $context;
         $this->setContext($context);
     }

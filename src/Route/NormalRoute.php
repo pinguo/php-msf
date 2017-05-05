@@ -66,16 +66,13 @@ class NormalRoute implements IRoute
      */
     public function handleClientRequest($request)
     {
-        $this->clientData->path = $request->server['path_info'];
+        $this->clientData->path = strtolower($request->server['path_info']);
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
-            $this->clientData->isRpc = true;
-            if (!isset($request->post['data'])) {
-                throw new Exception('Rpc request but data params not set.');
-            }
-            $this->clientData->params = $request->post ?? $request->get ?? [];
+            $this->clientData->isRpc          = true;
+            $this->clientData->params         = $request->post ?? $request->get ?? [];
             $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
-            $this->clientData->methodName = getInstance()->config->get('rpc.default_method');
+            $this->clientData->methodName     = getInstance()->config->get('rpc.default_method');
         } else {
             $this->parsePath($this->clientData->path);
         }
