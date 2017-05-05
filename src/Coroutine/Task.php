@@ -165,6 +165,9 @@ class Task
         if (!$this->destroy) {
             unset(getInstance()->coroutine->taskMap[$this->generatorContext->getController()->PGLog->logId]);
             unset(getInstance()->coroutine->IOCallBack[$this->generatorContext->getController()->PGLog->logId]);
+            if (getInstance()::mode == 'console') {
+                $this->generatorContext->getController()->destroy();
+            }
             unset($this->generatorContext->getController()->PGLog);
             unset($this->generatorContext->getController()->logId);
             $this->generatorContext->destroy();
