@@ -86,5 +86,6 @@ class Controller extends BController
             }
         }
         parent::destroy();
+        exit(0);
     }
 }
