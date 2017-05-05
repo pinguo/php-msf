@@ -66,7 +66,7 @@ class NormalRoute implements IRoute
      */
     public function handleClientRequest($request)
     {
-        $this->clientData->path = strtolower($request->server['path_info']);
+        $this->clientData->path = rtrim(strtolower($request->server['path_info']), '/');
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->clientData->isRpc          = true;
