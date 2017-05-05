@@ -29,4 +29,8 @@ interface IRoute
     function setMethodName($name);
 
     function setParams($params);
+
+    function setRouteCache($path, $callable);
+
+    function getRouteCache($path);
 }

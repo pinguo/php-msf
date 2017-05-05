@@ -125,7 +125,7 @@ abstract class Server extends Child
      * 路由器
      * @var IRoute
      */
-    public $route;
+    protected $route;
     /**
      * 加载器
      * @var Loader

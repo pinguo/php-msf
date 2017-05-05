@@ -15,6 +15,11 @@ class NormalRoute implements IRoute
      */
     protected $clientData;
 
+    /**
+     * 路由缓存
+     */
+    public $routeCache;
+
     public function __construct()
     {
         $this->clientData = new \stdClass();
@@ -39,15 +44,20 @@ class NormalRoute implements IRoute
      */
     public function parsePath($path)
     {
-        $route = explode('/', $path);
-        $route = array_map(function ($name) {
-            $name = strtolower($name);
-            $name = ucfirst($name);
-            return $name;
-        }, $route);
-        $methodName = array_pop($route);
-        $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
-        $this->clientData->methodName = $methodName;
+        if (isset($this->routeCache[$path])) {
+            $this->clientData->controllerName = $this->routeCache[$path][0];
+            $this->clientData->methodName     = $this->routeCache[$path][1];
+        } else {
+            $route = explode('/', $path);
+            $route = array_map(function ($name) {
+                $name = strtolower($name);
+                $name = ucfirst($name);
+                return $name;
+            }, $route);
+            $methodName = array_pop($route);
+            $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
+            $this->clientData->methodName = $methodName;
+        }
     }
 
     /**
@@ -107,15 +117,29 @@ class NormalRoute implements IRoute
     public function setControllerName($name)
     {
         $this->clientData->controllerName = $name;
+        return $this;
     }
 
     public function setMethodName($name)
     {
         $this->clientData->methodName = $name;
+        return $this;
     }
 
     public function setParams($params)
     {
         $this->clientData->params = $params;
+        return $this;
+    }
+
+    public function setRouteCache($path, $callable)
+    {
+        $this->routeCache[$path] = $callable;
+        return $this;
+    }
+
+    public function getRouteCache($path)
+    {
+        return $this->routeCache[$path] ?? null;
     }
 }

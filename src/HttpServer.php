@@ -175,6 +175,11 @@ abstract class HttpServer extends Server
                             $controllerInstance->setGeneratorContext($generatorContext);
                             $this->coroutine->start($generator, $generatorContext);
                         }
+                        
+                        if (!$this->route->getRouteCache($this->route->getPath())) {
+                            $this->route->setRouteCache($this->route->getPath(), [$controllerName, $methodName]);
+                        }
+
                         return;
                     }
                 } catch (\Throwable $e) {
