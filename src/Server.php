@@ -199,6 +199,13 @@ abstract class Server extends Child
      */
     public $sysCache;
 
+    /**
+     * 系统注册的定时器列表
+     *
+     * @var array
+     */
+    public $sysTimers;
+
     public function __construct()
     {
         $this->afterConstruct();

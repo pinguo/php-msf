@@ -146,7 +146,6 @@ class MSFCli extends WebSocketServer
                     $generatorContext->setController($controllerInstance, $controllerName, $methodName);
                     $controllerInstance->setGeneratorContext($generatorContext);
                     $this->coroutine->start($generator, $generatorContext);
-                    $this->coroutine->run();
                 }
             }
         } else {
@@ -332,11 +331,13 @@ class MSFCli extends WebSocketServer
         $this->tcpClient = new TcpClient();
 
         //redis proxy监测
-        if (!empty($this->redisProxyManager)) {
-            foreach ($this->redisProxyManager as $proxy) {
-                $proxy->check();
+        getInstance()->sysTimers[] = swoole_timer_tick(5000, function () {
+            if (!empty($this->redisProxyManager)) {
+                foreach ($this->redisProxyManager as $proxy) {
+                    $proxy->check();
+                }
             }
-        }
+        });
     }
 
     /**
