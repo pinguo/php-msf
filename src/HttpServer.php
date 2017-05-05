@@ -130,66 +130,65 @@ abstract class HttpServer extends Server
      */
     public function onSwooleRequest($request, $response)
     {
-        $error = '';
-        $code = 500;
+        $error              = '';
+        $code               = 500;
         $controllerInstance = null;
         $this->route->handleClientRequest($request);
-        list($host) = explode(':', $request->header['host']??'');
 
-        if (!$this->route->getIsRpc() && $this->route->getPath() == '/') {
-            $wwwPath = $this->getHostRoot($host) . $this->getHostIndex($host);
-            $result = httpEndFile($wwwPath, $request, $response);
-            if (!$result) {
-                $error = 'Index not found';
-                $code = 404;
-            } else {
-                return;
+        do {
+            if (!$this->route->getIsRpc() && $this->route->getPath() == '/') {
+                list($host) = explode(':', $request->header['host'] ?? '');
+                $wwwPath    = $this->getHostRoot($host) . $this->getHostIndex($host);
+                $result     = httpEndFile($wwwPath, $request, $response);
+                if (!$result) {
+                    $error = 'Index not found';
+                    $code  = 404;
+                }
+                break;
             }
-        } else {
-            $controllerName = $this->route->getControllerName();
+
+            $controllerName     = $this->route->getControllerName();
             $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
             if ($controllerInstance == null) {
-                $controllerName = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
+                $controllerName     = $controllerName . "\\" . $this->route->getMethodName();
                 $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
                 $this->route->setControllerName($controllerName);
-            }
-
-            if ($controllerInstance != null) {
-                $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
-                if (!method_exists($controllerInstance, $methodName)) {
-                    $methodName = $this->config->get('http.method_prefix',
-                            '') . $this->config->get('http.default_method', 'Index');
-                    $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
-                }
-
-                try {
-                    $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
-                    if (!method_exists($controllerInstance, $methodName)) {
-                        $error = 'Api not found method(' . $methodName . ')';
-                        $code = 404;
-                    } else {
-                        $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
-                        if ($generator instanceof \Generator) {
-                            $generatorContext = new GeneratorContext();
-                            $generatorContext->setController($controllerInstance, $controllerName, $methodName);
-                            $controllerInstance->setGeneratorContext($generatorContext);
-                            $this->coroutine->start($generator, $generatorContext);
-                        }
-                        
-                        if (!$this->route->getRouteCache($this->route->getPath())) {
-                            $this->route->setRouteCache($this->route->getPath(), [$controllerName, $methodName]);
-                        }
-
-                        return;
-                    }
-                } catch (\Throwable $e) {
-                    call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
-                }
+                $methodName = $this->config->get('http.method_prefix', '') . $this->config->get('http.default_method', 'Index');
+                $this->route->setMethodName($this->config->get('http.default_method', 'Index'));
             } else {
-                $error = 'Api not found controller(' . $controllerName . ')';
-                $code = 404;
+                $methodName = $this->config->get('http.method_prefix', '') . $this->route->getMethodName();
             }
-        }
+
+            if ($controllerInstance == null) {
+                $error = 'Api not found controller(' . $controllerName . ')';
+                $code  = 404;
+                break;
+            }
+
+            try {
+                $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
+                if (!method_exists($controllerInstance, $methodName)) {
+                    $error = 'Api not found method(' . $methodName . ')';
+                    $code  = 404;
+                    break;
+                }
+
+                $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                if ($generator instanceof \Generator) {
+                    $generatorContext = new GeneratorContext();
+                    $generatorContext->setController($controllerInstance, $controllerName, $methodName);
+                    $controllerInstance->setGeneratorContext($generatorContext);
+                    $this->coroutine->start($generator, $generatorContext);
+                }
+
+                if (!$this->route->getRouteCache($this->route->getPath())) {
+                    $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
+                }
+                break;
+            } catch (\Throwable $e) {
+                call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
+            }
+        } while (0);
 
         if ($error !== '') {
             if ($controllerInstance != null) {
