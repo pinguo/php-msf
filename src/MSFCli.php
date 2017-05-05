@@ -147,6 +147,7 @@ class MSFCli extends WebSocketServer
                     $controllerInstance->setGeneratorContext($generatorContext);
                     $this->coroutine->start($generator, $generatorContext);
                 }
+                $controllerInstance->destroy();
             }
         } else {
             echo "not found controller $controllerName\n";
@@ -317,9 +318,7 @@ class MSFCli extends WebSocketServer
         $this->mysqlPool = $this->asynPools['mysqlPool'];
         //注册
         $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);
-        if (!$this->config['asyn_process_enable']) {
-            $this->asnyPoolManager->noEventAdd();
-        }
+        $this->asnyPoolManager->noEventAdd();
         foreach ($this->asynPools as $pool) {
             if ($pool) {
                 $pool->workerInit($workerId);
@@ -331,13 +330,11 @@ class MSFCli extends WebSocketServer
         $this->tcpClient = new TcpClient();
 
         //redis proxy监测
-        getInstance()->sysTimers[] = swoole_timer_tick(5000, function () {
-            if (!empty($this->redisProxyManager)) {
-                foreach ($this->redisProxyManager as $proxy) {
-                    $proxy->check();
-                }
+        if (!empty($this->redisProxyManager)) {
+            foreach ($this->redisProxyManager as $proxy) {
+                $proxy->check();
             }
-        });
+        }
     }
 
     /**
