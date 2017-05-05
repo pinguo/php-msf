@@ -147,7 +147,6 @@ class MSFCli extends WebSocketServer
                     $controllerInstance->setGeneratorContext($generatorContext);
                     $this->coroutine->start($generator, $generatorContext);
                 }
-                $controllerInstance->destroy();
             }
         } else {
             echo "not found controller $controllerName\n";
