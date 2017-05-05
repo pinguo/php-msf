@@ -86,6 +86,7 @@ class Controller extends BController
             }
         }
         parent::destroy();
-        exit(0);
+        swoole_event_exit();
+        exit();
     }
 }
