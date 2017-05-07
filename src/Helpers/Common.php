@@ -104,6 +104,20 @@ function isMac()
 }
 
 /**
+ * 清理所有的定时器（请谨慎使用）
+ */
+function clearTimes()
+{
+    $timers = getInstance()->sysTimers;
+    if (!empty($timers)) {
+        foreach ($timers as $timerId) {
+            swoole_timer_clear($timerId);
+        }
+    }
+    swoole_event_exit();
+}
+
+/**
  * 剔出协程相关上下文信息
  * @param $output
  * @param $var

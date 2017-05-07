@@ -79,14 +79,9 @@ class Controller extends BController
         $this->PGLog->pushLog('params', $this->input->getAllPostGet());
         $this->PGLog->pushLog('status', '200');
         $this->PGLog->appendNoticeLog();
-        $timers = getInstance()->sysTimers;
-        if (!empty($timers)) {
-            foreach ($timers as $timerId) {
-                swoole_timer_clear($timerId);
-            }
-        }
         parent::destroy();
-        swoole_event_exit();
+        clearTimes();
         exit();
     }
+
 }

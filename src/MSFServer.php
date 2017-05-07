@@ -90,11 +90,11 @@ abstract class MSFServer extends WebSocketServer
     /**
      * @var AsynPoolManager
      */
-    private $asnyPoolManager;
+    protected $asnyPoolManager;
     /**
      * @var array
      */
-    private $redisProxyManager;
+    protected $redisProxyManager;
 
     /**
      * MSFServer constructor.
