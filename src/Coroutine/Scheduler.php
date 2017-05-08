@@ -85,6 +85,10 @@ class Scheduler
             'model_poll' => [
                 // 'xxx' => 22
             ],
+            // DNS Cache
+            'dns_cache' => [
+                // domain => [ip, time(), times]
+            ],
         ];
         $routineList = getInstance()->coroutine->taskMap;
         $data['pid'] = getInstance()->server->worker_pid;
@@ -143,6 +147,8 @@ class Scheduler
             }
         }
 
+        $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
+        $data['dns_cache_tcp']  = \PG\MSF\Client\Tcp\Client::$dnsCache;
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
