@@ -21,6 +21,11 @@ class Client
     public $context;
 
     /**
+     * @var array DNS查询缓存
+     */
+    public static $dnsCache;
+
+    /**
      * @var IPack
      */
     protected $pack;
@@ -52,30 +57,20 @@ class Client
         $data['port'] = $parseBaseUrlResult[1];
         $data['callBack'] = $callBack;
 
-        swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut) {
-            if (empty($ip)) {
-                $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
-                $this->context->output->outputJson([], 'error', 500);
-            } else {
-                if (empty($this->context)) {
-                    return true;
+        $ip = self::getDnsCache($data['host']);
+        if ($ip !== null) {
+            $this->coroutineCallBack($data['host'], $ip, $data, $timeOut);
+        } else {
+            swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut) {
+                if (empty($ip)) {
+                    $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
+                    $this->context->output->outputJson([], 'error', 500);
+                } else {
+                    self::setDnsCache($host, $ip);
+                    $this->coroutineCallBack($host, $ip, $data, $timeOut);
                 }
-                
-                $c = new \swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
-                $c->set($this->set);
-
-                $c->on('error', function ($cli) use ($data) {
-                    throw new Exception($data['host'] . ':' . $data['port'] . ' Connect failed');
-                });
-
-                $c->on('close', function ($cli) {
-                });
-
-                $tcpClient = new TcpClient($c, $ip, $data['port'], $timeOut / 1000);
-                $tcpClient->context = $this->context;
-                call_user_func($data['callBack'], $tcpClient);
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -87,5 +82,72 @@ class Client
     public function coroutineGetTcpClient($baseUrl, $timeout = 30000)
     {
         return new GetTcpClient($this, $baseUrl, $timeout);
+    }
+
+    /**
+     * DNS查询返回协程的回调
+     *
+     * @param $host string 主机名
+     * @param $ip string 主机名对应的IP
+     * @param $data array
+     * @param $headers array
+     * @return bool
+     */
+    public function coroutineCallBack($host, $ip, $data, $timeOut)
+    {
+        if (empty($this->context)) {
+            return true;
+        }
+
+        $c = new \swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
+        $c->set($this->set);
+
+        $c->on('error', function ($cli) use ($data) {
+            throw new Exception($data['host'] . ':' . $data['port'] . ' Connect failed');
+        });
+
+        $c->on('close', function ($cli) {
+        });
+
+        $tcpClient = new TcpClient($c, $ip, $data['port'], $timeOut / 1000);
+        $tcpClient->context = $this->context;
+        call_user_func($data['callBack'], $tcpClient);
+    }
+
+    /**
+     * 设置DNS缓存
+     *
+     * @param $host
+     * @param $ip
+     */
+    static public function setDnsCache($host, $ip)
+    {
+        self::$dnsCache[$host] = [
+            $ip, time(), 1
+        ];
+    }
+
+    /**
+     * 获取DNS缓存
+     *
+     * @param $host
+     * @return mixed|null
+     */
+    static public function getDnsCache($host)
+    {
+        if (!empty(self::$dnsCache[$host])) {
+            if (time() - self::$dnsCache[$host][1] > 60) {
+                return null;
+            }
+
+            if (self::$dnsCache[$host][2] > 10000) {
+                return null;
+            }
+
+            self::$dnsCache[$host][2]++;
+            return self::$dnsCache[$host][0];
+        } else {
+            return null;
+        }
     }
 }
