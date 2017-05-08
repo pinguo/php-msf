@@ -106,7 +106,7 @@ class Scheduler
                         ];
                     }
                 } else {
-                    $data['object_poll'][$class] = $objects->count();
+                    $data['object_poll'][$class] = $objects->count() + $data['coroutine']['total'];
                 }
             }
         }
@@ -122,7 +122,7 @@ class Scheduler
                         ];
                     }
                 } else {
-                    $data['controller_poll'][$class] = $objects->count();
+                    $data['controller_poll'][$class] = $objects->count() + $data['coroutine']['total'];
                 }
             }
         }
@@ -138,7 +138,7 @@ class Scheduler
                         ];
                     }
                 } else {
-                    $data['model_poll'][$class] = $objects->count();
+                    $data['model_poll'][$class] = $objects->count() + $data['coroutine']['total'];
                 }
             }
         }

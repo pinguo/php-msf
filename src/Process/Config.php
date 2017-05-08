@@ -34,6 +34,8 @@ class Config
     {
         $data = [
             'worker' => [
+                // worker进程ID
+                // 'pid' => 0,
                 // 协程统计信息
                 // 'coroutine' => [
                 // 当前正在处理的请求数
@@ -76,9 +78,9 @@ class Config
         foreach ($workerIds as $workerId) {
             $workerInfo = $this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
             if ($workerInfo) {
-                $data['worker']['worker#' . $workerId] =  $workerInfo;
+                $data['worker']['worker' . $workerId] =  $workerInfo;
             } else {
-                $data['worker']['worker#' . $workerId] = [];
+                $data['worker']['worker' . $workerId] = [];
             }
         }
 
