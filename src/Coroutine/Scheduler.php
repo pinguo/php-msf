@@ -85,8 +85,12 @@ class Scheduler
             'model_poll' => [
                 // 'xxx' => 22
             ],
-            // DNS Cache
-            'dns_cache' => [
+            // Http DNS Cache
+            'dns_cache_http' => [
+                // domain => [ip, time(), times]
+            ],
+            // Tcp DNS Cache
+            'dns_cache_tcp' => [
                 // domain => [ip, time(), times]
             ],
         ];
