@@ -8,7 +8,9 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Server\Helpers\Context;
+use PG\MSF\{
+    Helpers\Context, Coroutine\HttpClientRequest
+};
 
 class HttpClient
 {
@@ -80,11 +82,11 @@ class HttpClient
      * @param $path
      * @param $query
      * @param $timeout int 超时时间
-     * @return HttpClientRequestCoroutine
+     * @return HttpClientRequest
      */
     public function coroutineGet($path, $query = null, $timeout = 30000)
     {
-        return new HttpClientRequestCoroutine($this, 'GET', $path, $query, $timeout);
+        return new HttpClientRequest($this, 'GET', $path, $query, $timeout);
     }
 
     /**
@@ -102,10 +104,10 @@ class HttpClient
      * @param $path
      * @param $data
      * @param $timeout int 超时时间
-     * @return HttpClientRequestCoroutine
+     * @return HttpClientRequest
      */
     public function coroutinePost($path, $data, $timeout = 30000)
     {
-        return new HttpClientRequestCoroutine($this, 'POST', $path, $data, $timeout);
+        return new HttpClientRequest($this, 'POST', $path, $data, $timeout);
     }
 }

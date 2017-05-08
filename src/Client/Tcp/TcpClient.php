@@ -8,8 +8,8 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\Server\{
-    CoreBase\SwooleException, Helpers\Context, Pack\IPack
+use PG\MSF\{
+    Base\Exception, Helpers\Context, Pack\IPack, Coroutine\TcpClientRequest
 };
 
 class TcpClient
@@ -48,11 +48,11 @@ class TcpClient
         if (class_exists($pack_class_name)) {
             $this->pack = new $pack_class_name;
         } else {
-            $pack_class_name = "\\PG\\MSF\\Server\\Pack\\" . $packTool;
+            $pack_class_name = "\\PG\\MSF\\Pack\\" . $packTool;
             if (class_exists($pack_class_name)) {
                 $this->pack = new $pack_class_name;
             } else {
-                throw new SwooleException("class {$packTool} is not exist.");
+                throw new Exception("class {$packTool} is not exist.");
             }
         }
     }
@@ -61,13 +61,13 @@ class TcpClient
     public function coroutineSend($data)
     {
         if (!array_key_exists('path', $data)) {
-            throw new SwooleException('tcp data must has path');
+            throw new Exception('tcp data must has path');
         }
 
         $path = $data['path'];
         $data['logId'] = $this->context->PGLog->logId;
         $data = $this->encode($this->pack->pack($data));
-        return new TcpClientRequestCoroutine($this, $data, $path, $this->timeOut);
+        return new TcpClientRequest($this, $data, $path, $this->timeOut);
     }
 
     private function encode($buffer)
@@ -79,7 +79,7 @@ class TcpClient
             if ($this->set['open_eof_check']??0 == 1) {
                 return $buffer . $this->set['package_eof'];
             } else {
-                throw new SwooleException("tcpClient won't support set");
+                throw new Exception("tcpClient won't support set");
             }
         }
     }
