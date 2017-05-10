@@ -223,7 +223,7 @@ abstract class Server extends Child
         $this->setConfig();
 
         // 日志初始化
-        $this->log = new PGLog($this->name);
+        $this->log = new PGLog($this->name, $this->config['server']['log']);
 
         register_shutdown_function(array($this, 'checkErrors'));
         set_error_handler(array($this, 'displayErrorHandler'));

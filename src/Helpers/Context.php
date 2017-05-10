@@ -9,33 +9,14 @@
 
 namespace PG\MSF\Helpers;
 
+use PG\Context\AbstractContext;
 use PG\Log\PGLog;
 use PG\MSF\{
     Base\Input, Base\Output
 };
 
-class Context implements \ArrayAccess
+class Context extends AbstractContext
 {
-    /**
-     * @var
-     */
-    public $useCount;
-
-    /**
-     * @var
-     */
-    public $genTime;
-
-    /**
-     * @var string
-     */
-    public $logId;
-
-    /**
-     * @var PGLog
-     */
-    public $PGLog;
-
     /**
      * @var Input
      */
@@ -54,41 +35,6 @@ class Context implements \ArrayAccess
     public function __sleep()
     {
         return ['logId', 'input'];
-    }
-
-    /**
-     * @param mixed $offset
-     * @param mixed $value
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->{$offset} = $value;
-    }
-
-    /**
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->{$offset});
-    }
-
-    /**
-     * @param mixed $offset
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->{$offset});
-    }
-
-    /**
-     * @param mixed $offset
-     * @return null
-     */
-    public function offsetGet($offset)
-    {
-        return isset($this->{$offset}) ? $this->{$offset} : null;
     }
 
     public function destroy()

@@ -56,7 +56,7 @@ class Request
 
         $this->server['path_info'] = $route;
         $this->get                 = $params;
-        $this->post =              $params;
+        $this->post                = $params;
 
         return [$route, $params];
     }

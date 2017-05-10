@@ -11,6 +11,7 @@ namespace PG\MSF\Base;
 use PG\MSF\DataBase\CoroutineRedisHelp;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
+use PG\Helper\CommonHelper;
 
 class AOPFactory
 {
@@ -22,22 +23,22 @@ class AOPFactory
      */
     public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, Core $coreBase)
     {
-        $redisPoolCoroutine = new AOP($redisPoolCoroutine);
-        $redisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
+        $AOPRedisPoolCoroutine = new AOP($redisPoolCoroutine);
+        $AOPRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             $context = $coreBase->getContext();
             array_unshift($arguments, $context);
             $data['method'] = $method;
             $data['arguments'] = $arguments;
             return $data;
         });
-        return $redisPoolCoroutine;
+        return $AOPRedisPoolCoroutine;
     }
 
     /**
      * 获取redis proxy
      * @param $redisProxy
      * @param Core $coreBase
-     * @return AOP
+     * @return AOP|\Redis
      */
     public static function getRedisProxy(IProxy $redisProxy, Core $coreBase)
     {
@@ -62,9 +63,10 @@ class AOPFactory
      */
     public static function getObjectPool(Pool $pool, Core $coreBase)
     {
-        $pool = new AOP($pool);
+        $AOPPool = new AOP($pool);
+        $AOPPool->context = $coreBase->getContext();
 
-        $pool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
+        $AOPPool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             if ($method === 'push') {
                 //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
                 if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
@@ -80,13 +82,11 @@ class AOPFactory
             return $data;
         });
 
-        $pool->registerOnAfter(function ($method, $arguments, $result) use ($coreBase) {
+        $AOPPool->registerOnAfter(function ($method, $arguments, $result) use ($coreBase) {
             //取得对象后放入请求内部bucket
             if ($method === 'get' && is_object($result)) {
                 //使用次数+1
                 $result->useCount++;
-                //获得对象后调用initialization方法
-                method_exists($result, 'initialization') && $result->initialization();
                 $coreBase->objectPoolBuckets[] = $result;
             }
             $data['method'] = $method;
@@ -95,6 +95,32 @@ class AOPFactory
             return $data;
         });
 
-        return $pool;
+        return $AOPPool;
+    }
+
+
+    /**
+     * 获取协程与非协程适配对象
+     *
+     * @param \stdClass $object
+     * @return AOP
+     */
+    public static function getObjectAdapter($object)
+    {
+        $AOPObject = new AOP($object);
+        $AOPObject->registerOnAfter(function ($method, $arguments, $result) {
+            $data['method'] = $method;
+            $data['arguments'] = $arguments;
+
+            if (CommonHelper::getAppType() != 'msf' && $result instanceof \Generator) {
+                $data['result'] = $result->getReturn();
+                return $data;
+            }
+
+            $data['result'] = $result;
+            return $data;
+        });
+
+        return $AOPObject;
     }
 }
