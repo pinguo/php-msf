@@ -12,8 +12,10 @@ use PG\MSF\DataBase\CoroutineRedisHelp;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
 use PG\Helper\CommonHelper;
+use PG\AOP\Factory;
+use PG\AOP\Wrapper;
 
-class AOPFactory
+class AOPFactory extends Factory
 {
     /**
      * 获取协程redis
@@ -23,7 +25,7 @@ class AOPFactory
      */
     public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, Core $coreBase)
     {
-        $AOPRedisPoolCoroutine = new AOP($redisPoolCoroutine);
+        $AOPRedisPoolCoroutine = new Wrapper($redisPoolCoroutine);
         $AOPRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             $context = $coreBase->getContext();
             array_unshift($arguments, $context);
@@ -42,7 +44,7 @@ class AOPFactory
      */
     public static function getRedisProxy(IProxy $redisProxy, Core $coreBase)
     {
-        $redis = new AOP($redisProxy);
+        $redis = new Wrapper($redisProxy);
         $redis->registerOnBefore(function ($method, $arguments) use ($redisProxy, $coreBase) {
             $context = $coreBase->getContext();
             array_unshift($arguments, $context);
@@ -63,7 +65,7 @@ class AOPFactory
      */
     public static function getObjectPool(Pool $pool, Core $coreBase)
     {
-        $AOPPool = new AOP($pool);
+        $AOPPool = new Wrapper($pool);
         $AOPPool->context = $coreBase->getContext();
 
         $AOPPool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
@@ -96,31 +98,5 @@ class AOPFactory
         });
 
         return $AOPPool;
-    }
-
-
-    /**
-     * 获取协程与非协程适配对象
-     *
-     * @param \stdClass $object
-     * @return AOP
-     */
-    public static function getObjectAdapter($object)
-    {
-        $AOPObject = new AOP($object);
-        $AOPObject->registerOnAfter(function ($method, $arguments, $result) {
-            $data['method'] = $method;
-            $data['arguments'] = $arguments;
-
-            if (CommonHelper::getAppType() != 'msf' && $result instanceof \Generator) {
-                $data['result'] = $result->getReturn();
-                return $data;
-            }
-
-            $data['result'] = $result;
-            return $data;
-        });
-
-        return $AOPObject;
     }
 }
