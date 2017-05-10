@@ -66,7 +66,6 @@ class AOPFactory extends Factory
     public static function getObjectPool(Pool $pool, Core $coreBase)
     {
         $AOPPool = new Wrapper($pool);
-        $AOPPool->context = $coreBase->getContext();
 
         $AOPPool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             if ($method === 'push') {
@@ -90,6 +89,7 @@ class AOPFactory extends Factory
                 //使用次数+1
                 $result->useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
+                $result->context = $coreBase->getContext();
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;
