@@ -8,6 +8,7 @@
     "php": ">=7.0",
     "PGWireless/php-context": "dev-master",
     "PGWireless/php-log": "dev-master",
+    "PGWireless/php-aop": "dev-master",
     "PGWireless/php-helper": "dev-master",
     "PGWireless/php-exception": "dev-master",
     "league/plates": "3.*",
@@ -24,6 +25,10 @@
     "php-log": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-log.git"
+    },
+    "php-aop": {
+      "type": "vcs",
+      "url": "http://182.150.28.13:3000/PGWireless/php-aop.git"
     },
     "php-helper": {
       "type": "vcs",
