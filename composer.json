@@ -18,23 +18,23 @@
     "flexihash/flexihash": "^2.0.0"
   },
   "repositories": {
-    "php-log": {
+    "PGWireless/php-log": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-log.git"
     },
-    "php-context": {
+    "PGWireless/php-context": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-context.git"
     },
-    "php-aop": {
+    "PGWireless/php-aop": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-aop.git"
     },
-    "php-helper": {
+    "PGWireless/php-helper": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-helper.git"
     },
-    "php-exception": {
+    "PGWireless/php-exception": {
       "type": "vcs",
       "url": "http://182.150.28.13:3000/PGWireless/php-exception.git"
     }
