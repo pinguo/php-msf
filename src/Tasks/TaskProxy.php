@@ -30,11 +30,6 @@ class TaskProxy extends Core
         $this->afterConstruct();
     }
 
-    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
-    {
-        $this->setContext($context);
-    }
-
     /**
      * 代理
      * @param $name
@@ -45,18 +40,20 @@ class TaskProxy extends Core
     {
         $this->taskId = getInstance()->taskAtomic->add();
         //这里设置重置标识，id=65536,便设置回1
-        $reset = getInstance()->taskAtomic->cmpset(65536, 1);
+        $reset        = getInstance()->taskAtomic->cmpset(65536, 1);
+
         if ($reset) {
             $this->taskId = 1;
         }
+
         $this->taskProxyData = [
-            'type' => Marco::SERVER_TYPE_TASK,
+            'type'    => Marco::SERVER_TYPE_TASK,
             'message' => [
-                'task_name' => $this->coreName,
+                'task_name'     => $this->coreName,
                 'task_fuc_name' => $name,
                 'task_fuc_data' => $arguments,
-                'task_id' => $this->taskId,
-                'task_context' => $this->getContext(),
+                'task_id'       => $this->taskId,
+                'task_context'  => $this->getContext(),
             ]
         ];
 
@@ -89,5 +86,15 @@ class TaskProxy extends Core
     public function startTaskWait($timeOut = 0.5)
     {
         return getInstance()->server->taskwait($this->taskProxyData, $timeOut, -1);
+    }
+
+    /**
+     * 销毁
+     */
+    public function destroy()
+    {
+        unset($this->taskProxyData);
+        unset($this->taskId);
+        parent::destroy();
     }
 }

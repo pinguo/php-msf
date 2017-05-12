@@ -105,7 +105,7 @@ class Scheduler
 
         if (!empty(getInstance()->objectPool->map)) {
             foreach (getInstance()->objectPool->map as $class => $objects) {
-                if (APPLICATION_ENV == 'docker') {
+                if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
                         $data['object_poll'][$class][] = [
                             'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
@@ -121,12 +121,12 @@ class Scheduler
 
         if (!empty(ControllerFactory::getInstance()->pool)) {
             foreach (ControllerFactory::getInstance()->pool as $class => $objects) {
-                if (APPLICATION_ENV == 'docker') {
+                if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
                         $data['controller_poll'][$class][] = [
                             'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
                             'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
-                            'ref_count' => refcount($object),
+                            'ref_count' => refcount($object) - 1,
                         ];
                     }
                 } else {
@@ -137,7 +137,7 @@ class Scheduler
 
         if (!empty(ModelFactory::getInstance()->pool)) {
             foreach (ModelFactory::getInstance()->pool as $class => $objects) {
-                if (APPLICATION_ENV == 'docker') {
+                if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
                         $data['model_poll'][$class][] = [
                             'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,

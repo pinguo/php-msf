@@ -18,12 +18,10 @@ class Loader
      * @var array
      */
     private $_tasks = [];
-    private $_taskProxy;
     private $_modelFactory;
 
     public function __construct()
     {
-        $this->_taskProxy = new TaskProxy();
         $this->_modelFactory = ModelFactory::getInstance();
     }
 
@@ -72,29 +70,42 @@ class Loader
         if (empty($task)) {
             return null;
         }
-        $task = str_replace('/', '\\', $task);
-        $task_class = "\\App\\Tasks\\" . $task;
-        if (!class_exists($task_class)) {
-            $task_class = "\\PG\\MSF\\Tasks\\" . $task;
-            if (!class_exists($task_class)) {
-                throw new Exception("class task_class not exists");
+
+        $task      = str_replace('/', '\\', $task);
+        $taskClass = "\\App\\Tasks\\" . $task;
+
+        if (!class_exists($taskClass)) {
+            $taskClass = "\\PG\\MSF\\Tasks\\" . $task;
+            if (!class_exists($taskClass)) {
+                throw new Exception("class {$taskClass} not exists");
             }
         }
-        if (!getInstance()->server->taskworker) {//工作进程返回taskproxy
-            $this->_taskProxy->coreName = $task;
-            if ($parent != null) {
-                $this->_taskProxy->setContext($parent->getContext());
+
+        if (!getInstance()->server->taskworker) {
+            if ($parent != null && property_exists($parent, 'objectPool')) {
+                $taskProxy = $parent->objectPool->get(TaskProxy::class);
+            } else {
+                $taskProxy = new TaskProxy();
+                if ($parent != null) {
+                    $taskProxy->setContext($parent->getContext());
+                }
             }
-            return $this->_taskProxy;
+
+            $taskProxy->coreName = $task;
+
+            return $taskProxy;
         }
+
         if (key_exists($task, $this->_tasks)) {
-            $task_instance = $this->_tasks[$task];
-            $task_instance->reUse();
-            return $task_instance;
+            $taskInstance = $this->_tasks[$task];
+            $taskInstance->reUse();
+
+            return $taskInstance;
         } else {
-            $task_instance = new $task_class;
-            $this->_tasks[$task] = $task_instance;
-            return $task_instance;
+            $taskInstance        = new $taskClass;
+            $this->_tasks[$task] = $taskInstance;
+
+            return $taskInstance;
         }
     }
 

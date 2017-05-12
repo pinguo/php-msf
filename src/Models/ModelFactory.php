@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Models;
 
+use PG\MSF\Base\Exception;
+
 class ModelFactory
 {
     /**

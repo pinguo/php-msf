@@ -70,12 +70,10 @@ class AOPFactory extends Factory
         $AOPPool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             if ($method === 'push') {
                 //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
+                method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
                 if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
                     $data['result'] = false;
                     unset($arguments[0]);
-                } else {
-                    //返还时调用destroy方法
-                    method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
                 }
             }
             $data['method'] = $method;
