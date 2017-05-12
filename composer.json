@@ -20,23 +20,23 @@
   "repositories": {
     "PGWireless/php-log": {
       "type": "vcs",
-      "url": "http://182.150.28.13:3000/PGWireless/php-log.git"
+      "url": "https://github.com/PGWireless/php-log.git"
     },
     "PGWireless/php-context": {
       "type": "vcs",
-      "url": "http://182.150.28.13:3000/PGWireless/php-context.git"
+      "url": "https://github.com/PGWireless/php-context.git"
     },
     "PGWireless/php-aop": {
       "type": "vcs",
-      "url": "http://182.150.28.13:3000/PGWireless/php-aop.git"
+      "url": "https://github.com/PGWireless/php-aop.git"
     },
     "PGWireless/php-helper": {
       "type": "vcs",
-      "url": "http://182.150.28.13:3000/PGWireless/php-helper.git"
+      "url": "https://github.com/PGWireless/php-helper.git"
     },
     "PGWireless/php-exception": {
       "type": "vcs",
-      "url": "http://182.150.28.13:3000/PGWireless/php-exception.git"
+      "url": "https://github.com/PGWireless/php-exception.git"
     }
   },
   "autoload": {
