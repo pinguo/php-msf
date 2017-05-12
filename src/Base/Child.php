@@ -35,7 +35,7 @@ class Child
      * 上下文
      * @var array
      */
-    protected $context;
+    public $context;
 
     /**
      * after constructor

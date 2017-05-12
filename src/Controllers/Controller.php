@@ -9,8 +9,9 @@
 
 namespace PG\MSF\Controllers;
 
+use PG\AOP\Wrapper;
 use PG\MSF\{
-    Base\Core, Base\Input, Base\Output, Base\AOP, Base\AOPFactory, Base\Exception,
+    Base\Core, Base\Input, Base\Output, Base\AOPFactory, Base\Exception,
     Coroutine\GeneratorContext, DataBase\MysqlAsynPool, Marco, Server
 };
 
@@ -42,7 +43,7 @@ class Controller extends Core
      */
     public $tcpClient;
     /**
-     * @var AOP|\PG\MSF\Memory\Pool
+     * @var Wrapper|\PG\MSF\Memory\Pool
      */
     public $objectPool;
     /**

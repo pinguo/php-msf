@@ -23,15 +23,22 @@ class Redis extends Base
     {
         parent::__construct(3000);
         $this->redisAsynPool = $redisAsynPool;
-        $this->name = $name;
-        $this->arguments = $arguments;
-        $this->request = "#redis: $name";
-        $logId = $context->PGLog->logId;
-        getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($result) use ($logId) {
+        $this->name          = $name;
+        $this->arguments     = $arguments;
+        $profileName         = "redis: $name";
+        $this->request       = "#redis: $name";
+
+        $context->PGLog->profileStart($profileName);
+        getInstance()->coroutine->IOCallBack[$context->logId][] = $this;
+        $this->send(function ($result) use ($context, $profileName) {
+            if (empty(getInstance()->coroutine->taskMap[$context->logId])) {
+                return;
+            }
+            
+            $context->PGLog->profileEnd($profileName);
             $this->result = $result;
             $this->ioBack = true;
-            $this->nextRun($logId);
+            $this->nextRun($context->logId);
         });
     }
 
