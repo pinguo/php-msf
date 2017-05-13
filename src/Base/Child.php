@@ -132,5 +132,4 @@ class Child
         unset($this->parent);
         unset($this->context);
     }
-
 }

@@ -121,7 +121,12 @@ class Task
             }
 
             $runTaskException = $this->handleTaskException($e, $value);
-            $routine->throw($runTaskException);
+
+            if ($this->controller) {
+                call_user_func([$this->controller, 'onExceptionHandle'], $runTaskException);
+            } else {
+                $routine->throw($runTaskException);
+            }
 
             unset($value);
         }
