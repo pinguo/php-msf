@@ -11,10 +11,10 @@ namespace PG\MSF;
 use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\{
-    Base\Child, Controllers\ControllerFactory, Base\Loader, Base\Exception, Coroutine\GeneratorContext
+    Base\Child, Controllers\ControllerFactory, Base\Loader, Base\Exception
 };
 use PG\MSF\{
-    Base\Core, Pack\IPack, Route\IRoute
+    Base\Core, Pack\IPack, Route\IRoute, Helpers\Context, Base\Input, Base\Output
 };
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 
@@ -698,76 +698,128 @@ abstract class Server extends Child
     public function onSwooleReceive($serv, $fd, $fromId, $data)
     {
         $error = '';
-        $code = 500;
-        $data = substr($data, $this->packageLengthTypeLength);
+        $code  = 500;
+        $data  = substr($data, $this->packageLengthTypeLength);
         //反序列化，出现异常断开连接
         try {
             $clientData = $this->pack->unPack($data);
         } catch (\Exception $e) {
             $serv->close($fd);
-            return null;
+            return;
         }
+
         //client_data进行处理
         $clientData = $this->route->handleClientData($clientData);
-        $controllerName = $this->route->getControllerName();
-        $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
 
-        if ($controllerInstance == null) {
-            $controllerName = $this->route->getControllerName() . "\\" . $this->route->getMethodName();
+        do {
+            $controllerName     = $this->route->getControllerName();
             $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
-            $this->route->setControllerName($controllerName);
-        }
-
-        if ($controllerInstance != null) {
-            if (Server::$testUnity) {
-                $fd = 'self';
-                $uid = $fd;
+            $methodPrefix       = $this->config->get('tcp.method_prefix', '');
+            $methodDefault      = $this->config->get('tcp.default_method', 'Index');
+            if ($controllerInstance == null) {
+                $controllerName     = $controllerName . "\\" . $this->route->getMethodName();
+                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+                $this->route->setControllerName($controllerName);
+                $methodName = $methodPrefix . $methodDefault;
+                $this->route->setMethodName($methodDefault);
             } else {
-                $uid = $serv->connection_info($fd)['uid']??0;
+                $methodName = $methodPrefix . $this->route->getMethodName();
             }
-            $methodName = $this->config->get('tcp.method_prefix', '') . $this->route->getMethodName();
-            $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
-            if (!method_exists($controllerInstance, $methodName)) {
-                $methodName = $this->config->get('tcp.method_prefix', '') . $this->config->get('tcp.default_method',
-                        'Index');
-                $this->route->setMethodName($this->config->get('tcp.default_method', 'Index'));
+            if ($controllerInstance == null) {
+                $error = 'Api not found controller(' . $controllerName . ')';
+                $code  = 404;
+                break;
             }
 
             if (!method_exists($controllerInstance, $methodName)) {
                 $error = 'Api not found method(' . $methodName . ')';
-                $code = 404;
-            } else {
-                try {
-                    $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
-                    if ($generator instanceof \Generator) {
-                        $generatorContext = new GeneratorContext();
-                        $generatorContext->setController($controllerInstance, $controllerName, $methodName);
-                        $this->coroutine->start($generator, $generatorContext);
-                    }
-                } catch (\Throwable $e) {
-                    call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
-                }
+                $code  = 404;
+                break;
             }
-        } else {
-            $error = 'Api not found controller(' . $controllerName . ')';
-            $code = 404;
-        }
+
+            $uid = $serv->connection_info($fd)['uid'] ?? 0;
+            try {
+                /**
+                 * @var $context Context
+                 */
+                $context  = $controllerInstance->objectPool->get(Context::class);
+
+                // 初始化控制器
+                $controllerInstance->requestStartTime = microtime(true);
+                $PGLog            = null;
+                $PGLog            = clone $controllerInstance->logger;
+                $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
+                $PGLog->accessRecord['uri']       = $this->route->getPath();
+                $PGLog->logId = $this->genLogId();
+                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+                $PGLog->init();
+                $PGLog->pushLog('controller', $controllerName);
+                $PGLog->pushLog('method', $methodName);
+
+                // 构造请求上下文成员
+                $context->setLogId($PGLog->logId);
+                $context->setLog($PGLog);
+                $context->setObjectPool($controllerInstance->objectPool);
+                $controllerInstance->setContext($context);
+
+                /**
+                 * @var $input Input
+                 */
+                $input    = $controllerInstance->objectPool->get(Input::class);
+                $input->set($clientData);
+                /**
+                 * @var $output Output
+                 */
+                $output   = $controllerInstance->objectPool->get(Output::class);
+                $output->set($clientData, null);
+                $output->initialization($controllerInstance);
+
+                $context->setInput($input);
+                $context->setOutput($output);
+
+                $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
+
+                $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                if ($generator instanceof \Generator) {
+                    $this->coroutine->start($generator, $context, $controllerInstance);
+                }
+
+                if (!$this->route->getRouteCache($this->route->getPath())) {
+                    $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
+                }
+                break;
+            } catch (\Throwable $e) {
+                call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
+            }
+        } while (0);
+        
 
         if ($error !== '') {
             if ($controllerInstance != null) {
                 $controllerInstance->destroy();
             }
 
-            $response = json_encode([
-                'data' => self::$stdClass,
-                'message' => $error,
-                'status' => $code,
+            $res = json_encode([
+                'data'       => self::$stdClass,
+                'message'    => $error,
+                'status'     => $code,
                 'serverTime' => microtime(true)
             ]);
-            $response = getInstance()->encode($this->pack->pack($response));
+            $response = getInstance()->encode($this->pack->pack($res));
             getInstance()->send($fd, $response);
         }
+    }
+
+    /**
+     * gen a logId
+     *
+     * @return string
+     */
+    public function genLogId()
+    {
+        $logId = strval(new \MongoId());
+        return $logId;
     }
 
     /**

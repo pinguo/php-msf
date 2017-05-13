@@ -14,9 +14,7 @@ use PG\MSF\Client\{
 use PG\MSF\Process\{
     Config, Inotify
 };
-use PG\MSF\Coroutine\{
-    Task, GeneratorContext
-};
+use PG\MSF\Coroutine\Task;
 use PG\MSF\DataBase\{
     AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
 };
@@ -278,17 +276,6 @@ abstract class MSFServer extends WebSocketServer
                     $task->initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName,
                         $taskContext);
                     $result = call_user_func_array(array($task, $taskFucName), $taskData);
-                    if ($result instanceof \Generator) {
-                        $corotineTask = new Task($result, new GeneratorContext());
-                        while (1) {
-                            if ($corotineTask->isFinished()) {
-                                $result = $result->getReturn();
-                                $corotineTask->destroy();
-                                break;
-                            }
-                            $corotineTask->run();
-                        }
-                    }
                 } else {
                     throw new Exception("method $taskFucName not exist in $taskName");
                 }

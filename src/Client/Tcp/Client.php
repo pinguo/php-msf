@@ -9,33 +9,15 @@
 namespace PG\MSF\Client\Tcp;
 
 use PG\MSF\{
-    Base\Exception, Helpers\Context, Coroutine\GetTcpClient
+    Base\Exception, Base\Core, Helpers\Context, Coroutine\GetTcpClient
 };
 
-class Client
+class Client extends Core
 {
-    /**
-     * 上下文
-     * @var Context
-     */
-    public $context;
-
     /**
      * @var array DNS查询缓存
      */
     public static $dnsCache;
-
-    /**
-     * @var IPack
-     */
-    protected $pack;
-    protected $set;
-
-    public function __construct()
-    {
-        $this->context = new Context();
-        $this->set     = getInstance()->config->get('tcpClient.set', []);
-    }
 
     /**
      * 获取一个tcp客户端
@@ -46,15 +28,15 @@ class Client
      */
     public function getTcpClient($baseUrl, $callBack, $timeOut)
     {
-        $data = [];
+        $data               = [];
         $parseBaseUrlResult = explode(":", $baseUrl);
 
         if (count($parseBaseUrlResult) != 2) {
             throw new Exception($baseUrl . ' must be an ip:port string');
         }
 
-        $data['host'] = $parseBaseUrlResult[0];
-        $data['port'] = $parseBaseUrlResult[1];
+        $data['host']     = $parseBaseUrlResult[0];
+        $data['port']     = $parseBaseUrlResult[1];
         $data['callBack'] = $callBack;
 
         $ip = self::getDnsCache($data['host']);
@@ -63,7 +45,7 @@ class Client
         } else {
             swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut) {
                 if (empty($ip)) {
-                    $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
+                    $this->context->getLog()->warning($data['url'] . ' DNS查询失败');
                     $this->context->output->outputJson([], 'error', 500);
                 } else {
                     self::setDnsCache($host, $ip);
@@ -100,7 +82,7 @@ class Client
         }
 
         $c = new \swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
-        $c->set($this->set);
+        $c->set(getInstance()->config->get('tcpClient.set', []));
 
         $c->on('error', function ($cli) use ($data) {
             throw new Exception($data['host'] . ':' . $data['port'] . ' Connect failed');
@@ -109,8 +91,8 @@ class Client
         $c->on('close', function ($cli) {
         });
 
-        $tcpClient = new TcpClient($c, $ip, $data['port'], $timeOut / 1000);
-        $tcpClient->context = $this->context;
+        $tcpClient = $this->getContext()->getObjectPool()->get(TcpClient::class);
+        $tcpClient->initialization($c, $ip, $data['port'], $timeOut / 1000);
         call_user_func($data['callBack'], $tcpClient);
     }
 

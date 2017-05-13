@@ -9,8 +9,9 @@
 namespace PG\MSF\Base;
 
 use PG\MSF\Marco;
+use PG\MSF\Controllers\Controller;
 
-class Output
+class Output extends Core
 {
     /**
      * http response
@@ -23,16 +24,18 @@ class Output
      * @var \swoole_http_request
      */
     public $request;
+
     /**
      * @var Controller
      */
     protected $controller;
 
     /**
-     * Output constructor.
-     * @param $controller
+     * 初始化Output
+     *
+     * @param Controller $controller
      */
-    public function __construct($controller)
+    public function initialization($controller)
     {
         $this->controller = $controller;
     }
@@ -49,7 +52,7 @@ class Output
      */
     public function set($request, $response)
     {
-        $this->request = $request;
+        $this->request  = $request;
         $this->response = $response;
     }
 
@@ -78,6 +81,7 @@ class Output
     /**
      * 响应json格式数据
      *
+     * @param Controller $controller
      * @param null $data
      * @param string $message
      * @param int $status
@@ -86,7 +90,7 @@ class Output
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        $this->controller->PGLog->pushLog('status', $status);
+        $this->getContext()->getLog()->pushLog('status', $status);
 
         $result = [
             'data'       => $data,
@@ -124,14 +128,16 @@ class Output
      */
     public function getCallback($callback)
     {
-        if (is_null($callback) && (!empty($this->controller->input->postGet('callback'))
-                || !empty($this->controller->input->postGet('cb')) || !empty($this->controller->input->postGet('jsonpCallback')))
+        $input = $this->getContext()->getInput();
+        if (is_null($callback) && (!empty($input->postGet('callback')) ||
+                !empty($input->postGet('cb')) ||
+                !empty($input->postGet('jsonpCallback')))
         ) {
-            $callback = !empty($this->controller->input->postGet('callback'))
-                ? $this->controller->input->postGet('callback')
-                : !empty($this->controller->input->postGet('cb'))
-                    ? $this->controller->input->postGet('cb')
-                    : $this->controller->input->postGet('jsonpCallback');
+            $callback = !empty($input->postGet('callback'))
+                ? $input->postGet('callback')
+                : !empty($input->postGet('cb'))
+                    ? $input->postGet('cb')
+                    : $input->postGet('jsonpCallback');
         }
 
         return $callback;
@@ -140,8 +146,8 @@ class Output
     /**
      * Set Content-Type Header
      *
-     * @param    string $mime_type Extension of the file we're outputting
-     * @return    HttpOutPut
+     * @param string $mime_type Extension of the file we're outputting
+     * @return $this
      */
     public function setContentType($mime_type)
     {
@@ -220,5 +226,15 @@ class Output
             $this->controller->destroy();
         }
         return $result;
+    }
+
+    /**
+     * 销毁,解除引用
+     */
+    public function destroy()
+    {
+        $this->reset();
+        unset($this->controller);
+        parent::destroy();
     }
 }

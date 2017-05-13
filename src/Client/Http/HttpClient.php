@@ -9,10 +9,10 @@
 namespace PG\MSF\Client\Http;
 
 use PG\MSF\{
-    Helpers\Context, Coroutine\HttpClientRequest
+    Helpers\Context, Base\Core, Coroutine\HttpClientRequest
 };
 
-class HttpClient
+class HttpClient extends Core
 {
     /**
      * @var array
@@ -23,17 +23,13 @@ class HttpClient
      * @var \swoole_http_client
      */
     public $client;
-
+    
     /**
-     * @var Context
+     * 初始化HttpClient
+     *
+     * @param \swoole_http_client $client
      */
-    public $context;
-
-    /**
-     * HttpClient constructor.
-     * @param $client
-     */
-    public function __construct(\swoole_http_client $client)
+    public function initialization(\swoole_http_client $client)
     {
         $this->client = $client;
     }
@@ -109,5 +105,13 @@ class HttpClient
     public function coroutinePost($path, $data, $timeout = 30000)
     {
         return new HttpClientRequest($this, 'POST', $path, $data, $timeout);
+    }
+
+    public function destroy()
+    {
+        $this->client->close();
+        unset($this->client);
+        unset($this->headers);
+        parent::destroy();
     }
 }

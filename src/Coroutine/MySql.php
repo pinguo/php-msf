@@ -45,4 +45,11 @@ class MySql extends Base
         }
         return $result;
     }
+
+    public function destroy()
+    {
+        unset($this->mysqlAsynPool);
+        unset($this->bindId);
+        unset($this->sql);
+    }
 }

@@ -9,43 +9,15 @@
 
 namespace PG\MSF\Models;
 
+
+use PG\AOP\Wrapper;
 use PG\MSF\Base\{
     Core, AOPFactory
 };
-use PG\Log\PGLog;
+
 
 class Model extends Core
 {
-    /**
-     * @var \PG\MSF\DataBase\RedisAsynPool
-     */
-    public $redisPool;
-
-    /**
-     * @var \PG\MSF\DataBase\MysqlAsynPool
-     */
-    public $mysqlPool;
-
-    /**
-     * @var \PG\MSF\Memory\Pool
-     */
-    public $objectPool;
-
-    /**
-     * @var \PG\MSF\Client\Http\Client
-     */
-    public $client;
-
-    /**
-     * @var \PG\MSF\Client\Tcp\Client
-     */
-    public $tcpClient;
-
-    /**
-     * @var PGLog
-     */
-    public $PGLog;
-
     /**
      * redis连接池
      * @var array
@@ -60,7 +32,6 @@ class Model extends Core
     final public function __construct()
     {
         parent::__construct();
-        $this->mysqlPool = getInstance()->mysqlPool;
     }
 
     /**
@@ -70,10 +41,6 @@ class Model extends Core
     public function initialization($context)
     {
         $this->setContext($context);
-        $this->PGLog      = $context->PGLog;
-        $this->client     = $context->controller->client;
-        $this->tcpClient  = $context->controller->tcpClient;
-        $this->objectPool = $context->controller->objectPool;
     }
 
     /**
@@ -81,7 +48,6 @@ class Model extends Core
      */
     public function destroy()
     {
-        unset($this->PGLog, $this->client->context->PGLog);
         unset($this->redisProxies);
         unset($this->redisPools);
         parent::destroy();
@@ -91,7 +57,7 @@ class Model extends Core
     /**
      * 获取redis连接池
      * @param string $poolName
-     * @return bool|AOP|\PG\MSF\DataBase\CoroutineRedisHelp
+     * @return bool|Wrapper|\PG\MSF\DataBase\CoroutineRedisHelp
      */
     protected function getRedisPool(string $poolName)
     {
@@ -110,7 +76,7 @@ class Model extends Core
     /**
      * 获取redis代理
      * @param string $proxyName
-     * @return bool|AOP
+     * @return bool|Wrapper
      */
     protected function getRedisProxy(string $proxyName)
     {

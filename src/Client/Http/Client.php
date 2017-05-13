@@ -9,17 +9,11 @@
 namespace PG\MSF\Client\Http;
 
 use PG\MSF\{
-    Base\Exception, Helpers\Context, Coroutine\GetHttpClient
+    Base\Exception, Base\Core, Helpers\Context, Coroutine\GetHttpClient
 };
 
-class Client
+class Client extends Core
 {
-    /**
-     * 上下文
-     * @var Context
-     */
-    public $context;
-
     /**
      * @var array DNS查询缓存
      */
@@ -33,11 +27,11 @@ class Client
      */
     public function getHttpClient($baseUrl, $callBack, array $headers = [])
     {
-        $data = [];
-        $data['url'] = $baseUrl;
-        $data['callBack'] = $callBack;
-        $data['port'] = 80;
-        $data['ssl'] = false;
+        $data               = [];
+        $data['url']        = $baseUrl;
+        $data['callBack']   = $callBack;
+        $data['port']       = 80;
+        $data['ssl']        = false;
         $parseBaseUrlResult = explode(":", $baseUrl);
 
         if (count($parseBaseUrlResult) == 2) {
@@ -74,8 +68,8 @@ class Client
                     $ip = '127.0.0.1';
                 }
                 if (empty($ip)) {
-                    $this->context->PGLog->warning($data['url'] . ' DNS查询失败');
-                    $this->context->output->end();
+                    $this->context->getLog()->warning($data['url'] . ' DNS查询失败');
+                    $this->context->getOutput()->end();
                 } else {
                     self::setDnsCache($host, $ip);
                     $this->coroutineCallBack($host, $ip, $data, $headers);
@@ -107,16 +101,16 @@ class Client
      */
     public function coroutineCallBack($host, $ip, $data, $headers)
     {
-        if (empty($this->context) || empty($this->context->PGLog)) {
+        if (empty($this->context) || empty($this->context->getLog())) {
             return true;
         }
 
-        $client = new \swoole_http_client($ip, $data['port'], $data['ssl']);
-        $httpClient = new HttpClient($client);
-        $httpClient->context = $this->context;
+        $client     = new \swoole_http_client($ip, $data['port'], $data['ssl']);
+        $httpClient = $this->getContext()->getObjectPool()->get(HttpClient::class);
+        $httpClient->initialization($client);
         $headers = array_merge($headers, [
             'Host' => $host,
-            'X-Ngx-LogId' => $this->context->PGLog->logId,
+            'X-Ngx-LogId' => $this->context->getLogId(),
         ]);
 
         $httpClient->setHeaders($headers);

@@ -8,9 +8,11 @@
 
 namespace PG\MSF\Coroutine;
 
+use PG\MSF\Controllers\Controller;
 use PG\MSF\Marco;
 use PG\MSF\Controllers\ControllerFactory;
 use PG\MSF\Models\ModelFactory;
+use PG\MSF\Helpers\Context;
 
 class Scheduler
 {
@@ -181,11 +183,11 @@ class Scheduler
         return $this;
     }
 
-    public function start(\Generator $routine, GeneratorContext $generatorContext)
+    public function start(\Generator $routine, Context $context, Controller $controller)
     {
-        $task = new Task($routine, $generatorContext);
-        $this->IOCallBack[$generatorContext->getController()->PGLog->logId] = [];
-        $this->taskMap[$generatorContext->getController()->PGLog->logId] = $task;
+        $task = new Task($routine, $context, $controller);
+        $this->IOCallBack[$context->getLogId()] = [];
+        $this->taskMap[$context->getLogId()]    = $task;
         $this->taskQueue->enqueue($task);
     }
 }

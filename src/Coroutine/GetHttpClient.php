@@ -26,15 +26,15 @@ class GetHttpClient extends Base
         $this->client = $client;
         $this->headers = $headers;
         $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
-        $this->client->context->PGLog->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->client->context->PGLog->logId][] = $this;
+        $this->client->context->getLog()->profileStart($profileName);
+        getInstance()->coroutine->IOCallBack[$this->client->context->getLogId()][] = $this;
         $this->send(function ($httpClient) use ($profileName) {
             $this->result = $httpClient;
             $this->responseTime = microtime(true);
-            if (!empty($this->client->context->PGLog)) {
-                $this->client->context->PGLog->profileEnd($profileName);
+            if (!empty($this->client->context->getLog())) {
+                $this->client->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($this->client->context->PGLog->logId);
+                $this->nextRun($this->client->context->getLogId());
             }
         });
     }
@@ -42,5 +42,12 @@ class GetHttpClient extends Base
     public function send($callback)
     {
         $this->client->getHttpClient($this->baseUrl, $callback, $this->headers);
+    }
+
+    public function destroy()
+    {
+        unset($this->client);
+        unset($this->baseUrl);
+        unset($this->headers);
     }
 }

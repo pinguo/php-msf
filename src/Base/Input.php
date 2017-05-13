@@ -8,12 +8,17 @@
 
 namespace PG\MSF\Base;
 
-class Input
+class Input extends Core
 {
     /**
      * @var \swoole_http_request|\stdClass
      */
     public $request;
+
+    public function __sleep()
+    {
+        return ['request'];
+    }
 
     /**
      * @param $request
@@ -203,12 +208,21 @@ class Input
      * @param $xssClean
      * @return string
      */
-    public function getRequestHeader($index, $xssClean = true)
+    public function getRequestHeader($index, $xssClean = false)
     {
         if ($xssClean) {
             return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
         } else {
             return $this->request->header[$index]??'';
         }
+    }
+
+    /**
+     * 销毁,解除引用
+     */
+    public function destroy()
+    {
+        unset($this->request);
+        parent::destroy();
     }
 }

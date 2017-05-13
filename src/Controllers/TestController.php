@@ -8,10 +8,11 @@
 
 namespace PG\MSF\Controllers;
 
-use PG\MSF\Base\SelectCoroutine;
 use PG\MSF\Models\TestModel;
+use PG\MSF\Client\Http\Client;
+use PG\MSF\Client\Tcp\Client as TClient;
 
-class TestController extends BaseController
+class TestController extends Controller
 {
     /**
      * @var TestModel
@@ -28,15 +29,16 @@ class TestController extends BaseController
 
     public function HttpTcp()
     {
-        $tcpClient = yield $this->tcpClient->coroutineGetTcpClient('localhost:8000');
-        $data = yield $tcpClient->coroutineSend(['path' => 'server/status', 'data' => 1234]);
+        $client    = $this->getContext()->getObjectPool()->get(TClient::class);
+        $tcpClient = yield $client->coroutineGetTcpClient('localhost:8000');
+        $data      = yield $tcpClient->coroutineSend(['path' => 'server/status', 'data' => 1234]);
         $this->outputJson($data);
     }
 
     public function HttpRedis()
     {
-        yield $this->redisPool->incrBy('key', 1);
-        $value = yield $this->redisPool->cache('key');
+        yield $this->getRedisPool('tw')->incrBy('key', 1);
+        $value = yield $this->getRedisPool('tw')->cache('key');
         $this->outputJson($value);
     }
 
@@ -85,12 +87,13 @@ class TestController extends BaseController
 
     public function HttpTestCoroutine()
     {
-        $client = $this->client->coroutineGetHttpClient('http://phototask-feed-ms.360in.com');
-        $httpClient = yield $client;
-        if (!$httpClient) {
+        $client        = $this->getContext()->getObjectPool()->get(Client::class);
+        $httpClient    = $client->coroutineGetHttpClient('http://phototask-feed-ms.360in.com');
+        $httpClientDns = yield $httpClient;
+        if (!$httpClientDns) {
             $this->outputJson('network error', 500);
         } else {
-            $prePost = $httpClient->coroutineGet(
+            $prePost = $httpClientDns->coroutineGet(
                 '/feed/inner/feedInner/hotFeed?appVersion=8.3.2&platform=ios&locale=zh-Hans&C78818A7-26DD-4795-ACB6-663496AA5A32&ip=127.0.0.1&taskId=&longitude=104.0679504901092&30.53893220660016&channel=appstore&catIds=196608&catNums=100'
             );
             $data = yield $prePost;

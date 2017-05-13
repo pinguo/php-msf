@@ -10,7 +10,7 @@ namespace PG\MSF;
 
 use League\Plates\Engine;
 use PG\MSF\{
-    Controllers\ControllerFactory, Coroutine\GeneratorContext
+    Controllers\ControllerFactory, Helpers\Context, Base\Input, Base\Output
 };
 
 abstract class HttpServer extends Server
@@ -167,20 +167,56 @@ abstract class HttpServer extends Server
                 break;
             }
 
+            if (!method_exists($controllerInstance, $methodName)) {
+                $error = 'Api not found method(' . $methodName . ')';
+                $code  = 404;
+                break;
+            }
+
             try {
+                /**
+                 * @var $context Context
+                 */
+                $context  = $controllerInstance->objectPool->get(Context::class);
+
+                // 初始化控制器
+                $controllerInstance->requestStartTime = microtime(true);
+                $PGLog            = null;
+                $PGLog            = clone $controllerInstance->logger;
+                $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
+                $PGLog->accessRecord['uri']       = $this->route->getPath();
+                $PGLog->logId = $this->genLogId($request);
+                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+                $PGLog->init();
+                $PGLog->pushLog('controller', $controllerName);
+                $PGLog->pushLog('method', $methodName);
+
+                // 构造请求上下文成员
+                $context->setLogId($PGLog->logId);
+                $context->setLog($PGLog);
+                $context->setObjectPool($controllerInstance->objectPool);
+                $controllerInstance->setContext($context);
+
+                /**
+                 * @var $input Input
+                 */
+                $input    = $controllerInstance->objectPool->get(Input::class);
+                $input->set($request);
+                /**
+                 * @var $output Output
+                 */
+                $output   = $controllerInstance->objectPool->get(Output::class);
+                $output->set($request, $response);
+                $output->initialization($controllerInstance);
+
+                $context->setInput($input);
+                $context->setOutput($output);
+
                 $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
-                if (!method_exists($controllerInstance, $methodName)) {
-                    $error = 'Api not found method(' . $methodName . ')';
-                    $code  = 404;
-                    break;
-                }
 
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                 if ($generator instanceof \Generator) {
-                    $generatorContext = new GeneratorContext();
-                    $generatorContext->setController($controllerInstance, $controllerName, $methodName);
-                    $controllerInstance->setGeneratorContext($generatorContext);
-                    $this->coroutine->start($generator, $generatorContext);
+                    $this->coroutine->start($generator, $context, $controllerInstance);
                 }
 
                 if (!$this->route->getRouteCache($this->route->getPath())) {
@@ -205,6 +241,23 @@ abstract class HttpServer extends Server
             ]);
             $response->end($res);
         }
+    }
+
+    /**
+     * gen a logId
+     *
+     * @param \swoole_http_request $request
+     * @return string
+     */
+    public function genLogId($request)
+    {
+        $logId = $request->header['log_id'] ?? '' ;
+
+        if (!$logId) {
+            $logId = strval(new \MongoId());
+        }
+
+        return $logId;
     }
 
     /**

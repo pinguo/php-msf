@@ -9,7 +9,7 @@
 namespace PG\MSF;
 
 use PG\MSF\{
-    Controllers\ControllerFactory, Coroutine\GeneratorContext
+    Controllers\ControllerFactory, Helpers\Context, Base\Input, Base\Output
 };
 
 abstract class WebSocketServer extends HttpServer
@@ -136,6 +136,9 @@ abstract class WebSocketServer extends HttpServer
      */
     public function onSwooleWSAllMessage($serv, $fd, $data)
     {
+        $error = '';
+        $code  = 500;
+
         //反序列化，出现异常断开连接
         try {
             $clientData = $this->pack->unPack($data);
@@ -145,28 +148,117 @@ abstract class WebSocketServer extends HttpServer
         }
         //client_data进行处理
         $clientData = $this->route->handleClientData($clientData);
-        $controllerName = $this->route->getControllerName();
-        $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
-        if ($controllerInstance != null) {
-            $uid = $serv->connection_info($fd)['uid']??0;
-            $methodName = $this->config->get('websocket.method_prefix', '') . $this->route->getMethodName();
-            if (!method_exists($controllerInstance, $methodName)) {
-                $methodName = 'defaultMethod';
+        do {
+            $controllerName     = $this->route->getControllerName();
+            $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+            $methodPrefix       = $this->config->get('websocket.method_prefix', '');
+            $methodDefault      = $this->config->get('websocket.default_method', 'Index');
+            if ($controllerInstance == null) {
+                $controllerName     = $controllerName . "\\" . $this->route->getMethodName();
+                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
+                $this->route->setControllerName($controllerName);
+                $methodName = $methodPrefix . $methodDefault;
+                $this->route->setMethodName($methodDefault);
+            } else {
+                $methodName = $methodPrefix . $this->route->getMethodName();
             }
-            $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
+
+            if ($controllerInstance == null) {
+                $error = 'Api not found controller(' . $controllerName . ')';
+                $code  = 404;
+                break;
+            }
+
+            if (!method_exists($controllerInstance, $methodName)) {
+                $error = 'Api not found method(' . $methodName . ')';
+                $code  = 404;
+                break;
+            }
+
+            $uid = $serv->connection_info($fd)['uid'] ?? 0;
             try {
+                /**
+                 * @var $context Context
+                 */
+                $context  = $controllerInstance->objectPool->get(Context::class);
+
+                // 初始化控制器
+                $controllerInstance->requestStartTime = microtime(true);
+                $PGLog            = null;
+                $PGLog            = clone $controllerInstance->logger;
+                $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
+                $PGLog->accessRecord['uri']       = $this->route->getPath();
+                $PGLog->logId = $this->genLogId();
+                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+                $PGLog->init();
+                $PGLog->pushLog('controller', $controllerName);
+                $PGLog->pushLog('method', $methodName);
+
+                // 构造请求上下文成员
+                $context->setLogId($PGLog->logId);
+                $context->setLog($PGLog);
+                $context->setObjectPool($controllerInstance->objectPool);
+                $controllerInstance->setContext($context);
+
+                /**
+                 * @var $input Input
+                 */
+                $input    = $controllerInstance->objectPool->get(Input::class);
+                $input->set($clientData);
+                /**
+                 * @var $output Output
+                 */
+                $output   = $controllerInstance->objectPool->get(Output::class);
+                $output->set($clientData, null);
+                $output->initialization($controllerInstance);
+
+                $context->setInput($input);
+                $context->setOutput($output);
+
+                $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
+
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                 if ($generator instanceof \Generator) {
-                    $generatorContext = new GeneratorContext();
-                    $generatorContext->setController($controllerInstance, $controllerName, $methodName);
-                    $this->coroutine->start($generator, $generatorContext);
+                    $this->coroutine->start($generator, $context, $controllerInstance);
                 }
+
+                if (!$this->route->getRouteCache($this->route->getPath())) {
+                    $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
+                }
+                break;
             } catch (\Throwable $e) {
                 call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
             }
+        } while (0);
+
+
+        if ($error !== '') {
+            if ($controllerInstance != null) {
+                $controllerInstance->destroy();
+            }
+
+            $res = json_encode([
+                'data'       => self::$stdClass,
+                'message'    => $error,
+                'status'     => $code,
+                'serverTime' => microtime(true)
+            ]);
+            $response = getInstance()->encode($this->pack->pack($res));
+            getInstance()->send($fd, $response);
         }
     }
 
+    /**
+     * gen a logId
+     *
+     * @return string
+     */
+    public function genLogId()
+    {
+        $logId = strval(new \MongoId());
+        return $logId;
+    }
+    
     /**
      * websocket断开连接
      * @param $serv

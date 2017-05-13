@@ -91,6 +91,10 @@ class Loader
                 }
             }
 
+            if ($parent != null) {
+                $parent->addChild($taskProxy);
+            }
+
             $taskProxy->coreName = $task;
 
             return $taskProxy;

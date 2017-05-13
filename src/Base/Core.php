@@ -71,12 +71,14 @@ class Core extends Child
     }
 
     /**
-     * 销毁，解除引用
+     * 销毁,解除引用
      */
     public function destroy()
     {
-        parent::destroy();
-        $this->isDestroy = true;
+        if (!$this->isDestroy) {
+            parent::destroy();
+            $this->isDestroy = true;
+        }
     }
 
     /**

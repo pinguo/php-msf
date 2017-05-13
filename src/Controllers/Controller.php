@@ -9,39 +9,23 @@
 
 namespace PG\MSF\Controllers;
 
+use PG\Exception\Errno;
+use PG\Exception\ParameterValidationExpandException;
+use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
+use PG\Log\PGLog;
 use PG\MSF\{
     Base\Core, Base\Input, Base\Output, Base\AOPFactory, Base\Exception,
-    Coroutine\GeneratorContext, DataBase\MysqlAsynPool, Marco, Server
+    DataBase\MysqlAsynPool, Marco, Server, Coroutine\CException, Helpers\Context
 };
 
 class Controller extends Core
 {
     /**
-     * @var MysqlAsynPool
-     */
-    public $mysqlPool;
-    /**
-     * @var Input
-     */
-    public $input;
-    /**
-     * @var Output
-     */
-    public $output;
-    /**
      * 是否来自http的请求不是就是来自tcp
      * @var string
      */
     public $requestType;
-    /**
-     * @var \PG\MSF\Client\Http\Client
-     */
-    public $client;
-    /**
-     * @var \PG\MSF\Client\Tcp\Client
-     */
-    public $tcpClient;
     /**
      * @var Wrapper|\PG\MSF\Memory\Pool
      */
@@ -80,11 +64,6 @@ class Controller extends Core
      * @var array
      */
     protected $testUnitSendStack = [];
-    /**
-     * 协程上正文对象
-     * @var GeneratorContext
-     */
-    protected $generatorContext;
 
     /**
      * redis连接池
@@ -98,17 +77,17 @@ class Controller extends Core
     private $redisProxies;
 
     /**
+     * @var float 请求开始处理的时间
+     */
+    public $requestStartTime = 0.0;
+
+    /**
      * Controller constructor.
      */
     final public function __construct()
     {
         parent::__construct();
-        $this->input      = new Input();
-        $this->output     = new Output($this);
         $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
-        $this->mysqlPool  = getInstance()->mysqlPool;
-        $this->client     = clone getInstance()->client;
-        $this->tcpClient  = clone getInstance()->tcpClient;
     }
 
     /**
@@ -122,9 +101,8 @@ class Controller extends Core
     public function setClientData($uid, $fd, $clientData, $controllerName, $methodName)
     {
         $this->uid = $uid;
-        $this->fd = $fd;
+        $this->fd  = $fd;
         $this->clientData = $clientData;
-        $this->input->set($clientData);
         $this->requestType = Marco::TCP_REQUEST;
         $this->initialization($controllerName, $methodName);
     }
@@ -136,6 +114,7 @@ class Controller extends Core
      */
     public function initialization($controllerName, $methodName)
     {
+        $this->requestStartTime = microtime(true);
     }
 
     /**
@@ -147,34 +126,10 @@ class Controller extends Core
      */
     public function setRequestResponse($request, $response, $controllerName, $methodName)
     {
-        $this->request = $request;
-        $this->response = $response;
-        $this->input->set($request);
-        $this->output->set($request, $response);
+        $this->request     = $request;
+        $this->response    = $response;
         $this->requestType = Marco::HTTP_REQUEST;
         $this->initialization($controllerName, $methodName);
-    }
-
-    /**
-     * 返回协程上下文对象
-     *
-     * @return GeneratorContext
-     */
-    public function getGeneratorContext()
-    {
-        return $this->generatorContext;
-    }
-
-    /**
-     * 设置协程上下文对象
-     *
-     * @param GeneratorContext $generatorContext
-     * @return $this
-     */
-    public function setGeneratorContext(GeneratorContext $generatorContext)
-    {
-        $this->generatorContext = $generatorContext;
-        return $this;
     }
 
     /**
@@ -184,14 +139,26 @@ class Controller extends Core
      */
     public function onExceptionHandle(\Throwable $e)
     {
-        switch ($this->requestType) {
-            case Marco::HTTP_REQUEST:
-                $this->output->setStatusHeader(500);
-                $this->output->end($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
-                break;
-            case Marco::TCP_REQUEST:
-                $this->send($e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
-                break;
+        $errMsg = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+        $errMsg .= ' Trace: ' . $e->getTraceAsString();
+        if (!empty($e->getPrevious())) {
+            $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
+        }
+        if ($e instanceof ParameterValidationExpandException) {
+            $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
+            $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
+        } elseif ($e instanceof PrivilegeException) {
+            $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
+            $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
+        } elseif ($e instanceof \MongoException) {
+            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson(parent::$stdClass, 'Network Error.', Errno::FATAL);
+        } elseif ($e instanceof CException) {
+            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson(parent::$stdClass, $e->getPreviousMessage(), $e->getCode());
+        } else {
+            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+            $this->outputJson(parent::$stdClass, $e->getMessage(), $e->getCode());
         }
     }
 
@@ -222,17 +189,15 @@ class Controller extends Core
      */
     public function destroy()
     {
+        $this->getContext()->getLog()->appendNoticeLog();
         parent::destroy();
         unset($this->fd);
         unset($this->uid);
         unset($this->clientData);
         unset($this->request);
         unset($this->response);
-        unset($this->generatorContext);
         unset($this->redisProxies);
         unset($this->redisPools);
-        $this->input->reset();
-        $this->output->reset();
         //销毁对象池
         foreach ($this->objectPoolBuckets as $k => $obj) {
             $this->objectPool->push($obj);
@@ -259,9 +224,9 @@ class Controller extends Core
     public function defaultMethod()
     {
         if ($this->requestType == Marco::HTTP_REQUEST) {
-            $this->output->setHeader('HTTP/1.1', '404 Not Found');
+            $this->getContext()->getOutput()->setHeader('HTTP/1.1', '404 Not Found');
             $template = $this->loader->view('server::error_404');
-            $this->output->end($template->render());
+            $this->getContext()->getOutput()->end($template->render());
         } else {
             throw new Exception('method not exist');
         }
@@ -287,7 +252,7 @@ class Controller extends Core
     /**
      * 获取redis连接池
      * @param string $poolName
-     * @return bool|AOP|\PG\MSF\DataBase\CoroutineRedisHelp
+     * @return bool|Wrapper|\PG\MSF\DataBase\CoroutineRedisHelp
      */
     protected function getRedisPool(string $poolName)
     {
@@ -306,7 +271,7 @@ class Controller extends Core
     /**
      * 获取redis代理
      * @param string $proxyName
-     * @return bool|AOP
+     * @return bool|Wrapper
      */
     protected function getRedisProxy(string $proxyName)
     {
@@ -320,5 +285,23 @@ class Controller extends Core
 
         $this->redisProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
         return $this->redisProxies[$proxyName];
+    }
+
+    /**
+     * 响应json格式数据
+     *
+     * @param null $data
+     * @param string $message
+     * @param int $status
+     * @param null $callback
+     * @return array
+     */
+    public function outputJson(
+        $data = null,
+        $message = '',
+        $status = 200,
+        $callback = null
+    ) {
+        $this->getContext()->getOutput()->outputJson($data, $message, $status, $callback);
     }
 }

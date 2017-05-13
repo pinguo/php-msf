@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Base;
 
+use PG\MSF\Helpers\Context;
+
 class Child
 {
     /**
@@ -17,12 +19,13 @@ class Child
     public $coreName;
 
     /**
-     * @var
+     * @var \stdClass
      */
-
     public $parent;
+
     /**
      * 子集
+     *
      * @var array
      */
     public $childList = [];
@@ -31,9 +34,11 @@ class Child
      * 判断是否执行了__construct
      */
     public $isConstruct = false;
+
     /**
      * 上下文
-     * @var array
+     *
+     * @var Context
      */
     public $context;
 
@@ -48,25 +53,32 @@ class Child
 
     /**
      * 加入一个插件
+     *
      * @param $child Child
+     * @return $this
      */
     public function addChild($child)
     {
         $child->onAddChild($this);
         $this->childList[$child->coreName] = $child;
+        return $this;
     }
 
     /**
      * 被加入列表时
+     *
      * @param $parent
+     * @return $this
      */
     public function onAddChild($parent)
     {
         $this->parent = $parent;
+        return $this;
     }
 
     /**
      * 是否存在插件
+     *
      * @param $name
      * @return bool
      */
@@ -77,34 +89,39 @@ class Child
 
     /**
      * 获取插件
+     *
      * @param $name
      * @return mixed|null
      */
     public function getChild($name)
     {
-        return $this->childList[$name]??null;
+        return $this->childList[$name] ?? null;
     }
 
     /**
      * 获取上下文
-     * @return array
+     *
+     * @return Context
      */
-    public function &getContext()
+    public function getContext()
     {
-        return $this->context;
+        return $this->context ?? null;
     }
 
     /**
      * 设置上下文
+     *
      * @param $context
+     * @return $this
      */
     public function setContext($context)
     {
         $this->context = $context;
+        return $this;
     }
 
     /**
-     * 销毁，解除引用
+     * 销毁,解除引用
      */
     public function destroy()
     {

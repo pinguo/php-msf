@@ -15,12 +15,14 @@ use PG\MSF\DataBase\{
     AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
 };
 use PG\MSF\Coroutine\{
-    Task, GeneratorContext, Scheduler as Coroutine
+    Task, Scheduler as Coroutine
 };
 use PG\MSF\Console\Request;
 use PG\MSF\Controllers\ControllerFactory;
 use PG\MSF\Base\Exception;
 use PG\MSF\Memory\Pool;
+use PG\MSF\Base\Input;
+use PG\MSF\Helpers\Context;
 
 class MSFCli extends MSFServer
 {
@@ -67,25 +69,64 @@ class MSFCli extends MSFServer
                 break;
             }
 
-            $controllerInstance->setRequestResponse($request, null, $controllerName, $methodName);
             if (!method_exists($controllerInstance, $methodName)) {
                 echo "not found method $controllerName->$methodName\n";
                 $controllerInstance->destroy();
                 break;
             }
 
+            /**
+             * @var $context Context
+             */
+            $context  = $controllerInstance->objectPool->get(Context::class);
+
+            // 初始化控制器
+            $controllerInstance->requestStartTime = microtime(true);
+            $PGLog            = null;
+            $PGLog            = clone $controllerInstance->logger;
+            $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
+            $PGLog->accessRecord['uri']       = $this->route->getPath();
+            $PGLog->logId = $this->genLogId();
+            defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+            $PGLog->init();
+            $PGLog->pushLog('controller', $controllerName);
+            $PGLog->pushLog('method', $methodName);
+
+            // 构造请求上下文成员
+            $context->setLogId($PGLog->logId);
+            $context->setLog($PGLog);
+            $context->setObjectPool($controllerInstance->objectPool);
+            $controllerInstance->setContext($context);
+
+            /**
+             * @var $input Input
+             */
+            $input    = $controllerInstance->objectPool->get(Input::class);
+            $input->set($request);
+            $context->setInput($input);
+
+            $controllerInstance->setRequestResponse($request, null, $controllerName, $methodName);
+
             $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
             if ($generator instanceof \Generator) {
-                $generatorContext = new GeneratorContext();
-                $generatorContext->setController($controllerInstance, $controllerName, $methodName);
-                $controllerInstance->setGeneratorContext($generatorContext);
-                $this->coroutine->start($generator, $generatorContext);
+                $this->coroutine->start($generator, $context, $controllerInstance);
             } else {
                 $controllerInstance->destroy();
             }
             break;
 
         } while (0);
+    }
+
+    /**
+     * gen a logId
+     *
+     * @return string
+     */
+    public function genLogId()
+    {
+        $logId = strval(new \MongoId());
+        return $logId;
     }
 
     /**
