@@ -86,7 +86,7 @@ class MSFCli extends MSFServer
             $PGLog            = clone $controllerInstance->logger;
             $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
             $PGLog->accessRecord['uri']       = $this->route->getPath();
-            $PGLog->logId = $this->genLogId();
+            $PGLog->logId = $this->genLogId($request);
             defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
             $PGLog->init();
             $PGLog->pushLog('controller', $controllerName);
@@ -121,9 +121,10 @@ class MSFCli extends MSFServer
     /**
      * gen a logId
      *
+     * @param $request Request
      * @return string
      */
-    public function genLogId()
+    public function genLogId($request)
     {
         $logId = strval(new \MongoId());
         return $logId;
