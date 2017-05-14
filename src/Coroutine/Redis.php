@@ -26,17 +26,16 @@ class Redis extends Base
         $this->redisAsynPool = $redisAsynPool;
         $this->name          = $name;
         $this->arguments     = $arguments;
-        $profileName         = "redis.$name";
         $this->request       = "redis.$name";
 
-        $context->getLog()->profileStart($profileName);
+        $context->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$context->getLogId()][] = $this;
-        $this->send(function ($result) use ($context, $profileName) {
+        $this->send(function ($result) use ($context) {
             if (empty(getInstance()->coroutine->taskMap[$context->getLogId()])) {
                 return;
             }
 
-            $context->getLog()->profileEnd($profileName);
+            $context->getLog()->profileEnd($this->request);
             $this->result = $result;
             $this->ioBack = true;
             $this->nextRun($context->getLogId());
