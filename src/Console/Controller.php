@@ -23,7 +23,6 @@ class Controller extends BController
     {
         $this->getContext()->getLog()->pushLog('params', $this->getContext()->getInput()->getAllPostGet());
         $this->getContext()->getLog()->pushLog('status', '200');
-        $this->getContext()->getLog()->appendNoticeLog();
         parent::destroy();
         clearTimes();
         exit();
