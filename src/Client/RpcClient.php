@@ -199,7 +199,10 @@ class RpcClient
         $reqParams['sig'] = static::genSig($reqParams, $rpc->secret);
 
         $tcpClient = yield $obj->getContext()->getObjectPool(TClient::class)->coroutineGetTcpClient($rpc->host);
-        $response  = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
+        if ($tcpClient == null) {
+            throw new Exception('Coroutine get TcpClient failed');
+        }
+        $response = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
 
         return static::parseResponse($response);
     }
@@ -258,6 +261,10 @@ class RpcClient
         }
 
         $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
+        if ($httpClient == null) {
+            throw new Exception('Coroutine get HttpClient failed');
+        }
+
         if ($rpc->verb == 'POST') {
             $response = yield $httpClient->coroutinePost($rpc->urlPath, $sendData, $rpc->timeout);
         } else {
