@@ -41,7 +41,7 @@ class Context extends AbstractContext
      */
     public function getInput()
     {
-        return $this->input ?? null;
+        return $this->input;
     }
 
     /**
@@ -63,7 +63,7 @@ class Context extends AbstractContext
      */
     public function getOutput()
     {
-        return $this->output ?? null;
+        return $this->output;
     }
 
     /**
@@ -85,7 +85,7 @@ class Context extends AbstractContext
      */
     public function getObjectPool()
     {
-        return $this->objectPool ?? null;
+        return $this->objectPool;
     }
 
     /**
