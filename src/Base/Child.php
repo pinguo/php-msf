@@ -105,7 +105,7 @@ class Child
      */
     public function getContext()
     {
-        return $this->context;
+        return $this->context ?? null;
     }
 
     /**
