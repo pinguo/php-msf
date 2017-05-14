@@ -751,7 +751,7 @@ abstract class Server extends Child
                 $PGLog            = clone $controllerInstance->logger;
                 $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
                 $PGLog->accessRecord['uri']       = $this->route->getPath();
-                $PGLog->logId = $this->genLogId();
+                $PGLog->logId = $this->genLogId($clientData);
                 defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
                 $PGLog->init();
                 $PGLog->pushLog('controller', $controllerName);
@@ -814,9 +814,10 @@ abstract class Server extends Child
     /**
      * gen a logId
      *
+     * @param $clientData
      * @return string
      */
-    public function genLogId()
+    public function genLogId($clientData)
     {
         $logId = strval(new \MongoId());
         return $logId;
