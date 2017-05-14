@@ -9,6 +9,7 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Helpers\Context;
 
 class Redis extends Base
 {
@@ -19,26 +20,25 @@ class Redis extends Base
     public $name;
     public $arguments;
 
-    public function __construct($context, $redisAsynPool, $name, $arguments)
+    public function __construct(Context $context, $redisAsynPool, $name, $arguments)
     {
         parent::__construct(3000);
         $this->redisAsynPool = $redisAsynPool;
         $this->name          = $name;
         $this->arguments     = $arguments;
-        $profileName         = "redis: $name";
-        $this->request       = "#redis: $name";
+        $this->request       = "redis.$name";
 
-        $context->PGLog->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$context->logId][] = $this;
-        $this->send(function ($result) use ($context, $profileName) {
-            if (empty(getInstance()->coroutine->taskMap[$context->logId])) {
+        $context->getLog()->profileStart($this->request);
+        getInstance()->coroutine->IOCallBack[$context->getLogId()][] = $this;
+        $this->send(function ($result) use ($context) {
+            if (empty(getInstance()->coroutine->taskMap[$context->getLogId()])) {
                 return;
             }
-            
-            $context->PGLog->profileEnd($profileName);
+
+            $context->getLog()->profileEnd($this->request);
             $this->result = $result;
             $this->ioBack = true;
-            $this->nextRun($context->logId);
+            $this->nextRun($context->getLogId());
         });
     }
 
@@ -46,5 +46,12 @@ class Redis extends Base
     {
         $this->arguments[] = $callback;
         $this->redisAsynPool->__call($this->name, $this->arguments);
+    }
+
+    public function destroy()
+    {
+        unset($this->redisAsynPool);
+        unset($this->name);
+        unset($this->arguments);
     }
 }

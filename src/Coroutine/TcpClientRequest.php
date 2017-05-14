@@ -23,16 +23,16 @@ class TcpClientRequest extends Base
         $this->data = $data;
 
         $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-tcp:' . $path;
-        $this->tcpClient->context->PGLog->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->tcpClient->context->PGLog->logId][] = $this;
+        $this->tcpClient->context->getLog()->profileStart($profileName);
+        getInstance()->coroutine->IOCallBack[$this->tcpClient->context->getLogId()][] = $this;
         $this->send(function ($cli, $recData) use ($profileName) {
             $this->result = $recData;
             $this->responseTime = microtime(true);
             $cli->close();
-            if (!empty($this->tcpClient->context->PGLog)) {
-                $this->tcpClient->context->PGLog->profileEnd($profileName);
+            if (!empty($this->tcpClient->context->getLog())) {
+                $this->tcpClient->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($this->tcpClient->context->PGLog->logId);
+                $this->nextRun($this->tcpClient->context->getLogId());
             }
         });
     }
@@ -44,9 +44,7 @@ class TcpClientRequest extends Base
 
     public function destroy()
     {
-        $this->tcpClient->client->close();
-        $this->tcpClient->context = null;
-        unset($this->tcpClient->client);
         unset($this->tcpClient);
+        unset($this->data);
     }
 }

@@ -29,15 +29,15 @@ class HttpClientRequest extends Base
         $this->data = $data;
         $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1,
                 9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
-        $this->httpClient->context->PGLog->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->httpClient->context->PGLog->logId][] = $this;
+        $this->httpClient->context->getLog()->profileStart($profileName);
+        getInstance()->coroutine->IOCallBack[$this->httpClient->context->getLogId()][] = $this;
         $this->send(function ($client) use ($profileName) {
             $this->result = (array)$client;
             $this->responseTime = microtime(true);
-            if (!empty($this->httpClient->context->PGLog)) {
-                $this->httpClient->context->PGLog->profileEnd($profileName);
+            if (!empty($this->httpClient->context->getLog())) {
+                $this->httpClient->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($this->httpClient->context->PGLog->logId);
+                $this->nextRun($this->httpClient->context->getLogId());
             }
         });
     }
@@ -56,9 +56,9 @@ class HttpClientRequest extends Base
 
     public function destroy()
     {
-        $this->httpClient->client->close();
-        $this->httpClient->context = null;
-        unset($this->httpClient->client);
         unset($this->httpClient);
+        unset($this->data);
+        unset($this->path);
+        unset($this->method);
     }
 }

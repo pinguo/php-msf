@@ -10,7 +10,7 @@ namespace PG\MSF\Controllers;
 
 use PG\MSF\Marco;
 
-class Server extends BaseController
+class Server extends Controller
 {
     public function HttpInfo()
     {

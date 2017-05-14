@@ -11,14 +11,11 @@
 namespace PG\MSF\Tasks;
 
 use PG\Log\PGLog;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Base\AOPFactory;
 
 class Task extends TaskProxy
 {
-    /**
-     * @var PGLog
-     */
-    public $PGLog;
-
     public function __construct()
     {
         parent::__construct();
@@ -26,28 +23,34 @@ class Task extends TaskProxy
 
     public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
+        /**
+         * @var Context $context
+         */
         $this->taskId = $taskId;
         getInstance()->tidPidTable->set($this->taskId,
             ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
         $this->start_run_time = microtime(true);
         if ($context) {
+            $PGLog = null;
+            $PGLog = clone $this->logger;
+            $PGLog->logId = $context->getLogId();
+            $PGLog->accessRecord['beginTime'] = microtime(true);
+            $PGLog->accessRecord['uri'] = $context->getInput()->getPathInfo();
+            $PGLog->pushLog('task', $taskName);
+            $PGLog->pushLog('method', $methodName);
+            defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME . '-task';
+            $PGLog->init();
+            // 构造请求上下文成员
+            $context->setLogId($PGLog->logId);
+            $context->setLog($PGLog);
+            $context->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $this));
             $this->setContext($context);
-            $this->PGLog = null;
-            $this->PGLog = clone $this->logger;
-            $this->PGLog->logId = $this->getContext()->logId;
-            $this->PGLog->accessRecord['beginTime'] = microtime(true);
-            //$this->PGLog->accessRecord['uri'] = str_replace('\\', '/', '/' . $taskName . '/' . $methodName);
-            $this->PGLog->accessRecord['uri'] = $this->getContext()->input->getPathInfo();
-            $this->PGLog->pushLog('task', $taskName);
-            $this->PGLog->pushLog('method', $methodName);
-            defined('SYSTEM_NAME') && $this->PGLog->channel = SYSTEM_NAME . '-task';
-            $this->PGLog->init();
         }
     }
 
     public function destroy()
     {
-        $this->PGLog && $this->PGLog->appendNoticeLog();
+        $this->getContext()->getLog() && $this->getContext()->getLog()->appendNoticeLog();
         getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
         $this->taskId = 0;

@@ -9,18 +9,58 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Exception;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Controllers\Controller;
 
 class Task
 {
+    /**
+     * 协程任务的迭代器
+     *
+     * @var \Generator
+     */
     public $routine;
-    public $generatorContext;
+
+    /**
+     * 请求上下文
+     *
+     * @var Context
+     */
+    public $context;
+
+    /**
+     * 任务销毁标识
+     *
+     * @var bool
+     */
     public $destroy = false;
+
+    /**
+     * 协程嵌套栈
+     *
+     * @var \SplStack
+     */
     protected $stack;
 
-    public function __construct(\Generator $routine, GeneratorContext $generatorContext)
+    /**
+     * 请求的控制器
+     *
+     * @var Controller
+     */
+    protected $controller;
+
+    /**
+     * 构造方法
+     *
+     * @param \Generator $routine
+     * @param Context $context
+     * @param Controller $controller
+     */
+    public function __construct(\Generator $routine, Context $context, Controller $controller)
     {
-        $this->routine = $routine;
-        $this->generatorContext = $generatorContext;
+        $this->routine    = $routine;
+        $this->context    = $context;
+        $this->controller = $controller;
         $this->stack = new \SplStack();
     }
 
@@ -37,7 +77,6 @@ class Task
             $value = $routine->current();
             //嵌套的协程
             if ($value instanceof \Generator) {
-                $this->generatorContext->addYieldStack($value->key());
                 $this->stack->push($routine);
                 $routine = $value;
                 return;
@@ -64,7 +103,6 @@ class Task
                     $result = $routine->getReturn();
                     $this->routine = $this->stack->pop();
                     $this->routine->send($result);
-                    $this->generatorContext->popYieldStack();
                 }
             } else {
                 if ($routine->valid()) {
@@ -84,11 +122,12 @@ class Task
 
             $runTaskException = $this->handleTaskException($e, $value);
 
-            if ($this->generatorContext->getController() != null) {
-                call_user_func([$this->generatorContext->getController(), 'onExceptionHandle'], $runTaskException);
+            if ($this->controller) {
+                call_user_func([$this->controller, 'onExceptionHandle'], $runTaskException);
             } else {
                 $routine->throw($runTaskException);
             }
+
             unset($value);
         }
     }
@@ -104,15 +143,7 @@ class Task
         }
 
         $runTaskException = new Exception($message, $e->getCode(), $e);
-        $this->generatorContext->setStackMessage($this->routine->key());
-        $this->generatorContext->setErrorFile($e->getFile(), $e->getLine());
-        $this->generatorContext->setErrorMessage($message);
-
-        if ($runTaskException instanceof Exception) {
-            $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
-                $this->generatorContext->getController());
-        }
-        $this->generatorContext->getController()->PGLog->warning($message);
+        $this->context->getLog()->warning($message);
 
         if (!empty($value) && $value instanceof IBase && method_exists($value, 'destroy')) {
             $value->destroy();
@@ -132,8 +163,6 @@ class Task
         }
 
         $runTaskException = new Exception($message, $e->getCode(), $e);
-        $this->generatorContext->setErrorFile($e->getFile(), $e->getLine());
-        $this->generatorContext->setErrorMessage($message);
 
         while (!$this->stack->isEmpty()) {
             $this->routine = $this->stack->pop();
@@ -143,11 +172,6 @@ class Task
             } catch (\Exception $e) {
 
             }
-        }
-
-        if ($runTaskException instanceof Exception) {
-            $runTaskException->setShowOther($this->generatorContext->getTraceStack() . "\n" . $e->getTraceAsString(),
-                $this->generatorContext->getController());
         }
 
         if (!empty($value) && $value instanceof IBase && method_exists($value, 'destroy')) {
@@ -163,21 +187,16 @@ class Task
     public function destroy()
     {
         if (!$this->destroy) {
-            unset(getInstance()->coroutine->taskMap[$this->generatorContext->getController()->PGLog->logId]);
-            unset(getInstance()->coroutine->IOCallBack[$this->generatorContext->getController()->PGLog->logId]);
+            unset(getInstance()->coroutine->taskMap[$this->context->getLogId()]);
+            unset(getInstance()->coroutine->IOCallBack[$this->context->getLogId()]);
             if (getInstance()::mode == 'console') {
-                $this->generatorContext->getController()->destroy();
+                $this->controller->destroy();
             }
-            unset($this->generatorContext->getController()->PGLog);
-            unset($this->generatorContext->getController()->logId);
-            $this->generatorContext->destroy();
-            unset($this->generatorContext);
+            unset($this->context);
+            unset($this->controller);
             unset($this->stack);
             unset($this->routine);
             $this->destroy = true;
-            return true;
-        } else {
-            return false;
         }
     }
 

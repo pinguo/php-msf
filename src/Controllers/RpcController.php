@@ -11,7 +11,7 @@ namespace PG\MSF\Controllers;
 
 use PG\MSF\Base\Exception;
 
-class RpcController extends BaseController
+class RpcController extends Controller
 {
     /**
      * @var bool

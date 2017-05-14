@@ -12,6 +12,8 @@ namespace PG\MSF\Client;
 use PG\Helper\SecurityHelper;
 use PG\MSF\Base\Core;
 use PG\MSF\Base\Exception;
+use PG\MSF\Client\Http\Client;
+use PG\MSF\Client\Tcp\Client as TClient;
 
 class RpcClient
 {
@@ -75,7 +77,7 @@ class RpcClient
 
     /**
      * RpcClient constructor.
-     * @param $service 服务名称，如 'user.1'
+     * @param string $service 服务名称，如 'user.1'
      * @throws Exception
      */
     public function __construct($service)
@@ -196,7 +198,7 @@ class RpcClient
         $reqParams['X-RPC'] = 1;
         $reqParams['sig'] = static::genSig($reqParams, $rpc->secret);
 
-        $tcpClient = yield $obj->tcpClient->coroutineGetTcpClient($rpc->host);
+        $tcpClient = yield $obj->getContext()->getObjectPool(TClient::class)->coroutineGetTcpClient($rpc->host);
         if ($tcpClient == null) {
             throw new Exception('Coroutine get TcpClient failed');
         }
@@ -258,10 +260,11 @@ class RpcClient
             $sendData['sig'] = static::genSig($args, $rpc->secret);
         }
 
-        $httpClient = yield $obj->client->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
+        $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
         if ($httpClient == null) {
             throw new Exception('Coroutine get HttpClient failed');
         }
+
         if ($rpc->verb == 'POST') {
             $response = yield $httpClient->coroutinePost($rpc->urlPath, $sendData, $rpc->timeout);
         } else {

@@ -9,16 +9,11 @@
 namespace PG\MSF\Client\Tcp;
 
 use PG\MSF\{
-    Base\Exception, Helpers\Context, Pack\IPack, Coroutine\TcpClientRequest
+    Base\Exception, Base\Core, Helpers\Context, Pack\IPack, Coroutine\TcpClientRequest
 };
 
-class TcpClient
+class TcpClient extends Core
 {
-    /**
-     * @var Context
-     */
-    public $context;
-
     /**
      * @var \swoole_client
      */
@@ -27,23 +22,47 @@ class TcpClient
      * @var IPack
      */
     protected $pack;
+
+    /**
+     * @var string 长度值的类型
+     */
     protected $packageLengthTypeLength;
+
+    /**
+     * @var string
+     */
     private $ip;
+
+    /**
+     * @var int
+     */
     private $port;
+
+    /**
+     * @var int
+     */
     private $timeOut;
 
-    public function __construct(\swoole_client $client, $ip, $port, $timeOut)
+    /**
+     * 初始化TcpClient
+     *
+     * @param \swoole_client $client
+     * @param string $ip
+     * @param string $port
+     * @param int $timeOut
+     * @throws Exception
+     */
+    public function initialization(\swoole_client $client, $ip, $port, $timeOut)
     {
-        $this->client = $client;
-        $this->ip = $ip;
-        $this->port = $port;
-        $this->timeOut = $timeOut * 1000;
+        $this->client  = $client;
+        $this->ip      = $ip;
+        $this->port    = $port;
+        $this->timeOut = $timeOut;
 
         $this->set = getInstance()->config->get('tcpClient.set', []);
-        $packTool = getInstance()->config->get('tcpClient.pack_tool', 'JsonPack');
+        $packTool  = getInstance()->config->get('tcpClient.pack_tool', 'JsonPack');
 
         $this->packageLengthTypeLength = strlen(pack($this->set['package_length_type'], 1));
-        //pack class
         $pack_class_name = "\\App\\Pack\\" . $packTool;
         if (class_exists($pack_class_name)) {
             $this->pack = new $pack_class_name;
@@ -64,9 +83,9 @@ class TcpClient
             throw new Exception('tcp data must has path');
         }
 
-        $path = $data['path'];
-        $data['logId'] = $this->context->PGLog->logId;
-        $data = $this->encode($this->pack->pack($data));
+        $path          = $data['path'];
+        $data['logId'] = $this->context->getLogId();
+        $data          = $this->encode($this->pack->pack($data));
         return new TcpClientRequest($this, $data, $path, $this->timeOut);
     }
 
@@ -116,5 +135,17 @@ class TcpClient
     private function connect()
     {
         $this->client->connect($this->ip, $this->port, $this->timeOut);
+    }
+
+    public function destroy()
+    {
+        $this->client->close();
+        unset($this->client);
+        unset($this->pack);
+        unset($this->packageLengthTypeLength);
+        unset($this->ip);
+        unset($this->port);
+        unset($this->timeOut);
+        parent::destroy();
     }
 }

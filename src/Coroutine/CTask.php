@@ -8,6 +8,8 @@
 
 namespace PG\MSF\Coroutine;
 
+use PG\MSF\Helpers\Context;
+
 class CTask extends Base
 {
     public $id;
@@ -25,24 +27,33 @@ class CTask extends Base
             $taskProxyData['message']['task_fuc_data']
         );
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'] . '(' . implode(', ', $args) . ')';
+        /**
+         * @var Context $context
+         */
         $context             = $taskProxyData['message']['task_context'];
-        $context->PGLog->profileStart($profileName);
+        $context->getLog()->profileStart($profileName);
 
-        getInstance()->coroutine->IOCallBack[$context->logId][] = $this;
+        getInstance()->coroutine->IOCallBack[$context->getLogId()][] = $this;
         $this->send(function ($serv, $taskId, $data) use ($context, $profileName) {
-            if (empty(getInstance()->coroutine->taskMap[$context->logId])) {
+            if (empty(getInstance()->coroutine->taskMap[$context->getLogId()])) {
                 return;
             }
-            
-            $context->PGLog->profileEnd($profileName);
+
+            $context->getLog()->profileEnd($profileName);
             $this->result = $data;
             $this->ioBack = true;
-            $this->nextRun($context->logId);
+            $this->nextRun($context->getLogId());
         });
     }
 
     public function send($callback)
     {
         getInstance()->server->task($this->taskProxyData, $this->id, $callback);
+    }
+
+    public function destroy()
+    {
+        unset($this->id);
+        unset($this->taskProxyData);
     }
 }
