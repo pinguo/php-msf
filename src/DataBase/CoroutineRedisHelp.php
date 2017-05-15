@@ -14,9 +14,18 @@ class CoroutineRedisHelp
 {
     private $redisAsynPool;
 
-    public function __construct($redisAsynPool)
+
+    public $keyPrefix = '';
+    public $hashKey = false;
+    public $serializer = null;
+
+
+    public function __construct(RedisAsynPool $redisAsynPool)
     {
         $this->redisAsynPool = $redisAsynPool;
+        $this->hashKey = $redisAsynPool->hashKey;
+        $this->serializer = $redisAsynPool->serializer;
+        $this->keyPrefix = $redisAsynPool->keyPrefix;
     }
 
     /**
@@ -48,10 +57,105 @@ class CoroutineRedisHelp
 
     public function __call($name, $arguments)
     {
+        // key start
+        if (isset($arguments[1])) {
+            $key = $arguments[1];
+            if (is_array($key)) {
+                $isAssoc = array_keys($key) !== range(0, count($key) - 1); //true关联 false索引
+                $newKey = [];
+                foreach ($key as $k => $v) {
+                    if ($isAssoc) {
+                        $newKey[$this->generateUniqueKey($k)] = $v;
+                    } else {
+                        $newKey[$k] = $this->generateUniqueKey($v);
+                    }
+
+                }
+            } else {
+                $newKey = $this->generateUniqueKey($key);
+            }
+            $arguments[1] = $newKey;
+        }
+
+        if ($name == 'sDiff') {
+            $arguments[2] = $this->generateUniqueKey($arguments[2]);
+        }
+        // key end
+
+
+        // value serialize start
+        if (in_array($name, ['set'])) {
+            $arguments[2] = $this->serializeHandler($arguments[2]);
+        } elseif (in_array($name, ['mset'])) {
+            $keysValues = $arguments[1];
+            $newValues = [];
+            foreach ($keysValues as $k => $v) {
+                $newValues[$k] = $this->serializeHandler($v);
+            }
+            $arguments[1] = $newValues;
+        }
+        // value serialize end
+
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            return call_user_func_array([getInstance()->getRedis(), $name], $arguments);
+            $value = call_user_func_array([getInstance()->getRedis(), $name], $arguments);
+            // return value unserialize start
+            if (in_array($name, ['get'])) {
+                $value = $this->unSerializeHandler($value);
+            } elseif (in_array($name, ['mget'])) {
+                $newValues = [];
+                foreach ($value as $k => $v) {
+                    $newValues[$k] = $this->unSerializeHandler($v);
+                }
+                $value = $newValues;
+            }
+            // return value unserialize end
+
+            return $value;
         } else {
             return new Redis($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
+        }
+    }
+
+
+    protected function handleGetKey($key)
+    {
+        return $this->generateUniqueKey($key);
+    }
+
+    /**
+     * @param string $key a key identifying a value to be cached
+     * @return string a key generated from the provided key which ensures the uniqueness across applications
+     */
+    protected function generateUniqueKey($key)
+    {
+        return $this->hashKey ? md5($this->keyPrefix . $key) : $this->keyPrefix . $key;
+    }
+
+    /**
+     * 序列化
+     * @param $data
+     * @return string
+     */
+    protected function serializeHandler($data)
+    {
+        if ($this->serializer == \Redis::SERIALIZER_PHP) {
+            return serialize($data);
+        } else {
+            return $data;
+        }
+    }
+
+    /**
+     * 反序列化
+     * @param $data
+     * @return mixed
+     */
+    protected function unSerializeHandler($data)
+    {
+        if ($this->serializer == \Redis::SERIALIZER_PHP) {
+            return unserialize($data);
+        } else {
+            return $data;
         }
     }
 }
