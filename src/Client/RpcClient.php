@@ -190,7 +190,7 @@ class RpcClient
     {
         $reqParams = [
             'version' => static::$version,
-            'args' => $args,
+            'args' => array_values($args),
             'time' => microtime(true),
             'handler' => $rpc->handler,
             'method' => $method
@@ -243,7 +243,7 @@ class RpcClient
         if ($rpc->useRpc) {
             $reqParams = [
                 'version' => static::$version,
-                'args' => $args,
+                'args' => array_values($args),
                 'time' => microtime(true),
                 'handler' => $rpc->handler,
                 'method' => $method
@@ -256,8 +256,8 @@ class RpcClient
                 'X-RPC' => 1,
             ];
         } else {
-            $sendData = $args;
-            $sendData['sig'] = static::genSig($args, $rpc->secret);
+            $sendData = $args[0];
+            $sendData['sig'] = static::genSig($args[0], $rpc->secret);
         }
 
         $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
