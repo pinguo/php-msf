@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Proxy;
 
-
 use PG\MSF\Base\Exception;
 
 class RedisProxyMasterSlave implements IProxy
@@ -55,7 +54,6 @@ class RedisProxyMasterSlave implements IProxy
             } catch (\RedisException $e) {
                 // do nothing
             }
-
         }
 
         if ($this->master === null) {
@@ -167,7 +165,6 @@ class RedisProxyMasterSlave implements IProxy
             }
 
             return true;
-
         } catch (Exception $e) {
             echo RedisProxyFactory::getLogTitle() . $e->getMessage();
             return false;

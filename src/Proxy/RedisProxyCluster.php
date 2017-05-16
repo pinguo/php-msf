@@ -8,9 +8,8 @@
 
 namespace PG\MSF\Proxy;
 
-use Flexihash\{
-    Flexihash, Hasher\Md5Hasher
-};
+use Flexihash\Flexihash;
+use Flexihash\Hasher\Md5Hasher;
 use PG\MSF\Base\Exception;
 
 class RedisProxyCluster extends Flexihash implements IProxy
@@ -28,7 +27,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $hasher = $config['hasher'] ?? Md5Hasher::class;
         $hasher = new $hasher;
         try {
-            parent::__construct($hasher);;
+            parent::__construct($hasher);
+            ;
             $this->startCheck();
             if (empty($this->goodPools)) {
                 throw new Exception('No redis server can write in cluster');

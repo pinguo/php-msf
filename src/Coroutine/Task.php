@@ -170,7 +170,6 @@ class Task
                 $this->routine->throw($runTaskException);
                 break;
             } catch (\Exception $e) {
-
             }
         }
 

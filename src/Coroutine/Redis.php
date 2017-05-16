@@ -21,11 +21,14 @@ class Redis extends Base
     public $arguments;
     public $context;
 
+    public $serializer = null;
+
     public function __construct(Context $context, $redisAsynPool, $name, $arguments)
     {
         parent::__construct(3000);
         $this->context       = $context;
         $this->redisAsynPool = $redisAsynPool;
+        $this->serializer    = $redisAsynPool->serializer;
         $this->name          = $name;
         $this->arguments     = $arguments;
         $this->request       = "redis.$name";
@@ -33,12 +36,23 @@ class Redis extends Base
 
         $context->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($result) use ($logId) {
+        $this->send(function ($result) use ($name, $logId) {
             if (empty(getInstance()->coroutine->taskMap[$logId])) {
                 return;
             }
 
             $this->context->getLog()->profileEnd($this->request);
+
+            if (in_array($name, ['get'])) {
+                $result = $this->unSerializeHandler($result);
+            } elseif (in_array($name, ['mget'])) {
+                $newValues = [];
+                foreach ($result as $k => $v) {
+                    $newValues[$k] = $this->unSerializeHandler($v);
+                }
+                $result = $newValues;
+            }
+            
             $this->result = $result;
             $this->ioBack = true;
             $this->nextRun($logId);
@@ -57,5 +71,20 @@ class Redis extends Base
         unset($this->redisAsynPool);
         unset($this->name);
         unset($this->arguments);
+        unset($this->serializer);
+    }
+
+    /**
+     * 反序列化
+     * @param $data
+     * @return mixed
+     */
+    protected function unSerializeHandler($data)
+    {
+        if ($this->serializer == \Redis::SERIALIZER_PHP) {
+            return unserialize($data);
+        } else {
+            return $data;
+        }
     }
 }

@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Coroutine;
 
-
 interface IBase
 {
     function isTimeout();

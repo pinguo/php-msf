@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Proxy;
 
-
 interface IProxy
 {
     public function check();

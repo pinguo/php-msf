@@ -253,7 +253,6 @@ class MysqlAsynPool extends AsynPool
     public function commit($callback, $id)
     {
         $this->query($callback, $id, 'commit');
-
     }
 
     /**

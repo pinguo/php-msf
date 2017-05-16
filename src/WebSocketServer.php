@@ -8,9 +8,10 @@
 
 namespace PG\MSF;
 
-use PG\MSF\{
-    Controllers\ControllerFactory, Helpers\Context, Base\Input, Base\Output
-};
+use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Base\Input;
+use PG\MSF\Base\Output;
 
 abstract class WebSocketServer extends HttpServer
 {
@@ -28,7 +29,6 @@ abstract class WebSocketServer extends HttpServer
     public function __construct()
     {
         parent::__construct();
-
     }
 
     /**
@@ -115,7 +115,6 @@ abstract class WebSocketServer extends HttpServer
      */
     public function onSwooleWSOpen($server, $request)
     {
-
     }
 
     /**

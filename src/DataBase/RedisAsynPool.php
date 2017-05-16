@@ -23,10 +23,21 @@ class RedisAsynPool extends AsynPool
     private $coroutineRedisHelp;
     private $redisClient;
 
+    public $keyPrefix = '';
+    public $hashKey = false;
+    public $serializer = null;
+
+
     public function __construct($config, $active)
     {
         parent::__construct($config);
         $this->active = $active;
+
+        $config = $this->config['redis'][$this->active];
+        !empty($config['hashKey']) && ($this->hashKey = $config['hashKey']);
+        !empty($config['options'][\Redis::OPT_SERIALIZER]) && ($this->serializer = $config['options'][\Redis::OPT_SERIALIZER]);
+        !empty($config['options'][\Redis::OPT_PREFIX]) && ($this->keyPrefix = $config['options'][\Redis::OPT_PREFIX]);
+
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
     }
 
@@ -95,6 +106,15 @@ class RedisAsynPool extends AsynPool
         if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
             $this->redisClient->select($this->config['redis'][$this->active]['select']);
         }
+
+        //序列化
+        isset($this->redisOptions[\Redis::OPT_SERIALIZER]) &&
+        $this->redisClient->setOption(\Redis::OPT_SERIALIZER, $this->redisOptions[\Redis::OPT_SERIALIZER]);
+
+        //前缀
+        isset($this->redisOptions[\Redis::OPT_PREFIX]) &&
+        $this->redisClient->setOption(\Redis::OPT_PREFIX, $this->redisOptions[\Redis::OPT_PREFIX]);
+
         return $this->redisClient;
     }
 
