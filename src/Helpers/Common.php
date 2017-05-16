@@ -6,6 +6,8 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
+$____GLOBAL_DUMP = '';
+
 /**
  * 获取实例
  * @return \PG\MSF\MSFServer|\PG\MSF\MSFCli
@@ -118,12 +120,13 @@ function clearTimes()
 }
 
 /**
- * 剔出协程相关上下文信息
+ * 内部打印变量
+ *
  * @param $output
  * @param $var
  * @param $level
  */
-function dumpTaskMessage(&$output, $var, $level)
+function dumpInternal(&$output, $var, $level, $format = true)
 {
     switch (gettype($var)) {
         case 'boolean':
@@ -154,42 +157,103 @@ function dumpTaskMessage(&$output, $var, $level)
                 $output .= '[]';
             } else {
                 $keys = array_keys($var);
+                if ($format) {
+                    $spaces = str_repeat(' ', $level * 4);
+                } else {
+                    $spaces = '';
+                }
+
                 $output .= '[';
                 foreach ($keys as $key) {
-                    dumpTaskMessage($output, $key, 0);
+                    if ($format) {
+                        $output .= "\n" . $spaces . '    ';
+                    }
+                    dumpInternal($output, $key, 0, $format);
                     $output .= ' => ';
-                    dumpTaskMessage($output, $var[$key], $level + 1);
-                    $output .= ', ';
+                    dumpInternal($output, $var[$key], $level + 1, $format);
+                    if (!$format) {
+                        $output .= ', ';
+                    }
                 }
-                $output .= "], ";
+
+                if ($format) {
+                    $output .= "\n" . $spaces . ']';
+                } else {
+                    $output .= "], ";
+                }
             }
             break;
         case 'object':
-            if ($var instanceof \PG\MSF\Helpers\Context || $var instanceof \PG\MSF\Controllers\Controller
-                || $var instanceof \PG\MSF\DataBase\RedisAsynPool || $var instanceof \PG\MSF\DataBase\MysqlAsynPool) {
-                $output .= '..., ';
-                break;
+            if (method_exists($var, '__sleep')) {
+                $sleepProperties = $var->__sleep();
+            } else {
+                $sleepProperties = [];
             }
+
             if (4 <= $level) {
                 $output .= get_class($var) . '(...)';
             } else {
+                $spaces = str_repeat(' ', $level * 4);
                 $className = get_class($var);
-                $output .= "$className(";
+                if ($format) {
+                    $output .= "$className\n" . $spaces . '(';
+                } else {
+                    $output .= "$className(";
+                }
                 if ('__PHP_Incomplete_Class' !== get_class($var) && method_exists($var, '__debugInfo')) {
                     $dumpValues = $var->__debugInfo();
                 } else {
                     $dumpValues = (array)$var;
                 }
                 foreach ($dumpValues as $key => $value) {
-                    $keyDisplay = strtr(trim($key), "\0", ':');
-                    $output .= "$keyDisplay => ";
-                    dumpTaskMessage($output, $value, $level + 1);
-                    $output .= ', ';
+                    $key = str_replace('*', '', $key);
+                    $key = strtr(trim($key), "\0", ':');
+                    if (in_array($key, $sleepProperties) || empty($sleepProperties)) {
+                        $keyDisplay = strtr(trim($key), "\0", ':');
+                        if ($format) {
+                            $output .= "\n" . $spaces . "    [$keyDisplay] => ";
+                        } else {
+                            $output .= "$keyDisplay => ";
+                        }
+                        dumpInternal($output, $value, $level + 1, $format);
+                        if (!$format) {
+                            $output .= ', ';
+                        }
+                    }
                 }
-                $output .= '), ';
+
+                if ($format) {
+                    $output .= "\n" . $spaces . ')';
+                } else {
+                    $output .= '), ';
+                }
             }
             break;
     }
 
-    $output = str_replace([', ,', ',  ', ', )', ', ]'], [', ', ', ', ')', ']'], $output);
+    if (!$format) {
+        $output = str_replace([', ,', ',  ', ', )', ', ]'], [', ', ', ', ')', ']'], $output);
+    }
+}
+
+/**
+ * 打印变量
+ * 
+ * @param $var
+ * @param bool $format
+ * @param bool $return
+ * @return mixed
+ */
+function dump($var, $format = true, $return = false)
+{
+    global $____GLOBAL_DUMP;
+    dumpInternal($____GLOBAL_DUMP, $var, 0, $format);
+    if (!$return) {
+        echo $____GLOBAL_DUMP;
+        $____GLOBAL_DUMP = '';
+    } else {
+        $dump            = $____GLOBAL_DUMP;
+        $____GLOBAL_DUMP = '';
+        return $dump;
+    }
 }

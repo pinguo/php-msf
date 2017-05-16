@@ -23,18 +23,20 @@ class GetHttpClient extends Base
     {
         parent::__construct($timeout);
         $this->baseUrl = $baseUrl;
-        $this->client = $client;
+        $this->client  = $client;
         $this->headers = $headers;
-        $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $logId         = $this->client->context->getLogId();
+
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->client->context->getLog()->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->client->context->getLogId()][] = $this;
-        $this->send(function ($httpClient) use ($profileName) {
+        $this->send(function ($httpClient) use ($profileName, $logId) {
             $this->result = $httpClient;
             $this->responseTime = microtime(true);
-            if (!empty($this->client->context->getLog())) {
+            if (!empty($this->client) && !empty($this->client->context->getLog())) {
                 $this->client->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($this->client->context->getLogId());
+                $this->nextRun($logId);
             }
         });
     }
