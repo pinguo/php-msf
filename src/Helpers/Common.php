@@ -237,6 +237,8 @@ function dumpInternal(&$output, $var, $level, $format = true)
 }
 
 /**
+ * 打印变量
+ * 
  * @param $var
  * @param bool $format
  * @param bool $return
