@@ -64,6 +64,16 @@ class Controller extends Core
      * @var array
      */
     protected $testUnitSendStack = [];
+    /**
+     * 控制器名称
+     * @var string
+     */
+    protected $controllerName = '';
+    /**
+     * 方法名称
+     * @var string
+     */
+    protected $methodName = '';
 
     /**
      * redis连接池
@@ -114,6 +124,8 @@ class Controller extends Core
      */
     public function initialization($controllerName, $methodName)
     {
+        $this->controllerName = $controllerName;
+        $this->methodName = $methodName;
         $this->requestStartTime = microtime(true);
     }
 
@@ -193,6 +205,8 @@ class Controller extends Core
         parent::destroy();
         unset($this->fd);
         unset($this->uid);
+        unset($this->controllerName);
+        unset($this->methodName);
         unset($this->clientData);
         unset($this->request);
         unset($this->response);
