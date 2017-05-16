@@ -8,9 +8,9 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\{
-    Helpers\Context, Base\Core, Coroutine\HttpClientRequest
-};
+use PG\MSF\Helpers\Context;
+use PG\MSF\Base\Core;
+use PG\MSF\Coroutine\HttpClientRequest;
 
 class HttpClient extends Core
 {

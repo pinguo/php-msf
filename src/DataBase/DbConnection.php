@@ -1662,7 +1662,7 @@ class DbConnection
             case 'UPDATE':
             case 'INSERT':
                 return $this->getBindValuesCOMMON();
-            default :
+            default:
                 throw new Exception("type err");
         }
     }

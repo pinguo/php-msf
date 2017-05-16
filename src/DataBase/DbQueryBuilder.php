@@ -274,7 +274,7 @@ class DbQueryBuilder
         }
 
         // If the escape value was not set, we will base it on the global setting
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         foreach ($select as $val) {
             $val = trim($val);
@@ -327,7 +327,7 @@ class DbQueryBuilder
      */
     protected function _maxMinAvgSum($select = '', $alias = '', $type = 'MAX')
     {
-        if (!is_string($select) OR $select === '') {
+        if (!is_string($select) or $select === '') {
             throw new Exception('db_invalid_query');
         }
 
@@ -483,13 +483,11 @@ class DbQueryBuilder
                 // If so, we add the table prefix to the column name in the 3rd segment.
                 if (isset($parts[3])) {
                     $i = 2;
-                }
-                // Do we have 3 segments (database.table.column)?
+                } // Do we have 3 segments (database.table.column)?
                 // If so, we add the table prefix to the column name in 2nd position
                 elseif (isset($parts[2])) {
                     $i = 1;
-                }
-                // Do we have 2 segments (table.column)?
+                } // Do we have 2 segments (table.column)?
                 // If so, we add the table prefix to the column name in 1st segment
                 else {
                     $i = 0;
@@ -550,7 +548,7 @@ class DbQueryBuilder
      */
     public function escapeIdentifiers($item)
     {
-        if ($this->_escapeChar === '' OR empty($item) OR in_array($item, $this->_reservedIdentifiers)) {
+        if ($this->_escapeChar === '' or empty($item) or in_array($item, $this->_reservedIdentifiers)) {
             return $item;
         } elseif (is_array($item)) {
             foreach ($item as $key => $value) {
@@ -559,7 +557,7 @@ class DbQueryBuilder
 
             return $item;
         } // Avoid breaking functions and literal values inside queries
-        elseif (ctype_digit($item) OR $item[0] === "'" OR ($this->_escapeChar !== '"' && $item[0] === '"') OR strpos($item,
+        elseif (ctype_digit($item) or $item[0] === "'" or ($this->_escapeChar !== '"' && $item[0] === '"') or strpos($item,
                 '(') !== false
         ) {
             return $item;
@@ -685,7 +683,7 @@ class DbQueryBuilder
         // in the protect_identifiers to know whether to add a table prefix
         $this->_trackAliases($table);
 
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         if (!$this->_hasOperator($cond)) {
             $cond = ' USING (' . ($escape ? $this->escapeIdentifiers($cond) : $cond) . ')';
@@ -820,7 +818,6 @@ class DbQueryBuilder
                 '\s+LIKE\s+\S.*(' . $_les . ')?',    // LIKE 'expr'[ ESCAPE '%s']
                 '\s+NOT LIKE\s+\S.*(' . $_les . ')?' // NOT LIKE 'expr'[ ESCAPE '%s']
             );
-
         }
 
         return preg_match('/' . implode('|', $_operators) . '/i', $str, $match)
@@ -871,7 +868,7 @@ class DbQueryBuilder
         }
 
         // If the escape value was not set will base it on the global setting
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         foreach ($key as $k => $v) {
             $prefix = (count($this->$qb_key) === 0 && count($this->$qb_cache_key) === 0)
@@ -898,7 +895,6 @@ class DbQueryBuilder
                 $this->{$qb_cache_key}[] = array('condition' => $prefix . $k . $v, 'escape' => $escape);
                 $this->qbCacheExists[] = substr($qb_key, 3);
             }
-
         }
 
         return $this;
@@ -943,7 +939,7 @@ class DbQueryBuilder
         if (is_array($str)) {
             $str = array_map(array(&$this, 'escape'), $str);
             return $str;
-        } elseif (is_string($str) OR (is_object($str) && method_exists($str, '__toString'))) {
+        } elseif (is_string($str) or (is_object($str) && method_exists($str, '__toString'))) {
             return "'" . $this->escapeStr($str) . "'";
         } elseif (is_bool($str)) {
             return ($str === false) ? 0 : 1;
@@ -1041,7 +1037,7 @@ class DbQueryBuilder
      */
     protected function _whereIn($key = null, $values = null, $not = false, $type = 'AND ', $escape = null)
     {
-        if ($key === null OR $values === null) {
+        if ($key === null or $values === null) {
             return $this;
         }
 
@@ -1049,7 +1045,7 @@ class DbQueryBuilder
             $values = array($values);
         }
 
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         $not = ($not) ? ' NOT' : '';
 
@@ -1177,7 +1173,7 @@ class DbQueryBuilder
             $field = array($field => $match);
         }
 
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
         // lowercase $side in case somebody writes e.g. 'BEFORE' instead of 'before' (doh)
         $side = strtolower($side);
 
@@ -1385,7 +1381,7 @@ class DbQueryBuilder
      */
     public function groupBy($by, $escape = null)
     {
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         if (is_string($by)) {
             $by = ($escape === true)
@@ -1469,7 +1465,7 @@ class DbQueryBuilder
             $direction = in_array($direction, array('ASC', 'DESC'), true) ? ' ' . $direction : '';
         }
 
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         if ($escape === false) {
             $qbOrderby[] = array('field' => $orderby, 'direction' => $direction, 'escape' => false);
@@ -1506,7 +1502,7 @@ class DbQueryBuilder
      */
     public function offset($offset)
     {
-        empty($offset) OR $this->qbOffset = (int)$offset;
+        empty($offset) or $this->qbOffset = (int)$offset;
         return $this;
     }
 
@@ -1658,8 +1654,7 @@ class DbQueryBuilder
             $qbNoEscape = $this->qbCacheNoEscape;
         }
 
-        foreach (array_unique($this->qbCacheExists) as $val) // select, from, etc.
-        {
+        foreach (array_unique($this->qbCacheExists) as $val) { // select, from, etc.
             $qb_variable = 'qb_' . $val;
             $qb_cache_var = 'qb_cache_' . $val;
             $qb_new = $this->$qb_cache_var;
@@ -1739,7 +1734,7 @@ class DbQueryBuilder
 
                 for ($ci = 0, $cc = count($conditions); $ci < $cc; $ci++) {
                     if (($op = $this->_getOperator($conditions[$ci])) === false
-                        OR !preg_match('/^(\(?)(.*)(' . preg_quote($op, '/') . ')\s*(.*(?<!\)))?(\)?)$/i',
+                        or !preg_match('/^(\(?)(.*)(' . preg_quote($op, '/') . ')\s*(.*(?<!\)))?(\)?)$/i',
                             $conditions[$ci], $matches)
                     ) {
                         continue;
@@ -1755,7 +1750,7 @@ class DbQueryBuilder
                     // );
 
                     if (!empty($matches[4])) {
-                        $this->_isLiteral($matches[4]) OR $matches[4] = $this->protectIdentifiers(trim($matches[4]));
+                        $this->_isLiteral($matches[4]) or $matches[4] = $this->protectIdentifiers(trim($matches[4]));
                         $matches[4] = ' ' . $matches[4];
                     }
 
@@ -1787,7 +1782,7 @@ class DbQueryBuilder
     {
         $str = trim($str);
 
-        if (empty($str) OR ctype_digit($str) OR (string)(float)$str === $str OR in_array(strtoupper($str),
+        if (empty($str) or ctype_digit($str) or (string)(float)$str === $str or in_array(strtoupper($str),
                 array('TRUE', 'FALSE'), true)
         ) {
             return true;
@@ -1825,7 +1820,7 @@ class DbQueryBuilder
                     continue;
                 }
 
-                $this->qbGroupBy[$i] = ($this->qbGroupBy[$i]['escape'] === false OR $this->_isLiteral($this->qbGroupBy[$i]['field']))
+                $this->qbGroupBy[$i] = ($this->qbGroupBy[$i]['escape'] === false or $this->_isLiteral($this->qbGroupBy[$i]['field']))
                     ? $this->qbGroupBy[$i]['field']
                     : $this->protectIdentifiers($this->qbGroupBy[$i]['field']);
             }
@@ -2075,7 +2070,7 @@ class DbQueryBuilder
             $key = array($key => $value);
         }
 
-        is_bool($escape) OR $escape = $this->_protectIdentifiers;
+        is_bool($escape) or $escape = $this->_protectIdentifiers;
 
         foreach ($key as $k => $v) {
             $this->qbSet[$this->protectIdentifiers($k, false, $escape)] = ($escape)
@@ -2341,8 +2336,8 @@ class DbQueryBuilder
      */
     public function limit($value, $offset = 0)
     {
-        is_null($value) OR $this->qbLimit = (int)$value;
-        empty($offset) OR $this->qbOffset = (int)$offset;
+        is_null($value) or $this->qbLimit = (int)$value;
+        empty($offset) or $this->qbOffset = (int)$offset;
 
         return $this;
     }
