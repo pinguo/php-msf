@@ -37,7 +37,6 @@ class RpcController extends Controller
      * @var null
      */
     public $reqParams = null;
-
     /**
      * @var null
      */
@@ -50,6 +49,12 @@ class RpcController extends Controller
     public function initialization($controllerName, $methodName)
     {
         parent::initialization($controllerName, $methodName);
+    }
+
+    public function destroy()
+    {
+        unset($this->ip);
+        parent::destroy();
     }
 
     /**
