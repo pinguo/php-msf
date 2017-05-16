@@ -14,6 +14,10 @@ class CTask extends Base
 {
     public $id;
     public $taskProxyData;
+    /**
+     * @var Context
+     */
+    public $context;
 
     public function __construct($taskProxyData, $id)
     {
@@ -30,19 +34,20 @@ class CTask extends Base
         /**
          * @var Context $context
          */
-        $context             = $taskProxyData['message']['task_context'];
-        $context->getLog()->profileStart($profileName);
+        $this->context       = $taskProxyData['message']['task_context'];
+        $logId               = $this->context->getLogId();
 
-        getInstance()->coroutine->IOCallBack[$context->getLogId()][] = $this;
-        $this->send(function ($serv, $taskId, $data) use ($context, $profileName) {
-            if (empty(getInstance()->coroutine->taskMap[$context->getLogId()])) {
+        $this->context->getLog()->profileStart($profileName);
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($serv, $taskId, $data) use ($profileName, $logId) {
+            if (empty(getInstance()->coroutine->taskMap[$logId])) {
                 return;
             }
 
-            $context->getLog()->profileEnd($profileName);
+            $this->context->getLog()->profileEnd($profileName);
             $this->result = $data;
             $this->ioBack = true;
-            $this->nextRun($context->getLogId());
+            $this->nextRun($logId);
         });
     }
 
@@ -53,6 +58,7 @@ class CTask extends Base
 
     public function destroy()
     {
+        unset($this->context);
         unset($this->id);
         unset($this->taskProxyData);
     }

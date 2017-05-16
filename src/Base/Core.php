@@ -27,7 +27,6 @@ class Core extends Child
      * @var bool
      */
     public $isDestroy = false;
-
     /**
      * @var Loader
      */
@@ -55,6 +54,11 @@ class Core extends Child
      * @var null
      */
     public static $stdClass = null;
+
+    public function __sleep()
+    {
+        return ['useCount', 'genTime'];
+    }
 
     /**
      * Task constructor.

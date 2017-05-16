@@ -19,26 +19,29 @@ class Redis extends Base
     public $redisAsynPool;
     public $name;
     public $arguments;
+    public $context;
 
     public function __construct(Context $context, $redisAsynPool, $name, $arguments)
     {
         parent::__construct(3000);
+        $this->context       = $context;
         $this->redisAsynPool = $redisAsynPool;
         $this->name          = $name;
         $this->arguments     = $arguments;
         $this->request       = "redis.$name";
+        $logId               = $context->getLogId();
 
         $context->getLog()->profileStart($this->request);
-        getInstance()->coroutine->IOCallBack[$context->getLogId()][] = $this;
-        $this->send(function ($result) use ($context) {
-            if (empty(getInstance()->coroutine->taskMap[$context->getLogId()])) {
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($result) use ($logId) {
+            if (empty(getInstance()->coroutine->taskMap[$logId])) {
                 return;
             }
 
-            $context->getLog()->profileEnd($this->request);
+            $this->context->getLog()->profileEnd($this->request);
             $this->result = $result;
             $this->ioBack = true;
-            $this->nextRun($context->getLogId());
+            $this->nextRun($logId);
         });
     }
 
@@ -50,6 +53,7 @@ class Redis extends Base
 
     public function destroy()
     {
+        unset($this->context);
         unset($this->redisAsynPool);
         unset($this->name);
         unset($this->arguments);

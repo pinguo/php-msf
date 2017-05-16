@@ -24,20 +24,21 @@ class HttpClientRequest extends Base
     {
         parent::__construct($timeout);
         $this->httpClient = $httpClient;
-        $this->path = $path;
-        $this->method = $method;
-        $this->data = $data;
-        $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1,
-                9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
+        $this->path       = $path;
+        $this->method     = $method;
+        $this->data       = $data;
+        $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
+        $logId            = $this->httpClient->context->getLogId();
+
         $this->httpClient->context->getLog()->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->httpClient->context->getLogId()][] = $this;
-        $this->send(function ($client) use ($profileName) {
-            $this->result = (array)$client;
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($client) use ($profileName, $logId) {
+            $this->result       = (array)$client;
             $this->responseTime = microtime(true);
-            if (!empty($this->httpClient->context->getLog())) {
+            if (!empty($this->httpClient) && !empty($this->httpClient->context->getLog())) {
                 $this->httpClient->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($this->httpClient->context->getLogId());
+                $this->nextRun($logId);
             }
         });
     }

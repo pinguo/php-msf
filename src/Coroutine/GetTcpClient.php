@@ -22,17 +22,19 @@ class GetTcpClient extends Base
     {
         parent::__construct($timeout);
         $this->baseUrl = $baseUrl;
-        $this->client = $client;
-        $profileName = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $this->client  = $client;
+        $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $logId         = $this->client->context->getLogId();
+
         $this->client->context->getLog()->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->client->context->getLogId()][] = $this;
-        $this->send(function ($tcpClient) use ($profileName) {
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($tcpClient) use ($profileName, $logId) {
             $this->result = $tcpClient;
             $this->responseTime = microtime(true);
-            if (!empty($this->client->context->getLog())) {
+            if (!empty($this->client) && !empty($this->client->context->getLog())) {
                 $this->client->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($this->client->context->getLogId());
+                $this->nextRun($logId);
             }
         });
     }
