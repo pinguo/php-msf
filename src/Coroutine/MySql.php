@@ -10,6 +10,7 @@ namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Exception;
 use PG\MSF\DataBase\MysqlAsynPool;
+use PG\MSF\Helpers\Context;
 
 class MySql extends Base
 {
@@ -19,16 +20,28 @@ class MySql extends Base
     public $mysqlAsynPool;
     public $bindId;
     public $sql;
+    public $context;
 
-    public function __construct($_mysqlAsynPool, $_bind_id = null, $_sql = null)
+    public function __construct(Context $context, $_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
         parent::__construct();
         $this->mysqlAsynPool = $_mysqlAsynPool;
-        $this->bindId = $_bind_id;
-        $this->sql = $_sql;
-        $this->request = '#Mysql:' . $_sql;
-        $this->send(function ($result) {
+        $this->bindId        = $_bind_id;
+        $this->sql           = $_sql;
+        $this->request       = 'mysql(' . $_sql . ')';
+        $this->context       = $context;
+        $logId               = $this->context->getLogId();
+
+        getInstance()->coroutine->IOCallBack[$logId][] = $this;
+        $this->send(function ($result) use ($logId) {
+            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                return;
+            }
+
+            $this->context->getLog()->profileEnd($this->request);
             $this->result = $result;
+            $this->ioBack = true;
+            $this->nextRun($logId);
         });
     }
 
@@ -48,6 +61,7 @@ class MySql extends Base
 
     public function destroy()
     {
+        unset($this->context);
         unset($this->mysqlAsynPool);
         unset($this->bindId);
         unset($this->sql);

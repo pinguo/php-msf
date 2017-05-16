@@ -20,7 +20,7 @@ class Config
 
     public $lastMinute;
 
-    public function __construct(Conf $config,  MSFServer $MSFServer)
+    public function __construct(Conf $config, MSFServer $MSFServer)
     {
         echo "启动了configManager\n";
         $this->config = $config;
@@ -132,7 +132,6 @@ class Config
                                     $goodPools[$pool] = $weight;
                                 }
                             } catch (\RedisException $e) {
-
                             }
                             $redis->close();
                         }
@@ -153,7 +152,6 @@ class Config
                                     $master = $pool;
                                 }
                             } catch (\RedisException $e) {
-
                             }
                             $redis->close();
                         }
@@ -173,7 +171,6 @@ class Config
                                         $slaves[] = $pool;
                                     }
                                 } catch (\RedisException $e) {
-
                                 }
                                 $redis->close();
                             }

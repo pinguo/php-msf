@@ -8,15 +8,15 @@
 
 namespace PG\MSF;
 
-use PG\MSF\Client\{
-    Http\Client as HttpClient, Tcp\Client as TcpClient
-};
-use PG\MSF\DataBase\{
-    AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
-};
-use PG\MSF\Coroutine\{
-    Task, Scheduler as Coroutine
-};
+use PG\MSF\Client\Http\Client as HttpClient;
+use PG\MSF\Client\Tcp\Client as TcpClient;
+use PG\MSF\DataBase\AsynPool;
+use PG\MSF\DataBase\AsynPoolManager;
+use PG\MSF\DataBase\Miner;
+use PG\MSF\DataBase\MysqlAsynPool;
+use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Coroutine\Task;
+use PG\MSF\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Console\Request;
 use PG\MSF\Controllers\ControllerFactory;
 use PG\MSF\Base\Exception;
@@ -114,7 +114,6 @@ class MSFCli extends MSFServer
                 $controllerInstance->destroy();
             }
             break;
-
         } while (0);
     }
 

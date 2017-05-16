@@ -78,38 +78,6 @@ class Task extends TaskProxy
     }
 
     /**
-     * sendToUid
-     * @param $uid
-     * @param $data
-     */
-    protected function sendToUid($uid, $data)
-    {
-        $data = $this->pack->pack($data);
-        getInstance()->sendToUid($uid, $data);
-    }
-
-    /**
-     * sendToUids
-     * @param $uids
-     * @param $data
-     */
-    protected function sendToUids($uids, $data)
-    {
-        $data = $this->pack->pack($data);
-        getInstance()->sendToUids($uids, $data);
-    }
-
-    /**
-     * sendToAll
-     * @param $data
-     */
-    protected function sendToAll($data)
-    {
-        $data = $this->pack->pack($data);
-        getInstance()->sendToAll($data);
-    }
-
-    /**
      * 获取同步redis
      * @return \Redis
      * @throws Exception

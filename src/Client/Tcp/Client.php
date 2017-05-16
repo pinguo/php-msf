@@ -8,9 +8,10 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\{
-    Base\Exception, Base\Core, Helpers\Context, Coroutine\GetTcpClient
-};
+use PG\MSF\Base\Exception;
+use PG\MSF\Base\Core;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Coroutine\GetTcpClient;
 
 class Client extends Core
 {
@@ -43,10 +44,14 @@ class Client extends Core
         if ($ip !== null) {
             $this->coroutineCallBack($data['host'], $ip, $data, $timeOut);
         } else {
-            swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut) {
+            $logId = $this->getContext()->getLogId();
+            swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut, $logId) {
+                if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                    return;
+                }
+
                 if (empty($ip)) {
                     $this->context->getLog()->warning($data['url'] . ' DNS查询失败');
-                    $this->context->output->outputJson([], 'error', 500);
                 } else {
                     self::setDnsCache($host, $ip);
                     $this->coroutineCallBack($host, $ip, $data, $timeOut);
@@ -102,7 +107,7 @@ class Client extends Core
      * @param $host
      * @param $ip
      */
-    static public function setDnsCache($host, $ip)
+    public static function setDnsCache($host, $ip)
     {
         self::$dnsCache[$host] = [
             $ip, time(), 1
@@ -115,7 +120,7 @@ class Client extends Core
      * @param $host
      * @return mixed|null
      */
-    static public function getDnsCache($host)
+    public static function getDnsCache($host)
     {
         if (!empty(self::$dnsCache[$host])) {
             if (time() - self::$dnsCache[$host][1] > 60) {

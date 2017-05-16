@@ -136,7 +136,7 @@ class Task
     {
         if ($value != '') {
             $logValue = '';
-            dumpTaskMessage($logValue, $value, 0);
+            dumpInternal($logValue, $value, 0, false);
             $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
         } else {
             $message = 'message: ' . $e->getMessage();
@@ -156,7 +156,7 @@ class Task
     {
         if ($value != '') {
             $logValue = '';
-            dumpTaskMessage($logValue, $value, 0);
+            dumpInternal($logValue, $value, 0, false);
             $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
         } else {
             $message = 'message: ' . $e->getMessage();
@@ -170,7 +170,6 @@ class Task
                 $this->routine->throw($runTaskException);
                 break;
             } catch (\Exception $e) {
-
             }
         }
 
