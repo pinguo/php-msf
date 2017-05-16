@@ -9,9 +9,10 @@
 namespace PG\MSF;
 
 use League\Plates\Engine;
-use PG\MSF\{
-    Controllers\ControllerFactory, Helpers\Context, Base\Input, Base\Output
-};
+use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Base\Input;
+use PG\MSF\Base\Output;
 
 abstract class HttpServer extends Server
 {

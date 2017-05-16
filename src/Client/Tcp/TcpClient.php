@@ -8,9 +8,11 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\{
-    Base\Exception, Base\Core, Helpers\Context, Pack\IPack, Coroutine\TcpClientRequest
-};
+use PG\MSF\Base\Exception;
+use PG\MSF\Base\Core;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Pack\IPack;
+use PG\MSF\Coroutine\TcpClientRequest;
 
 class TcpClient extends Core
 {

@@ -69,7 +69,6 @@ class CoroutineRedisHelp
                     } else {
                         $newKey[$k] = $this->generateUniqueKey($v);
                     }
-
                 }
             } else {
                 $newKey = $this->generateUniqueKey($key);

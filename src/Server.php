@@ -10,12 +10,16 @@ namespace PG\MSF;
 
 use Noodlehaus\Config;
 use PG\Log\PGLog;
-use PG\MSF\{
-    Base\Child, Controllers\ControllerFactory, Base\Loader, Base\Exception
-};
-use PG\MSF\{
-    Base\Core, Pack\IPack, Route\IRoute, Helpers\Context, Base\Input, Base\Output
-};
+use PG\MSF\Base\Child;
+use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Base\Loader;
+use PG\MSF\Base\Exception;
+use PG\MSF\Base\Core;
+use PG\MSF\Pack\IPack;
+use PG\MSF\Route\IRoute;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Base\Input;
+use PG\MSF\Base\Output;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 
 abstract class Server extends Child
@@ -476,7 +480,7 @@ abstract class Server extends Child
                 self::$testUnity = true;
                 self::$testUnityDir = $command2;
                 break;
-            default :
+            default:
                 exit("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
         }
     }
@@ -641,7 +645,6 @@ abstract class Server extends Child
      */
     public function beforeSwooleStart()
     {
-
     }
 
     /**
@@ -841,7 +844,6 @@ abstract class Server extends Child
      */
     public function onSwooleClose($serv, $fd)
     {
-
     }
 
     /**
@@ -851,7 +853,6 @@ abstract class Server extends Child
      */
     public function onSwooleWorkerStop($serv, $fd)
     {
-
     }
 
     /**
@@ -864,7 +865,6 @@ abstract class Server extends Child
      */
     public function onSwooleTask($serv, $taskId, $fromId, $data)
     {
-
     }
 
     /**
@@ -875,7 +875,6 @@ abstract class Server extends Child
      */
     public function onSwooleFinish($serv, $taskId, $data)
     {
-
     }
 
     /**
@@ -886,7 +885,6 @@ abstract class Server extends Child
      */
     public function onSwoolePipeMessage($serv, $fromWorkerId, $message)
     {
-
     }
 
     /**
@@ -926,7 +924,6 @@ abstract class Server extends Child
      */
     public function onSwooleManagerStop($serv)
     {
-
     }
 
     /**
@@ -937,7 +934,6 @@ abstract class Server extends Child
      */
     public function onSwoolePacket($server, $data, $clientInfo)
     {
-
     }
 
     /**
@@ -997,10 +993,10 @@ abstract class Server extends Child
         $error = error_get_last();
         if (isset($error['type'])) {
             switch ($error['type']) {
-                case E_ERROR :
-                case E_PARSE :
-                case E_CORE_ERROR :
-                case E_COMPILE_ERROR :
+                case E_ERROR:
+                case E_PARSE:
+                case E_CORE_ERROR:
+                case E_COMPILE_ERROR:
                     $message = $error['message'];
                     $file = $error['file'];
                     $line = $error['line'];
@@ -1105,5 +1101,4 @@ abstract class Server extends Child
         print_r($msg . "\n");
         print_r($log . "\n");
     }
-
 }

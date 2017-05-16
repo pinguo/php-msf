@@ -27,5 +27,4 @@ class Controller extends BController
         clearTimes();
         exit();
     }
-
 }

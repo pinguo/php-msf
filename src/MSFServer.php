@@ -8,16 +8,16 @@
 
 namespace PG\MSF;
 
-use PG\MSF\Client\{
-    Http\Client as HttpClient, Tcp\Client as TcpClient
-};
-use PG\MSF\Process\{
-    Config, Inotify
-};
+use PG\MSF\Client\Http\Client as HttpClient;
+use PG\MSF\Client\Tcp\Client as TcpClient;
+use PG\MSF\Process\Config;
+use PG\MSF\Process\Inotify;
 use PG\MSF\Coroutine\Task;
-use PG\MSF\DataBase\{
-    AsynPool, AsynPoolManager, Miner, MysqlAsynPool, RedisAsynPool
-};
+use PG\MSF\DataBase\AsynPool;
+use PG\MSF\DataBase\AsynPoolManager;
+use PG\MSF\DataBase\Miner;
+use PG\MSF\DataBase\MysqlAsynPool;
+use PG\MSF\DataBase\RedisAsynPool;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Base\Exception;
@@ -400,7 +400,6 @@ abstract class MSFServer extends WebSocketServer
         } else {
             //注册中断信号
             pcntl_signal(SIGUSR1, function () {
-
             });
         }
 

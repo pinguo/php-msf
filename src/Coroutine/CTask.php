@@ -21,7 +21,7 @@ class CTask extends Base
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $args                = array_map(
-            function($elem){
+            function ($elem) {
                 return str_replace(["\n", "  "], ["", " "], var_export($elem, true));
             },
             $taskProxyData['message']['task_fuc_data']

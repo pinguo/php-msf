@@ -67,7 +67,7 @@ abstract class Base implements IBase
         $this->requestTime = microtime(true);
     }
 
-    public abstract function send($callback);
+    abstract public function send($callback);
 
     public function getResult()
     {

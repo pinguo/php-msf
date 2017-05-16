@@ -50,6 +50,5 @@ class Select extends Base
 
     public function send($callback)
     {
-
     }
 }
