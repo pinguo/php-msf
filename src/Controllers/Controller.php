@@ -71,17 +71,6 @@ class Controller extends Core
      */
     protected $testUnitSendStack = [];
     /**
-     * 控制器名称
-     * @var string
-     */
-    protected $controllerName = '';
-    /**
-     * 方法名称
-     * @var string
-     */
-    protected $methodName = '';
-
-    /**
      * redis连接池
      * @var array
      */
@@ -130,8 +119,6 @@ class Controller extends Core
      */
     public function initialization($controllerName, $methodName)
     {
-        $this->controllerName = $controllerName;
-        $this->methodName = $methodName;
         $this->requestStartTime = microtime(true);
     }
 

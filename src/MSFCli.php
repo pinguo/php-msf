@@ -104,6 +104,8 @@ class MSFCli extends MSFServer
             $input    = $controllerInstance->objectPool->get(Input::class);
             $input->set($request);
             $context->setInput($input);
+            $context->setControllerName($controllerName);
+            $context->setActionName($methodName);
 
             $controllerInstance->setRequestResponse($request, null, $controllerName, $methodName);
 

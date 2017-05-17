@@ -212,6 +212,8 @@ abstract class HttpServer extends Server
 
                 $context->setInput($input);
                 $context->setOutput($output);
+                $context->setControllerName($controllerName);
+                $context->setActionName($methodName);
 
                 $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
 

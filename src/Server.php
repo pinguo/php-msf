@@ -780,7 +780,9 @@ abstract class Server extends Child
 
                 $context->setInput($input);
                 $context->setOutput($output);
-
+                $context->setControllerName($controllerName);
+                $context->setActionName($methodName);
+                
                 $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
