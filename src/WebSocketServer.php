@@ -213,6 +213,8 @@ abstract class WebSocketServer extends HttpServer
 
                 $context->setInput($input);
                 $context->setOutput($output);
+                $context->setControllerName($controllerName);
+                $context->setActionName($methodName);
 
                 $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 

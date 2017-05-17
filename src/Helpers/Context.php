@@ -35,6 +35,20 @@ class Context extends AbstractContext
     protected $objectPool;
 
     /**
+     * 执行的控制器名称
+     *
+     * @var string
+     */
+    protected $controllerName;
+
+    /**
+     * 执行的方法名称
+     *
+     * @var string
+     */
+    protected $actionName;
+
+    /**
      * 获取请求输入对象
      *
      * @return Input
@@ -100,9 +114,53 @@ class Context extends AbstractContext
         return $this;
     }
 
+    /**
+     * 设置控制器名称
+     *
+     * @param $controllerName
+     * @return $this
+     */
+    public function setControllerName($controllerName)
+    {
+        $this->controllerName = $controllerName;
+        return $this;
+    }
+
+    /**
+     * 返回控制器名称
+     *
+     * @return string
+     */
+    public function getControllerName()
+    {
+        return $this->controllerName;
+    }
+
+    /**
+     * 设置方法名称
+     *
+     * @param $actionName
+     * @return $this
+     */
+    public function setActionName($actionName)
+    {
+        $this->actionName = $actionName;
+        return $this;
+    }
+
+    /**
+     * 返回方法名称
+     *
+     * @return $this
+     */
+    public function getActionName()
+    {
+        return $this->actionName;
+    }
+
     public function __sleep()
     {
-        return ['logId', 'input'];
+        return ['logId', 'input', 'controllerName', 'actionName'];
     }
 
     public function destroy()
@@ -111,5 +169,7 @@ class Context extends AbstractContext
         unset($this->input);
         unset($this->output);
         unset($this->objectPool);
+        unset($this->controllerName);
+        unset($this->actionName);
     }
 }
