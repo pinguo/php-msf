@@ -187,7 +187,7 @@ class Task
      */
     public function destroy()
     {
-        if (!$this->destroy) {
+        if (!empty($this->context)) {
             unset(getInstance()->coroutine->taskMap[$this->context->getLogId()]);
             unset(getInstance()->coroutine->IOCallBack[$this->context->getLogId()]);
             if (getInstance()::mode == 'console') {
@@ -197,7 +197,6 @@ class Task
             unset($this->controller);
             unset($this->stack);
             unset($this->routine);
-            $this->destroy = true;
         }
     }
 
