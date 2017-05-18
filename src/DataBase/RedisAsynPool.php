@@ -9,6 +9,7 @@
 namespace PG\MSF\DataBase;
 
 use PG\MSF\Base\Exception;
+use PG\MSF\Coroutine\Redis;
 
 class RedisAsynPool extends AsynPool
 {
@@ -77,7 +78,7 @@ class RedisAsynPool extends AsynPool
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return call_user_func_array([$this->getSync(), $name], $arg);
         } else {
-            return new Redis($context, $this, $name, $arg);
+            return $context->getObjectPool()->get(Redis::class)->initialization($context, $this, $name, $arg);
         }
     }
 

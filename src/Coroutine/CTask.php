@@ -19,9 +19,9 @@ class CTask extends Base
      */
     public $context;
 
-    public function __construct($taskProxyData, $id)
+    public function initialization($taskProxyData, $id)
     {
-        parent::__construct();
+        parent::init();
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $args                = array_map(
@@ -49,6 +49,8 @@ class CTask extends Base
             $this->ioBack = true;
             $this->nextRun($logId);
         });
+        
+        return $this;
     }
 
     public function send($callback)

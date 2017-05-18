@@ -111,7 +111,7 @@ class CoroutineRedisHelp
 
             return $value;
         } else {
-            return new Redis($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
+            return $arguments[0]->getObjectPool()->get(Redis::class)->initialization($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
         }
     }
 

@@ -93,7 +93,7 @@ class Client extends Core
      */
     public function coroutineGetHttpClient($baseUrl, $timeout = 30000, $headers = [])
     {
-        return new GetHttpClient($this, $baseUrl, $timeout, $headers);
+        return $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, $timeout, $headers);
     }
 
     /**

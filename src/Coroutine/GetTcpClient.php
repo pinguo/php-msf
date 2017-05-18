@@ -18,9 +18,9 @@ class GetTcpClient extends Base
     public $client;
     public $baseUrl;
 
-    public function __construct(Client $client, $baseUrl, $timeout)
+    public function initialization(Client $client, $baseUrl, $timeout)
     {
-        parent::__construct($timeout);
+        parent::init($timeout);
         $this->baseUrl = $baseUrl;
         $this->client  = $client;
         $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
@@ -37,6 +37,8 @@ class GetTcpClient extends Base
                 $this->nextRun($logId);
             }
         });
+
+        return $this;
     }
 
     public function send($callback)

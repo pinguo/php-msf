@@ -88,7 +88,7 @@ class TcpClient extends Core
         $path          = $data['path'];
         $data['logId'] = $this->context->getLogId();
         $data          = $this->encode($this->pack->pack($data));
-        return new TcpClientRequest($this, $data, $path, $this->timeOut);
+        return $this->getContext()->getObjectPool()->get(TcpClientRequest::class)->initialization($this, $data, $path, $this->timeOut);
     }
 
     private function encode($buffer)

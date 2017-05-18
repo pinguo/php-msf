@@ -82,7 +82,7 @@ class HttpClient extends Core
      */
     public function coroutineGet($path, $query = null, $timeout = 30000)
     {
-        return new HttpClientRequest($this, 'GET', $path, $query, $timeout);
+        return $this->getContext()->getObjectPool()->get(HttpClientRequest::class)->initialization($this, 'GET', $path, $query, $timeout);
     }
 
     /**
@@ -104,7 +104,7 @@ class HttpClient extends Core
      */
     public function coroutinePost($path, $data, $timeout = 30000)
     {
-        return new HttpClientRequest($this, 'POST', $path, $data, $timeout);
+        return $this->getContext()->getObjectPool()->get(HttpClientRequest::class)->initialization($this, 'POST', $path, $data, $timeout);
     }
 
     public function destroy()

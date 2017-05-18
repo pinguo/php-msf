@@ -75,7 +75,7 @@ class TaskProxy extends Core
      */
     public function coroutineSend()
     {
-        return new CTask($this->taskProxyData, -1);
+        return $this->getContext()->getObjectPool()->get(CTask::class)->initialization($this->taskProxyData, -1);
     }
 
     /**

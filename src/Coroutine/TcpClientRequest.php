@@ -16,9 +16,9 @@ class TcpClientRequest extends Base
     public $tcpClient;
     public $data;
 
-    public function __construct(TcpClient $tcpClient, string $data, string $path, int $timeout)
+    public function initialization(TcpClient $tcpClient, string $data, string $path, int $timeout)
     {
-        parent::__construct($timeout);
+        parent::init($timeout);
         $this->tcpClient = $tcpClient;
         $this->data      = $data;
         $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-tcp:' . $path;
@@ -36,6 +36,8 @@ class TcpClientRequest extends Base
                 $this->nextRun($logId);
             }
         });
+
+        return $this;
     }
 
     public function send($callback)
