@@ -50,5 +50,6 @@ class GetTcpClient extends Base
     {
         unset($this->client);
         unset($this->baseUrl);
+        parent::destroy();
     }
 }

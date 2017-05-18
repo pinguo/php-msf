@@ -185,7 +185,7 @@ class Scheduler
 
     public function start(\Generator $routine, Context $context, Controller $controller)
     {
-        $task = new Task($routine, $context, $controller);
+        $task = $context->getObjectPool()->get(Task::class)->initialization($routine, $context, $controller);
         $this->IOCallBack[$context->getLogId()] = [];
         $this->taskMap[$context->getLogId()]    = $task;
         $this->taskQueue->enqueue($task);

@@ -63,5 +63,6 @@ class HttpClientRequest extends Base
         unset($this->data);
         unset($this->path);
         unset($this->method);
+        parent::destroy();
     }
 }

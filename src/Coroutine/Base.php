@@ -109,4 +109,14 @@ abstract class Base implements IBase
 
         return true;
     }
+
+    public function destroy()
+    {
+        $this->ioBack = false;
+        unset($this->request);
+        unset($this->result);
+        unset($this->timeout);
+        unset($this->requestTime);
+        unset($this->responseTime);
+    }
 }

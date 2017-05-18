@@ -49,5 +49,6 @@ class TcpClientRequest extends Base
     {
         unset($this->tcpClient);
         unset($this->data);
+        parent::destroy();
     }
 }

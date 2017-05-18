@@ -26,7 +26,11 @@ class CTask extends Base
         $this->id            = $id;
         $args                = array_map(
             function ($elem) {
-                return str_replace(["\n", "  "], ["", " "], var_export($elem, true));
+                if (is_string($elem) && strlen($elem) > 4096) {
+                    return 'string[too big, not display]';
+                } else {
+                    return str_replace(["\n", "  "], ["", " "], var_export($elem, true));
+                }
             },
             $taskProxyData['message']['task_fuc_data']
         );
@@ -63,5 +67,6 @@ class CTask extends Base
         unset($this->context);
         unset($this->id);
         unset($this->taskProxyData);
+        parent::destroy();
     }
 }

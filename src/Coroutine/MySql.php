@@ -67,5 +67,6 @@ class MySql extends Base
         unset($this->mysqlAsynPool);
         unset($this->bindId);
         unset($this->sql);
+        parent::destroy();
     }
 }

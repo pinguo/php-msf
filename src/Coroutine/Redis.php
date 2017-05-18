@@ -74,6 +74,7 @@ class Redis extends Base
         unset($this->name);
         unset($this->arguments);
         unset($this->serializer);
+        parent::destroy();
     }
 
     /**
