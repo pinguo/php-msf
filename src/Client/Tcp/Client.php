@@ -68,7 +68,7 @@ class Client extends Core
      */
     public function coroutineGetTcpClient($baseUrl, $timeout = 30000)
     {
-        return new GetTcpClient($this, $baseUrl, $timeout);
+        return $this->getContext()->getObjectPool()->get(GetTcpClient::class)->initialization($this, $baseUrl, $timeout);
     }
 
     /**

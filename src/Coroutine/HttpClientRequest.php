@@ -20,9 +20,9 @@ class HttpClientRequest extends Base
     public $path;
     public $method;
 
-    public function __construct(HttpClient $httpClient, $method, $path, $data, $timeout)
+    public function initialization(HttpClient $httpClient, $method, $path, $data, $timeout)
     {
-        parent::__construct($timeout);
+        parent::init($timeout);
         $this->httpClient = $httpClient;
         $this->path       = $path;
         $this->method     = $method;
@@ -41,6 +41,8 @@ class HttpClientRequest extends Base
                 $this->nextRun($logId);
             }
         });
+
+        return $this;
     }
 
     public function send($callback)
@@ -61,5 +63,6 @@ class HttpClientRequest extends Base
         unset($this->data);
         unset($this->path);
         unset($this->method);
+        parent::destroy();
     }
 }

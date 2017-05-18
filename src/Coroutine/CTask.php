@@ -19,14 +19,18 @@ class CTask extends Base
      */
     public $context;
 
-    public function __construct($taskProxyData, $id)
+    public function initialization($taskProxyData, $id)
     {
-        parent::__construct();
+        parent::init();
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $args                = array_map(
             function ($elem) {
-                return str_replace(["\n", "  "], ["", " "], var_export($elem, true));
+                if (is_string($elem) && strlen($elem) > 4096) {
+                    return 'string[too big, not display]';
+                } else {
+                    return str_replace(["\n", "  "], ["", " "], var_export($elem, true));
+                }
             },
             $taskProxyData['message']['task_fuc_data']
         );
@@ -49,6 +53,8 @@ class CTask extends Base
             $this->ioBack = true;
             $this->nextRun($logId);
         });
+        
+        return $this;
     }
 
     public function send($callback)
@@ -61,5 +67,6 @@ class CTask extends Base
         unset($this->context);
         unset($this->id);
         unset($this->taskProxyData);
+        parent::destroy();
     }
 }

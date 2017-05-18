@@ -19,9 +19,9 @@ class GetHttpClient extends Base
     public $baseUrl;
     public $headers;
 
-    public function __construct(Client $client, $baseUrl, $timeout, $headers = [])
+    public function initialization(Client $client, $baseUrl, $timeout, $headers = [])
     {
-        parent::__construct($timeout);
+        parent::init($timeout);
         $this->baseUrl = $baseUrl;
         $this->client  = $client;
         $this->headers = $headers;
@@ -39,6 +39,8 @@ class GetHttpClient extends Base
                 $this->nextRun($logId);
             }
         });
+
+        return $this;
     }
 
     public function send($callback)
@@ -51,5 +53,6 @@ class GetHttpClient extends Base
         unset($this->client);
         unset($this->baseUrl);
         unset($this->headers);
+        parent::destroy();
     }
 }

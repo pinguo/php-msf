@@ -23,9 +23,9 @@ class Redis extends Base
 
     public $serializer = null;
 
-    public function __construct(Context $context, $redisAsynPool, $name, $arguments)
+    public function initialization(Context $context, $redisAsynPool, $name, $arguments)
     {
-        parent::__construct(3000);
+        parent::init(3000);
         $this->context       = $context;
         $this->redisAsynPool = $redisAsynPool;
         $this->serializer    = $redisAsynPool->serializer;
@@ -57,6 +57,8 @@ class Redis extends Base
             $this->ioBack = true;
             $this->nextRun($logId);
         });
+
+        return $this;
     }
 
     public function send($callback)
@@ -72,6 +74,7 @@ class Redis extends Base
         unset($this->name);
         unset($this->arguments);
         unset($this->serializer);
+        parent::destroy();
     }
 
     /**

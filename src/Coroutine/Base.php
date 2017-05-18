@@ -51,7 +51,7 @@ abstract class Base implements IBase
      * Base constructor.
      * @param int $timeout
      */
-    public function __construct($timeout = 0)
+    public function init($timeout = 0)
     {
         if (self::$MAX_TIMERS == 0) {
             self::$MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 30000);
@@ -108,5 +108,15 @@ abstract class Base implements IBase
         }
 
         return true;
+    }
+
+    public function destroy()
+    {
+        $this->ioBack = false;
+        unset($this->request);
+        unset($this->result);
+        unset($this->timeout);
+        unset($this->requestTime);
+        unset($this->responseTime);
     }
 }

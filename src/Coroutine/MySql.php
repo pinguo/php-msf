@@ -22,9 +22,9 @@ class MySql extends Base
     public $sql;
     public $context;
 
-    public function __construct(Context $context, $_mysqlAsynPool, $_bind_id = null, $_sql = null)
+    public function initialization(Context $context, $_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
-        parent::__construct();
+        parent::init();
         $this->mysqlAsynPool = $_mysqlAsynPool;
         $this->bindId        = $_bind_id;
         $this->sql           = $_sql;
@@ -43,6 +43,8 @@ class MySql extends Base
             $this->ioBack = true;
             $this->nextRun($logId);
         });
+
+        return $this;
     }
 
     public function send($callback)
@@ -65,5 +67,6 @@ class MySql extends Base
         unset($this->mysqlAsynPool);
         unset($this->bindId);
         unset($this->sql);
+        parent::destroy();
     }
 }

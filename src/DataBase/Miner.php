@@ -9,6 +9,8 @@
 
 namespace PG\MSF\DataBase;
 
+use PG\MSF\Coroutine\MySql;
+
 class Miner
 {
 

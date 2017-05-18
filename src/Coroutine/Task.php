@@ -50,18 +50,20 @@ class Task
     protected $controller;
 
     /**
-     * 构造方法
+     * 初始化方法
      *
      * @param \Generator $routine
      * @param Context $context
      * @param Controller $controller
+     * @return $this
      */
-    public function __construct(\Generator $routine, Context $context, Controller $controller)
+    public function initialization(\Generator $routine, Context $context, Controller $controller)
     {
         $this->routine    = $routine;
         $this->context    = $context;
         $this->controller = $controller;
         $this->stack = new \SplStack();
+        return $this;
     }
 
     /**
@@ -99,7 +101,7 @@ class Task
                     }
                 }
 
-                while (!$routine->valid() && !$this->stack->isEmpty()) {
+                while (!$routine->valid() && !empty($this->stack) && !$this->stack->isEmpty()) {
                     $result = $routine->getReturn();
                     $this->routine = $this->stack->pop();
                     $this->routine->send($result);
