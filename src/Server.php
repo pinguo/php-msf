@@ -282,8 +282,8 @@ abstract class Server extends Child
         $this->user = $this->config->get('server.set.user', '');
 
         //设置异步IO模式
-        swoole_async_set([
-            'thread_num'         => $this->config->get('server.set.worker_num', 4),
+        swoole_async_set($this->config->get('server.set.async_io'), [
+            'thread_num'         => $this->config->get('server.set.worker_num', 1),
             'aio_mode'           => SWOOLE_AIO_BASE,
             'use_async_resolver' => true,
             'dns_lookup_random'  => true,
