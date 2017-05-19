@@ -49,11 +49,6 @@ class NormalRoute implements IRoute
             $this->clientData->methodName     = $this->routeCache[$path][1];
         } else {
             $route = explode('/', $path);
-            $route = array_map(function ($name) {
-                $name = strtolower($name);
-                $name = ucfirst($name);
-                return $name;
-            }, $route);
             $methodName = array_pop($route);
             $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
             $this->clientData->methodName     = $methodName;
@@ -66,7 +61,7 @@ class NormalRoute implements IRoute
      */
     public function handleClientRequest($request)
     {
-        $this->clientData->path = rtrim(strtolower($request->server['path_info']), '/');
+        $this->clientData->path = rtrim($request->server['path_info'], '/');
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->clientData->isRpc          = true;
