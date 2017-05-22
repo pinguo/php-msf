@@ -14,10 +14,6 @@ class CTask extends Base
 {
     public $id;
     public $taskProxyData;
-    /**
-     * @var Context
-     */
-    public $context;
 
     public function initialization($taskProxyData, $id)
     {

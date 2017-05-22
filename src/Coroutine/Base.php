@@ -9,9 +9,12 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Exception;
+use PG\AOP\MI;
 
 abstract class Base implements IBase
 {
+    use MI;
+
     public static $MAX_TIMERS = 0;
     /**
      * 请求语句

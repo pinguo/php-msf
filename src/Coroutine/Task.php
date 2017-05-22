@@ -11,22 +11,18 @@ namespace PG\MSF\Coroutine;
 use PG\MSF\Base\Exception;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Controllers\Controller;
+use PG\AOP\MI;
 
 class Task
 {
+    use MI;
+
     /**
      * 协程任务的迭代器
      *
      * @var \Generator
      */
     public $routine;
-
-    /**
-     * 请求上下文
-     *
-     * @var Context
-     */
-    public $context;
 
     /**
      * 任务销毁标识

@@ -19,7 +19,6 @@ class Redis extends Base
     public $redisAsynPool;
     public $name;
     public $arguments;
-    public $context;
 
     public $serializer = null;
 
