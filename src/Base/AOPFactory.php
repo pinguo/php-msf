@@ -18,6 +18,11 @@ use PG\AOP\Wrapper;
 class AOPFactory extends Factory
 {
     /**
+     * @var array
+     */
+    protected static $reflections = [];
+
+    /**
      * 获取协程redis
      * @param CoroutineRedisHelp $redisPoolCoroutine
      * @param Core $coreBase
@@ -71,6 +76,10 @@ class AOPFactory extends Factory
             if ($method === 'push') {
                 //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
                 method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
+                $class = get_class($arguments[0]);
+                if (!empty(self::$reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
+                    $arguments[0]->resetProperties(self::$reflections[$class]);
+                }
                 if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
                     $data['result'] = false;
                     unset($arguments[0]);
@@ -88,6 +97,16 @@ class AOPFactory extends Factory
                 $result->useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
                 $result->context = $coreBase->getContext();
+                $class = get_class($result);
+                if (!isset(self::$reflections[$class])) {
+                    $reflection = new \ReflectionClass($class);
+                    $default = $reflection->getDefaultProperties();
+                    $ps = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_STATIC);
+                    foreach ($ps as $val) {
+                        unset($default[$val->getName()]);
+                    }
+                    self::$reflections[$class] = $default;
+                }
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;
