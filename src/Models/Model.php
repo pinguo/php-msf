@@ -45,8 +45,8 @@ class Model extends Core
      */
     public function destroy()
     {
-        unset($this->redisProxies);
-        unset($this->redisPools);
+        $this->redisProxies = null;
+        $this->redisPools = null;
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
     }

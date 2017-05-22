@@ -64,9 +64,9 @@ class CTask extends Base
 
     public function destroy()
     {
-        unset($this->context);
-        unset($this->id);
-        unset($this->taskProxyData);
+        $this->context = null;
+        $this->id = null;
+        $this->taskProxyData = null;
         parent::destroy();
     }
 }

@@ -69,11 +69,11 @@ class Redis extends Base
 
     public function destroy()
     {
-        unset($this->context);
-        unset($this->redisAsynPool);
-        unset($this->name);
-        unset($this->arguments);
-        unset($this->serializer);
+        $this->context = null;
+        $this->redisAsynPool = null;
+        $this->name = null;
+        $this->arguments = null;
+        $this->serializer = null;
         parent::destroy();
     }
 

@@ -47,8 +47,8 @@ class TcpClientRequest extends Base
 
     public function destroy()
     {
-        unset($this->tcpClient);
-        unset($this->data);
+        $this->tcpClient = null;
+        $this->data = null;
         parent::destroy();
     }
 }

@@ -93,8 +93,8 @@ class TaskProxy extends Core
      */
     public function destroy()
     {
-        unset($this->taskProxyData);
-        unset($this->taskId);
+        $this->taskProxyData = null;
+        $this->taskId = null;
         parent::destroy();
     }
 }

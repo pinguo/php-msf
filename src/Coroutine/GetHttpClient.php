@@ -50,9 +50,9 @@ class GetHttpClient extends Base
 
     public function destroy()
     {
-        unset($this->client);
-        unset($this->baseUrl);
-        unset($this->headers);
+        $this->client = null;
+        $this->baseUrl = null;
+        $this->headers = null;
         parent::destroy();
     }
 }

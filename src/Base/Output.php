@@ -57,15 +57,6 @@ class Output extends Core
     }
 
     /**
-     * 重置
-     */
-    public function reset()
-    {
-        unset($this->response);
-        unset($this->request);
-    }
-
-    /**
      * Set HTTP Status Header
      *
      * @param    int    the status code
@@ -233,8 +224,9 @@ class Output extends Core
      */
     public function destroy()
     {
-        $this->reset();
-        unset($this->controller);
+        $this->response = null;
+        $this->request = null;
+        $this->controller = null;
         parent::destroy();
     }
 }

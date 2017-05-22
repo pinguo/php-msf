@@ -113,10 +113,10 @@ abstract class Base implements IBase
     public function destroy()
     {
         $this->ioBack = false;
-        unset($this->request);
-        unset($this->result);
-        unset($this->timeout);
-        unset($this->requestTime);
-        unset($this->responseTime);
+        $this->request = null;
+        $this->result = null;
+        $this->timeout = null;
+        $this->requestTime = null;
+        $this->responseTime = null;
     }
 }

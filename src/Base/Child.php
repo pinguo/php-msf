@@ -129,7 +129,7 @@ class Child
             $coreChild->destroy();
         }
         $this->childList = [];
-        unset($this->parent);
-        unset($this->context);
+        $this->parent    = null;
+        $this->context   = null;
     }
 }
