@@ -78,7 +78,7 @@ class AOPFactory extends Factory
                 method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
                 $class = get_class($arguments[0]);
                 if (!empty(self::$reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
-                    $arguments[0]->resetProperties($arguments[0], self::$reflections[$class]);
+                    $arguments[0]->resetProperties(self::$reflections[$class]);
                 }
                 if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
                     $data['result'] = false;
