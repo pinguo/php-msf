@@ -10,10 +10,14 @@ namespace PG\MSF\Base;
 
 use Monolog\Logger;
 use Noodlehaus\Config;
+use PG\AOP\MI;
 use PG\MSF\Pack\IPack;
 
 class Core extends Child
 {
+    // use method insert
+    use MI;
+
     /**
      * @var int
      */
@@ -70,7 +74,7 @@ class Core extends Child
             $this->logger = getInstance()->log;
             $this->server = getInstance()->server;
             $this->config = getInstance()->config;
-            $this->pack   = getInstance()->pack;
+            $this->pack = getInstance()->pack;
         }
     }
 
@@ -91,19 +95,5 @@ class Core extends Child
     public function reUse()
     {
         $this->isDestroy = false;
-    }
-
-    /**
-     * @param Object $object
-     * @param array $properties
-     */
-    public function resetProperties($object, array $properties = [])
-    {
-        if (empty($properties)) {
-            return;
-        }
-        foreach ($properties as $prop => $val) {
-            $object->{$prop} = $val;
-        }
     }
 }
