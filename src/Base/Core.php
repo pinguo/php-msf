@@ -19,6 +19,10 @@ class Core extends Child
     use MI;
 
     /**
+     * @var array
+     */
+    protected static $reflections = [];
+    /**
      * @var int
      */
     public $useCount;
@@ -74,7 +78,27 @@ class Core extends Child
             $this->logger = getInstance()->log;
             $this->server = getInstance()->server;
             $this->config = getInstance()->config;
-            $this->pack = getInstance()->pack;
+            $this->pack   = getInstance()->pack;
+        }
+
+        if (!empty(static::$reflections)) {
+            $reflection = new \ReflectionClass(static::class);
+            $default    = $reflection->getDefaultProperties();
+            $ps         = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_STATIC);
+
+            foreach ($ps as $val) {
+                unset($default[$val->getName()]);
+            }
+            unset($default['useCount']);
+            unset($default['genTime']);
+            unset($default['coreName']);
+            unset($default['loader']);
+            unset($default['log']);
+            unset($default['server']);
+            unset($default['config']);
+            unset($default['pack']);
+            unset($default['isDestroy']);
+            static::$reflections = $default;
         }
     }
 
@@ -86,6 +110,7 @@ class Core extends Child
         if (!$this->isDestroy) {
             parent::destroy();
             $this->isDestroy = true;
+            $this->resetProperties(static::$reflections);
         }
     }
 

@@ -142,12 +142,6 @@ class TcpClient extends Core
     public function destroy()
     {
         $this->client->close();
-        $this->client = null;
-        $this->pack = null;
-        $this->packageLengthTypeLength = null;
-        $this->ip = null;
-        $this->port = null;
-        $this->timeOut = null;
         parent::destroy();
     }
 }

@@ -224,9 +224,6 @@ class Output extends Core
      */
     public function destroy()
     {
-        $this->response = null;
-        $this->request = null;
-        $this->controller = null;
         parent::destroy();
     }
 }

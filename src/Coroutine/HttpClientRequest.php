@@ -59,10 +59,6 @@ class HttpClientRequest extends Base
 
     public function destroy()
     {
-        $this->httpClient = null;
-        $this->data = null;
-        $this->path = null;
-        $this->method = null;
         parent::destroy();
     }
 }

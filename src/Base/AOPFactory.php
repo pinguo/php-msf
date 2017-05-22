@@ -26,7 +26,7 @@ class AOPFactory extends Factory
      * 获取协程redis
      * @param CoroutineRedisHelp $redisPoolCoroutine
      * @param Core $coreBase
-     * @return AOP|CoroutineRedisHelp
+     * @return Wrapper|CoroutineRedisHelp
      */
     public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, Core $coreBase)
     {
@@ -45,7 +45,7 @@ class AOPFactory extends Factory
      * 获取redis proxy
      * @param $redisProxy
      * @param Core $coreBase
-     * @return AOP|\Redis
+     * @return Wrapper|\Redis
      */
     public static function getRedisProxy(IProxy $redisProxy, Core $coreBase)
     {
@@ -66,7 +66,7 @@ class AOPFactory extends Factory
      * 获取对象池实例
      * @param Pool $pool
      * @param Core $coreBase
-     * @return AOP|Pool
+     * @return Wrapper|Pool
      */
     public static function getObjectPool(Pool $pool, Core $coreBase)
     {
@@ -74,12 +74,14 @@ class AOPFactory extends Factory
 
         $AOPPool->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             if ($method === 'push') {
-                //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
+                // 手工处理释放资源
                 method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
+                // 自动处理释放资源
                 $class = get_class($arguments[0]);
                 if (!empty(self::$reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
                     $arguments[0]->resetProperties(self::$reflections[$class]);
                 }
+                //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
                 if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
                     $data['result'] = false;
                     unset($arguments[0]);
@@ -105,8 +107,11 @@ class AOPFactory extends Factory
                     foreach ($ps as $val) {
                         unset($default[$val->getName()]);
                     }
+                    unset($default['useCount']);
+                    unset($default['genTime']);
                     self::$reflections[$class] = $default;
                 }
+
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;

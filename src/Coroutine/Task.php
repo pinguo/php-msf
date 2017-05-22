@@ -195,10 +195,6 @@ class Task
             if (getInstance()::mode == 'console') {
                 $this->controller->destroy();
             }
-            $this->context = null;
-            $this->controller = null;
-            $this->stack = null;
-            $this->routine = null;
         }
     }
 

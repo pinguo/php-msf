@@ -48,8 +48,6 @@ class GetTcpClient extends Base
 
     public function destroy()
     {
-        $this->client = null;
-        $this->baseUrl = null;
         parent::destroy();
     }
 }

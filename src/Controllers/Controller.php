@@ -191,13 +191,6 @@ class Controller extends Core
     {
         $this->getContext()->getLog()->appendNoticeLog();
         parent::destroy();
-        $this->fd = null;
-        $this->uid = null;
-        $this->clientData = null;
-        $this->request = null;
-        $this->response = null;
-        $this->redisProxies = null;
-        $this->redisPools = null;
         //销毁对象池
         foreach ($this->objectPoolBuckets as $k => $obj) {
             $this->objectPool->push($obj);

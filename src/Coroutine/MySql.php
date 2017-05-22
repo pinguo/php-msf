@@ -63,10 +63,6 @@ class MySql extends Base
 
     public function destroy()
     {
-        $this->context = null;
-        $this->mysqlAsynPool = null;
-        $this->bindId = null;
-        $this->sql = null;
         parent::destroy();
     }
 }
