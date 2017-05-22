@@ -92,4 +92,18 @@ class Core extends Child
     {
         $this->isDestroy = false;
     }
+
+    /**
+     * @param Object $object
+     * @param array $properties
+     */
+    public function resetProperties($object, array $properties = [])
+    {
+        if (empty($properties)) {
+            return;
+        }
+        foreach ($properties as $prop => $val) {
+            $object->{$prop} = $val;
+        }
+    }
 }
