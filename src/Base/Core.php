@@ -10,10 +10,14 @@ namespace PG\MSF\Base;
 
 use Monolog\Logger;
 use Noodlehaus\Config;
+use PG\AOP\MI;
 use PG\MSF\Pack\IPack;
 
 class Core extends Child
 {
+    // use method insert
+    use MI;
+
     /**
      * @var int
      */
@@ -70,7 +74,7 @@ class Core extends Child
             $this->logger = getInstance()->log;
             $this->server = getInstance()->server;
             $this->config = getInstance()->config;
-            $this->pack   = getInstance()->pack;
+            $this->pack = getInstance()->pack;
         }
     }
 
