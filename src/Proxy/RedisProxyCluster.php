@@ -28,7 +28,6 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $hasher = new $hasher;
         try {
             parent::__construct($hasher);
-            ;
             $this->startCheck();
             if (empty($this->goodPools)) {
                 throw new Exception('No redis server can write in cluster');
@@ -177,6 +176,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
     public function check()
     {
         $this->goodPools = getInstance()->sysCache->get($this->name) ?? [];
+        if (!$this->goodPools) {
+            return false;
+        }
 
         $nowPools = $this->getAllTargets();
         $newPools = array_keys($this->goodPools);
