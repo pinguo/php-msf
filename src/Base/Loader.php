@@ -71,15 +71,24 @@ class Loader
             return null;
         }
 
-        $task      = str_replace('/', '\\', $task);
-        $taskClass = "\\App\\Tasks\\" . $task;
-
-        if (!class_exists($taskClass)) {
-            $taskClass = "\\PG\\MSF\\Tasks\\" . $task;
-            if (!class_exists($taskClass)) {
-                throw new Exception("class {$taskClass} not exists");
+        $taskClass = $task;
+        do {
+            if (class_exists($taskClass)) {
+                break;
             }
-        }
+
+            $taskClass = "\\App\\Tasks\\$task";
+            if (class_exists($taskClass)) {
+                break;
+            }
+
+            $taskClass = "\\PG\\MSF\\Tasks\\$task";
+            if (class_exists($taskClass)) {
+                break;
+            }
+
+            throw new Exception("class {$taskClass} not exists");
+        } while (0);
 
         if (!getInstance()->server->taskworker) {
             if ($parent != null && property_exists($parent, 'objectPool')) {
@@ -95,7 +104,7 @@ class Loader
                 $parent->addChild($taskProxy);
             }
 
-            $taskProxy->coreName = $task;
+            $taskProxy->coreName = $taskClass;
 
             return $taskProxy;
         }

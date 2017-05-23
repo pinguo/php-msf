@@ -46,53 +46,44 @@ class ModelFactory
      */
     public function getModel($model)
     {
-        $model = str_replace('/', '\\', $model);
-        $className = "\\App\\Models\\$model";
-
-        if (class_exists($className)) {
-            $models = $this->pool[$model]??null;
-            if ($models == null) {
-                $models = $this->pool[$model] = new \SplStack();
+        $className = $model;
+        do {
+            if (class_exists($className)) {
+                break;
             }
 
-            if (!$models->isEmpty()) {
-                $modelInstance = $models->shift();
-                $modelInstance->reUse();
-                $modelInstance->useCount++;
-                return $modelInstance;
+            $className = "\\App\\Models\\$model";
+            if (class_exists($className)) {
+                break;
             }
 
-            $modelInstance = new $className;
-            $modelInstance->coreName = $model;
-            $modelInstance->afterConstruct();
-            $modelInstance->genTime  = time();
-            $modelInstance->useCount = 1;
-            return $modelInstance;
-        }
-
-        $className = "\\PG\\MSF\\Models\\$model";
-        if (class_exists($className)) {
-            $models = $this->pool[$model]??null;
-            if ($models == null) {
-                $models = $this->pool[$model] = new \SplStack();
+            $className = "\\PG\\MSF\\Models\\$model";
+            if (class_exists($className)) {
+                break;
             }
 
-            if (!$models->isEmpty()) {
-                $modelInstance = $models->shift();
-                $modelInstance->reUse();
-                $modelInstance->useCount++;
-                return $modelInstance;
-            }
-
-            $modelInstance = new $className;
-            $modelInstance->coreName = $model;
-            $modelInstance->afterConstruct();
-            $modelInstance->genTime  = time();
-            $modelInstance->useCount = 1;
-            return $modelInstance;
-        } else {
             throw new Exception("class $model is not exist");
+        } while (0);
+
+        $models = $this->pool[$model]??null;
+        if ($models == null) {
+            $models = $this->pool[$model] = new \SplStack();
         }
+
+        if (!$models->isEmpty()) {
+            $modelInstance = $models->shift();
+            $modelInstance->reUse();
+            $modelInstance->useCount++;
+            return $modelInstance;
+        }
+
+        $modelInstance = new $className;
+        $modelInstance->coreName = $model;
+        $modelInstance->afterConstruct();
+        $modelInstance->genTime  = time();
+        $modelInstance->useCount = 1;
+
+        return $modelInstance;
     }
 
     /**
