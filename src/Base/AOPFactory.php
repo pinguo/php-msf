@@ -111,7 +111,7 @@ class AOPFactory extends Factory
                     unset($default['genTime']);
                     unset($default['coreName']);
                     unset($default['loader']);
-                    unset($default['log']);
+                    unset($default['logger']);
                     unset($default['server']);
                     unset($default['config']);
                     unset($default['pack']);

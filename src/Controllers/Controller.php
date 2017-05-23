@@ -139,26 +139,32 @@ class Controller extends Core
      */
     public function onExceptionHandle(\Throwable $e)
     {
-        $errMsg = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
-        $errMsg .= ' Trace: ' . $e->getTraceAsString();
-        if (!empty($e->getPrevious())) {
-            $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
-        }
-        if ($e instanceof ParameterValidationExpandException) {
-            $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
-            $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
-        } elseif ($e instanceof PrivilegeException) {
-            $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-            $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
-        } elseif ($e instanceof \MongoException) {
-            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson(parent::$stdClass, 'Network Error.', Errno::FATAL);
-        } elseif ($e instanceof CException) {
-            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson(parent::$stdClass, $e->getPreviousMessage(), $e->getCode());
-        } else {
-            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson(parent::$stdClass, $e->getMessage(), $e->getCode());
+        try {
+            $errMsg = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+            $errMsg .= ' Trace: ' . $e->getTraceAsString();
+            if (!empty($e->getPrevious())) {
+                $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
+            }
+            if ($e instanceof ParameterValidationExpandException) {
+                $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
+                $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
+            } elseif ($e instanceof PrivilegeException) {
+                $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
+                $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
+            } elseif ($e instanceof \MongoException) {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+                $this->outputJson(parent::$stdClass, 'Network Error.', Errno::FATAL);
+            } elseif ($e instanceof CException) {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+                $this->outputJson(parent::$stdClass, $e->getPreviousMessage(), $e->getCode());
+            } else {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+                $this->outputJson(parent::$stdClass, $e->getMessage(), $e->getCode());
+            }
+        } catch (\Throwable $ne) {
+            echo 'Call Controller::onExceptionHandle Error', "\n";
+            echo 'Last Exception: ', dump($e), "\n";
+            echo 'Handle Exception: ', dump($ne), "\n";
         }
     }
 
