@@ -169,7 +169,6 @@ class Context extends AbstractContext
     public function destroy()
     {
         $this->PGLog          = null;
-        $this->logId          = null;
         $this->input          = null;
         $this->output         = null;
         $this->objectPool     = null;
