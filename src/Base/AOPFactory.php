@@ -11,7 +11,6 @@ namespace PG\MSF\Base;
 use PG\MSF\DataBase\CoroutineRedisHelp;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
-use PG\Helper\CommonHelper;
 use PG\AOP\Factory;
 use PG\AOP\Wrapper;
 
@@ -26,9 +25,9 @@ class AOPFactory extends Factory
      * 获取协程redis
      * @param CoroutineRedisHelp $redisPoolCoroutine
      * @param Core $coreBase
-     * @return AOP|CoroutineRedisHelp
+     * @return Wrapper |CoroutineRedisHelp
      */
-    public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, Core $coreBase)
+    public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, $coreBase)
     {
         $AOPRedisPoolCoroutine = new Wrapper($redisPoolCoroutine);
         $AOPRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
@@ -45,9 +44,9 @@ class AOPFactory extends Factory
      * 获取redis proxy
      * @param $redisProxy
      * @param Core $coreBase
-     * @return AOP|\Redis
+     * @return Wrapper|\Redis
      */
-    public static function getRedisProxy(IProxy $redisProxy, Core $coreBase)
+    public static function getRedisProxy(IProxy $redisProxy, $coreBase)
     {
         $redis = new Wrapper($redisProxy);
         $redis->registerOnBefore(function ($method, $arguments) use ($redisProxy, $coreBase) {
@@ -66,9 +65,9 @@ class AOPFactory extends Factory
      * 获取对象池实例
      * @param Pool $pool
      * @param Core $coreBase
-     * @return AOP|Pool
+     * @return Wrapper|Pool
      */
-    public static function getObjectPool(Pool $pool, Core $coreBase)
+    public static function getObjectPool(Pool $pool, $coreBase)
     {
         $AOPPool = new Wrapper($pool);
 

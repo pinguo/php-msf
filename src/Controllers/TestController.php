@@ -8,6 +8,9 @@
 
 namespace PG\MSF\Controllers;
 
+use PG\InnerServ\Geo\PGGeo;
+use PG\InnerServ\InnerServ;
+use PG\InnerServ\Sso\PGUserInfo;
 use PG\MSF\Models\TestModel;
 use PG\MSF\Client\Http\Client;
 use PG\MSF\Client\Tcp\Client as TClient;
@@ -99,5 +102,13 @@ class TestController extends Controller
             $data = yield $prePost;
             $this->outputJson($data['body']);
         }
+    }
+
+    public function httpUser()
+    {
+        $obj = InnerServ::get(PGUserInfo::class, $this->getContext());
+        $obj->initialization();
+        $data = yield $obj->getUserInfo('0108d9571b25aec97cbf5b57', '', true, true);
+        $this->outputJson($data);
     }
 }

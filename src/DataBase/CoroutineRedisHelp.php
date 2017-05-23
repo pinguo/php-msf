@@ -83,8 +83,9 @@ class CoroutineRedisHelp
 
 
         // value serialize start
-        if (in_array($name, ['set'])) {
-            $arguments[2] = $this->serializeHandler($arguments[2]);
+        if (in_array($name, ['set', 'setex'])) {
+            $last = count($arguments) - 1;
+            $arguments[$last] = $this->serializeHandler($arguments[$last]);
         } elseif (in_array($name, ['mset'])) {
             $keysValues = $arguments[1];
             $newValues = [];
