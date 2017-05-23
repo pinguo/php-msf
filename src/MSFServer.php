@@ -84,7 +84,7 @@ abstract class MSFServer extends WebSocketServer
      * 连接池
      * @var
      */
-    protected $asynPools;
+    protected $asynPools = [];
     /**
      * @var AsynPoolManager
      */
@@ -92,7 +92,7 @@ abstract class MSFServer extends WebSocketServer
     /**
      * @var array
      */
-    protected $redisProxyManager;
+    protected $redisProxyManager = [];
 
     /**
      * MSFServer constructor.
@@ -309,12 +309,16 @@ abstract class MSFServer extends WebSocketServer
      * @param AsynPool $pool
      * @throws Exception
      */
-    public function addAsynPool($name, AsynPool $pool)
+    public function addAsynPool($name, AsynPool $pool, $isRegister = false)
     {
         if (key_exists($name, $this->asynPools)) {
             throw new Exception('pool key is exists!');
         }
         $this->asynPools[$name] = $pool;
+        if ($isRegister) {
+            $pool->workerInit($this->server->worker_id);
+            $this->asnyPoolManager->registAsyn($pool);
+        }
     }
 
     /**
