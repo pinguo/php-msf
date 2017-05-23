@@ -109,6 +109,14 @@ class AOPFactory extends Factory
                     }
                     unset($default['useCount']);
                     unset($default['genTime']);
+                    unset($default['coreName']);
+                    unset($default['loader']);
+                    unset($default['log']);
+                    unset($default['server']);
+                    unset($default['config']);
+                    unset($default['pack']);
+                    unset($default['isDestroy']);
+                    unset($default['isConstruct']);
                     self::$reflections[$class] = $default;
                 }
 

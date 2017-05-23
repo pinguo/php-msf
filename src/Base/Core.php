@@ -81,7 +81,7 @@ class Core extends Child
             $this->pack   = getInstance()->pack;
         }
 
-        if (!empty(static::$reflections)) {
+        if (empty(static::$reflections)) {
             $reflection = new \ReflectionClass(static::class);
             $default    = $reflection->getDefaultProperties();
             $ps         = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_STATIC);
@@ -98,6 +98,7 @@ class Core extends Child
             unset($default['config']);
             unset($default['pack']);
             unset($default['isDestroy']);
+            unset($default['isConstruct']);
             static::$reflections = $default;
         }
     }
