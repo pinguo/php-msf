@@ -160,10 +160,9 @@ class ControllerFactory
      */
     public function revertController($controller)
     {
-        if (!$controller->isDestroy) {
+        if (!$controller->getIsDestroy()) {
             $controller->destroy();
         }
-
 
         //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
         if (($controller->genTime + 7200) < time() || $controller->useCount > 10000) {

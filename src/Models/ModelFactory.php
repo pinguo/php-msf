@@ -101,7 +101,7 @@ class ModelFactory
      */
     public function revertModel($model)
     {
-        if (!$model->isDestroy) {
+        if (!$model->getIsDestroy()) {
             $model->destroy();
         }
 

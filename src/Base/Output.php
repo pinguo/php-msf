@@ -225,5 +225,6 @@ class Output extends Core
     public function destroy()
     {
         parent::destroy();
+        $this->controller = null;
     }
 }

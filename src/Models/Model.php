@@ -19,12 +19,12 @@ class Model extends Core
      * redis连接池
      * @var array
      */
-    private $redisPools;
+    public $redisPools;
     /**
      * redis代理池
      * @var array
      */
-    private $redisProxies;
+    public $redisProxies;
 
     final public function __construct()
     {

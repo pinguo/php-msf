@@ -34,27 +34,27 @@ class Core extends Child
      * 销毁标志
      * @var bool
      */
-    public $isDestroy = false;
+    protected $isDestroy = false;
     /**
      * @var Loader
      */
-    public $loader;
+    protected $loader;
     /**
      * @var Logger
      */
-    public $logger;
+    protected $logger;
     /**
      * @var \swoole_server
      */
-    public $server;
+    protected $server;
     /**
      * @var Config
      */
-    public $config;
+    protected $config;
     /**
      * @var IPack
      */
-    public $pack;
+    protected $pack;
 
     protected $start_run_time;
 
@@ -82,25 +82,66 @@ class Core extends Child
         }
 
         if (empty(static::$reflections)) {
-            $reflection = new \ReflectionClass(static::class);
-            $default    = $reflection->getDefaultProperties();
-            $ps         = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_STATIC);
-
+            $reflection  = new \ReflectionClass(static::class);
+            $default     = $reflection->getDefaultProperties();
+            $ps          = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+            $ss          = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
+            $autoDestroy = [];
             foreach ($ps as $val) {
-                unset($default[$val->getName()]);
+                $autoDestroy[$val->getName()] = $default[$val->getName()];
             }
-            unset($default['useCount']);
-            unset($default['genTime']);
-            unset($default['coreName']);
-            unset($default['loader']);
-            unset($default['logger']);
-            unset($default['server']);
-            unset($default['config']);
-            unset($default['pack']);
-            unset($default['isDestroy']);
-            unset($default['isConstruct']);
-            static::$reflections = $default;
+            foreach ($ss as $val) {
+                unset($autoDestroy[$val->getName()]);
+            }
+            unset($autoDestroy['useCount']);
+            unset($autoDestroy['genTime']);
+            unset($autoDestroy['coreName']);
+            static::$reflections = $autoDestroy;
+            unset($reflection);
+            unset($default);
+            unset($ps);
+            unset($ss);
         }
+    }
+
+    /**
+     * @return Loader
+     */
+    public function getLoader()
+    {
+        return $this->loader;
+    }
+
+    /**
+     * @return Logger|\PG\Log\PGLog
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @return \swoole_server
+     */
+    public function getServer()
+    {
+        return $this->server;
+    }
+
+    /**
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @return IPack
+     */
+    public function getPack()
+    {
+        return $this->pack;
     }
 
     /**
@@ -121,5 +162,10 @@ class Core extends Child
     public function reUse()
     {
         $this->isDestroy = false;
+    }
+
+    public function getIsDestroy()
+    {
+        return $this->isDestroy;
     }
 }

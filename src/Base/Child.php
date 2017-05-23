@@ -33,7 +33,7 @@ class Child
     /**
      * 判断是否执行了__construct
      */
-    public $isConstruct = false;
+    protected $isConstruct = false;
 
     /**
      * 上下文
@@ -50,7 +50,11 @@ class Child
         $this->isConstruct = true;
     }
 
-
+    public function getIsConstruct()
+    {
+        return $this->isConstruct;
+    }
+    
     /**
      * 加入一个插件
      *

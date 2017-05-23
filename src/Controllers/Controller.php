@@ -39,42 +39,42 @@ class Controller extends Core
      * fd
      * @var int
      */
-    protected $fd;
+    public $fd;
     /**
      * uid
      * @var int
      */
-    protected $uid;
+    public $uid;
     /**
      * 用户数据
      * @var
      */
-    protected $clientData;
+    public $clientData;
     /**
      * http response
      * @var \swoole_http_request
      */
-    protected $request;
+    public $request;
     /**
      * http response
      * @var \swoole_http_response
      */
-    protected $response;
+    public $response;
     /**
      * 用于单元测试模拟捕获服务器发出的消息
      * @var array
      */
-    protected $testUnitSendStack = [];
+    public $testUnitSendStack = [];
     /**
      * redis连接池
      * @var array
      */
-    private $redisPools;
+    public $redisPools;
     /**
      * redis代理池
      * @var array
      */
-    private $redisProxies;
+    public $redisProxies;
 
     /**
      * @var float 请求开始处理的时间

@@ -101,25 +101,26 @@ class AOPFactory extends Factory
                 $result->context = $coreBase->getContext();
                 $class = get_class($result);
                 if (!isset(self::$reflections[$class])) {
-                    $reflection = new \ReflectionClass($class);
-                    $default = $reflection->getDefaultProperties();
-                    $ps = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_STATIC);
+                    $reflection  = new \ReflectionClass($class);
+                    $default     = $reflection->getDefaultProperties();
+                    $ps          = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+                    $ss          = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
+                    $autoDestroy = [];
                     foreach ($ps as $val) {
-                        unset($default[$val->getName()]);
+                        $autoDestroy[$val->getName()] = $default[$val->getName()];
                     }
-                    unset($default['useCount']);
-                    unset($default['genTime']);
-                    unset($default['coreName']);
-                    unset($default['loader']);
-                    unset($default['logger']);
-                    unset($default['server']);
-                    unset($default['config']);
-                    unset($default['pack']);
-                    unset($default['isDestroy']);
-                    unset($default['isConstruct']);
-                    self::$reflections[$class] = $default;
+                    foreach ($ss as $val) {
+                        unset($autoDestroy[$val->getName()]);
+                    }
+                    unset($autoDestroy['useCount']);
+                    unset($autoDestroy['genTime']);
+                    unset($autoDestroy['coreName']);
+                    self::$reflections[$class] = $autoDestroy;
                 }
-
+                unset($reflection);
+                unset($default);
+                unset($ps);
+                unset($ss);
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;

@@ -34,7 +34,7 @@ class Loader
      */
     public function model($model, Child $parent)
     {
-        if (!$parent->isConstruct) {
+        if (!$parent->getIsConstruct()) {
             $parentName = get_class($parent);
             throw new Exception("class:$parentName,error:loader model 方法不允许在__construct内使用！");
         }
