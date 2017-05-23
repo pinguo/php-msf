@@ -19,7 +19,6 @@ class Redis extends Base
     public $redisAsynPool;
     public $name;
     public $arguments;
-    public $context;
 
     public $serializer = null;
 
@@ -69,11 +68,6 @@ class Redis extends Base
 
     public function destroy()
     {
-        unset($this->context);
-        unset($this->redisAsynPool);
-        unset($this->name);
-        unset($this->arguments);
-        unset($this->serializer);
         parent::destroy();
     }
 

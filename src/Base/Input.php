@@ -222,7 +222,6 @@ class Input extends Core
      */
     public function destroy()
     {
-        unset($this->request);
         parent::destroy();
     }
 }

@@ -19,12 +19,12 @@ class Model extends Core
      * redis连接池
      * @var array
      */
-    private $redisPools;
+    public $redisPools;
     /**
      * redis代理池
      * @var array
      */
-    private $redisProxies;
+    public $redisProxies;
 
     final public function __construct()
     {
@@ -45,8 +45,6 @@ class Model extends Core
      */
     public function destroy()
     {
-        unset($this->redisProxies);
-        unset($this->redisPools);
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
     }

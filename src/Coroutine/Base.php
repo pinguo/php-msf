@@ -9,9 +9,12 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Exception;
+use PG\AOP\MI;
 
 abstract class Base implements IBase
 {
+    use MI;
+
     public static $MAX_TIMERS = 0;
     /**
      * 请求语句
@@ -113,10 +116,5 @@ abstract class Base implements IBase
     public function destroy()
     {
         $this->ioBack = false;
-        unset($this->request);
-        unset($this->result);
-        unset($this->timeout);
-        unset($this->requestTime);
-        unset($this->responseTime);
     }
 }

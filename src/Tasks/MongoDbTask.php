@@ -17,25 +17,25 @@ class MongoDbTask extends Task
      * 配置名，db名，collection名
      * @var array
      */
-    public $mongoConf = [];
+    protected $mongoConf = [];
     /**
      * 全局MongoDB配置
      * @var array
      */
-    public $config;
+    protected $config;
     /**
      * @var \MongoClient
      */
-    public $mongoClient;
+    protected $mongoClient;
 
     /**
      * @var \MongoDB
      */
-    public $mongoDb;
+    protected $mongoDb;
     /**
      * @var \MongoCollection
      */
-    public $mongoCollection;
+    protected $mongoCollection;
 
     /**
      * @var string

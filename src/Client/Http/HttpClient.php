@@ -110,8 +110,6 @@ class HttpClient extends Core
     public function destroy()
     {
         $this->client->close();
-        unset($this->client);
-        unset($this->headers);
         parent::destroy();
     }
 }

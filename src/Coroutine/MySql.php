@@ -20,7 +20,6 @@ class MySql extends Base
     public $mysqlAsynPool;
     public $bindId;
     public $sql;
-    public $context;
 
     public function initialization(Context $context, $_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
@@ -63,10 +62,6 @@ class MySql extends Base
 
     public function destroy()
     {
-        unset($this->context);
-        unset($this->mysqlAsynPool);
-        unset($this->bindId);
-        unset($this->sql);
         parent::destroy();
     }
 }

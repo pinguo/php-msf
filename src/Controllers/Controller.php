@@ -39,42 +39,42 @@ class Controller extends Core
      * fd
      * @var int
      */
-    protected $fd;
+    public $fd;
     /**
      * uid
      * @var int
      */
-    protected $uid;
+    public $uid;
     /**
      * 用户数据
      * @var
      */
-    protected $clientData;
+    public $clientData;
     /**
      * http response
      * @var \swoole_http_request
      */
-    protected $request;
+    public $request;
     /**
      * http response
      * @var \swoole_http_response
      */
-    protected $response;
+    public $response;
     /**
      * 用于单元测试模拟捕获服务器发出的消息
      * @var array
      */
-    protected $testUnitSendStack = [];
+    public $testUnitSendStack = [];
     /**
      * redis连接池
      * @var array
      */
-    private $redisPools;
+    public $redisPools;
     /**
      * redis代理池
      * @var array
      */
-    private $redisProxies;
+    public $redisProxies;
 
     /**
      * @var float 请求开始处理的时间
@@ -139,26 +139,32 @@ class Controller extends Core
      */
     public function onExceptionHandle(\Throwable $e)
     {
-        $errMsg = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
-        $errMsg .= ' Trace: ' . $e->getTraceAsString();
-        if (!empty($e->getPrevious())) {
-            $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
-        }
-        if ($e instanceof ParameterValidationExpandException) {
-            $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
-            $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
-        } elseif ($e instanceof PrivilegeException) {
-            $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-            $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
-        } elseif ($e instanceof \MongoException) {
-            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson(parent::$stdClass, 'Network Error.', Errno::FATAL);
-        } elseif ($e instanceof CException) {
-            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson(parent::$stdClass, $e->getPreviousMessage(), $e->getCode());
-        } else {
-            $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
-            $this->outputJson(parent::$stdClass, $e->getMessage(), $e->getCode());
+        try {
+            $errMsg = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+            $errMsg .= ' Trace: ' . $e->getTraceAsString();
+            if (!empty($e->getPrevious())) {
+                $errMsg .= ' Previous trace: ' . $e->getPrevious()->getTraceAsString();
+            }
+            if ($e instanceof ParameterValidationExpandException) {
+                $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
+                $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
+            } elseif ($e instanceof PrivilegeException) {
+                $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
+                $this->outputJson(parent::$stdClass, $e->getMessage(), Errno::PRIVILEGE_NOT_PASS);
+            } elseif ($e instanceof \MongoException) {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+                $this->outputJson(parent::$stdClass, 'Network Error.', Errno::FATAL);
+            } elseif ($e instanceof CException) {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+                $this->outputJson(parent::$stdClass, $e->getPreviousMessage(), $e->getCode());
+            } else {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $e->getCode());
+                $this->outputJson(parent::$stdClass, $e->getMessage(), $e->getCode());
+            }
+        } catch (\Throwable $ne) {
+            echo 'Call Controller::onExceptionHandle Error', "\n";
+            echo 'Last Exception: ', dump($e), "\n";
+            echo 'Handle Exception: ', dump($ne), "\n";
         }
     }
 
@@ -191,18 +197,10 @@ class Controller extends Core
     {
         $this->getContext()->getLog()->appendNoticeLog();
         parent::destroy();
-        unset($this->fd);
-        unset($this->uid);
-        unset($this->controllerName);
-        unset($this->methodName);
-        unset($this->clientData);
-        unset($this->request);
-        unset($this->response);
-        unset($this->redisProxies);
-        unset($this->redisPools);
         //销毁对象池
         foreach ($this->objectPoolBuckets as $k => $obj) {
             $this->objectPool->push($obj);
+            $this->objectPoolBuckets[$k] = null;
             unset($this->objectPoolBuckets[$k]);
         }
 

@@ -14,10 +14,6 @@ class CTask extends Base
 {
     public $id;
     public $taskProxyData;
-    /**
-     * @var Context
-     */
-    public $context;
 
     public function initialization($taskProxyData, $id)
     {
@@ -64,9 +60,6 @@ class CTask extends Base
 
     public function destroy()
     {
-        unset($this->context);
-        unset($this->id);
-        unset($this->taskProxyData);
         parent::destroy();
     }
 }

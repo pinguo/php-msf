@@ -59,10 +59,6 @@ class HttpClientRequest extends Base
 
     public function destroy()
     {
-        unset($this->httpClient);
-        unset($this->data);
-        unset($this->path);
-        unset($this->method);
         parent::destroy();
     }
 }

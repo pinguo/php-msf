@@ -53,7 +53,6 @@ class RpcController extends Controller
 
     public function destroy()
     {
-        unset($this->ip);
         parent::destroy();
     }
 

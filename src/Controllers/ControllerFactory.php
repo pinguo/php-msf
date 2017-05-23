@@ -46,53 +46,45 @@ class ControllerFactory
         if ($controller == null) {
             return null;
         }
-        $controller  = ltrim($controller, '\\');
-        $className = "\\App\\Controllers\\$controller";
 
-        if (class_exists($className)) {
-            $controllers = $this->pool[$controller]??null;
-            if ($controllers == null) {
-                $controllers = $this->pool[$controller] = new \SplStack();
+        $className = $controller;
+        do {
+            if (class_exists($className)) {
+                break;
             }
 
-            if (!$controllers->isEmpty()) {
-                $controllerInstance = $controllers->shift();
-                $controllerInstance->reUse();
-                $controllerInstance->useCount++;
-                return $controllerInstance;
+            $className = "\\App\\Controllers\\$controller";
+            if (class_exists($className)) {
+                break;
             }
 
-            $controllerInstance = new $className;
-            $controllerInstance->coreName = $controller;
-            $controllerInstance->afterConstruct();
-            $controllerInstance->genTime  = time();
-            $controllerInstance->useCount = 1;
+            $className = "\\PG\\MSF\\Controllers\\$controller";
+            if (class_exists($className)) {
+                break;
+            }
+
+            return null;
+        } while (0);
+
+        $controllers = $this->pool[$controller]??null;
+        if ($controllers == null) {
+            $controllers = $this->pool[$controller] = new \SplStack();
+        }
+
+        if (!$controllers->isEmpty()) {
+            $controllerInstance = $controllers->shift();
+            $controllerInstance->reUse();
+            $controllerInstance->useCount++;
             return $controllerInstance;
         }
 
-        $className = "\\PG\\MSF\\Controllers\\$controller";
-        if (class_exists($className)) {
-            $controllers = $this->pool[$controller]??null;
-            if ($controllers == null) {
-                $controllers = $this->pool[$controller] = new \SplStack();
-            }
+        $controllerInstance = new $className;
+        $controllerInstance->coreName = $controller;
+        $controllerInstance->afterConstruct();
+        $controllerInstance->genTime  = time();
+        $controllerInstance->useCount = 1;
 
-            if (!$controllers->isEmpty()) {
-                $controllerInstance = $controllers->shift();
-                $controllerInstance->reUse();
-                $controllerInstance->useCount++;
-                return $controllerInstance;
-            }
-
-            $controllerInstance = new $className;
-            $controllerInstance->coreName = $controller;
-            $controllerInstance->afterConstruct();
-            $controllerInstance->genTime  = time();
-            $controllerInstance->useCount = 1;
-            return $controllerInstance;
-        }
-
-        return null;
+        return $controllerInstance;
     }
 
     /**
@@ -106,8 +98,7 @@ class ControllerFactory
             return null;
         }
         $controller  = ltrim($controller, '\\');
-        $className = "\\App\\Console\\$controller";
-
+        $className = strpos($controller, '\\') === 0 ? $controller : "\\App\\Console\\$controller";
         if (class_exists($className)) {
             $controllers = $this->pool[$controller]??null;
             if ($controllers == null) {
@@ -129,7 +120,7 @@ class ControllerFactory
             return $controllerInstance;
         }
 
-        $className = "\\PG\\MSF\\Controllers\\$controller";
+        $className = strpos($controller, '\\') === 0 ? $controller : "\\PG\\MSF\\Controllers\\$controller";
         if (class_exists($className)) {
             $controllers = $this->pool[$controller]??null;
             if ($controllers == null) {
@@ -160,10 +151,9 @@ class ControllerFactory
      */
     public function revertController($controller)
     {
-        if (!$controller->isDestroy) {
+        if (!$controller->getIsDestroy()) {
             $controller->destroy();
         }
-
 
         //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
         if (($controller->genTime + 7200) < time() || $controller->useCount > 10000) {

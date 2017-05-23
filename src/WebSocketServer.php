@@ -184,7 +184,7 @@ abstract class WebSocketServer extends HttpServer
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
                 $PGLog            = null;
-                $PGLog            = clone $controllerInstance->logger;
+                $PGLog            = clone $controllerInstance->getLogger();
                 $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
                 $PGLog->accessRecord['uri']       = $this->route->getPath();
                 $PGLog->logId = $this->genLogId($clientData);

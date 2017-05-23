@@ -14,9 +14,12 @@ use PG\Log\PGLog;
 use PG\MSF\Base\Input;
 use PG\MSF\Base\Output;
 use PG\MSF\Memory\Pool;
+use PG\AOP\MI;
 
 class Context extends AbstractContext
 {
+    use MI;
+    
     /**
      * @var Input
      */
@@ -165,11 +168,12 @@ class Context extends AbstractContext
 
     public function destroy()
     {
-        unset($this->PGLog);
-        unset($this->input);
-        unset($this->output);
-        unset($this->objectPool);
-        unset($this->controllerName);
-        unset($this->actionName);
+        $this->PGLog          = null;
+        $this->logId          = null;
+        $this->input          = null;
+        $this->output         = null;
+        $this->objectPool     = null;
+        $this->controllerName = null;
+        $this->actionName     = null;
     }
 }

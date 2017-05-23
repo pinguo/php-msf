@@ -23,27 +23,27 @@ class TcpClient extends Core
     /**
      * @var IPack
      */
-    protected $pack;
+    public $pack;
 
     /**
      * @var string 长度值的类型
      */
-    protected $packageLengthTypeLength;
+    public $packageLengthTypeLength;
 
     /**
      * @var string
      */
-    private $ip;
+    public $ip;
 
     /**
      * @var int
      */
-    private $port;
+    public $port;
 
     /**
      * @var int
      */
-    private $timeOut;
+    public $timeOut;
 
     /**
      * 初始化TcpClient
@@ -142,12 +142,6 @@ class TcpClient extends Core
     public function destroy()
     {
         $this->client->close();
-        unset($this->client);
-        unset($this->pack);
-        unset($this->packageLengthTypeLength);
-        unset($this->ip);
-        unset($this->port);
-        unset($this->timeOut);
         parent::destroy();
     }
 }

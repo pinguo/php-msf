@@ -11,22 +11,18 @@ namespace PG\MSF\Coroutine;
 use PG\MSF\Base\Exception;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Controllers\Controller;
+use PG\AOP\MI;
 
 class Task
 {
+    use MI;
+
     /**
      * 协程任务的迭代器
      *
      * @var \Generator
      */
     public $routine;
-
-    /**
-     * 请求上下文
-     *
-     * @var Context
-     */
-    public $context;
 
     /**
      * 任务销毁标识
@@ -101,7 +97,7 @@ class Task
                     }
                 }
 
-                while (!$routine->valid() && !empty($this->stack) && !$this->stack->isEmpty()) {
+                while (!empty($this->stack) && !$routine->valid() && !$this->stack->isEmpty()) {
                     $result = $routine->getReturn();
                     $this->routine = $this->stack->pop();
                     $this->routine->send($result);
@@ -188,15 +184,15 @@ class Task
     public function destroy()
     {
         if (!empty($this->context)) {
+            getInstance()->coroutine->taskMap[$this->context->getLogId()] = null;
             unset(getInstance()->coroutine->taskMap[$this->context->getLogId()]);
+            getInstance()->coroutine->IOCallBack[$this->context->getLogId()] = null;
             unset(getInstance()->coroutine->IOCallBack[$this->context->getLogId()]);
             if (getInstance()::mode == 'console') {
                 $this->controller->destroy();
             }
-            unset($this->context);
-            unset($this->controller);
-            unset($this->stack);
-            unset($this->routine);
+            $this->stack      = null;
+            $this->controller = null;
         }
     }
 
