@@ -75,10 +75,7 @@ class MSFCli extends MSFServer
                 break;
             }
 
-            /**
-             * @var $context Context
-             */
-            $context  = $controllerInstance->objectPool->get(Context::class);
+            $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
 
             // 初始化控制器
             $controllerInstance->requestStartTime = microtime(true);
@@ -93,25 +90,24 @@ class MSFCli extends MSFServer
             $PGLog->pushLog('method', $methodName);
 
             // 构造请求上下文成员
-            $context->setLogId($PGLog->logId);
-            $context->setLog($PGLog);
-            $context->setObjectPool($controllerInstance->objectPool);
-            $controllerInstance->setContext($context);
+            $controllerInstance->context->setLogId($PGLog->logId);
+            $controllerInstance->context->setLog($PGLog);
+            $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
 
             /**
              * @var $input Input
              */
-            $input    = $controllerInstance->objectPool->get(Input::class);
+            $input    = $controllerInstance->getObjectPool()->get(Input::class);
             $input->set($request);
-            $context->setInput($input);
-            $context->setControllerName($controllerName);
-            $context->setActionName($methodName);
+            $controllerInstance->context->setInput($input);
+            $controllerInstance->context->setControllerName($controllerName);
+            $controllerInstance->context->setActionName($methodName);
 
             $controllerInstance->setRequestResponse($request, null, $controllerName, $methodName);
 
             $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
             if ($generator instanceof \Generator) {
-                $this->coroutine->start($generator, $context, $controllerInstance);
+                $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
             } else {
                 $controllerInstance->destroy();
             }

@@ -91,8 +91,8 @@ class Loader
         } while (0);
 
         if (!getInstance()->server->taskworker) {
-            if ($parent != null && property_exists($parent, 'objectPool')) {
-                $taskProxy = $parent->objectPool->get(TaskProxy::class);
+            if ($parent != null && method_exists($parent, 'getObjectPool')) {
+                $taskProxy = $parent->getObjectPool()->get(TaskProxy::class);
             } else {
                 $taskProxy = new TaskProxy();
                 if ($parent != null) {

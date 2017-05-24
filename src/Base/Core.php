@@ -73,7 +73,7 @@ class Core extends Child
             $this->pack   = getInstance()->pack;
         }
 
-        if (empty(static::$reflections)) {
+        if (empty(Child::$reflections[static::class])) {
             $reflection  = new \ReflectionClass(static::class);
             $default     = $reflection->getDefaultProperties();
             $ps          = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
@@ -88,7 +88,7 @@ class Core extends Child
             unset($autoDestroy['useCount']);
             unset($autoDestroy['genTime']);
             unset($autoDestroy['coreName']);
-            static::$reflections = $autoDestroy;
+            Child::$reflections[static::class] = $autoDestroy;
             unset($reflection);
             unset($default);
             unset($ps);

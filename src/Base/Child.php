@@ -54,7 +54,7 @@ class Child
     {
         return $this->isConstruct;
     }
-    
+
     /**
      * 加入一个插件
      *
@@ -132,6 +132,6 @@ class Child
         foreach ($this->childList as $coreChild) {
             $coreChild->destroy();
         }
-        $this->resetProperties(static::$reflections);
+        $this->resetProperties(Child::$reflections[static::class]);
     }
 }

@@ -249,7 +249,7 @@ function dump($var, $format = true, $return = false)
     global $____GLOBAL_DUMP;
     dumpInternal($____GLOBAL_DUMP, $var, 0, $format);
     if (!$return) {
-        echo $____GLOBAL_DUMP;
+        echo $____GLOBAL_DUMP, "\n";
         $____GLOBAL_DUMP = '';
     } else {
         $dump            = $____GLOBAL_DUMP;
