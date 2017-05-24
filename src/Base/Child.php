@@ -9,9 +9,16 @@
 namespace PG\MSF\Base;
 
 use PG\MSF\Helpers\Context;
+use PG\AOP\MI;
 
 class Child
 {
+    // use method insert
+    use MI;
+    /**
+     * @var array
+     */
+    protected static $reflections = [];
     /**
      * 名称
      * @var string
@@ -34,13 +41,6 @@ class Child
      * 判断是否执行了__construct
      */
     protected $isConstruct = false;
-
-    /**
-     * 上下文
-     *
-     * @var Context
-     */
-    public $context;
 
     /**
      * after constructor
@@ -132,8 +132,6 @@ class Child
         foreach ($this->childList as $coreChild) {
             $coreChild->destroy();
         }
-        $this->childList = [];
-        $this->parent    = null;
-        $this->context   = null;
+        $this->resetProperties(static::$reflections);
     }
 }

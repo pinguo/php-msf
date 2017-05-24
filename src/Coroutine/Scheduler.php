@@ -112,7 +112,7 @@ class Scheduler
                         $data['object_poll'][$class][] = [
                             'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
                             'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
-                            'ref_count' => refcount($object),
+                            'ref_count' => refcount($object) - 1,
                         ];
                     }
                 } else {
@@ -144,7 +144,7 @@ class Scheduler
                         $data['model_poll'][$class][] = [
                             'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
                             'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
-                            'ref_count' => refcount($object),
+                            'ref_count' => refcount($object) - 1,
                         ];
                     }
                 } else {

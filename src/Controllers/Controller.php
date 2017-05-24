@@ -196,14 +196,13 @@ class Controller extends Core
     public function destroy()
     {
         $this->getContext()->getLog()->appendNoticeLog();
-        parent::destroy();
         //销毁对象池
         foreach ($this->objectPoolBuckets as $k => $obj) {
             $this->objectPool->push($obj);
             $this->objectPoolBuckets[$k] = null;
             unset($this->objectPoolBuckets[$k]);
         }
-
+        parent::destroy();
         ControllerFactory::getInstance()->revertController($this);
     }
 
