@@ -10,18 +10,10 @@ namespace PG\MSF\Base;
 
 use Monolog\Logger;
 use Noodlehaus\Config;
-use PG\AOP\MI;
 use PG\MSF\Pack\IPack;
 
 class Core extends Child
 {
-    // use method insert
-    use MI;
-
-    /**
-     * @var array
-     */
-    protected static $reflections = [];
     /**
      * @var int
      */
@@ -152,7 +144,6 @@ class Core extends Child
         if (!$this->isDestroy) {
             parent::destroy();
             $this->isDestroy = true;
-            $this->resetProperties(static::$reflections);
         }
     }
 

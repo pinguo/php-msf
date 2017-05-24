@@ -35,9 +35,10 @@ class Pool
      */
     public function get($class)
     {
-        $pool = $this->map[$class] ?? null;
+        $poolName = trim($class, '\\');
+        $pool     = $this->map[$poolName] ?? null;
         if ($pool == null) {
-            $pool = $this->applyNewPool($class);
+            $pool = $this->applyNewPool($poolName);
         }
         if ($pool->count()) {
             return $pool->shift();
@@ -49,13 +50,13 @@ class Pool
         }
     }
 
-    private function applyNewPool($class)
+    private function applyNewPool($poolName)
     {
-        if (array_key_exists($class, $this->map)) {
+        if (array_key_exists($poolName, $this->map)) {
             throw new Exception('the name is exists in pool map');
         }
-        $this->map[$class] = new \SplStack();
-        return $this->map[$class];
+        $this->map[$poolName] = new \SplStack();
+        return $this->map[$poolName];
     }
 
     /**
@@ -64,7 +65,7 @@ class Pool
      */
     public function push($classInstance)
     {
-        $class = get_class($classInstance);
+        $class = trim(get_class($classInstance), '\\');
         $pool = $this->map[$class] ?? null;
         if ($pool == null) {
             $pool = $this->applyNewPool($class);
