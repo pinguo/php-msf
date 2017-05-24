@@ -90,7 +90,7 @@ class ModelFactory
      * 归还一个model
      * @param $model Model
      */
-    public function revertModel($model)
+    public function revertModel(&$model)
     {
         if (!$model->getIsDestroy()) {
             $model->destroy();
@@ -98,7 +98,7 @@ class ModelFactory
 
         //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
         if (($model->genTime + 7200) < time() || $model->useCount > 10000) {
-            unset($model);
+            $model = null;
         } else {
             $this->pool[$model->coreName]->push($model);
         }

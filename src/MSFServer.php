@@ -106,7 +106,7 @@ abstract class MSFServer extends WebSocketServer
 
     public function start()
     {
-        return parent::start();
+        parent::start();
     }
 
     /**

@@ -175,10 +175,7 @@ abstract class HttpServer extends Server
             }
 
             try {
-                /**
-                 * @var $context Context
-                 */
-                $context  = $controllerInstance->objectPool->get(Context::class);
+                $controllerInstance->context  = $controllerInstance->objectPool->get(Context::class);
 
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
@@ -193,10 +190,9 @@ abstract class HttpServer extends Server
                 $PGLog->pushLog('method', $methodName);
 
                 // 构造请求上下文成员
-                $context->setLogId($PGLog->logId);
-                $context->setLog($PGLog);
-                $context->setObjectPool($controllerInstance->objectPool);
-                $controllerInstance->setContext($context);
+                $controllerInstance->context->setLogId($PGLog->logId);
+                $controllerInstance->context->setLog($PGLog);
+                $controllerInstance->context->setObjectPool($controllerInstance->objectPool);
 
                 /**
                  * @var $input Input
@@ -210,16 +206,16 @@ abstract class HttpServer extends Server
                 $output->set($request, $response);
                 $output->initialization($controllerInstance);
 
-                $context->setInput($input);
-                $context->setOutput($output);
-                $context->setControllerName($controllerName);
-                $context->setActionName($methodName);
+                $controllerInstance->context->setInput($input);
+                $controllerInstance->context->setOutput($output);
+                $controllerInstance->context->setControllerName($controllerName);
+                $controllerInstance->context->setActionName($methodName);
 
                 $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
 
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                 if ($generator instanceof \Generator) {
-                    $this->coroutine->start($generator, $context, $controllerInstance);
+                    $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                 }
 
                 if (!$this->route->getRouteCache($this->route->getPath())) {

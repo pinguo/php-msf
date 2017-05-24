@@ -743,10 +743,7 @@ abstract class Server extends Child
 
             $uid = $serv->connection_info($fd)['uid'] ?? 0;
             try {
-                /**
-                 * @var $context Context
-                 */
-                $context  = $controllerInstance->objectPool->get(Context::class);
+                $controllerInstance->context  = $controllerInstance->objectPool->get(Context::class);
 
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
@@ -761,10 +758,10 @@ abstract class Server extends Child
                 $PGLog->pushLog('method', $methodName);
 
                 // 构造请求上下文成员
-                $context->setLogId($PGLog->logId);
-                $context->setLog($PGLog);
-                $context->setObjectPool($controllerInstance->objectPool);
-                $controllerInstance->setContext($context);
+                $controllerInstance->context->setLogId($PGLog->logId);
+                $controllerInstance->context->setLog($PGLog);
+                $controllerInstance->context->setObjectPool($controllerInstance->objectPool);
+                $controllerInstance->setContext($controllerInstance->context);
 
                 /**
                  * @var $input Input
@@ -778,16 +775,16 @@ abstract class Server extends Child
                 $output->set($clientData, null);
                 $output->initialization($controllerInstance);
 
-                $context->setInput($input);
-                $context->setOutput($output);
-                $context->setControllerName($controllerName);
-                $context->setActionName($methodName);
+                $controllerInstance->context->setInput($input);
+                $controllerInstance->context->setOutput($output);
+                $controllerInstance->context->setControllerName($controllerName);
+                $controllerInstance->context->setActionName($methodName);
                 
                 $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                 if ($generator instanceof \Generator) {
-                    $this->coroutine->start($generator, $context, $controllerInstance);
+                    $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                 }
 
                 if (!$this->route->getRouteCache($this->route->getPath())) {
