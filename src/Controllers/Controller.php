@@ -30,7 +30,7 @@ class Controller extends Core
     /**
      * @var Wrapper|\PG\MSF\Memory\Pool
      */
-    public $objectPool;
+    protected $objectPool;
     /**
      * @var array
      */
@@ -88,6 +88,14 @@ class Controller extends Core
     {
         parent::__construct();
         $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
+    }
+
+    /**
+     * @return Wrapper|\PG\MSF\Base\AOP|\PG\MSF\Memory\Pool
+     */
+    public function getObjectPool()
+    {
+        return $this->objectPool;
     }
 
     /**

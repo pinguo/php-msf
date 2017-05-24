@@ -743,7 +743,7 @@ abstract class Server extends Child
 
             $uid = $serv->connection_info($fd)['uid'] ?? 0;
             try {
-                $controllerInstance->context  = $controllerInstance->objectPool->get(Context::class);
+                $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
 
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
@@ -760,18 +760,18 @@ abstract class Server extends Child
                 // 构造请求上下文成员
                 $controllerInstance->context->setLogId($PGLog->logId);
                 $controllerInstance->context->setLog($PGLog);
-                $controllerInstance->context->setObjectPool($controllerInstance->objectPool);
+                $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
                 $controllerInstance->setContext($controllerInstance->context);
 
                 /**
                  * @var $input Input
                  */
-                $input    = $controllerInstance->objectPool->get(Input::class);
+                $input    = $controllerInstance->getObjectPool()->get(Input::class);
                 $input->set($clientData);
                 /**
                  * @var $output Output
                  */
-                $output   = $controllerInstance->objectPool->get(Output::class);
+                $output   = $controllerInstance->getObjectPool()->get(Output::class);
                 $output->set($clientData, null);
                 $output->initialization($controllerInstance);
 

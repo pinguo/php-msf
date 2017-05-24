@@ -75,7 +75,7 @@ class MSFCli extends MSFServer
                 break;
             }
 
-            $controllerInstance->context  = $controllerInstance->objectPool->get(Context::class);
+            $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
 
             // 初始化控制器
             $controllerInstance->requestStartTime = microtime(true);
@@ -92,12 +92,12 @@ class MSFCli extends MSFServer
             // 构造请求上下文成员
             $controllerInstance->context->setLogId($PGLog->logId);
             $controllerInstance->context->setLog($PGLog);
-            $controllerInstance->context->setObjectPool($controllerInstance->objectPool);
+            $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
 
             /**
              * @var $input Input
              */
-            $input    = $controllerInstance->objectPool->get(Input::class);
+            $input    = $controllerInstance->getObjectPool()->get(Input::class);
             $input->set($request);
             $controllerInstance->context->setInput($input);
             $controllerInstance->context->setControllerName($controllerName);
