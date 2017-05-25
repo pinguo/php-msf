@@ -67,6 +67,15 @@ class RpcController extends Controller
 
     /**
      * @param $arguments
+     */
+    public function tcpCallHandler($arguments)
+    {
+        $this->parseTcpArgument($arguments);
+        yield $this->runMethod();
+    }
+
+    /**
+     * @param $arguments
      * @throws Exception
      */
     protected function parseHttpArgument(&$arguments)
@@ -96,31 +105,6 @@ class RpcController extends Controller
     }
 
     /**
-     * @throws Exception
-     */
-    protected function runMethod()
-    {
-        $handlerClass = 'Handlers\\' . $this->handler;
-        $handlerInstance = $this->loader->model($handlerClass, $this);
-        if (!method_exists($handlerInstance, $this->method)) {
-            throw new Exception('Rpc method not found.');
-        }
-        //$response = $handlerInstance->{$this->method}(...$this->reqParams);
-        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->reqParams);
-
-        $this->outputJson($response);
-    }
-
-    /**
-     * @param $arguments
-     */
-    public function tcpCallHandler($arguments)
-    {
-        $this->parseTcpArgument($arguments);
-        yield $this->runMethod();
-    }
-
-    /**
      * @param $arguments
      * @throws Exception
      */
@@ -144,5 +128,30 @@ class RpcController extends Controller
         $this->method = $arguments['method'];
         $this->reqParams = (array)$arguments['args'];
         $this->rpcTime = $arguments['time'];
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function runMethod()
+    {
+        $handlerClass = 'Handlers\\' . $this->handler;
+        $handlerInstance = $this->loader->model($handlerClass, $this);
+        if (!method_exists($handlerInstance, $this->method)) {
+            throw new Exception('Rpc method not found.');
+        }
+        //$response = $handlerInstance->{$this->method}(...$this->reqParams);
+        $this->preRunMethod();
+        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->reqParams);
+
+        $this->outputJson($response);
+    }
+
+    /**
+     * 在执行 method 前执行
+     */
+    protected function preRunMethod()
+    {
+
     }
 }
