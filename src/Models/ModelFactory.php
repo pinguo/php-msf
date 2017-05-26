@@ -96,11 +96,6 @@ class ModelFactory
             $model->destroy();
         }
 
-        //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
-        if (($model->genTime + 7200) < time() || $model->useCount > 10000) {
-            $model = null;
-        } else {
-            $this->pool[$model->coreName]->push($model);
-        }
+        $this->pool[$model->coreName]->push($model);
     }
 }
