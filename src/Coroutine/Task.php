@@ -113,7 +113,7 @@ class Task
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if (empty($value)) {
                 $value = "";
             }
@@ -150,7 +150,7 @@ class Task
         return $runTaskException;
     }
 
-    public function handleTaskException(\Exception $e, $value)
+    public function handleTaskException(\Throwable $e, $value)
     {
         if ($value != '') {
             $logValue = '';
