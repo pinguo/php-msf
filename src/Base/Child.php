@@ -103,16 +103,6 @@ class Child
     }
 
     /**
-     * 获取上下文
-     *
-     * @return Context
-     */
-    public function getContext()
-    {
-        return $this->context ?? null;
-    }
-
-    /**
      * 设置上下文
      *
      * @param $context

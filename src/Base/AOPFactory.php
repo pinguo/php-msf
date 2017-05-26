@@ -80,12 +80,6 @@ class AOPFactory extends Factory
                 if (!empty(self::$reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
                     $arguments[0]->resetProperties(self::$reflections[$class]);
                 }
-                //判断是否还返还对象：使用时间超过2小时或者使用次数大于10000则不返还，直接销毁
-                if (($arguments[0]->genTime + 7200) < time() || $arguments[0]->useCount > 10000) {
-                    $data['result'] = false;
-                    $arguments[0]   = null;
-                    unset($arguments[0]);
-                }
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;
