@@ -66,9 +66,9 @@ class ControllerFactory
             return null;
         } while (0);
 
-        $controllers = $this->pool[$controller]??null;
+        $controllers = $this->pool[$className] ?? null;
         if ($controllers == null) {
-            $controllers = $this->pool[$controller] = new \SplStack();
+            $controllers = $this->pool[$className] = new \SplStack();
         }
 
         if (!$controllers->isEmpty()) {
@@ -79,7 +79,7 @@ class ControllerFactory
         }
 
         $controllerInstance = new $className;
-        $controllerInstance->coreName = $controller;
+        $controllerInstance->coreName = $className;
         $controllerInstance->afterConstruct();
         $controllerInstance->genTime  = time();
         $controllerInstance->useCount = 1;
@@ -117,9 +117,9 @@ class ControllerFactory
             return null;
         } while (0);
 
-        $controllers = $this->pool[$controller]??null;
+        $controllers = $this->pool[$className] ?? null;
         if ($controllers == null) {
-            $controllers = $this->pool[$controller] = new \SplStack();
+            $controllers = $this->pool[$className] = new \SplStack();
         }
 
         if (!$controllers->isEmpty()) {
@@ -130,7 +130,7 @@ class ControllerFactory
         }
 
         $controllerInstance = new $className;
-        $controllerInstance->coreName = $controller;
+        $controllerInstance->coreName = $className;
         $controllerInstance->afterConstruct();
         $controllerInstance->genTime  = time();
         $controllerInstance->useCount = 1;

@@ -91,11 +91,21 @@ class Controller extends Core
     }
 
     /**
-     * @return Wrapper|\PG\MSF\Base\AOP|\PG\MSF\Memory\Pool
+     * @return Wrapper|\PG\MSF\Memory\Pool
      */
     public function getObjectPool()
     {
         return $this->objectPool;
+    }
+
+    /**
+     * @param Wrapper|\PG\MSF\Memory\Pool|NULL $objectPool
+     * @return $this
+     */
+    public function setObjectPool($objectPool)
+    {
+        $this->objectPool = $objectPool;
+        return $this;
     }
 
     /**
@@ -232,7 +242,7 @@ class Controller extends Core
     {
         if ($this->requestType == Marco::HTTP_REQUEST) {
             $this->getContext()->getOutput()->setHeader('HTTP/1.1', '404 Not Found');
-            $template = $this->loader->view('server::error_404');
+            $template = $this->getLoader()->view('server::error_404');
             $this->getContext()->getOutput()->end($template->render());
         } else {
             throw new Exception('method not exist');

@@ -256,8 +256,8 @@ abstract class Server extends Child
                 }
             }
         }
-        $this->route     = new $routeClassName;
-        $this->loader    = new Loader();
+        $this->route  = new $routeClassName;
+        $this->loader = new Loader();
     }
 
     /**

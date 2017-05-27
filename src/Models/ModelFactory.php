@@ -65,9 +65,9 @@ class ModelFactory
             throw new Exception("class $model is not exist");
         } while (0);
 
-        $models = $this->pool[$model]??null;
+        $models = $this->pool[$className] ?? null;
         if ($models == null) {
-            $models = $this->pool[$model] = new \SplStack();
+            $models = $this->pool[$className] = new \SplStack();
         }
 
         if (!$models->isEmpty()) {
