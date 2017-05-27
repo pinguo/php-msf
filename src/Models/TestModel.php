@@ -21,7 +21,7 @@ class TestModel extends Model
     public function contextTest()
     {
         print_r($this->getContext());
-        $testTask = $this->loader->task('TestTask', $this);
+        $testTask = $this->getLoader()->task('TestTask', $this);
         $testTask->contextTest();
         $testTask->startTask(null);
     }
@@ -56,7 +56,7 @@ class TestModel extends Model
 
     public function testTask()
     {
-        $testTask = $this->loader->task('TestTask', $this);
+        $testTask = $this->getLoader()->task('TestTask', $this);
         $testTask->test();
         $testTask->startTask(null);
     }

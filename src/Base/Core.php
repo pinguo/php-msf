@@ -27,26 +27,6 @@ class Core extends Child
      * @var bool
      */
     protected $isDestroy = false;
-    /**
-     * @var Loader
-     */
-    protected $loader;
-    /**
-     * @var Logger
-     */
-    protected $logger;
-    /**
-     * @var \swoole_server
-     */
-    protected $server;
-    /**
-     * @var Config
-     */
-    protected $config;
-    /**
-     * @var IPack
-     */
-    protected $pack;
 
     protected $start_run_time;
 
@@ -65,14 +45,6 @@ class Core extends Child
      */
     public function __construct()
     {
-        if (!empty(getInstance())) {
-            $this->loader = getInstance()->loader;
-            $this->logger = getInstance()->log;
-            $this->server = getInstance()->server;
-            $this->config = getInstance()->config;
-            $this->pack   = getInstance()->pack;
-        }
-
         if (empty(Child::$reflections[static::class])) {
             $reflection  = new \ReflectionClass(static::class);
             $default     = $reflection->getDefaultProperties();
@@ -101,7 +73,7 @@ class Core extends Child
      */
     public function getLoader()
     {
-        return $this->loader;
+        return getInstance()->loader;
     }
 
     /**
@@ -109,7 +81,7 @@ class Core extends Child
      */
     public function getLogger()
     {
-        return $this->logger;
+        return getInstance()->log;
     }
 
     /**
@@ -117,7 +89,7 @@ class Core extends Child
      */
     public function getServer()
     {
-        return $this->server;
+        return getInstance()->server;
     }
 
     /**
@@ -125,7 +97,7 @@ class Core extends Child
      */
     public function getConfig()
     {
-        return $this->config;
+        return getInstance()->config;
     }
 
     /**
@@ -133,7 +105,7 @@ class Core extends Child
      */
     public function getPack()
     {
-        return $this->pack;
+        return getInstance()->pack;
     }
 
     /**

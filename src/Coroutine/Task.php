@@ -46,6 +46,13 @@ class Task
     protected $controller;
 
     /**
+     * 任务ID
+     *
+     * @var string
+     */
+    protected $id;
+
+    /**
      * 初始化方法
      *
      * @param \Generator $routine
@@ -53,12 +60,13 @@ class Task
      * @param Controller $controller
      * @return $this
      */
-    public function initialization(\Generator $routine, Context $context, Controller $controller)
+    public function initialization(\Generator $routine, Context &$context, Controller &$controller)
     {
         $this->routine    = $routine;
         $this->context    = $context;
         $this->controller = $controller;
-        $this->stack = new \SplStack();
+        $this->stack      = new \SplStack();
+        $this->id         = $context->getLogId();
         return $this;
     }
 
@@ -97,7 +105,7 @@ class Task
                     }
                 }
 
-                while (!empty($this->stack) && !$routine->valid() && !$this->stack->isEmpty()) {
+                while (!empty($this->stack) && !$this->routine->valid() && !$this->stack->isEmpty()) {
                     $result = $routine->getReturn();
                     $this->routine = $this->stack->pop();
                     $this->routine->send($result);
@@ -130,7 +138,7 @@ class Task
         }
     }
 
-    public function handleTaskTimeout(\Exception $e, $value)
+    public function handleTaskTimeout(\Throwable $e, $value)
     {
         if ($value != '') {
             $logValue = '';
@@ -183,16 +191,17 @@ class Task
      */
     public function destroy()
     {
-        if (!empty($this->context)) {
-            getInstance()->coroutine->taskMap[$this->context->getLogId()] = null;
-            unset(getInstance()->coroutine->taskMap[$this->context->getLogId()]);
-            getInstance()->coroutine->IOCallBack[$this->context->getLogId()] = null;
-            unset(getInstance()->coroutine->IOCallBack[$this->context->getLogId()]);
+        if (!empty($this->id)) {
+            getInstance()->coroutine->taskMap[$this->id] = null;
+            unset(getInstance()->coroutine->taskMap[$this->id]);
+            getInstance()->coroutine->IOCallBack[$this->id] = null;
+            unset(getInstance()->coroutine->IOCallBack[$this->id]);
             if (getInstance()::mode == 'console') {
                 $this->controller->destroy();
             }
             $this->stack      = null;
             $this->controller = null;
+            $this->id         = null;
         }
     }
 

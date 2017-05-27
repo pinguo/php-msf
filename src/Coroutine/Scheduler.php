@@ -51,6 +51,40 @@ class Scheduler
                 }
             }
         });
+
+        swoole_timer_tick(60000, function ($timerId) {
+            if (!empty(getInstance()->objectPool->map)) {
+                foreach (getInstance()->objectPool->map as $class => &$objectsMap) {
+                    while ($objectsMap->count()) {
+                        $obj = $objectsMap->shift();
+                        $obj = null;
+                        unset($obj);
+                    }
+                }
+            }
+
+            if (!empty(ControllerFactory::getInstance()->pool)) {
+                foreach (ControllerFactory::getInstance()->pool as $class => &$objectsCPool) {
+                    while ($objectsCPool->count()) {
+                        $obj = $objectsCPool->shift();
+                        $obj->getObjectPool()->destroy();
+                        $obj->setObjectPool(null);
+                        $obj = null;
+                        unset($obj);
+                    }
+                }
+            }
+
+            if (!empty(ModelFactory::getInstance()->pool)) {
+                foreach (ModelFactory::getInstance()->pool as $class => &$objectsMPool) {
+                    while ($objectsMPool->count()) {
+                        $obj = $objectsMPool->shift();
+                        $obj = null;
+                        unset($obj);
+                    }
+                }
+            }
+        });
     }
 
     public function stat()
