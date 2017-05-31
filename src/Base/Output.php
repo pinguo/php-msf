@@ -50,7 +50,7 @@ class Output extends Core
      * @param $request
      * @param $response
      */
-    public function set($request, $response)
+    public function set(&$request, &$response)
     {
         $this->request  = $request;
         $this->response = $response;
