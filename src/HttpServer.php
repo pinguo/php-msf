@@ -210,8 +210,8 @@ abstract class HttpServer extends Server
                 $controllerInstance->context->setOutput($output);
                 $controllerInstance->context->setControllerName($controllerName);
                 $controllerInstance->context->setActionName($methodName);
-
-                $controllerInstance->setRequestResponse($request, $response, $controllerName, $methodName);
+                $controllerInstance->setRequestType(Marco::HTTP_REQUEST);
+                $controllerInstance->initialization($controllerName, $methodName);
 
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
                 if ($generator instanceof \Generator) {

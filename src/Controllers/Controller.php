@@ -51,16 +51,6 @@ class Controller extends Core
      */
     public $clientData;
     /**
-     * http response
-     * @var \swoole_http_request
-     */
-    public $request;
-    /**
-     * http response
-     * @var \swoole_http_response
-     */
-    public $response;
-    /**
      * 用于单元测试模拟捕获服务器发出的消息
      * @var array
      */
@@ -121,8 +111,25 @@ class Controller extends Core
         $this->uid = $uid;
         $this->fd  = $fd;
         $this->clientData = $clientData;
-        $this->requestType = Marco::TCP_REQUEST;
         $this->initialization($controllerName, $methodName);
+    }
+
+    /**
+     * @param string $requestType
+     * @return $this
+     */
+    public function setRequestType($requestType)
+    {
+        $this->requestType = $requestType;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestType()
+    {
+        return $this->requestType;
     }
 
     /**
@@ -133,21 +140,6 @@ class Controller extends Core
     public function initialization($controllerName, $methodName)
     {
         $this->requestStartTime = microtime(true);
-    }
-
-    /**
-     * set http Request Response
-     * @param $request
-     * @param $response
-     * @param $controllerName
-     * @param $methodName
-     */
-    public function setRequestResponse($request, $response, $controllerName, $methodName)
-    {
-        $this->request     = $request;
-        $this->response    = $response;
-        $this->requestType = Marco::HTTP_REQUEST;
-        $this->initialization($controllerName, $methodName);
     }
 
     /**
