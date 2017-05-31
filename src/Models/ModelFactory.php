@@ -78,7 +78,7 @@ class ModelFactory
         }
 
         $modelInstance = new $className;
-        $modelInstance->coreName = $model;
+        $modelInstance->coreName = $className;
         $modelInstance->afterConstruct();
         $modelInstance->genTime  = time();
         $modelInstance->useCount = 1;
