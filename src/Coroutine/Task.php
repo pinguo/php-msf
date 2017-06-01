@@ -53,6 +53,11 @@ class Task
     protected $id;
 
     /**
+     * @var \Throwable
+     */
+    protected $exception;
+
+    /**
      * 初始化方法
      *
      * @param \Generator $routine
@@ -71,6 +76,14 @@ class Task
     }
 
     /**
+     * @param \Throwable $exception
+     */
+    public function setException(\Throwable $exception)
+    {
+        $this->exception = $exception;
+    }
+
+    /**
      * 协程调度
      */
     public function run()
@@ -79,6 +92,9 @@ class Task
         try {
             if (!$routine) {
                 return;
+            }
+            if ($this->exception) {
+                throw $this->exception;
             }
             $value = $routine->current();
             //嵌套的协程
@@ -122,12 +138,11 @@ class Task
                 }
             }
         } catch (\Throwable $e) {
+            $this->exception = null;
             if (empty($value)) {
-                $value = "";
+                $value = '';
             }
-
             $runTaskException = $this->handleTaskException($e, $value);
-
             if ($this->controller) {
                 call_user_func([$this->controller, 'onExceptionHandle'], $runTaskException);
             } else {
@@ -165,7 +180,7 @@ class Task
             dumpInternal($logValue, $value, 0, false);
             $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
         } else {
-            $message = 'message: ' . $e->getMessage();
+            $message = $e->getMessage();
         }
 
         $runTaskException = new Exception($message, $e->getCode(), $e);

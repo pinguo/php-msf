@@ -196,17 +196,23 @@ class Scheduler
     {
         while (!$this->taskQueue->isEmpty()) {
             $task = $this->taskQueue->dequeue();
+            /* @var $task Task */
             $task->run();
             if (empty($task->routine)) {
                 continue;
             }
-            if ($task->routine->valid() && ($task->routine->current() instanceof IBase)) {
-            } else {
-                if ($task->isFinished()) {
-                    $task->destroy();
+            try {
+                if ($task->routine->valid() && ($task->routine->current() instanceof IBase)) {
                 } else {
-                    $this->schedule($task);
+                    if ($task->isFinished()) {
+                        $task->destroy();
+                    } else {
+                        $this->schedule($task);
+                    }
                 }
+            } catch (\Throwable $e) {
+                $task->setException($e);
+                $this->schedule($task);
             }
         }
     }
