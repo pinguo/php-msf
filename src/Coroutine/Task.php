@@ -112,7 +112,7 @@ class Task
                         $this->handleTaskTimeout($e, $value);
                     }
                     unset($value);
-                    $routine->send(null);
+                    $routine->send(false);
                 } else {
                     $result = $value->getResult();
                     if ($result !== CNull::getInstance()) {
