@@ -10,7 +10,6 @@
 
 namespace PG\MSF\Tasks;
 
-use PG\Log\PGLog;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Base\AOPFactory;
 
