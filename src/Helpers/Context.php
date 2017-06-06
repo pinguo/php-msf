@@ -52,6 +52,12 @@ class Context extends AbstractContext
     protected $actionName;
 
     /**
+     * 存储自定义的全局上下文数据
+     * @var array
+     */
+    protected $userDefined = [];
+
+    /**
      * 获取请求输入对象
      *
      * @return Input
@@ -161,9 +167,43 @@ class Context extends AbstractContext
         return $this->actionName;
     }
 
+    /**
+     * 获取所有用户自定义的全局上下文对象
+     *
+     * @return array
+     */
+    public function getAllUserDefined()
+    {
+        return $this->userDefined;
+    }
+
+    /**
+     * 获取key所对应的用户自定义的全局上下文数据
+     *
+     * @param $key
+     * @return mixed|null
+     */
+    public function getUserDefined($key)
+    {
+        return $this->userDefined[$key] ?? null;
+    }
+
+    /**
+     * 设置key所对应的用户自定义的全局上下文的value
+     *
+     * @param string $key
+     * @param mixed $val
+     * @return $this
+     */
+    public function setUserDefined($key, $val)
+    {
+        $this->userDefined[(string)$key] = $val;
+        return $this;
+    }
+
     public function __sleep()
     {
-        return ['logId', 'input', 'controllerName', 'actionName'];
+        return ['logId', 'input', 'controllerName', 'actionName', 'userDefined'];
     }
 
     public function destroy()
@@ -174,5 +214,6 @@ class Context extends AbstractContext
         $this->objectPool     = null;
         $this->controllerName = null;
         $this->actionName     = null;
+        $this->userDefined    = [];
     }
 }
