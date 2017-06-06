@@ -87,14 +87,14 @@ class RpcClient
          * 'user' = [
          *     'host' => 'http://10.1.90.10:80', <必须>
          *     'timeout' => 1000, <选填，可被下级覆盖>
-         *     'secret' => 'xxxxxx', <选填，可被下级覆盖>
+         *     'appsecret' => 'xxxxxx', <选填，可被下级覆盖>
          *     'useRpc' => false, <选填，可被下级覆盖>
          *     '1' => [
          *         'useRpc' => false, // 是否真的使用 rpc 方式，为了兼容非 rpc 服务 <选填，如果填写将会覆盖上级的 useRpc>
          *         'urlPath' => '/path', <选填>
          *         'verb' => 'GET', <选填>
          *         'timeout' => 2000, <选填，如果填写将会覆盖上级的 timeout>
-         *         'secret' => 'yyyyyy', <选填，如果填写将会覆盖上级的 secret>
+         *         'appsecret' => 'yyyyyy', <选填，如果填写将会覆盖上级的 appsecret>
          *     ]
          * ]
          */
@@ -110,8 +110,8 @@ class RpcClient
         if (! isset($config['timeout'])) {
             $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
         }
-        if (!isset($config['secret'])) {
-            $config['secret'] = getInstance()->config->get('params.service.' . $root . '.secret', '');
+        if (!isset($config['appsecret'])) {
+            $config['appsecret'] = getInstance()->config->get('params.service.' . $root . '.appsecret', '');
         }
         // 赋值到类属性中.
         $this->host = $config['host'];
@@ -129,7 +129,7 @@ class RpcClient
         }
         $this->verb = $config['verb'] ?? 'POST';
         $this->timeout = $config['timeout'];
-        $this->secret = $config['secret'];
+        $this->appsecret = $config['appsecret'];
     }
 
     /**
@@ -196,7 +196,7 @@ class RpcClient
             'method' => $method
         ];
         $reqParams['X-RPC'] = 1;
-        $reqParams['sig'] = static::genSig($reqParams, $rpc->secret);
+        $reqParams['sig'] = static::genSig($reqParams, $rpc->appsecret);
 
         $tcpClient = yield $obj->getContext()->getObjectPool(TClient::class)->coroutineGetTcpClient($rpc->host);
         if ($tcpClient == null) {
@@ -210,15 +210,15 @@ class RpcClient
     /**
      * 生产秘钥
      * @param $params
-     * @param $secret
+     * @param string $appsecret
      * @return bool|string
      */
-    public static function genSig($params, $secret)
+    public static function genSig($params, $appsecret)
     {
-        if ($secret === '') {
+        if ($appsecret === '') {
             return '';
         }
-        $sig = SecurityHelper::sign($params, $secret);
+        $sig = SecurityHelper::sign($params, $appsecret);
 
         return $sig;
     }
@@ -250,14 +250,14 @@ class RpcClient
             ];
             $sendData = [
                 'data' => getInstance()->pack->pack($reqParams),
-                'sig' => static::genSig($reqParams, $rpc->secret),
+                'sig' => static::genSig($reqParams, $rpc->appsecret),
             ];
             $headers = [
                 'X-RPC' => 1,
             ];
         } else {
             $sendData = $args[0];
-            $sendData['sig'] = static::genSig($args[0], $rpc->secret);
+            $sendData['sig'] = static::genSig($args[0], $rpc->appsecret);
         }
 
         $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
