@@ -26,11 +26,6 @@ class Child
     public $coreName;
 
     /**
-     * @var \stdClass
-     */
-    public $parent;
-
-    /**
      * 子集
      *
      * @var array

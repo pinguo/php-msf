@@ -93,6 +93,7 @@ class AOPFactory extends Factory
                 $result->useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
                 $result->context = &$coreBase->context;
+                $result->parent  = &$coreBase;
                 $class = get_class($result);
                 if (!isset(self::$reflections[$class])) {
                     $reflection  = new \ReflectionClass($class);
