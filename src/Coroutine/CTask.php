@@ -20,17 +20,6 @@ class CTask extends Base
         parent::init();
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
-        //$args                = array_map(
-        //    function ($elem) {
-        //        if (is_string($elem) && strlen($elem) > 4096) {
-        //            return 'string[too big, not display]';
-        //        } else {
-        //            return str_replace(["\n", "  "], ["", " "], var_export($elem, true));
-        //        }
-        //    },
-        //    $taskProxyData['message']['task_fuc_data']
-        //);
-        //$profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'] . '(' . implode(', ', $args) . ')';
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];
         /**
          * @var Context $context

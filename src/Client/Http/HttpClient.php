@@ -62,7 +62,7 @@ class HttpClient extends Core
 
     /**
      * @param $path
-     * @param $query
+     * @param mixed(array|object) $query
      * @param $callback
      */
     public function get($path, $query, $callback)
