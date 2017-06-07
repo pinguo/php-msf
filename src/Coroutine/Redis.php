@@ -20,14 +20,16 @@ class Redis extends Base
     public $name;
     public $arguments;
 
-    public $serializer = null;
+    public $phpSerialize = false;
+    public $redisSerialize = false;
 
     public function initialization(Context $context, $redisAsynPool, $name, $arguments)
     {
         parent::init(3000);
         $this->context       = $context;
         $this->redisAsynPool = $redisAsynPool;
-        $this->serializer    = $redisAsynPool->serializer;
+        $this->phpSerialize    = $redisAsynPool->phpSerialize;
+        $this->redisSerialize = $redisAsynPool->redisSerialize;
         $this->name          = $name;
         $this->arguments     = $arguments;
         $this->request       = "redis.$name";
@@ -78,10 +80,14 @@ class Redis extends Base
      */
     protected function unSerializeHandler($data)
     {
-        if ($this->serializer == \Redis::SERIALIZER_PHP) {
-            return unserialize($data);
-        } else {
-            return $data;
+        if ($this->redisSerialize) {
+            $data = $this->redisAsynPool->redisClient->_unserialize($data);
         }
+
+        if ($this->phpSerialize) {
+            $data = unserialize($data);
+        }
+
+        return $data;
     }
 }

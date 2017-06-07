@@ -10,6 +10,7 @@ namespace PG\MSF\DataBase;
 
 use PG\MSF\Base\Exception;
 use PG\MSF\Coroutine\Redis;
+use PG\MSF\Helpers\Context;
 
 class RedisAsynPool extends AsynPool
 {
@@ -22,11 +23,16 @@ class RedisAsynPool extends AsynPool
     protected $redisMaxCount = 0;
     private $active;
     private $coroutineRedisHelp;
-    private $redisClient;
+    /**
+     * 不要在业务中使用
+     * @var \Redis
+     */
+    public $redisClient;
 
     public $keyPrefix = '';
     public $hashKey = false;
-    public $serializer = null;
+    public $phpSerialize = false;
+    public $redisSerialize = false;
 
 
     public function __construct($config, $active)
@@ -36,8 +42,9 @@ class RedisAsynPool extends AsynPool
 
         $config = $this->config['redis'][$this->active];
         !empty($config['hashKey']) && ($this->hashKey = $config['hashKey']);
-        !empty($config['options'][\Redis::OPT_SERIALIZER]) && ($this->serializer = $config['options'][\Redis::OPT_SERIALIZER]);
-        !empty($config['options'][\Redis::OPT_PREFIX]) && ($this->keyPrefix = $config['options'][\Redis::OPT_PREFIX]);
+        !empty($config['redisSerialize']) && ($this->redisSerialize = $config['doubleSerialize']);
+        !empty($config['phpSerialize']) && ($this->phpSerialize = $config['phpSerialize']);
+        !empty($config['keyPrefix']) && ($this->keyPrefix = $config['keyPrefix']);
 
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
     }
@@ -109,12 +116,10 @@ class RedisAsynPool extends AsynPool
         }
 
         //序列化
-        isset($this->redisOptions[\Redis::OPT_SERIALIZER]) &&
-        $this->redisClient->setOption(\Redis::OPT_SERIALIZER, $this->redisOptions[\Redis::OPT_SERIALIZER]);
+        $this->redisSerialize && $this->redisClient->setOption(\Redis::OPT_SERIALIZER, $this->redisSerialize);
 
         //前缀
-        isset($this->redisOptions[\Redis::OPT_PREFIX]) &&
-        $this->redisClient->setOption(\Redis::OPT_PREFIX, $this->redisOptions[\Redis::OPT_PREFIX]);
+        $this->keyPrefix && $this->redisClient->setOption(\Redis::OPT_PREFIX, $this->keyPrefix);
 
         return $this->redisClient;
     }
