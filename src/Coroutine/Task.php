@@ -127,7 +127,7 @@ class Task
                     $this->routine->send($result);
                 }
             } else {
-                if ($routine->valid()) {
+                if ($routine instanceof \Generator && $routine->valid()) {
                     $routine->send($value);
                 } else {
                     if (count($this->stack) > 0) {
@@ -185,7 +185,7 @@ class Task
 
         $runTaskException = new Exception($message, $e->getCode(), $e);
 
-        while (!$this->stack->isEmpty()) {
+        while (!empty($this->stack) && !$this->stack->isEmpty()) {
             $this->routine = $this->stack->pop();
             try {
                 $this->routine->throw($runTaskException);
