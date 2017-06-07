@@ -17,15 +17,16 @@ class CoroutineRedisHelp
 
     public $keyPrefix = '';
     public $hashKey = false;
-    public $serializer = null;
-
+    public $phpSerialize = false;
+    public $redisSerialize = false;
 
     public function __construct(RedisAsynPool $redisAsynPool)
     {
         $this->redisAsynPool = $redisAsynPool;
         $this->hashKey = $redisAsynPool->hashKey;
-        $this->serializer = $redisAsynPool->serializer;
+        $this->phpSerialize = $redisAsynPool->phpSerialize;
         $this->keyPrefix = $redisAsynPool->keyPrefix;
+        $this->redisSerialize = $redisAsynPool->redisSerialize;
     }
 
     /**
@@ -138,11 +139,15 @@ class CoroutineRedisHelp
      */
     protected function serializeHandler($data)
     {
-        if ($this->serializer == \Redis::SERIALIZER_PHP) {
-            return serialize($data);
-        } else {
-            return $data;
+        if ($this->phpSerialize) {
+            $data = serialize($data);
         }
+
+        if ($this->redisSerialize) {
+            $data = $this->redisAsynPool->redisClient->_serialize($data);
+        }
+
+        return $data;
     }
 
     /**
@@ -152,10 +157,14 @@ class CoroutineRedisHelp
      */
     protected function unSerializeHandler($data)
     {
-        if ($this->serializer == \Redis::SERIALIZER_PHP) {
-            return unserialize($data);
-        } else {
-            return $data;
+        if ($this->redisSerialize) {
+            $data = $this->redisAsynPool->redisClient->_unserialize($data);
         }
+
+        if ($this->phpSerialize) {
+            $data = unserialize($data);
+        }
+
+        return $data;
     }
 }
