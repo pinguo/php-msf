@@ -162,11 +162,11 @@ class CoroutineRedisHelp
             return false;
         }
 
-        if ($this->redisSerialize) {
+        if (is_string($data) && $this->redisSerialize) {
             $data = $this->redisAsynPool->redisClient->_unserialize($data);
         }
 
-        if ($this->phpSerialize) {
+        if (is_string($data) && $this->phpSerialize) {
             $data = unserialize($data);
         }
 
