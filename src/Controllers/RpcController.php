@@ -152,6 +152,5 @@ class RpcController extends Controller
      */
     protected function preRunMethod()
     {
-
     }
 }
