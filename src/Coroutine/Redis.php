@@ -80,6 +80,11 @@ class Redis extends Base
      */
     protected function unSerializeHandler($data)
     {
+        // 如果值是null，直接返回false
+        if (null === $data) {
+            return false;
+        }
+
         if ($this->redisSerialize) {
             $data = $this->redisAsynPool->redisClient->_unserialize($data);
         }

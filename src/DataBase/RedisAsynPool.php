@@ -42,11 +42,12 @@ class RedisAsynPool extends AsynPool
 
         $config = $this->config['redis'][$this->active];
         !empty($config['hashKey']) && ($this->hashKey = $config['hashKey']);
-        !empty($config['redisSerialize']) && ($this->redisSerialize = $config['doubleSerialize']);
+        !empty($config['redisSerialize']) && ($this->redisSerialize = $config['redisSerialize']);
         !empty($config['phpSerialize']) && ($this->phpSerialize = $config['phpSerialize']);
         !empty($config['keyPrefix']) && ($this->keyPrefix = $config['keyPrefix']);
 
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
+        $this->getSync();
     }
 
     public function serverInit($swooleServer, $asynManager)
