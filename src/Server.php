@@ -666,10 +666,14 @@ abstract class Server extends Child
      */
     public function onSwooleWorkerStart($serv, $workerId)
     {
-        //清除apc缓存
         if (function_exists('apc_clear_cache')) {
             apc_clear_cache();
         }
+
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
         file_put_contents(self::$pidFile, ',' . $serv->worker_pid, FILE_APPEND);
         if (!$serv->taskworker) {//worker进程
             if ($this->needCoroutine) {//启动协程调度器
