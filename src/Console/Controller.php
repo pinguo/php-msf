@@ -21,8 +21,10 @@ class Controller extends BController
 
     public function destroy()
     {
-        $this->getContext()->getLog()->pushLog('params', $this->getContext()->getInput()->getAllPostGet());
-        $this->getContext()->getLog()->pushLog('status', '200');
+        if ($this->getContext()) {
+            $this->getContext()->getLog()->pushLog('params', $this->getContext()->getInput()->getAllPostGet());
+            $this->getContext()->getLog()->pushLog('status', '200');
+        }
         parent::destroy();
         clearTimes();
         exit();
