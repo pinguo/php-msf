@@ -35,7 +35,7 @@ class RedisAsynPool extends AsynPool
     public $redisSerialize = false;
 
 
-    public function __construct($config, $active)
+    public function __construct($config, string $active)
     {
         parent::__construct($config);
         $this->active = $active;
@@ -60,7 +60,7 @@ class RedisAsynPool extends AsynPool
      * @param $name
      * @param $arguments
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, $arguments)
     {
         $callback = array_pop($arguments);
         $data = [
