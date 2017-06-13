@@ -58,20 +58,62 @@ class Task
     protected $exception;
 
     /**
+     * @var callable|null
+     */
+    protected $callBack;
+
+    /**
      * 初始化方法
      *
      * @param \Generator $routine
      * @param Context $context
      * @param Controller $controller
+     * @param $callBack callable|null
      * @return $this
      */
-    public function initialization(\Generator $routine, Context &$context, Controller &$controller)
+    public function initialization(\Generator $routine, Context &$context, Controller &$controller, callable $callBack = null)
     {
         $this->routine    = $routine;
         $this->context    = $context;
         $this->controller = $controller;
         $this->stack      = new \SplStack();
         $this->id         = $context->getLogId();
+        $this->callBack   = $callBack;
+        return $this;
+    }
+
+    /**
+     * 重置迭代器
+     *
+     * @param \Generator $routine
+     * @return $this
+     */
+    public function resetRoutine(\Generator $routine) {
+        $this->routine = null;
+        $this->routine = $routine;
+        return $this;
+    }
+
+    /**
+     * 获取callback
+     *
+     * @return mixed
+     */
+    public function getCallBack()
+    {
+        return $this->callBack;
+    }
+
+    /**
+     * 重置callback
+     *
+     * @param callable|null $callBack
+     * @return $this
+     */
+    public function resetCallBack(callable $callBack = null)
+    {
+        $this->callBack = null;
+        $this->callBack = $callBack;
         return $this;
     }
 
@@ -217,6 +259,7 @@ class Task
             $this->stack      = null;
             $this->controller = null;
             $this->id         = null;
+            $this->callBack   = null;
         }
     }
 
