@@ -205,7 +205,12 @@ class Scheduler
                 if ($task->routine->valid() && ($task->routine->current() instanceof IBase)) {
                 } else {
                     if ($task->isFinished()) {
-                        $task->destroy();
+                        if (is_callable($task->getCallBack())) {
+                            call_user_func($task->getCallBack());
+                            $task->resetCallBack();
+                        } else {
+                            $task->destroy();
+                        }
                     } else {
                         $this->schedule($task);
                     }
@@ -223,9 +228,9 @@ class Scheduler
         return $this;
     }
 
-    public function start(\Generator $routine, Context $context, Controller $controller)
+    public function start(\Generator $routine, Context $context, Controller $controller, callable $callBack = null)
     {
-        $task = $context->getObjectPool()->get(Task::class)->initialization($routine, $context, $controller);
+        $task = $context->getObjectPool()->get(Task::class)->initialization($routine, $context, $controller, $callBack);
         $this->IOCallBack[$context->getLogId()] = [];
         $this->taskMap[$context->getLogId()]    = $task;
         $this->taskQueue->enqueue($task);
