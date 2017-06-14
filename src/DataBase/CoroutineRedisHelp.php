@@ -139,7 +139,7 @@ class CoroutineRedisHelp
             $arguments[2] = $this->generateUniqueKey($arguments[2]);
         }
         // key end
-        
+
         // value serialize start
         if (in_array($name, ['set', 'setex'])) {
             $last = count($arguments) - 1;
