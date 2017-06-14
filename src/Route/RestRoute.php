@@ -44,16 +44,8 @@ class RestRoute extends NormalRoute
     public function handleClientRequest($request)
     {
         $this->clientData->path = rtrim($request->server['path_info'], '/');
-
-        if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
-            $this->clientData->isRpc = true;
-            $this->clientData->params = $request->post ?? $request->get ?? [];
-            $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
-            $this->clientData->methodName = getInstance()->config->get('rpc.default_method');
-        } else {
-            $this->parsePath($this->clientData->path);
-        }
         $this->verb = $this->getVerb($request);
+        $this->parsePath($this->clientData->path);
     }
 
     /**
