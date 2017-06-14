@@ -20,6 +20,8 @@ class Redis extends Base
     public $name;
     public $arguments;
 
+    public $keyPrefix = '';
+    public $hashKey = false;
     public $phpSerialize = false;
     public $redisSerialize = false;
 
@@ -27,9 +29,13 @@ class Redis extends Base
     {
         parent::init(3000);
         $this->context = $context;
+
         $this->redisAsynPool = $redisAsynPool;
+        $this->hashKey = $redisAsynPool->hashKey;
         $this->phpSerialize = $redisAsynPool->phpSerialize;
+        $this->keyPrefix = $redisAsynPool->keyPrefix;
         $this->redisSerialize = $redisAsynPool->redisSerialize;
+
         $this->name = $name;
         $this->arguments = $arguments;
         $this->request = "redis.$name";
@@ -50,8 +56,11 @@ class Redis extends Base
                     break;
                 case 'mget';
                     $newValues = [];
+                    $keys = $this->arguments[0];
+                    $len = strlen($this->keyPrefix);
                     foreach ($result as $k => $v) {
-                        $newValues[$k] = $this->unSerializeHandler($v);
+                        $key = substr($keys[$k], $len);
+                        $newValues[$key] = $this->unSerializeHandler($v);
                     }
                     $result = $newValues;
                     break;
