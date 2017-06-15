@@ -60,7 +60,7 @@ class ConcurrentClient
 
             //dns失败
             if ($dnsClient == null) {
-                $parent->getLogger()->error('DNS lookup for ' . $item['host'] . ' Failed');
+                $parent->getContext()->getLog()->error('DNS lookup for ' . $item['host'] . ' Failed');
                 $result[$name] = null;
                 unset($list[$name]);
                 continue;
@@ -79,7 +79,7 @@ class ConcurrentClient
 
             // http 失败
             if (!isset($response['body'])) {
-                $parent->getLogger()->error('Request for ' . $item['host'] . $item['api'] . ' Failed, Method: ' . $item['method'] . ' Params: ' . json_encode($item['params']) . ' Response: ' . json_encode($response));
+                $parent->getContext()->getLog()->error('Request for ' . $item['host'] . $item['api'] . ' Failed, Method: ' . $item['method'] . ' Params: ' . json_encode($item['params']) . ' Response: ' . json_encode($response));
                 $result[$name] = null;
                 unset($list[$name]);
                 continue;
@@ -109,7 +109,7 @@ class ConcurrentClient
 
             return static::parseResponse($body);
         } catch (BusinessException $businessException) {
-            $parent->getLogger()->error($businessException->getMessage());
+            $parent->getContext()->getLog()->error($businessException->getMessage());
             return null;
         }
     }
