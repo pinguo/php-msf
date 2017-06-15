@@ -55,14 +55,9 @@ class Redis extends Base
                     $result = $this->unSerializeHandler($result);
                     break;
                 case 'mget';
-                    $newValues = [];
                     $keys = $this->arguments[0];
                     $len = strlen($this->keyPrefix);
-                    foreach ($result as $k => $v) {
-                        $key = substr($keys[$k], $len);
-                        $newValues[$key] = $this->unSerializeHandler($v);
-                    }
-                    $result = $newValues;
+                    $result = $this->unSerializeHandler($result, $keys, $len);
                     break;
                 case 'eval':
                     //如果redis中的数据本身没有进行序列化，同时返回值是json，那么解析成array
@@ -104,9 +99,11 @@ class Redis extends Base
     /**
      * 反序列化
      * @param $data
-     * @return mixed
+     * @param array $keys
+     * @param int $len
+     * @return array|bool|mixed
      */
-    protected function unSerializeHandler($data)
+    protected function unSerializeHandler($data, $keys = [], $len = 0)
     {
         // 如果值是null，直接返回false
         if (null === $data) {
@@ -114,17 +111,41 @@ class Redis extends Base
         }
 
         try {
-            if (is_string($data) && $this->redisSerialize) {
-                $data = $this->redisAsynPool->redisClient->_unserialize($data);
+            if (!empty($keys) && is_array($data)) {
+                $ret = [];
+                array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
+                    $key = substr($keys[$k], $len);
+
+                    if (is_string($val) && $this->redisSerialize) {
+                        $val = $this->redisAsynPool->redisClient->_unserialize($val);
+                    }
+
+                    if (is_string($val) && $this->phpSerialize) {
+                        $val = unserialize($val);
+                    }
+
+                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                        $val = $val[0];
+                    }
+
+                    $ret[$key] = $val;
+                });
+
+                $data = $ret;
+            } else {
+                if (is_string($data) && $this->redisSerialize) {
+                    $data = $this->redisAsynPool->redisClient->_unserialize($data);
+                }
+
+                if (is_string($data) && $this->phpSerialize) {
+                    $data = unserialize($data);
+                }
+
+                if (is_array($data) && count($data) === 2 && $data[1] === null) {
+                    $data = $data[0];
+                }
             }
 
-            if (is_string($data) && $this->phpSerialize) {
-                $data = unserialize($data);
-            }
-
-            if (in_array($this->name, ['get', 'mget']) && is_array($data) && count($data) === 2 && $data[1] === null) {
-                $data = $data[0];
-            }
         } catch (\Exception $exception) {
             // do noting
         }
