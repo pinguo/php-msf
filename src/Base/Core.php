@@ -77,14 +77,6 @@ class Core extends Child
     }
 
     /**
-     * @return Logger|\PG\Log\PGLog
-     */
-    public function getLogger()
-    {
-        return getInstance()->log;
-    }
-
-    /**
      * @return \swoole_server
      */
     public function getServer()
