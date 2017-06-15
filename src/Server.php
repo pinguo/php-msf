@@ -758,7 +758,7 @@ abstract class Server extends Child
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
                 $PGLog            = null;
-                $PGLog            = clone $controllerInstance->getLogger();
+                $PGLog            = clone getInstance()->log;
                 $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
                 $PGLog->accessRecord['uri']       = $this->route->getPath();
                 $PGLog->logId = $this->genLogId($clientData);
