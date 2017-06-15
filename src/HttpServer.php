@@ -119,9 +119,7 @@ abstract class HttpServer extends Server
     public function setTemplateEngine()
     {
         $this->templateEngine = new Engine();
-        $this->templateEngine->addFolder('server', __DIR__ . '/Views');
-        $this->templateEngine->addFolder('app', ROOT_PATH . '/app/Views');
-        $this->templateEngine->registerFunction('get_www', 'get_www');
+        $this->templateEngine->registerFunction('getWww', 'getWww');
     }
 
     /**
@@ -180,7 +178,7 @@ abstract class HttpServer extends Server
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
                 $PGLog            = null;
-                $PGLog            = clone $controllerInstance->getLogger();
+                $PGLog            = clone getInstance()->log;
                 $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
                 $PGLog->accessRecord['uri']       = $this->route->getPath();
                 $PGLog->logId = $this->genLogId($request);

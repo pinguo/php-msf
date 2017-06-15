@@ -12,7 +12,7 @@ interface IProxy
 {
     public function check();
 
-    public function handle($method, $arguments);
+    public function handle(string $method, array $arguments);
 
     public function startCheck();
 }

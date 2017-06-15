@@ -210,8 +210,14 @@ abstract class Server extends Child
      */
     public $sysTimers;
 
+    /**
+     * @var string 框架目录
+     */
+    public $MSFSrcDir;
+
     public function __construct()
     {
+        $this->MSFSrcDir = __DIR__;
         $this->afterConstruct();
         $this->onErrorHandel = [$this, 'onErrorHandel'];
         self::$_worker = $this;
@@ -752,7 +758,7 @@ abstract class Server extends Child
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
                 $PGLog            = null;
-                $PGLog            = clone $controllerInstance->getLogger();
+                $PGLog            = clone getInstance()->log;
                 $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
                 $PGLog->accessRecord['uri']       = $this->route->getPath();
                 $PGLog->logId = $this->genLogId($clientData);
@@ -776,7 +782,7 @@ abstract class Server extends Child
                  * @var $output Output
                  */
                 $output   = $controllerInstance->getObjectPool()->get(Output::class);
-                $output->set($clientData, null);
+                $output->set($clientData);
                 $output->initialization($controllerInstance);
 
                 $controllerInstance->context->setInput($input);
