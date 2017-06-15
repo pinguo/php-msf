@@ -112,6 +112,10 @@ class Redis extends Base
             if (is_string($data) && $this->phpSerialize) {
                 $data = unserialize($data);
             }
+
+            if (in_array($this->name, ['get', 'mget']) && is_array($data) && count($data) === 2 && $data[1] === null) {
+                $data = $data[0];
+            }
         } catch (\Exception $exception) {
             // do noting
         }

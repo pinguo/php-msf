@@ -190,12 +190,18 @@ class CoroutineRedisHelp
      */
     protected function serializeHandler($data)
     {
-        if ($this->phpSerialize) {
-            $data = serialize($data);
-        }
+        try {
+            $data = [$data, null];
 
-        if ($this->redisSerialize) {
-            $data = $this->redisAsynPool->redisClient->_serialize($data);
+            if ($this->phpSerialize) {
+                $data = serialize($data);
+            }
+
+            if ($this->redisSerialize) {
+                $data = $this->redisAsynPool->redisClient->_serialize($data);
+            }
+        } catch (\Exception $exception) {
+            // do noting
         }
 
         return $data;
@@ -213,12 +219,20 @@ class CoroutineRedisHelp
             return false;
         }
 
-        if (is_string($data) && $this->redisSerialize) {
-            $data = $this->redisAsynPool->redisClient->_unserialize($data);
-        }
+        try {
+            if (is_string($data) && $this->redisSerialize) {
+                $data = $this->redisAsynPool->redisClient->_unserialize($data);
+            }
 
-        if (is_string($data) && $this->phpSerialize) {
-            $data = unserialize($data);
+            if (is_string($data) && $this->phpSerialize) {
+                $data = unserialize($data);
+            }
+
+            if (is_array($data) && count($data) === 2 && $data[1] === null) {
+                $data = $data[0];
+            }
+        } catch (\Exception $exception) {
+            // do noting
         }
 
         return $data;
