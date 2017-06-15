@@ -43,7 +43,7 @@ class Task extends TaskProxy
         $this->start_run_time = microtime(true);
         if ($context) {
             $PGLog = null;
-            $PGLog = clone $this->getLogger();
+            $PGLog = clone getInstance()->log;
             $PGLog->logId = $context->getLogId();
             $PGLog->accessRecord['beginTime'] = microtime(true);
             $PGLog->accessRecord['uri'] = $context->getInput()->getPathInfo();
