@@ -18,7 +18,12 @@ class RedisProxyMasterSlave implements IProxy
     private $slaves;
     private $goodPools;
 
-    public function __construct($name, $config)
+    /**
+     * RedisProxyMasterSlave constructor.
+     * @param string $name
+     * @param array $config
+     */
+    public function __construct(string $name, array $config)
     {
         $this->name = $name;
         $this->pools = $config['pools'];
@@ -88,11 +93,11 @@ class RedisProxyMasterSlave implements IProxy
 
     /**
      * 处理入口
-     * @param $method
-     * @param $arguments
+     * @param string $method
+     * @param array $arguments
      * @return mixed
      */
-    public function handle($method, $arguments)
+    public function handle(string $method, array $arguments)
     {
         //读
         $lowerMethod = strtolower($method);

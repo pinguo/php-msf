@@ -20,7 +20,7 @@ class RedisProxyFactory
      * @param $config
      * @return bool|RedisProxyCluster|RedisProxyMasterSlave
      */
-    public static function makeProxy($name, $config)
+    public static function makeProxy(string $name, array $config)
     {
         $mode = $config['mode'];
         if ($mode == Marco::CLUSTER) {
