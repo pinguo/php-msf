@@ -119,9 +119,7 @@ abstract class HttpServer extends Server
     public function setTemplateEngine()
     {
         $this->templateEngine = new Engine();
-        $this->templateEngine->addFolder('server', __DIR__ . '/Views');
-        $this->templateEngine->addFolder('app', ROOT_PATH . '/app/Views');
-        $this->templateEngine->registerFunction('get_www', 'get_www');
+        $this->templateEngine->registerFunction('getWww', 'getWww');
     }
 
     /**

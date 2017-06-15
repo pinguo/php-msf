@@ -305,7 +305,7 @@ class Controller extends Core
      * @param string $message
      * @param int $status
      * @param null $callback
-     * @return array
+     * @return void
      */
     public function outputJson(
         $data = null,
@@ -314,5 +314,46 @@ class Controller extends Core
         $callback = null
     ) {
         $this->getContext()->getOutput()->outputJson($data, $message, $status, $callback);
+    }
+
+    /**
+     * 响应通过模板输出的HTML
+     *
+     * @param array $data
+     * @param string|null $view
+     * @throws \Exception
+     * @throws \Throwable
+     * @throws Exception
+     * @return void
+     */
+    public function outputView(array $data, $view = null)
+    {
+        if ($this->requestType !== Marco::HTTP_REQUEST) {
+            throw new Exception('$this->outputView not support '. $this->requestType);
+        }
+
+        $this->getContext()->getOutput()->setContentType('text/html; charset=UTF-8');
+        if (empty($view)) {
+            $view = str_replace('\\', '/', $this->getContext()->getControllerName()) . '/' .
+                str_replace($this->getConfig()->get('http.method_prefix', ''), '', $this->getContext()->getActionName());
+        }
+
+        try {
+            $viewFile = ROOT_PATH . '/app/Views/' . $view;
+            $template = $this->getLoader()->view($viewFile);
+            $response = $template->render($data);
+        } catch (\Throwable $e) {
+            $template = null;
+            $viewFile = getInstance()->MSFSrcDir . '/Views/' . $view;
+            try {
+                $template = $this->getLoader()->view($viewFile);
+                $response = $template->render($data);
+            } catch (\Throwable $e) {
+                throw new Exception('app view and server view both not exist, please check again', 500);
+            }
+        }
+
+        $template = null;
+        $this->getContext()->getOutput()->end($response);
     }
 }
