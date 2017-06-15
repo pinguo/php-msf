@@ -40,7 +40,7 @@
     },
     "PGWireless/plates": {
       "type": "vcs",
-      "url": "https://github.com/thephpleague/plates.git"
+      "url": "https://github.com/PGWireless/plates.git"
     }
   },
   "autoload": {
