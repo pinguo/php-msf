@@ -144,7 +144,7 @@ class CoroutineRedisHelp
         if (in_array($name, ['set', 'setex'])) {
             $last = count($arguments) - 1;
             $arguments[$last] = $this->serializeHandler($arguments[$last]);
-        } elseif (in_array($name, ['mset'])) {
+        } elseif ($name === 'mset') {
             $keysValues = $arguments[1];
             $newValues = [];
             foreach ($keysValues as $k => $v) {
@@ -157,14 +157,12 @@ class CoroutineRedisHelp
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             $value = call_user_func_array([getInstance()->getRedis(), $name], $arguments);
             // return value unserialize start
-            if (in_array($name, ['get'])) {
+            if ($name === 'get') {
                 $value = $this->unSerializeHandler($value);
-            } elseif (in_array($name, ['mget'])) {
-                $newValues = [];
-                foreach ($value as $k => $v) {
-                    $newValues[$k] = $this->unSerializeHandler($v);
-                }
-                $value = $newValues;
+            } elseif ($name === 'mget') {
+                $keys = $arguments[0];
+                $len = strlen($this->keyPrefix);
+                $value = $this->unSerializeHandler($value, $keys, $len);
             }
             // return value unserialize end
 
@@ -210,9 +208,11 @@ class CoroutineRedisHelp
     /**
      * 反序列化
      * @param $data
-     * @return mixed
+     * @param array $keys
+     * @param int $len
+     * @return array|bool|mixed
      */
-    protected function unSerializeHandler($data)
+    protected function unSerializeHandler($data, $keys = [], $len = 0)
     {
         // 如果值是null，直接返回false
         if (null === $data) {
@@ -220,17 +220,41 @@ class CoroutineRedisHelp
         }
 
         try {
-            if (is_string($data) && $this->redisSerialize) {
-                $data = $this->redisAsynPool->redisClient->_unserialize($data);
+            if (!empty($keys) && is_array($data)) {
+                $ret = [];
+                array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
+                    $key = substr($keys[$k], $len);
+
+                    if (is_string($val) && $this->redisSerialize) {
+                        $val = $this->redisAsynPool->redisClient->_unserialize($val);
+                    }
+
+                    if (is_string($val) && $this->phpSerialize) {
+                        $val = unserialize($val);
+                    }
+
+                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                        $val = $val[0];
+                    }
+
+                    $ret[$key] = $val;
+                });
+
+                $data = $ret;
+            } else {
+                if (is_string($data) && $this->redisSerialize) {
+                    $data = $this->redisAsynPool->redisClient->_unserialize($data);
+                }
+
+                if (is_string($data) && $this->phpSerialize) {
+                    $data = unserialize($data);
+                }
+
+                if (is_array($data) && count($data) === 2 && $data[1] === null) {
+                    $data = $data[0];
+                }
             }
 
-            if (is_string($data) && $this->phpSerialize) {
-                $data = unserialize($data);
-            }
-
-            if (is_array($data) && count($data) === 2 && $data[1] === null) {
-                $data = $data[0];
-            }
         } catch (\Exception $exception) {
             // do noting
         }
