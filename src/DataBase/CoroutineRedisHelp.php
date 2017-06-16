@@ -10,6 +10,7 @@ namespace PG\MSF\DataBase;
 
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
+use PG\MSF\Marco;
 
 class CoroutineRedisHelp
 {
@@ -225,12 +226,24 @@ class CoroutineRedisHelp
                 array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
                     $key = substr($keys[$k], $len);
 
-                    if (is_string($val) && $this->redisSerialize) {
-                        $val = $this->redisAsynPool->redisClient->_unserialize($val);
+                    if (is_string($val)) {
+                        switch ($this->redisSerialize) {
+                            case Marco::SERIALIZE_PHP:
+                                $val = unserialize($val);
+                                break;
+                            case Marco::SERIALIZE_IGBINARY:
+                                $val = @igbinary_unserialize($val);
+                        }
                     }
 
                     if (is_string($val) && $this->phpSerialize) {
-                        $val = unserialize($val);
+                        switch ($this->phpSerialize) {
+                            case Marco::SERIALIZE_PHP:
+                                $val = unserialize($val);
+                                break;
+                            case Marco::SERIALIZE_IGBINARY:
+                                $val = @igbinary_unserialize($val);
+                        }
                     }
 
                     if (is_array($val) && count($val) === 2 && $val[1] === null) {
@@ -243,11 +256,23 @@ class CoroutineRedisHelp
                 $data = $ret;
             } else {
                 if (is_string($data) && $this->redisSerialize) {
-                    $data = $this->redisAsynPool->redisClient->_unserialize($data);
+                    switch ($this->redisSerialize) {
+                        case Marco::SERIALIZE_PHP:
+                            $data = unserialize($data);
+                            break;
+                        case Marco::SERIALIZE_IGBINARY:
+                            $data = @igbinary_unserialize($data);
+                    }
                 }
 
                 if (is_string($data) && $this->phpSerialize) {
-                    $data = unserialize($data);
+                    switch ($this->phpSerialize) {
+                        case Marco::SERIALIZE_PHP:
+                            $data = unserialize($data);
+                            break;
+                        case Marco::SERIALIZE_IGBINARY:
+                            $data = @igbinary_unserialize($data);
+                    }
                 }
 
                 if (is_array($data) && count($data) === 2 && $data[1] === null) {
