@@ -10,7 +10,6 @@ namespace PG\MSF\DataBase;
 
 use PG\MSF\Base\Exception;
 use PG\MSF\Coroutine\Redis;
-use PG\MSF\Helpers\Context;
 
 class RedisAsynPool extends AsynPool
 {
@@ -41,10 +40,18 @@ class RedisAsynPool extends AsynPool
         $this->active = $active;
 
         $config = $this->config['redis'][$this->active];
-        !empty($config['hashKey']) && ($this->hashKey = $config['hashKey']);
-        !empty($config['redisSerialize']) && ($this->redisSerialize = $config['redisSerialize']);
-        !empty($config['phpSerialize']) && ($this->phpSerialize = $config['phpSerialize']);
-        !empty($config['keyPrefix']) && ($this->keyPrefix = $config['keyPrefix']);
+        if (!empty($config['hashKey'])) {
+            $this->hashKey = $config['hashKey'];
+        }
+        if (!empty($config['redisSerialize'])) {
+            $this->redisSerialize = $config['redisSerialize'];
+        }
+        if (!empty($config['phpSerialize'])) {
+            $this->phpSerialize = $config['phpSerialize'];
+        }
+        if (!empty($config['keyPrefix'])) {
+            $this->keyPrefix = $config['keyPrefix'];
+        }
 
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
         $this->getSync();
