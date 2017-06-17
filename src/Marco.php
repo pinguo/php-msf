@@ -96,4 +96,11 @@ class Marco
      * Server统计key
      */
     const SERVER_STATS = 'msf_server_stats_';
+
+    /**
+     * 序列化和反序列化选项
+     */
+    const SERIALIZE_NONE = 0;
+    const SERIALIZE_PHP = 1;
+    const SERIALIZE_IGBINARY = 2;
 }
