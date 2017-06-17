@@ -20,6 +20,10 @@ class Route extends \PG\MSF\Route\NormalRoute
      */
     public $methodParam = '_method';
     /**
+     * @var string
+     */
+    public $verb;
+    /**
      * @var array
      * support verb
      */
@@ -33,9 +37,17 @@ class Route extends \PG\MSF\Route\NormalRoute
         'OPTIONS',  // 获取信息，关于资源的哪些属性是客户端可以改变的
     ];
     /**
-     * @var string
+     * @var array
      */
-    public $verb;
+    public $patterns = [
+        'PUT,PATCH {id}' => 'update', // 更新资源，如：/users/<id>
+        'DELETE {id}' => 'delete', // 删除资源，如：/users/<id>
+        'GET,HEAD {id}' => 'view', // 查看资源单条数据，如：/users/<id>
+        'POST' => 'create', // 新建资源，如：/users
+        'GET,HEAD' => 'index', // 查看资源列表数据（可分页），如：/users
+        '{id}' => 'options', // 查看资源所支持的HTTP动词，如：/users/<id> | /users
+        '' => 'options',
+    ];
 
     /**
      * 处理http request
