@@ -8,6 +8,7 @@
  */
 namespace PG\MSF\Rest;
 
+use PG\Exception\Errno;
 use PG\MSF\Base\Output;
 
 /**
@@ -37,7 +38,11 @@ class Controller extends \PG\MSF\Controllers\Controller
         /* @var $output Output */
         $output = $this->getContext()->getOutput();
         // set status in header
+        if (!in_array($status, array_keys(Output::$codes))) {
+            throw new \Exception('Http code invalid', Errno::FATAL);
+        }
         $output->setStatusHeader($status);
+        // 错误信息返回格式可参考：[https://developer.github.com/v3/]
         if ($status != 200 && $message !== '') {
             $data = [
                 'message' => $message
