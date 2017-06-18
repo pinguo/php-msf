@@ -145,9 +145,9 @@ class Route extends \PG\MSF\Route\NormalRoute
                     $params[$key] = $value;
                 }
             }
-            $path = strtr($rule[2], $tr);
+            $rule[2] = strtr($rule[2], $tr);
 
-            return [$path, $params];
+            return [$rule[2], $params];
         }
 
         return [];

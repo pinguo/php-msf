@@ -8,6 +8,7 @@
 namespace PG\MSF\Rest;
 
 /**
+ * 暂未实现，后面如果在 Restful 返回值中需要有 _links 或在 header 中加入分页信息可用...
  * Class Serializer
  * @package PG\MSF\Rest
  */
@@ -92,24 +93,12 @@ class Serializer
 
     /**
      * Serializes the given data into a format that can be easily turned into other formats.
-     * This method mainly converts the objects of recognized types into array representation.
-     * It will not do conversion for unknown object types or non-object data.
-     * The default implementation will handle [[Model]] and [[DataProviderInterface]].
-     * You may override this method to support more object types.
      * @param mixed $data the data to be serialized.
      * @return mixed the converted data.
      */
     public function serialize($data)
     {
-        if ($data instanceof Model && $data->hasErrors()) {
-            return $this->serializeModelErrors($data);
-        } elseif ($data instanceof Arrayable) {
-            return $this->serializeModel($data);
-        } elseif ($data instanceof DataProviderInterface) {
-            return $this->serializeDataProvider($data);
-        } else {
-            return $data;
-        }
+        return $data;
     }
 
     /**
@@ -128,40 +117,6 @@ class Serializer
             is_string($fields) ? preg_split('/\s*,\s*/', $fields, -1, PREG_SPLIT_NO_EMPTY) : [],
             is_string($expand) ? preg_split('/\s*,\s*/', $expand, -1, PREG_SPLIT_NO_EMPTY) : [],
         ];
-    }
-
-    /**
-     * Serializes a data provider.
-     * @param DataProviderInterface $dataProvider
-     * @return array the array representation of the data provider.
-     */
-    protected function serializeDataProvider($dataProvider)
-    {
-        if ($this->preserveKeys) {
-            $models = $dataProvider->getModels();
-        } else {
-            $models = array_values($dataProvider->getModels());
-        }
-        $models = $this->serializeModels($models);
-
-        if (($pagination = $dataProvider->getPagination()) !== false) {
-            $this->addPaginationHeaders($pagination);
-        }
-
-        if ($this->request->getIsHead()) {
-            return null;
-        } elseif ($this->collectionEnvelope === null) {
-            return $models;
-        } else {
-            $result = [
-                $this->collectionEnvelope => $models,
-            ];
-            if ($pagination !== false) {
-                return array_merge($result, $this->serializePagination($pagination));
-            } else {
-                return $result;
-            }
-        }
     }
 
     /**
@@ -200,58 +155,5 @@ class Serializer
             ->set($this->currentPageHeader, $pagination->getPage() + 1)
             ->set($this->perPageHeader, $pagination->pageSize)
             ->set('Link', implode(', ', $links));
-    }
-
-    /**
-     * Serializes a model object.
-     * @param Arrayable $model
-     * @return array the array representation of the model
-     */
-    protected function serializeModel($model)
-    {
-        if ($this->request->getIsHead()) {
-            return null;
-        } else {
-            list ($fields, $expand) = $this->getRequestedFields();
-            return $model->toArray($fields, $expand);
-        }
-    }
-
-    /**
-     * Serializes the validation errors in a model.
-     * @param Model $model
-     * @return array the array representation of the errors
-     */
-    protected function serializeModelErrors($model)
-    {
-        $this->response->setStatusCode(422, 'Data Validation Failed.');
-        $result = [];
-        foreach ($model->getFirstErrors() as $name => $message) {
-            $result[] = [
-                'field' => $name,
-                'message' => $message,
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Serializes a set of models.
-     * @param array $models
-     * @return array the array representation of the models
-     */
-    protected function serializeModels(array $models)
-    {
-        list ($fields, $expand) = $this->getRequestedFields();
-        foreach ($models as $i => $model) {
-            if ($model instanceof Arrayable) {
-                $models[$i] = $model->toArray($fields, $expand);
-            } elseif (is_array($model)) {
-                $models[$i] = ArrayHelper::toArray($model);
-            }
-        }
-
-        return $models;
     }
 }
