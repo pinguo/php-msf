@@ -11,14 +11,17 @@ namespace PG\MSF\Route;
 class NormalRoute implements IRoute
 {
     /**
-     * @var \stdClass
+     * @var bool
      */
-    protected $clientData;
-
+    public $enableCache = true;
     /**
      * 路由缓存
      */
     public $routeCache;
+    /**
+     * @var \stdClass
+     */
+    protected $clientData;
 
     public function __construct()
     {
@@ -126,6 +129,11 @@ class NormalRoute implements IRoute
     {
         $this->clientData->params = $params;
         return $this;
+    }
+
+    public function getEnableCache()
+    {
+        return $this->enableCache;
     }
 
     public function setRouteCache($path, $callable)

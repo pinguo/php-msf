@@ -225,7 +225,7 @@ abstract class HttpServer extends Server
                     }
                 }
 
-                if (!$this->route->getRouteCache($this->route->getPath())) {
+                if ($this->route->getEnableCache() && !$this->route->getRouteCache($this->route->getPath())) {
                     $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
                 }
                 break;
