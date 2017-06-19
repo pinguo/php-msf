@@ -197,19 +197,19 @@ class CoroutineRedisHelp
 
             switch ($this->phpSerialize) {
                 case Marco::SERIALIZE_PHP:
-                    $data = unserialize($data);
+                    $data = serialize($data);
                     break;
                 case Marco::SERIALIZE_IGBINARY:
-                    $data = @igbinary_unserialize($data);
+                    $data = @igbinary_serialize($data);
                     break;
             }
 
             switch ($this->redisSerialize) {
                 case Marco::SERIALIZE_PHP:
-                    $data = unserialize($data);
+                    $data = serialize($data);
                     break;
                 case Marco::SERIALIZE_IGBINARY:
-                    $data = @igbinary_unserialize($data);
+                    $data = @igbinary_serialize($data);
                     break;
             }
 
