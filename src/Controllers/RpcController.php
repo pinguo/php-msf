@@ -167,7 +167,7 @@ class RpcController extends Controller
     {
         $key = $this->handler . '::' . $this->method;
         if (!isset(self::$reflectionParameterCache[$key])) {
-            $handlerClass = 'Handlers\\' . $this->handler;
+            $handlerClass = '\\App\\Models\\Handlers\\' . $this->handler;
             $reflection = new \ReflectionMethod($handlerClass, $this->method);
             $params = [];
             foreach ($reflection->getParameters() as $reflectionParameter) {
