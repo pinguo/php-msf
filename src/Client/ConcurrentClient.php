@@ -61,7 +61,7 @@ class ConcurrentClient
             //dns失败
             if ($dnsClient == null) {
                 $parent->getContext()->getLog()->error('DNS lookup for ' . $item['host'] . ' Failed');
-                $result[$name] = null;
+                $result[$name] = false;
                 unset($list[$name]);
                 continue;
             }
@@ -80,7 +80,7 @@ class ConcurrentClient
             // http 失败
             if (!isset($response['body'])) {
                 $parent->getContext()->getLog()->error('Request for ' . $item['host'] . $item['api'] . ' Failed, Method: ' . $item['method'] . ' Params: ' . json_encode($item['params']) . ' Response: ' . json_encode($response));
-                $result[$name] = null;
+                $result[$name] = false;
                 unset($list[$name]);
                 continue;
             }

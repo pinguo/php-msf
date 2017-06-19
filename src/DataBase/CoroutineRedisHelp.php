@@ -190,15 +190,29 @@ class CoroutineRedisHelp
     protected function serializeHandler($data)
     {
         try {
-            $data = [$data, null];
 
             if ($this->phpSerialize) {
-                $data = serialize($data);
+                $data = [$data, null];
             }
 
-            if ($this->redisSerialize) {
-                $data = $this->redisAsynPool->redisClient->_serialize($data);
+            switch ($this->phpSerialize) {
+                case Marco::SERIALIZE_PHP:
+                    $data = unserialize($data);
+                    break;
+                case Marco::SERIALIZE_IGBINARY:
+                    $data = @igbinary_unserialize($data);
+                    break;
             }
+
+            switch ($this->redisSerialize) {
+                case Marco::SERIALIZE_PHP:
+                    $data = unserialize($data);
+                    break;
+                case Marco::SERIALIZE_IGBINARY:
+                    $data = @igbinary_unserialize($data);
+                    break;
+            }
+
         } catch (\Exception $exception) {
             // do noting
         }
@@ -233,6 +247,7 @@ class CoroutineRedisHelp
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
+                                break;
                         }
                     }
 
@@ -243,6 +258,7 @@ class CoroutineRedisHelp
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
+                                break;
                         }
                     }
 
@@ -262,6 +278,7 @@ class CoroutineRedisHelp
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
+                            break;
                     }
                 }
 
@@ -272,6 +289,7 @@ class CoroutineRedisHelp
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
+                            break;
                     }
                 }
 
