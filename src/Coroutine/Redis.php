@@ -124,6 +124,7 @@ class Redis extends Base
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
+                                break;
                         }
                     }
 
@@ -134,6 +135,7 @@ class Redis extends Base
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
+                                break;
                         }
                     }
 
@@ -153,6 +155,7 @@ class Redis extends Base
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
+                            break;
                     }
                 }
 
@@ -163,6 +166,7 @@ class Redis extends Base
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
+                            break;
                     }
                 }
 
