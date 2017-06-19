@@ -34,13 +34,24 @@ class RpcController extends Controller
      */
     public $sig = null;
     /**
-     * @var null
+     * @var null | array
      */
     public $reqParams = null;
+
+    /**
+     * @var null | array
+     */
+    public $methodParams = null;
     /**
      * @var null
      */
     public $rpcTime = null;
+
+    /**
+     * 参数反射缓存
+     * @var array
+     */
+    protected static $reflectionParameterCache = [];
 
     /**
      * @param string $controllerName
@@ -58,6 +69,7 @@ class RpcController extends Controller
 
     /**
      * @param $arguments
+     * @return \Generator
      */
     public function httpCallHandler($arguments)
     {
@@ -67,6 +79,7 @@ class RpcController extends Controller
 
     /**
      * @param $arguments
+     * @return \Generator
      */
     public function tcpCallHandler($arguments)
     {
@@ -142,7 +155,7 @@ class RpcController extends Controller
         }
         //$response = $handlerInstance->{$this->method}(...$this->reqParams);
         $this->preRunMethod();
-        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->reqParams);
+        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->methodParams ?? $this->reqParams);
 
         $this->outputJson($response);
     }
@@ -152,5 +165,28 @@ class RpcController extends Controller
      */
     protected function preRunMethod()
     {
+        $key = $this->handler . '::' . $this->method;
+        if (!isset(self::$reflectionParameterCache[$key])) {
+            $handlerClass = 'Handlers\\' . $this->handler;
+            $reflection = new \ReflectionMethod($handlerClass, $this->method);
+            $params = [];
+            foreach ($reflection->getParameters() as $reflectionParameter) {
+                $defaultValue = null;
+                if ($reflectionParameter->isOptional()) {
+                    $defaultValue = $reflectionParameter->getDefaultValue();
+                }
+                $params[$reflectionParameter->name] = $defaultValue;
+            };
+            self::$reflectionParameterCache[$key] = $params;
+        }
+
+        $parameters = self::$reflectionParameterCache[$key];
+        foreach ($parameters as $name => $val) {
+            if (isset($this->reqParams[$name])) {
+                $parameters[$name] = $this->reqParams[$name];
+            }
+        }
+
+        $this->methodParams = $parameters;
     }
 }
