@@ -185,10 +185,13 @@ class Task
                 $value = '';
             }
             $runTaskException = $this->handleTaskException($e, $value);
-            if ($this->controller) {
-                call_user_func([$this->controller, 'onExceptionHandle'], $runTaskException);
-            } else {
-                $routine->throw($runTaskException);
+
+            if ($runTaskException instanceof \Throwable) {
+                if ($this->controller) {
+                    call_user_func([$this->controller, 'onExceptionHandle'], $runTaskException);
+                } else {
+                    $routine->throw($runTaskException);
+                }
             }
 
             unset($value);
@@ -240,7 +243,11 @@ class Task
             $value->destroy();
         }
 
-        return $runTaskException;
+        if (!empty($this->stack) && $this->stack->isEmpty()) {
+            return $runTaskException;
+        }
+
+        return true;
     }
 
     /**
