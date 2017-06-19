@@ -165,8 +165,9 @@ class RpcController extends Controller
      */
     protected function preRunMethod()
     {
-        $key = $this->handler . '::' . $this->method;
-        if (!isset(self::$reflectionParameterCache[$key])) {
+        $key = 'rpc_' . $this->handler . '::' . $this->method;
+        $parameters = getInstance()->sysCache->get($key);
+        if (false === $parameters) {
             $handlerClass = '\\App\\Models\\Handlers\\' . $this->handler;
             $reflection = new \ReflectionMethod($handlerClass, $this->method);
             $params = [];
@@ -177,10 +178,10 @@ class RpcController extends Controller
                 }
                 $params[$reflectionParameter->name] = $defaultValue;
             };
-            self::$reflectionParameterCache[$key] = $params;
+            getInstance()->sysCache->set($key, $params);
+            $parameters = $params;
         }
 
-        $parameters = self::$reflectionParameterCache[$key];
         foreach ($parameters as $name => $val) {
             if (isset($this->reqParams[$name])) {
                 $parameters[$name] = $this->reqParams[$name];
