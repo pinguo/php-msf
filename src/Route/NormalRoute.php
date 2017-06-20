@@ -47,13 +47,21 @@ class NormalRoute implements IRoute
      */
     public function parsePath($path)
     {
-        if (isset($this->routeCache[$path])) {
+        if ($this->getEnableCache() && isset($this->routeCache[$path])) {
             $this->clientData->controllerName = $this->routeCache[$path][0];
             $this->clientData->methodName     = $this->routeCache[$path][1];
         } else {
             $route = explode('/', $path);
             $route = array_map(function ($name) {
-                $name = ucfirst($name);
+                if (strpos($name, '-') !== false) { // 中横线模式处理.
+                    $slices = array_map('ucfirst', explode('-', $name));
+                    $name = '';
+                    foreach ($slices as $slice) {
+                        $name .= $slice;
+                    }
+                } else {
+                    $name = ucfirst($name);
+                }
                 return $name;
             }, $route);
             $methodName = array_pop($route);

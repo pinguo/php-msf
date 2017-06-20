@@ -47,15 +47,15 @@ class Route extends \PG\MSF\Route\NormalRoute
     /**
      * @var array
      */
-    public $patterns = [
-        'PUT,PATCH {id}' => 'update', // 更新资源，如：/users/<id>
-        'DELETE {id}' => 'delete', // 删除资源，如：/users/<id>
-        'GET,HEAD {id}' => 'view', // 查看资源单条数据，如：/users/<id>
-        'POST' => 'create', // 新建资源，如：/users
-        'GET,HEAD' => 'index', // 查看资源列表数据（可分页），如：/users
-        '{id}' => 'options', // 查看资源所支持的HTTP动词，如：/users/<id> | /users
-        '' => 'options',
-    ];
+    //public $patterns = [
+    //    'PUT,PATCH {id}' => 'update', // 更新资源，如：/users/<id>
+    //    'DELETE {id}' => 'delete', // 删除资源，如：/users/<id>
+    //    'GET,HEAD {id}' => 'view', // 查看资源单条数据，如：/users/<id>
+    //    'POST' => 'create', // 新建资源，如：/users
+    //    'GET,HEAD' => 'index', // 查看资源列表数据（可分页），如：/users
+    //    '{id}' => 'options', // 查看资源所支持的HTTP动词，如：/users/<id> | /users
+    //    '' => 'options',
+    //];
 
     /**
      * Route constructor.
@@ -75,10 +75,8 @@ class Route extends \PG\MSF\Route\NormalRoute
         $this->clientData->path = rtrim($request->server['path_info'], '/');
         $this->verb = $this->getVerb($request);
         $data = $this->parseRule();
-        if (!isset($data[0])) {
-            throw new \Exception('');
-        }
-        $this->parsePath($data[0]);
+        $path = $data[0] ?? $this->clientData->path;
+        $this->parsePath($path);
         // 将 path 中含有的参数放入 get 中
         if (!empty($data[1])) {
             foreach ($data[1] as $name => $value) {
@@ -115,7 +113,7 @@ class Route extends \PG\MSF\Route\NormalRoute
         if (empty($this->restRules)) {
             return [];
         }
-        $pathInfo = $this->clientData->path;
+        $pathInfo = $this->trimSlashes($this->clientData->path);
         foreach ($this->restRules as $rule) {
             if (!in_array($this->verb, $rule[0])) {
                 continue;
@@ -140,34 +138,18 @@ class Route extends \PG\MSF\Route\NormalRoute
             foreach ($matches as $key => $value) {
                 if (isset($pathParams[$key])) {
                     $tr[$pathParams[$key]] = $value;
-                    unset($params[$key]);
+                    //unset($params[$key]);
+                    $params[$key] = $value;
                 } elseif (isset($patternParams[$key])) {
                     $params[$key] = $value;
                 }
             }
-            $rule[2] = strtr($rule[2], $tr);
+            $rule[2] = '/' . strtr($rule[2], $tr);
 
             return [$rule[2], $params];
         }
 
         return [];
-    }
-
-    /**
-     * 解析path
-     *
-     * @param $path
-     */
-    public function parsePath($path)
-    {
-        $route = explode('/', $path);
-        $route = array_map(function ($name) {
-            $name = ucfirst($name);
-            return $name;
-        }, $route);
-        $methodName = array_pop($route);
-        $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
-        $this->clientData->methodName = $methodName;
     }
 
     /**
@@ -273,8 +255,8 @@ class Route extends \PG\MSF\Route\NormalRoute
             }
 
             // 解析如果path里面含有<>
-            if (strpos($path, '<') !== false && preg_match_all('/<([\w._-]+)>/', $path, $matches)) {
-                foreach ($matches[1] as $name) {
+            if (strpos($path, '<') !== false && preg_match_all('/<([\w._-]+)>/', $path, $matches2)) {
+                foreach ($matches2[1] as $name) {
                     $pathParams[$name] = "<$name>";
                 }
             }
@@ -290,24 +272,25 @@ class Route extends \PG\MSF\Route\NormalRoute
                 ')' => '\\)',
             ];
             $tr2 = [];
-            if (preg_match_all('/<([\w._-]+):?([^>]+)?>/', $pattern, $matches2, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
-                foreach ($matches2 as $match) {
+            if (preg_match_all('/<([\w._-]+):?([^>]+)?>/', $pattern, $matches3, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+                foreach ($matches3 as $match) {
                     $name = $match[1][0];
-                    $tPattern = isset($match[2][0]) ? $match[2][0] : '[^\/]+';
-                    $placeholder = 'a' . hash('crc32b', $name); // placeholder must begin with a letter
+                    $tmpPattern = isset($match[2][0]) ? $match[2][0] : '[^\/]+';
+                    $placeholder = 'a' . hash('crc32b', $name);
                     $placeholders[$placeholder] = $name;
-                    $tr["<$name>"] = "(?P<$placeholder>$tPattern)";
+                    $tr["<$name>"] = "(?P<$placeholder>$tmpPattern)";
                     if (isset($pathParams[$name])) {
-                        $tr2["<$name>"] = "(?P<$placeholder>$tPattern)";
+                        $tr2["<$name>"] = "(?P<$placeholder>$tmpPattern)";
                     } else {
-                        $patternParams[$name] = $tPattern === '[^\/]+' ? '' : "#^$tPattern$#u";
+                        $patternParams[$name] = $tmpPattern === '[^\/]+' ? '' : "#^$tmpPattern$#u";
                     }
                 }
             }
+            $pattern = preg_replace('/<([\w._-]+):?([^>]+)?>/', '<$1>', $pattern);
             $pattern = '#^' . trim(strtr($pattern, $tr), '/') . '$#u';
 
             // 组装数据
-            $item = [
+            $this->restRules[] = [
                 $matchVerbs,
                 [
                     $pattern,       // 0
@@ -317,8 +300,6 @@ class Route extends \PG\MSF\Route\NormalRoute
                 ],
                 $path
             ];
-
-            $this->restRules[] = $item;
         }
     }
 
