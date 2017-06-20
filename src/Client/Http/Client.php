@@ -85,15 +85,143 @@ class Client extends Core
     }
 
     /**
-     * 协程方式获取httpClient
+     * 获取协程GetHttpClient,未解析DNS
      *
-     * @param $baseUrl
+     * @param string $baseUrl  如 https://www.baidu.com
      * @param int $timeout 协程超时时间
+     * @param array $headers 额外的报头
      * @return GetHttpClient
      */
     public function coroutineGetHttpClient($baseUrl, $timeout = 30000, $headers = [])
     {
         return $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, $timeout, $headers);
+    }
+
+    /**
+     * 以协程方式获取异步的HttpClient,已解析DNS
+     *
+     * @param string $baseUrl  如 https://www.baidu.com
+     * @param int $timeout 协程超时时间
+     * @param array $headers 额外的报头
+     * @return HttpClient
+     */
+    public function coroutineHttpClientWithDNS($baseUrl, $timeout = 30000, $headers = [])
+    {
+        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, 300, $headers);
+        /**
+         * @var $httpClient HttpClient
+         */
+        $httpClient = yield $sendDnsQuery;
+
+        return $httpClient;
+    }
+
+    /**
+     * 以协程方式发送POST请求,包含DNS解析、获取数据
+     *
+     * @param string $url 请求的URL
+     * @param array $data POST的数据
+     * @param int $timeout 请求超时时间
+     * @param array $headers 额外的报头
+     * @return bool|array
+     */
+    public function coroutinePost($url, $data = [], $timeout = 30000, $headers = [])
+    {
+        $parseUrlResult = parse_url($url);
+        if ($parseUrlResult === false) {
+            return false;
+        }
+
+        if (empty($parseUrlResult['scheme'])) {
+            $parseUrlResult['scheme'] = 'http';
+        }
+
+        if (empty($parseUrlResult['host'])) {
+            return false;
+        }
+
+        if (empty($parseUrlResult['port'])) {
+            if ($parseUrlResult['scheme'] == 'http') {
+                $parseUrlResult['port'] = 80;
+            } else {
+                $parseUrlResult['port'] = 443;
+            }
+        }
+
+        if (empty($parseUrlResult['path'])) {
+            $parseUrlResult['path'] = '/';
+        }
+
+        if (empty($parseUrlResult['query'])) {
+            $parseUrlResult['query'] = '';
+        } else {
+            $parseUrlResult['query'] = '?' . $parseUrlResult['query'];
+        }
+
+        $baseUrl      = $parseUrlResult['scheme'] . '://' . $parseUrlResult['host'] . ':' . $parseUrlResult['port'];
+        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, 300, $headers);
+        /**
+         * @var $httpClient HttpClient
+         */
+        $httpClient   = yield $sendDnsQuery;
+        $sendPostReq  = $httpClient->coroutinePost($parseUrlResult['path'] . $parseUrlResult['query'], $data, $timeout);
+        $result       = yield $sendPostReq;
+
+        return $result;
+    }
+
+    /**
+     * 以协程方式发送GET请求,包含DNS解析、获取数据
+     *
+     * @param string $url 请求的URL
+     * @param array $query POST的数据
+     * @param int $timeout 请求超时时间
+     * @param array $headers 额外的报头
+     * @return bool|array
+     */
+    public function coroutineGet($url, $query = null, $timeout = 30000, $headers = [])
+    {
+        $parseUrlResult = parse_url($url);
+        if ($parseUrlResult === false) {
+            return false;
+        }
+
+        if (empty($parseUrlResult['scheme'])) {
+            $parseUrlResult['scheme'] = 'http';
+        }
+
+        if (empty($parseUrlResult['host'])) {
+            return false;
+        }
+
+        if (empty($parseUrlResult['port'])) {
+            if ($parseUrlResult['scheme'] == 'http') {
+                $parseUrlResult['port'] = 80;
+            } else {
+                $parseUrlResult['port'] = 443;
+            }
+        }
+
+        if (empty($parseUrlResult['path'])) {
+            $parseUrlResult['path'] = '/';
+        }
+
+        if (empty($parseUrlResult['query'])) {
+            $parseUrlResult['query'] = '';
+        } else {
+            $parseUrlResult['query'] = '?' . $parseUrlResult['query'];
+        }
+
+        $baseUrl      = $parseUrlResult['scheme'] . '://' . $parseUrlResult['host'] . ':' . $parseUrlResult['port'];
+        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, 300, $headers);
+        /**
+         * @var $httpClient HttpClient
+         */
+        $httpClient   = yield $sendDnsQuery;
+        $sendPostReq  = $httpClient->coroutineGet($parseUrlResult['path'] . $parseUrlResult['query'], $query, $timeout);
+        $result       = yield $sendPostReq;
+
+        return $result;
     }
 
     /**
@@ -152,7 +280,7 @@ class Client extends Core
             if (self::$dnsCache[$host][2] > 10000) {
                 return null;
             }
-            
+
             self::$dnsCache[$host][2]++;
             return self::$dnsCache[$host][0];
         } else {

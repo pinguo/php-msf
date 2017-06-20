@@ -23,7 +23,7 @@ class HttpClient extends Core
      * @var \swoole_http_client
      */
     public $client;
-    
+
     /**
      * 初始化HttpClient
      *
@@ -92,6 +92,10 @@ class HttpClient extends Core
      */
     public function post($path, $data, $callback)
     {
+        // 解决swoole底层http_build_query failed的问题
+        if (empty($data)) {
+            $data = '';
+        }
         $this->client->post($path, $data, $callback);
     }
 
@@ -102,7 +106,7 @@ class HttpClient extends Core
      * @param $timeout int 超时时间
      * @return HttpClientRequest
      */
-    public function coroutinePost($path, $data, $timeout = 30000)
+    public function coroutinePost($path, $data = [], $timeout = 30000)
     {
         return $this->getContext()->getObjectPool()->get(HttpClientRequest::class)->initialization($this, 'POST', $path, $data, $timeout);
     }
