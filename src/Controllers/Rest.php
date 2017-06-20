@@ -12,6 +12,8 @@ use PG\MSF\Rest\Controller;
 
 /**
  * Restful 测试
+ * 选择路由器：
+ * $config['server']['route_tool'] = '\\PG\\MSF\\Rest\\Route';
  * 路由相关配置 eg：
  * $config['rest']['route']['rules'] = [
  *     'POST rests' => 'rest/create',
@@ -27,11 +29,12 @@ use PG\MSF\Rest\Controller;
  * Class RestController
  * @package PG\MSF\Controllers
  */
-class RestController extends Controller
+class Rest extends Controller
 {
     public function httpCreate()
     {
         var_dump($this->getContext()->getInput()->getAllPostGet());
+        $this->outputJson(11, 'shibaile', 403);
     }
 
     public function httpIndex()
