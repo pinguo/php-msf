@@ -75,6 +75,7 @@ class Route extends \PG\MSF\Route\NormalRoute
         $this->clientData->path = rtrim($request->server['path_info'], '/');
         $this->verb = $this->getVerb($request);
         $data = $this->parseRule();
+        // 如果未从rest配置中解析到，则按普通模式解析
         $path = $data[0] ?? $this->clientData->path;
         $this->parsePath($path);
         // 将 path 中含有的参数放入 get 中
