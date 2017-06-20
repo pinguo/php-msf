@@ -30,6 +30,8 @@ interface IRoute
 
     function setParams($params);
 
+    function getEnableCache();
+
     function setRouteCache($path, $callable);
 
     function getRouteCache($path);

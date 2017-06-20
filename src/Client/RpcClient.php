@@ -271,7 +271,7 @@ class RpcClient
             $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
         }
         if (!isset($response['body'])) {
-            throw new Exception('The response of body is not found');
+            throw new Exception('The response of body is not found with response: ' . json_encode($response));
         }
         $body = json_decode($response['body'], true);
         if ($body === null) {
