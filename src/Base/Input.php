@@ -162,7 +162,14 @@ class Input extends Core
      */
     public function getRequestMethod()
     {
-        return $this->request->server['request_method'];
+        if (isset($this->request->server['http_x_http_method_override'])) {
+            return strtoupper($this->request->server['http_x_http_method_override']);
+        }
+        if (isset($this->request->server['request_method'])) {
+            return strtoupper($this->request->server['request_method']);
+        }
+
+        return 'GET';
     }
 
     /**
