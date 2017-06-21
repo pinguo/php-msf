@@ -25,7 +25,15 @@ use PG\MSF\Rest\Controller;
  *     'OPTIONS rests' => 'rest/options',
  *     'OPTIONS rests/<id:\d+>' => 'rest/options',
  * ];
- *
+ * 建议action：
+ * [
+ *     update -> 更新资源，如：/users/<id>
+ *     delete -> 删除资源，如：/users/<id>
+ *     view -> 查看资源单条数据，如：/users/<id>
+ *     index -> 查看资源列表数据（可分页），如：/users
+ *     options -> 查看资源所支持的HTTP动词，如：/users/<id> | /users
+ *     create -> 新建资源，如：/users
+ * ]
  * Class RestController
  * @package PG\MSF\Controllers
  */
@@ -33,17 +41,28 @@ class Rest extends Controller
 {
     /**
      * POST
+     * /rests
+     * x-www-form-urlencoded
+     * [
+     *     'p1' => 1,
+     *     'p2' => 'Hello',
+     * ]
      */
     public function httpCreate()
     {
         var_dump($this->verb);
-        var_dump($this->getContext()->getInput()->getAllPostGet());
+        $data = [
+            'f1' => $this->getContext()->getInput()->post('p1'),
+            'f2' => $this->getContext()->getInput()->post('p2'),
+        ];
 
-        $this->outputJson(11, 'shibaile', 403);
+        $this->outputJson($data);
+        //$this->outputJson(null, 'shibaile', 403);
     }
 
     /**
      * GET
+     * /rests?p1=1&p2=Hello
      */
     public function httpIndex()
     {
@@ -51,53 +70,75 @@ class Rest extends Controller
         $data = [
             [
                 'f1' => $this->getContext()->getInput()->get('p1'),
-                'f2' =>$this->getContext()->getInput()->get('p2'),
+                'f2' => $this->getContext()->getInput()->get('p2'),
             ],
             [
                 'f1' => $this->getContext()->getInput()->get('p1'),
-                'f2' =>$this->getContext()->getInput()->get('p2'),
+                'f2' => $this->getContext()->getInput()->get('p2'),
             ]
         ];
         $this->outputJson($data);
+        //$this->outputJson(null, 'canshucuowuyo', 401);
     }
 
     /**
      * GET
+     * /rests/1?p1=1&p2=Hello
      */
     public function httpView()
     {
         var_dump($this->verb);
         $data = [
             'f1' => $this->getContext()->getInput()->get('p1'),
-            'f2' =>$this->getContext()->getInput()->get('p2'),
+            'f2' => $this->getContext()->getInput()->get('p2'),
+            'f3' => $this->getContext()->getInput()->get('id'),
         ];
         $this->outputJson($data);
     }
 
     /**
      * OPTIONS
+     * /rests | /rests/1
      */
     public function httpOptions()
     {
-        var_dump($this->verb);
-        var_dump($this->getContext()->getInput()->getAllPostGet());
+        if ($this->getContext()->getInput()->get('id')) {
+            $options = $this->resourceOptions;
+        } else {
+            $options = $this->collectionOptions;
+        }
+        $this->outputOptions($options);
     }
 
     /**
      * PUT|PATCH
+     * /rests/1
+     * x-www-form-urlencoded
+     * [
+     *     'p1' => 1,
+     *     'p2' => 'Hello',
+     * ]
      */
     public function httpUpdate()
     {
         var_dump($this->verb);
-        var_dump($this->getContext()->getInput()->getAllPostGet());
+        $data = [
+            'f1' => $this->getContext()->getInput()->post('p1'),
+            'f2' => $this->getContext()->getInput()->post('p2'),
+            'id' => $this->getContext()->getInput()->get('id')
+        ];
+
+        $this->outputJson($data);
     }
 
     /**
      * DELETE
+     * /rests/1
      */
     public function httpDelete()
     {
         var_dump($this->verb);
-        var_dump($this->getContext()->getInput()->getAllPostGet());
+        var_dump($this->getContext()->getInput()->get('id'));
+        $this->outputJson(null, Output::$codes[204], 204);
     }
 }
