@@ -102,6 +102,7 @@ class Rest extends Controller
      */
     public function httpOptions()
     {
+        var_dump($this->verb);
         if ($this->getContext()->getInput()->get('id')) {
             $options = $this->resourceOptions;
         } else {
