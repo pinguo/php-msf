@@ -11,11 +11,6 @@ namespace PG\MSF\Route;
 class NormalRoute implements IRoute
 {
     /**
-     * @var string
-     * The name of the POST parameter that is used to indicate if a request is a PUT, PATCH or DELETE
-     */
-    public $methodParam = '_method';
-    /**
      * @var bool
      */
     public $enableCache = true;
@@ -100,9 +95,6 @@ class NormalRoute implements IRoute
      */
     public function parseVerb($request)
     {
-        if (isset($request->post[$this->methodParam])) {
-            return strtoupper($request->post[$this->methodParam]);
-        }
         if (isset($request->server['http_x_http_method_override'])) {
             return strtoupper($request->server['http_x_http_method_override']);
         }

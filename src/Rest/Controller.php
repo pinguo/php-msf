@@ -31,6 +31,16 @@ class Controller extends \PG\MSF\Controllers\Controller
     public $resourceOptions = ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
     /**
+     * @param string $controllerName
+     * @param string $methodName
+     */
+    public function initialization($controllerName, $methodName)
+    {
+        parent::initialization($controllerName, $methodName);
+        $this->verb = $this->getContext()->getInput()->getRequestMethod();
+    }
+
+    /**
      * Returns whether this is a GET request.
      * @return bool whether this is a GET request.
      */
@@ -119,6 +129,23 @@ class Controller extends \PG\MSF\Controllers\Controller
         if (!empty($output->response)) {
             $output->setContentType('application/json; charset=UTF-8');
             $output->end($result);
+        }
+    }
+
+    /**
+     * 对返回options的封装
+     */
+    public function outputOptions(array $options)
+    {
+        /* @var $output Output */
+        $output = $this->getContext()->getOutput();
+        if ($this->verb !== 'OPTIONS') {
+            $output->setStatusHeader(405);
+        }
+        $output->setHeader('Allow', implode(', ', $options));
+        if (!empty($output->response)) {
+            $output->setContentType('application/json; charset=UTF-8');
+            $output->end();
         }
     }
 }
