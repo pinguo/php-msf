@@ -11,6 +11,11 @@ namespace PG\MSF\Route;
 class NormalRoute implements IRoute
 {
     /**
+     * @var string
+     * The name of the POST parameter that is used to indicate if a request is a PUT, PATCH or DELETE
+     */
+    public $methodParam = '_method';
+    /**
      * @var bool
      */
     public $enableCache = true;
@@ -90,8 +95,8 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * get request verb
-     * @param Object $request
+     * @param $request
+     * @return string
      */
     public function parseVerb($request)
     {
