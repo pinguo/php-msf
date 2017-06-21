@@ -24,11 +24,15 @@ interface IRoute
 
     function getIsRpc();
 
+    function getVerb();
+
     function setControllerName($name);
 
     function setMethodName($name);
 
     function setParams($params);
+
+    function getEnableCache();
 
     function setRouteCache($path, $callable);
 

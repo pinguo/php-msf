@@ -175,9 +175,8 @@ class Controller extends Core
                 $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
             }
         } catch (\Throwable $ne) {
-            echo 'Call Controller::onExceptionHandle Error', "\n";
-            echo 'Last Exception: ', dump($ce), "\n";
-            echo 'Handle Exception: ', dump($ne), "\n";
+            getInstance()->log->error('previous exception ' . dump($ce, false, true));
+            getInstance()->log->error('handle exception ' . dump($ne, false, true));
         }
     }
 

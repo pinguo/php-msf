@@ -186,6 +186,7 @@ abstract class HttpServer extends Server
                 $PGLog->init();
                 $PGLog->pushLog('controller', $controllerName);
                 $PGLog->pushLog('method', $methodName);
+                $PGLog->pushLog('verb', $this->route->getVerb());
 
                 // 构造请求上下文成员
                 $controllerInstance->context->setLogId($PGLog->logId);
@@ -225,7 +226,7 @@ abstract class HttpServer extends Server
                     }
                 }
 
-                if (!$this->route->getRouteCache($this->route->getPath())) {
+                if ($this->route->getEnableCache() && !$this->route->getRouteCache($this->route->getPath())) {
                     $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
                 }
                 break;

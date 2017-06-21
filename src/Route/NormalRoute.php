@@ -11,14 +11,17 @@ namespace PG\MSF\Route;
 class NormalRoute implements IRoute
 {
     /**
-     * @var \stdClass
+     * @var bool
      */
-    protected $clientData;
-
+    public $enableCache = true;
     /**
      * 路由缓存
      */
     public $routeCache;
+    /**
+     * @var \stdClass
+     */
+    protected $clientData;
 
     public function __construct()
     {
@@ -38,34 +41,13 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * 解析path
-     *
-     * @param $path
-     */
-    public function parsePath($path)
-    {
-        if (isset($this->routeCache[$path])) {
-            $this->clientData->controllerName = $this->routeCache[$path][0];
-            $this->clientData->methodName     = $this->routeCache[$path][1];
-        } else {
-            $route = explode('/', $path);
-            $route = array_map(function ($name) {
-                $name = ucfirst($name);
-                return $name;
-            }, $route);
-            $methodName = array_pop($route);
-            $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
-            $this->clientData->methodName     = $methodName;
-        }
-    }
-
-    /**
      * 处理http request
      * @param $request
      */
     public function handleClientRequest($request)
     {
         $this->clientData->path = rtrim($request->server['path_info'], '/');
+        $this->clientData->verb = $this->parseVerb($request);
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->clientData->isRpc          = true;
@@ -75,6 +57,52 @@ class NormalRoute implements IRoute
         } else {
             $this->parsePath($this->clientData->path);
         }
+    }
+
+    /**
+     * 解析path
+     *
+     * @param $path
+     */
+    public function parsePath($path)
+    {
+        if ($this->getEnableCache() && isset($this->routeCache[$path])) {
+            $this->clientData->controllerName = $this->routeCache[$path][0];
+            $this->clientData->methodName     = $this->routeCache[$path][1];
+        } else {
+            $route = explode('/', $path);
+            $route = array_map(function ($name) {
+                if (strpos($name, '-') !== false) { // 中横线模式处理.
+                    $slices = array_map('ucfirst', explode('-', $name));
+                    $name = '';
+                    foreach ($slices as $slice) {
+                        $name .= $slice;
+                    }
+                } else {
+                    $name = ucfirst($name);
+                }
+                return $name;
+            }, $route);
+            $methodName = array_pop($route);
+            $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
+            $this->clientData->methodName     = $methodName;
+        }
+    }
+
+    /**
+     * @param $request
+     * @return string
+     */
+    public function parseVerb($request)
+    {
+        if (isset($request->server['http_x_http_method_override'])) {
+            return strtoupper($request->server['http_x_http_method_override']);
+        }
+        if (isset($request->server['request_method'])) {
+            return strtoupper($request->server['request_method']);
+        }
+
+        return 'GET';
     }
 
     /**
@@ -102,12 +130,17 @@ class NormalRoute implements IRoute
 
     public function getIsRpc()
     {
-        return $this->clientData->isRpc??false;
+        return $this->clientData->isRpc ?? false;
+    }
+
+    public function getVerb()
+    {
+        return $this->clientData->verb ?? null;
     }
 
     public function getParams()
     {
-        return $this->clientData->params??null;
+        return $this->clientData->params ?? null;
     }
 
     public function setControllerName($name)
@@ -126,6 +159,11 @@ class NormalRoute implements IRoute
     {
         $this->clientData->params = $params;
         return $this;
+    }
+
+    public function getEnableCache()
+    {
+        return $this->enableCache;
     }
 
     public function setRouteCache($path, $callable)

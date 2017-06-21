@@ -57,7 +57,7 @@ abstract class Base implements IBase
     public function init($timeout = 0)
     {
         if (self::$MAX_TIMERS == 0) {
-            self::$MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 30000);
+            self::$MAX_TIMERS = getInstance()->config->get('coroutine.timeout', 30000);
         }
 
         if ($timeout > 0) {
