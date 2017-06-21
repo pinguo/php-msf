@@ -37,11 +37,6 @@ class Route extends \PG\MSF\Route\NormalRoute
     public $restRules = [];
     /**
      * @var string
-     * The name of the POST parameter that is used to indicate if a request is a PUT, PATCH or DELETE
-     */
-    public $methodParam = '_method';
-    /**
-     * @var string
      */
     public $verb;
     /**
@@ -73,6 +68,7 @@ class Route extends \PG\MSF\Route\NormalRoute
     public function handleClientRequest($request)
     {
         $this->clientData->path = rtrim($request->server['path_info'], '/');
+        $this->clientData->verb = $this->parseVerb($request);
         $data = $this->parseRule();
         // 如果未从rest配置中解析到，则按普通模式解析
         $path = $data[0] ?? $this->clientData->path;
