@@ -186,6 +186,7 @@ abstract class HttpServer extends Server
                 $PGLog->init();
                 $PGLog->pushLog('controller', $controllerName);
                 $PGLog->pushLog('method', $methodName);
+                $PGLog->pushLog('verb', $this->route->getVerb());
 
                 // 构造请求上下文成员
                 $controllerInstance->context->setLogId($PGLog->logId);

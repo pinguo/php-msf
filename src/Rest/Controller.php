@@ -18,6 +18,10 @@ use PG\MSF\Base\Output;
 class Controller extends \PG\MSF\Controllers\Controller
 {
     /**
+     * @var string
+     */
+    public $verb = 'GET';
+    /**
      * @var array the HTTP verbs that are supported by the collection URL
      */
     public $collectionOptions = ['GET', 'POST', 'HEAD', 'OPTIONS'];
@@ -25,6 +29,69 @@ class Controller extends \PG\MSF\Controllers\Controller
      * @var array the HTTP verbs that are supported by the resource URL
      */
     public $resourceOptions = ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+
+    /**
+     * Returns whether this is a GET request.
+     * @return bool whether this is a GET request.
+     */
+    public function getIsGet()
+    {
+        return $this->verb === 'GET';
+    }
+
+    /**
+     * Returns whether this is an OPTIONS request.
+     * @return bool whether this is a OPTIONS request.
+     */
+    public function getIsOptions()
+    {
+        return $this->verb === 'OPTIONS';
+    }
+
+    /**
+     * Returns whether this is a HEAD request.
+     * @return bool whether this is a HEAD request.
+     */
+    public function getIsHead()
+    {
+        return $this->verb === 'HEAD';
+    }
+
+    /**
+     * Returns whether this is a POST request.
+     * @return bool whether this is a POST request.
+     */
+    public function getIsPost()
+    {
+        return $this->verb === 'POST';
+    }
+
+    /**
+     * Returns whether this is a DELETE request.
+     * @return bool whether this is a DELETE request.
+     */
+    public function getIsDelete()
+    {
+        return $this->verb === 'DELETE';
+    }
+
+    /**
+     * Returns whether this is a PUT request.
+     * @return bool whether this is a PUT request.
+     */
+    public function getIsPut()
+    {
+        return $this->verb === 'PUT';
+    }
+
+    /**
+     * Returns whether this is a PATCH request.
+     * @return bool whether this is a PATCH request.
+     */
+    public function getIsPatch()
+    {
+        return $this->verb === 'PATCH';
+    }
 
     /**
      * output Json

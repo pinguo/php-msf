@@ -31,34 +31,73 @@ use PG\MSF\Rest\Controller;
  */
 class Rest extends Controller
 {
+    /**
+     * POST
+     */
     public function httpCreate()
     {
+        var_dump($this->verb);
         var_dump($this->getContext()->getInput()->getAllPostGet());
+
         $this->outputJson(11, 'shibaile', 403);
     }
 
+    /**
+     * GET
+     */
     public function httpIndex()
     {
-        var_dump($this->getContext()->getInput()->getAllPostGet());
+        var_dump($this->verb);
+        $data = [
+            [
+                'f1' => $this->getContext()->getInput()->get('p1'),
+                'f2' =>$this->getContext()->getInput()->get('p2'),
+            ],
+            [
+                'f1' => $this->getContext()->getInput()->get('p1'),
+                'f2' =>$this->getContext()->getInput()->get('p2'),
+            ]
+        ];
+        $this->outputJson($data);
     }
 
+    /**
+     * GET
+     */
     public function httpView()
     {
-        var_dump($this->getContext()->getInput()->getAllPostGet());
+        var_dump($this->verb);
+        $data = [
+            'f1' => $this->getContext()->getInput()->get('p1'),
+            'f2' =>$this->getContext()->getInput()->get('p2'),
+        ];
+        $this->outputJson($data);
     }
 
-    public function httpDelete()
-    {
-        var_dump($this->getContext()->getInput()->getAllPostGet());
-    }
-
-    public function httpUpdate()
-    {
-        var_dump($this->getContext()->getInput()->getAllPostGet());
-    }
-
+    /**
+     * OPTIONS
+     */
     public function httpOptions()
     {
+        var_dump($this->verb);
+        var_dump($this->getContext()->getInput()->getAllPostGet());
+    }
+
+    /**
+     * PUT|PATCH
+     */
+    public function httpUpdate()
+    {
+        var_dump($this->verb);
+        var_dump($this->getContext()->getInput()->getAllPostGet());
+    }
+
+    /**
+     * DELETE
+     */
+    public function httpDelete()
+    {
+        var_dump($this->verb);
         var_dump($this->getContext()->getInput()->getAllPostGet());
     }
 }

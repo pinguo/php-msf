@@ -73,7 +73,6 @@ class Route extends \PG\MSF\Route\NormalRoute
     public function handleClientRequest($request)
     {
         $this->clientData->path = rtrim($request->server['path_info'], '/');
-        $this->verb = $this->getVerb($request);
         $data = $this->parseRule();
         // 如果未从rest配置中解析到，则按普通模式解析
         $path = $data[0] ?? $this->clientData->path;
@@ -87,25 +86,6 @@ class Route extends \PG\MSF\Route\NormalRoute
     }
 
     /**
-     * get request verb
-     * @param Object $request
-     */
-    public function getVerb($request)
-    {
-        if (isset($request->post[$this->methodParam])) {
-            return strtoupper($request->post[$this->methodParam]);
-        }
-        if (isset($request->server['http_x_http_method_override'])) {
-            return strtoupper($request->server['http_x_http_method_override']);
-        }
-        if (isset($request->server['request_method'])) {
-            return strtoupper($request->server['request_method']);
-        }
-
-        return 'GET';
-    }
-
-    /**
      * parse Rest Rules, return path
      * @return array
      */
@@ -116,7 +96,7 @@ class Route extends \PG\MSF\Route\NormalRoute
         }
         $pathInfo = $this->trimSlashes($this->clientData->path);
         foreach ($this->restRules as $rule) {
-            if (!in_array($this->verb, $rule[0])) {
+            if (!in_array($this->clientData->verb, $rule[0])) {
                 continue;
             }
             if (!preg_match($rule[1][0], $pathInfo, $matches)) {
@@ -151,69 +131,6 @@ class Route extends \PG\MSF\Route\NormalRoute
         }
 
         return [];
-    }
-
-    /**
-     * Returns whether this is a GET request.
-     * @return bool whether this is a GET request.
-     */
-    public function getIsGet()
-    {
-        return $this->verb === 'GET';
-    }
-
-    /**
-     * Returns whether this is an OPTIONS request.
-     * @return bool whether this is a OPTIONS request.
-     */
-    public function getIsOptions()
-    {
-        return $this->verb === 'OPTIONS';
-    }
-
-    /**
-     * Returns whether this is a HEAD request.
-     * @return bool whether this is a HEAD request.
-     */
-    public function getIsHead()
-    {
-        return $this->verb === 'HEAD';
-    }
-
-    /**
-     * Returns whether this is a POST request.
-     * @return bool whether this is a POST request.
-     */
-    public function getIsPost()
-    {
-        return $this->verb === 'POST';
-    }
-
-    /**
-     * Returns whether this is a DELETE request.
-     * @return bool whether this is a DELETE request.
-     */
-    public function getIsDelete()
-    {
-        return $this->verb === 'DELETE';
-    }
-
-    /**
-     * Returns whether this is a PUT request.
-     * @return bool whether this is a PUT request.
-     */
-    public function getIsPut()
-    {
-        return $this->verb === 'PUT';
-    }
-
-    /**
-     * Returns whether this is a PATCH request.
-     * @return bool whether this is a PATCH request.
-     */
-    public function getIsPatch()
-    {
-        return $this->verb === 'PATCH';
     }
 
     /**

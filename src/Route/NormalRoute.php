@@ -41,6 +41,25 @@ class NormalRoute implements IRoute
     }
 
     /**
+     * 处理http request
+     * @param $request
+     */
+    public function handleClientRequest($request)
+    {
+        $this->clientData->path = rtrim($request->server['path_info'], '/');
+        $this->clientData->verb = $this->parseVerb($request);
+
+        if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
+            $this->clientData->isRpc          = true;
+            $this->clientData->params         = $request->post ?? $request->get ?? [];
+            $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
+            $this->clientData->methodName     = getInstance()->config->get('rpc.default_method');
+        } else {
+            $this->parsePath($this->clientData->path);
+        }
+    }
+
+    /**
      * 解析path
      *
      * @param $path
@@ -71,21 +90,22 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * 处理http request
-     * @param $request
+     * get request verb
+     * @param Object $request
      */
-    public function handleClientRequest($request)
+    public function parseVerb($request)
     {
-        $this->clientData->path = rtrim($request->server['path_info'], '/');
-
-        if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
-            $this->clientData->isRpc          = true;
-            $this->clientData->params         = $request->post ?? $request->get ?? [];
-            $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
-            $this->clientData->methodName     = getInstance()->config->get('rpc.default_method');
-        } else {
-            $this->parsePath($this->clientData->path);
+        if (isset($request->post[$this->methodParam])) {
+            return strtoupper($request->post[$this->methodParam]);
         }
+        if (isset($request->server['http_x_http_method_override'])) {
+            return strtoupper($request->server['http_x_http_method_override']);
+        }
+        if (isset($request->server['request_method'])) {
+            return strtoupper($request->server['request_method']);
+        }
+
+        return 'GET';
     }
 
     /**
@@ -113,12 +133,17 @@ class NormalRoute implements IRoute
 
     public function getIsRpc()
     {
-        return $this->clientData->isRpc??false;
+        return $this->clientData->isRpc ?? false;
+    }
+
+    public function getVerb()
+    {
+        return $this->clientData->verb ?? null;
     }
 
     public function getParams()
     {
-        return $this->clientData->params??null;
+        return $this->clientData->params ?? null;
     }
 
     public function setControllerName($name)

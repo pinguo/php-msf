@@ -24,6 +24,8 @@ interface IRoute
 
     function getIsRpc();
 
+    function getVerb();
+
     function setControllerName($name);
 
     function setMethodName($name);
