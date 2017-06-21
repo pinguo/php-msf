@@ -71,11 +71,13 @@ class TaskProxy extends Core
 
     /**
      * 异步的协程模式
+     *
+     * @param int $timeout 超时时间,单位毫秒
      * @return CTask
      */
-    public function coroutineSend()
+    public function coroutineSend($timeout = 0)
     {
-        return $this->getContext()->getObjectPool()->get(CTask::class)->initialization($this->taskProxyData, -1);
+        return $this->getContext()->getObjectPool()->get(CTask::class)->initialization($this->taskProxyData, -1, $timeout);
     }
 
     /**
