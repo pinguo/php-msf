@@ -21,6 +21,7 @@ use PG\MSF\DataBase\RedisAsynPool;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Base\Exception;
+use \PG\MSF\Tasks\Task as TaskBase;
 
 abstract class MSFServer extends WebSocketServer
 {
@@ -261,25 +262,34 @@ abstract class MSFServer extends WebSocketServer
         } else {
             $unserializeData = $data;
         }
-        $type = $unserializeData['type']??'';
-        $message = $unserializeData['message']??'';
+        $type    = $unserializeData['type'] ?? '';
+        $message = $unserializeData['message'] ?? '';
+        $result  = false;
         switch ($type) {
             case Marco::SERVER_TYPE_TASK://task任务
-                $taskName = $message['task_name'];
-                $task = $this->loader->task($taskName, $this);
-                $taskFucName = $message['task_fuc_name'];
-                $taskData = $message['task_fuc_data'];
-                $taskId = $message['task_id'];
-                $taskContext = $message['task_context'];
-                if (method_exists($task, $taskFucName)) {
-                    //给task做初始化操作
-                    $task->initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName,
-                        $taskContext);
-                    $result = call_user_func_array(array($task, $taskFucName), $taskData);
-                } else {
-                    throw new Exception("method $taskFucName not exist in $taskName");
+                try {
+                    $taskName    = $message['task_name'];
+                    $task        = $this->loader->task($taskName, $this);
+                    $taskFucName = $message['task_fuc_name'];
+                    $taskData    = $message['task_fuc_data'];
+                    $taskId      = $message['task_id'];
+                    $taskContext = $message['task_context'];
+                    if (method_exists($task, $taskFucName)) {
+                        //给task做初始化操作
+                        $task->initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName, $taskContext);
+                        $result = call_user_func_array(array($task, $taskFucName), $taskData);
+                    } else {
+                        throw new Exception("method $taskFucName not exist in $taskName");
+                    }
+                    $task->destroy();
+                } catch (\Throwable $e) {
+                    if (empty($task) || !($task instanceof TaskBase) || empty($task->getContext())) {
+                        getInstance()->log->error(dump($e, false, true));
+                    } else {
+                        $error = dump($e, false, true);
+                        $task->getContext()->getLog()->error($error);
+                    }
                 }
-                $task->destroy();
                 return $result;
             default:
                 return parent::onSwooleTask($serv, $taskId, $fromId, $data);
