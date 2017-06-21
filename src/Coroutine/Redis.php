@@ -174,7 +174,6 @@ class Redis extends Base
                     $data = $data[0];
                 }
             }
-
         } catch (\Exception $exception) {
             // do noting
         }

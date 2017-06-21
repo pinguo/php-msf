@@ -88,7 +88,8 @@ class Task
      * @param \Generator $routine
      * @return $this
      */
-    public function resetRoutine(\Generator $routine) {
+    public function resetRoutine(\Generator $routine)
+    {
         $this->routine = null;
         $this->routine = $routine;
         return $this;
