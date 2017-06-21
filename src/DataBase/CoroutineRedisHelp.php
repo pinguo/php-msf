@@ -190,7 +190,6 @@ class CoroutineRedisHelp
     protected function serializeHandler($data)
     {
         try {
-
             if ($this->phpSerialize) {
                 $data = [$data, null];
             }
@@ -212,7 +211,6 @@ class CoroutineRedisHelp
                     $data = @igbinary_serialize($data);
                     break;
             }
-
         } catch (\Exception $exception) {
             // do noting
         }
@@ -297,7 +295,6 @@ class CoroutineRedisHelp
                     $data = $data[0];
                 }
             }
-
         } catch (\Exception $exception) {
             // do noting
         }
