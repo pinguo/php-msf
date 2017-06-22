@@ -32,15 +32,15 @@ class ConcurrentClient
     public static function requestByConcurrent(array $requests, Core $parent)
     {
         $config = $parent->getConfig();
-        $serviceConf = $config->get('params.service');
+        $serviceConf = $config->get('params.service', null);
         $parallelConf = $config->get('params.parallel');
 
         $list = $result = [];
         foreach ($requests as $name => $params) {
             if (isset($parallelConf[$name])) {
                 //服务名
-                $list[$name]['service'] = $service = $parallelConf[$name]['service'];
-                $list[$name]['host'] = $serviceConf[$service]['host'];
+                $list[$name]['service'] = $service = $parallelConf[$name]['service'] ?? null;
+                $list[$name]['host'] = $parallelConf[$name]['host'] ?? $serviceConf[$service]['host'];
                 $list[$name]['timeout'] = $parallelConf[$name]['timeout'] ?? $serviceConf[$service]['timeout'] ?? 1000;
                 $list[$name]['api'] = $parallelConf[$name]['url'];
                 //优先使用parallel配置，然后有参数有POST，无参用GET
