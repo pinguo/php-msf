@@ -173,7 +173,6 @@ class Redis extends Base
                 if (is_string($data) && $this->redisSerialize) {
                     switch ($this->redisSerialize) {
                         case Marco::SERIALIZE_PHP:
-                            print_r($data);
                             $data = unserialize($data);
                             break;
                         case Marco::SERIALIZE_IGBINARY:
