@@ -136,22 +136,71 @@ class CoroutineRedisHelp
             $arguments[1] = $newKey;
         }
 
-        if ($name == 'sDiff') {
-            $arguments[2] = $this->generateUniqueKey($arguments[2]);
+        //多key操作特殊逻辑
+        switch (strtolower($name)) {
+            //kkk...
+            case 'sdiff':
+            case 'sdiffstore':
+            case 'sunion':
+            case 'sunionstore':
+                foreach ($arguments as $k => $argument) {
+                    if ($k >= 2) {
+                        $arguments[$k] = $this->generateUniqueKey($k);
+                    }
+                }
+                break;
+            //kkv or kk
+            case 'smove':
+            case 'rpoplpush':
+            case 'brpoplpush':
+                $arguments[2] = $this->generateUniqueKey(2);
+                break;
         }
         // key end
 
         // value serialize start
-        if (in_array($name, ['set', 'setex'])) {
-            $last = count($arguments) - 1;
-            $arguments[$last] = $this->serializeHandler($arguments[$last]);
-        } elseif ($name === 'mset') {
-            $keysValues = $arguments[1];
-            $newValues = [];
-            foreach ($keysValues as $k => $v) {
-                $newValues[$k] = $this->serializeHandler($v);
-            }
-            $arguments[1] = $newValues;
+        switch (strtolower($name)) {
+            case 'set':
+            case 'setex':
+                $last = count($arguments) - 1;
+                $arguments[$last] = $this->serializeHandler($arguments[$last]);
+                break;
+            case 'mset':
+                $keysValues = $arguments[1];
+                $newValues = [];
+                foreach ($keysValues as $k => $v) {
+                    $newValues[$k] = $this->serializeHandler($v);
+                }
+                $arguments[1] = $newValues;
+                break;
+            case 'sadd':
+                //member是array
+                if (is_array($arguments[2])) {
+                    $newValues = [];
+                    foreach ($arguments[2] as $v) {
+                        $newValues[] = $this->serializeHandler($v, false);
+                    }
+                    $arguments[2] = $newValues;
+                } else {
+                    foreach ($arguments as $k => $argument) {
+                        if ($k >= 2) {
+                            $arguments[$k] = $this->serializeHandler($argument, false);
+                        }
+                    }
+                }
+                break;
+            case 'zadd':
+            case 'hset':
+                $argument[3] = $this->serializeHandler($arguments[3], false);
+                break;
+            case 'hmset':
+                $keysValues = $arguments[2];
+                $newValues = [];
+                foreach ($keysValues as $k => $v) {
+                    $newValues[$k] = $this->serializeHandler($v);
+                }
+                $arguments[2] = $newValues;
+                break;
         }
         // value serialize end
 
@@ -187,20 +236,20 @@ class CoroutineRedisHelp
      * @param $data
      * @return string
      */
-    protected function serializeHandler($data)
+    protected function serializeHandler($data, $phpSerialize = false)
     {
         try {
-            if ($this->phpSerialize) {
+            //只有set、mset等才需要
+            if ($this->phpSerialize && $phpSerialize) {
                 $data = [$data, null];
-            }
-
-            switch ($this->phpSerialize) {
-                case Marco::SERIALIZE_PHP:
-                    $data = serialize($data);
-                    break;
-                case Marco::SERIALIZE_IGBINARY:
-                    $data = @igbinary_serialize($data);
-                    break;
+                switch ($this->phpSerialize) {
+                    case Marco::SERIALIZE_PHP:
+                        $data = serialize($data);
+                        break;
+                    case Marco::SERIALIZE_IGBINARY:
+                        $data = @igbinary_serialize($data);
+                        break;
+                }
             }
 
             switch ($this->redisSerialize) {
@@ -233,6 +282,7 @@ class CoroutineRedisHelp
         }
 
         try {
+            //mget
             if (!empty($keys) && is_array($data)) {
                 $ret = [];
                 array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
@@ -268,7 +318,31 @@ class CoroutineRedisHelp
                 });
 
                 $data = $ret;
+            } elseif (is_array($data) && empty($keys)) {
+                //eval sRandMember...
+                $ret = [];
+                array_walk($data, function ($val, $k) use (&$ret) {
+                    if (is_string($val)) {
+                        switch ($this->redisSerialize) {
+                            case Marco::SERIALIZE_PHP:
+                                $val = unserialize($val);
+                                break;
+                            case Marco::SERIALIZE_IGBINARY:
+                                $val = @igbinary_unserialize($val);
+                                break;
+                        }
+                    }
+
+                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                        $val = $val[0];
+                    }
+
+                    $ret[$k] = $val;
+                });
+
+                $data = $ret;
             } else {
+                //get
                 if (is_string($data) && $this->redisSerialize) {
                     switch ($this->redisSerialize) {
                         case Marco::SERIALIZE_PHP:

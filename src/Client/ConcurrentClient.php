@@ -68,9 +68,9 @@ class ConcurrentClient
 
             //http请求
             if ($item['method'] == 'POST') {
-                $item['http'] = $dnsClient->coroutinePost($item['api'], $item['params'], $item['timeout']);
+                $list[$name]['http'] = $dnsClient->coroutinePost($item['api'], $item['params'], $item['timeout']);
             } else {
-                $item['http'] = $dnsClient->coroutineGet($item['api'], $item['params'], $item['timeout']);
+                $list[$name]['http'] = $dnsClient->coroutineGet($item['api'], $item['params'], $item['timeout']);
             }
         }
 
@@ -86,7 +86,8 @@ class ConcurrentClient
             }
 
             //解析结果
-            $result[$name] = self::$item['parser']($response, $parent);
+            $parser = $item['parser'];
+            $result[$name] = self::$parser($response, $parent);
         }
 
         return $result;
