@@ -32,15 +32,15 @@ class ConcurrentClient
     public static function requestByConcurrent(array $requests, Core $parent)
     {
         $config = $parent->getConfig();
-        $serviceConf = $config->get('params.service');
+        $serviceConf = $config->get('params.service', null);
         $parallelConf = $config->get('params.parallel');
 
         $list = $result = [];
         foreach ($requests as $name => $params) {
             if (isset($parallelConf[$name])) {
                 //服务名
-                $list[$name]['service'] = $service = $parallelConf[$name]['service'];
-                $list[$name]['host'] = $serviceConf[$service]['host'];
+                $list[$name]['service'] = $service = $parallelConf[$name]['service'] ?? null;
+                $list[$name]['host'] = $parallelConf[$name]['host'] ?? $serviceConf[$service]['host'];
                 $list[$name]['timeout'] = $parallelConf[$name]['timeout'] ?? $serviceConf[$service]['timeout'] ?? 1000;
                 $list[$name]['api'] = $parallelConf[$name]['url'];
                 //优先使用parallel配置，然后有参数有POST，无参用GET
@@ -68,9 +68,9 @@ class ConcurrentClient
 
             //http请求
             if ($item['method'] == 'POST') {
-                $item['http'] = $dnsClient->coroutinePost($item['api'], $item['params'], $item['timeout']);
+                $list[$name]['http'] = $dnsClient->coroutinePost($item['api'], $item['params'], $item['timeout']);
             } else {
-                $item['http'] = $dnsClient->coroutineGet($item['api'], $item['params'], $item['timeout']);
+                $list[$name]['http'] = $dnsClient->coroutineGet($item['api'], $item['params'], $item['timeout']);
             }
         }
 
@@ -86,7 +86,8 @@ class ConcurrentClient
             }
 
             //解析结果
-            $result[$name] = self::$item['parser']($response, $parent);
+            $parser = $item['parser'];
+            $result[$name] = self::$parser($response, $parent);
         }
 
         return $result;

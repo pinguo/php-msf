@@ -66,16 +66,10 @@ class Redis extends Base
                     if (is_array($decodeVal)) {
                         $result = $decodeVal;
                     }
-
-                    if (is_array($result)) {
-                        //处理反序列化
-                        foreach ($result as $k => $v) {
-                            $result[$k] = $this->unSerializeHandler($v);
-                        }
-                    } else {
-                        $result = $this->unSerializeHandler($result);
-                    }
+                    $result = $this->unSerializeHandler($result);
                     break;
+                default:
+                    $result = $this->unSerializeHandler($result);
             }
 
             $this->result = $result;
@@ -110,8 +104,12 @@ class Redis extends Base
         if (null === $data) {
             return false;
         }
+        if ('OK' === $data) {
+            return $data;
+        }
 
         try {
+            //mget
             if (!empty($keys) && is_array($data)) {
                 $ret = [];
                 array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
@@ -147,7 +145,31 @@ class Redis extends Base
                 });
 
                 $data = $ret;
+            } elseif (is_array($data) && empty($keys)) {
+                //eval sRandMember...
+                $ret = [];
+                array_walk($data, function ($val, $k) use (&$ret) {
+                    if (is_string($val)) {
+                        switch ($this->redisSerialize) {
+                            case Marco::SERIALIZE_PHP:
+                                $val = unserialize($val);
+                                break;
+                            case Marco::SERIALIZE_IGBINARY:
+                                $val = @igbinary_unserialize($val);
+                                break;
+                        }
+                    }
+
+                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                        $val = $val[0];
+                    }
+
+                    $ret[$k] = $val;
+                });
+
+                $data = $ret;
             } else {
+                //get
                 if (is_string($data) && $this->redisSerialize) {
                     switch ($this->redisSerialize) {
                         case Marco::SERIALIZE_PHP:
