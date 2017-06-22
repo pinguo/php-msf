@@ -61,8 +61,8 @@ class TcpClient extends Core
         $this->port    = $port;
         $this->timeOut = $timeOut;
 
-        $this->set = getInstance()->config->get('tcpClient.set', []);
-        $packTool  = getInstance()->config->get('tcpClient.pack_tool', 'JsonPack');
+        $this->set = getInstance()->config->get('tcp_client.set', []);
+        $packTool  = getInstance()->config->get('tcp_client.pack_tool', 'JsonPack');
 
         $this->packageLengthTypeLength = strlen(pack($this->set['package_length_type'], 1));
         $pack_class_name = "\\App\\Pack\\" . $packTool;
@@ -100,7 +100,7 @@ class TcpClient extends Core
             if ($this->set['open_eof_check']??0 == 1) {
                 return $buffer . $this->set['package_eof'];
             } else {
-                throw new Exception("tcpClient won't support set");
+                throw new Exception("tcp_client won't support set");
             }
         }
     }

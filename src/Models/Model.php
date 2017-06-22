@@ -15,17 +15,6 @@ use PG\MSF\Base\AOPFactory;
 
 class Model extends Core
 {
-    /**
-     * redis连接池
-     * @var array
-     */
-    public $redisPools;
-    /**
-     * redis代理池
-     * @var array
-     */
-    public $redisProxies;
-
     final public function __construct()
     {
         parent::__construct();
@@ -47,43 +36,5 @@ class Model extends Core
     {
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
-    }
-
-    /**
-     * 获取redis连接池
-     * @param string $poolName
-     * @return bool|Wrapper|\PG\MSF\DataBase\CoroutineRedisHelp
-     */
-    protected function getRedisPool(string $poolName)
-    {
-        if (isset($this->redisPools[$poolName])) {
-            return $this->redisPools[$poolName];
-        }
-        $pool = getInstance()->getAsynPool($poolName);
-        if (!$pool) {
-            return false;
-        }
-
-        $this->redisPools[$poolName] = AOPFactory::getRedisPoolCoroutine($pool->getCoroutine(), $this);
-        return $this->redisPools[$poolName];
-    }
-
-    /**
-     * 获取redis代理
-     * @param string $proxyName
-     * @return bool|Wrapper
-     */
-    protected function getRedisProxy(string $proxyName)
-    {
-        if (isset($this->redisProxies[$proxyName])) {
-            return $this->redisProxies[$proxyName];
-        }
-        $proxy = getInstance()->getRedisProxy($proxyName);
-        if (!$proxy) {
-            return false;
-        }
-
-        $this->redisProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
-        return $this->redisProxies[$proxyName];
     }
 }
