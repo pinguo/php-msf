@@ -87,7 +87,7 @@ class Client extends Core
         }
 
         $c = new \swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
-        $c->set(getInstance()->config->get('tcpClient.set', []));
+        $c->set(getInstance()->config->get('tcp_client.set', []));
 
         $c->on('error', function ($cli) use ($data) {
             throw new Exception($data['host'] . ':' . $data['port'] . ' Connect failed');
