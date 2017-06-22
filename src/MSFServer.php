@@ -12,7 +12,6 @@ use PG\MSF\Client\Http\Client as HttpClient;
 use PG\MSF\Client\Tcp\Client as TcpClient;
 use PG\MSF\Process\Config;
 use PG\MSF\Process\Inotify;
-use PG\MSF\Coroutine\Task;
 use PG\MSF\DataBase\AsynPool;
 use PG\MSF\DataBase\AsynPoolManager;
 use PG\MSF\DataBase\Miner;
@@ -22,6 +21,7 @@ use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Base\Exception;
 use \PG\MSF\Tasks\Task as TaskBase;
+use PG\AOP\Wrapper;
 
 abstract class MSFServer extends WebSocketServer
 {

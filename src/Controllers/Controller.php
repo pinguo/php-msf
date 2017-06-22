@@ -56,17 +56,6 @@ class Controller extends Core
      */
     public $testUnitSendStack = [];
     /**
-     * redis连接池
-     * @var array
-     */
-    public $redisPools;
-    /**
-     * redis代理池
-     * @var array
-     */
-    public $redisProxies;
-
-    /**
      * @var float 请求开始处理的时间
      */
     public $requestStartTime = 0.0;
@@ -263,44 +252,6 @@ class Controller extends Core
     }
 
     /**
-     * 获取redis连接池
-     * @param string $poolName
-     * @return bool|Wrapper|\PG\MSF\DataBase\CoroutineRedisHelp
-     */
-    protected function getRedisPool(string $poolName)
-    {
-        if (isset($this->redisPools[$poolName])) {
-            return $this->redisPools[$poolName];
-        }
-        $pool = getInstance()->getAsynPool($poolName);
-        if (!$pool) {
-            return false;
-        }
-
-        $this->redisPools[$poolName] = AOPFactory::getRedisPoolCoroutine($pool->getCoroutine(), $this);
-        return $this->redisPools[$poolName];
-    }
-
-    /**
-     * 获取redis代理
-     * @param string $proxyName
-     * @return bool|Wrapper
-     */
-    protected function getRedisProxy(string $proxyName)
-    {
-        if (isset($this->redisProxies[$proxyName])) {
-            return $this->redisProxies[$proxyName];
-        }
-        $proxy = getInstance()->getRedisProxy($proxyName);
-        if (!$proxy) {
-            return false;
-        }
-
-        $this->redisProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
-        return $this->redisProxies[$proxyName];
-    }
-
-    /**
      * 响应json格式数据
      *
      * @param null $data
@@ -330,32 +281,6 @@ class Controller extends Core
      */
     public function outputView(array $data, $view = null)
     {
-        if ($this->requestType !== Marco::HTTP_REQUEST) {
-            throw new Exception('$this->outputView not support '. $this->requestType);
-        }
-
-        $this->getContext()->getOutput()->setContentType('text/html; charset=UTF-8');
-        if (empty($view)) {
-            $view = str_replace('\\', '/', $this->getContext()->getControllerName()) . '/' .
-                str_replace($this->getConfig()->get('http.method_prefix', ''), '', $this->getContext()->getActionName());
-        }
-
-        try {
-            $viewFile = ROOT_PATH . '/app/Views/' . $view;
-            $template = $this->getLoader()->view($viewFile);
-            $response = $template->render($data);
-        } catch (\Throwable $e) {
-            $template = null;
-            $viewFile = getInstance()->MSFSrcDir . '/Views/' . $view;
-            try {
-                $template = $this->getLoader()->view($viewFile);
-                $response = $template->render($data);
-            } catch (\Throwable $e) {
-                throw new Exception('app view and server view both not exist, please check again', 500);
-            }
-        }
-
-        $template = null;
-        $this->getContext()->getOutput()->end($response);
+        $this->getContext()->getOutput()->outputView($data, $view);
     }
 }

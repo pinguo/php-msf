@@ -9,7 +9,6 @@
 namespace PG\MSF\DataBase;
 
 use PG\MSF\Marco;
-use PG\MSF\Server;
 
 class AsynPoolManager
 {

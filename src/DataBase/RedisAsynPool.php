@@ -39,7 +39,11 @@ class RedisAsynPool extends AsynPool
         parent::__construct($config);
         $this->active = $active;
 
-        $config = $this->config['redis'][$this->active];
+        $config = $this->config->get('redis.' . $this->active, null);
+        if (!$config) {
+            throw new Exception("config redis.$active not exists");
+        }
+
         if (!empty($config['hashKey'])) {
             $this->hashKey = $config['hashKey'];
         }
@@ -54,7 +58,6 @@ class RedisAsynPool extends AsynPool
         }
 
         $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
-        $this->getSync();
     }
 
     public function serverInit($swooleServer, $asynManager)

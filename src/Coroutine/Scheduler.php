@@ -13,6 +13,7 @@ use PG\MSF\Marco;
 use PG\MSF\Controllers\ControllerFactory;
 use PG\MSF\Models\ModelFactory;
 use PG\MSF\Helpers\Context;
+use PG\MSF\Base\Core;
 
 class Scheduler
 {
@@ -46,7 +47,9 @@ class Scheduler
                     }
 
                     if ($callBack->isTimeout()) {
-                        $this->schedule($this->taskMap[$logId]);
+                        if (!empty($this->taskMap[$logId])) {
+                            $this->schedule($this->taskMap[$logId]);
+                        }
                     }
                 }
             }
@@ -57,6 +60,10 @@ class Scheduler
                 foreach (getInstance()->objectPool->map as $class => &$objectsMap) {
                     while ($objectsMap->count()) {
                         $obj = $objectsMap->shift();
+                        if ($obj instanceof Core) {
+                            $obj->setRedisPools(null);
+                            $obj->setRedisProxies(null);
+                        }
                         $obj = null;
                         unset($obj);
                     }
@@ -69,6 +76,8 @@ class Scheduler
                         $obj = $objectsCPool->shift();
                         $obj->getObjectPool()->destroy();
                         $obj->setObjectPool(null);
+                        $obj->setRedisPools(null);
+                        $obj->setRedisProxies(null);
                         $obj = null;
                         unset($obj);
                     }
@@ -79,6 +88,8 @@ class Scheduler
                 foreach (ModelFactory::getInstance()->pool as $class => &$objectsMPool) {
                     while ($objectsMPool->count()) {
                         $obj = $objectsMPool->shift();
+                        $obj->setRedisPools(null);
+                        $obj->setRedisProxies(null);
                         $obj = null;
                         unset($obj);
                     }

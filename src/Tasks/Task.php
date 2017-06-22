@@ -16,17 +16,6 @@ use PG\MSF\Base\AOPFactory;
 
 class Task extends TaskProxy
 {
-    /**
-     * redis连接池
-     * @var array
-     */
-    public $redisPools;
-    /**
-     * redis代理池
-     * @var array
-     */
-    public $redisProxies;
-
     public function __construct()
     {
         parent::__construct();
@@ -40,7 +29,6 @@ class Task extends TaskProxy
         $this->taskId = $taskId;
         getInstance()->tidPidTable->set($this->taskId,
             ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
-        $this->start_run_time = microtime(true);
         if ($context) {
             $PGLog = null;
             $PGLog = clone getInstance()->log;
@@ -87,45 +75,6 @@ class Task extends TaskProxy
 
         return false;
     }
-
-    /**
-     * 获取redis连接池
-     * @param string $poolName
-     * @return bool|Wrapper|\PG\MSF\DataBase\CoroutineRedisHelp
-     */
-    protected function getRedisPool(string $poolName)
-    {
-        if (isset($this->redisPools[$poolName])) {
-            return $this->redisPools[$poolName];
-        }
-        $pool = getInstance()->getAsynPool($poolName);
-        if (!$pool) {
-            return false;
-        }
-
-        $this->redisPools[$poolName] = AOPFactory::getRedisPoolCoroutine($pool->getCoroutine(), $this);
-        return $this->redisPools[$poolName];
-    }
-
-    /**
-     * 获取redis代理
-     * @param string $proxyName
-     * @return bool|Wrapper
-     */
-    protected function getRedisProxy(string $proxyName)
-    {
-        if (isset($this->redisProxies[$proxyName])) {
-            return $this->redisProxies[$proxyName];
-        }
-        $proxy = getInstance()->getRedisProxy($proxyName);
-        if (!$proxy) {
-            return false;
-        }
-
-        $this->redisProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
-        return $this->redisProxies[$proxyName];
-    }
-    //运行完后清理下
 
     /**
      * 获取同步mysql
