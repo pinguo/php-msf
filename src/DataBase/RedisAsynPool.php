@@ -390,7 +390,13 @@ class RedisAsynPool extends AsynPool
                 //给worker发消息
                 $this->asynManager->sendMessageToWorker($this, $data);
                 //回归连接
-                $this->pushToPool($client);
+                if (((time() - $client->genTime) < 1800)
+                    || (($this->redisMaxCount + $this->waitConnetNum) <= 10)) {
+                    $this->pushToPool($client);
+                } else {
+                    $client->close();
+                    $this->redisMaxCount--;
+                }
             };
             $client->__call($data['name'], array_values($arguments));
         }
@@ -401,7 +407,7 @@ class RedisAsynPool extends AsynPool
      */
     public function prepareOne()
     {
-        if ($this->redisMaxCount + $this->waitConnetNum >= $this->config->get('redis.asyn_max_count', 10)) {
+        if ($this->redisMaxCount + $this->waitConnetNum >= 1024) {
             return;
         }
         $this->reconnect();
@@ -419,7 +425,9 @@ class RedisAsynPool extends AsynPool
         $this->waitConnetNum++;
         if ($client == null) {
             $client = new \swoole_redis();
+            $client->genTime = time();
         }
+
         $callback = function ($client, $result) use ($check) {
             $check->isKill = false;
             $this->waitConnetNum--;
