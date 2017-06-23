@@ -207,25 +207,12 @@ class CoroutineRedisHelp
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             $value = call_user_func_array([getInstance()->getRedis(), $name], $arguments);
             // return value unserialize start
-            switch ($name) {
-                case 'get':
-                    $value = $this->unSerializeHandler($value);
-                    break;
-                case 'mget';
-                    $keys = $arguments[0];
-                    $len = strlen($this->keyPrefix);
-                    $value = $this->unSerializeHandler($value, $keys, $len);
-                    break;
-                case 'eval':
-                    //如果redis中的数据本身没有进行序列化，同时返回值是json，那么解析成array
-                    $decodeVal = @json_decode($value, true);
-                    if (is_array($decodeVal)) {
-                        $value = $decodeVal;
-                    }
-                    $value = $this->unSerializeHandler($value);
-                    break;
-                default:
-                    $value = $this->unSerializeHandler($value);
+            if ($name === 'get') {
+                $value = $this->unSerializeHandler($value);
+            } elseif ($name === 'mget') {
+                $keys = $arguments[0];
+                $len = strlen($this->keyPrefix);
+                $value = $this->unSerializeHandler($value, $keys, $len);
             }
             // return value unserialize end
 
@@ -247,8 +234,7 @@ class CoroutineRedisHelp
     /**
      * 序列化
      * @param $data
-     * @param bool $phpSerialize
-     * @return array|string
+     * @return string
      */
     protected function serializeHandler($data, $phpSerialize = false)
     {
