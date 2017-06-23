@@ -31,16 +31,16 @@ class Redis extends Base
         parent::init(3000);
         $this->context = $context;
 
-        $this->redisAsynPool = $redisAsynPool;
-        $this->hashKey = $redisAsynPool->hashKey;
-        $this->phpSerialize = $redisAsynPool->phpSerialize;
-        $this->keyPrefix = $redisAsynPool->keyPrefix;
+        $this->redisAsynPool  = $redisAsynPool;
+        $this->hashKey        = $redisAsynPool->hashKey;
+        $this->phpSerialize   = $redisAsynPool->phpSerialize;
+        $this->keyPrefix      = $redisAsynPool->keyPrefix;
         $this->redisSerialize = $redisAsynPool->redisSerialize;
 
-        $this->name = $name;
+        $this->name      = $name;
         $this->arguments = $arguments;
-        $this->request = "redis.$name";
-        $logId = $context->getLogId();
+        $this->request   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
+        $logId           = $context->getLogId();
 
         $context->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
