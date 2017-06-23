@@ -163,13 +163,13 @@ class CoroutineRedisHelp
             case 'set':
             case 'setex':
                 $last = count($arguments) - 1;
-                $arguments[$last] = $this->serializeHandler($arguments[$last]);
+                $arguments[$last] = $this->serializeHandler($arguments[$last], true);
                 break;
             case 'mset':
                 $keysValues = $arguments[1];
                 $newValues = [];
                 foreach ($keysValues as $k => $v) {
-                    $newValues[$k] = $this->serializeHandler($v);
+                    $newValues[$k] = $this->serializeHandler($v, true);
                 }
                 $arguments[1] = $newValues;
                 break;
@@ -178,20 +178,20 @@ class CoroutineRedisHelp
                 if (is_array($arguments[2])) {
                     $newValues = [];
                     foreach ($arguments[2] as $v) {
-                        $newValues[] = $this->serializeHandler($v, false);
+                        $newValues[] = $this->serializeHandler($v);
                     }
                     $arguments[2] = $newValues;
                 } else {
                     foreach ($arguments as $k => $argument) {
                         if ($k >= 2) {
-                            $arguments[$k] = $this->serializeHandler($argument, false);
+                            $arguments[$k] = $this->serializeHandler($argument);
                         }
                     }
                 }
                 break;
             case 'zadd':
             case 'hset':
-                $argument[3] = $this->serializeHandler($arguments[3], false);
+                $argument[3] = $this->serializeHandler($arguments[3]);
                 break;
             case 'hmset':
                 $keysValues = $arguments[2];

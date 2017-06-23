@@ -104,6 +104,7 @@ class Redis extends Base
         if (null === $data) {
             return false;
         }
+
         if ('OK' === $data) {
             return $data;
         }
@@ -181,9 +182,10 @@ class Redis extends Base
                     }
                 }
 
-                if (is_string($data) && $this->phpSerialize) {
+                if (is_string($data) && $this->phpSerialize && in_array(substr($data, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:'])) {
                     switch ($this->phpSerialize) {
                         case Marco::SERIALIZE_PHP:
+                            //var_dump($this->name, $this->keyPrefix, $data);
                             $data = unserialize($data);
                             break;
                         case Marco::SERIALIZE_IGBINARY:
