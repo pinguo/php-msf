@@ -163,13 +163,13 @@ class CoroutineRedisHelp
             case 'set':
             case 'setex':
                 $last = count($arguments) - 1;
-                $arguments[$last] = $this->serializeHandler($arguments[$last]);
+                $arguments[$last] = $this->serializeHandler($arguments[$last], true);
                 break;
             case 'mset':
                 $keysValues = $arguments[1];
                 $newValues = [];
                 foreach ($keysValues as $k => $v) {
-                    $newValues[$k] = $this->serializeHandler($v);
+                    $newValues[$k] = $this->serializeHandler($v, true);
                 }
                 $arguments[1] = $newValues;
                 break;
@@ -178,20 +178,20 @@ class CoroutineRedisHelp
                 if (is_array($arguments[2])) {
                     $newValues = [];
                     foreach ($arguments[2] as $v) {
-                        $newValues[] = $this->serializeHandler($v, false);
+                        $newValues[] = $this->serializeHandler($v);
                     }
                     $arguments[2] = $newValues;
                 } else {
                     foreach ($arguments as $k => $argument) {
                         if ($k >= 2) {
-                            $arguments[$k] = $this->serializeHandler($argument, false);
+                            $arguments[$k] = $this->serializeHandler($argument);
                         }
                     }
                 }
                 break;
             case 'zadd':
             case 'hset':
-                $argument[3] = $this->serializeHandler($arguments[3], false);
+                $argument[3] = $this->serializeHandler($arguments[3]);
                 break;
             case 'hmset':
                 $keysValues = $arguments[2];
@@ -207,12 +207,25 @@ class CoroutineRedisHelp
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             $value = call_user_func_array([getInstance()->getRedis(), $name], $arguments);
             // return value unserialize start
-            if ($name === 'get') {
-                $value = $this->unSerializeHandler($value);
-            } elseif ($name === 'mget') {
-                $keys = $arguments[0];
-                $len = strlen($this->keyPrefix);
-                $value = $this->unSerializeHandler($value, $keys, $len);
+            switch ($name) {
+                case 'get':
+                    $value = $this->unSerializeHandler($value);
+                    break;
+                case 'mget';
+                    $keys = $arguments[0];
+                    $len = strlen($this->keyPrefix);
+                    $value = $this->unSerializeHandler($value, $keys, $len);
+                    break;
+                case 'eval':
+                    //如果redis中的数据本身没有进行序列化，同时返回值是json，那么解析成array
+                    $decodeVal = @json_decode($value, true);
+                    if (is_array($decodeVal)) {
+                        $value = $decodeVal;
+                    }
+                    $value = $this->unSerializeHandler($value);
+                    break;
+                default:
+                    $value = $this->unSerializeHandler($value);
             }
             // return value unserialize end
 
@@ -234,7 +247,8 @@ class CoroutineRedisHelp
     /**
      * 序列化
      * @param $data
-     * @return string
+     * @param bool $phpSerialize
+     * @return array|string
      */
     protected function serializeHandler($data, $phpSerialize = false)
     {
