@@ -9,9 +9,7 @@
 
 namespace PG\MSF\Models;
 
-use PG\AOP\Wrapper;
 use PG\MSF\Base\Core;
-use PG\MSF\Base\AOPFactory;
 
 class Model extends Core
 {
