@@ -8,8 +8,10 @@
  */
 namespace PG\MSF\Rest;
 
-use PG\Exception\Errno;
+use PG\Exception\ParameterValidationExpandException;
+use PG\Exception\PrivilegeException;
 use PG\MSF\Base\Output;
+use PG\MSF\Coroutine\CException;
 
 /**
  * Class Controller
@@ -116,7 +118,7 @@ class Controller extends \PG\MSF\Controllers\Controller
         $output = $this->getContext()->getOutput();
         // set status in header
         if (!isset(Output::$codes[$status])) {
-            throw new \Exception('Http code invalid', Errno::FATAL);
+            throw new \Exception('Http code invalid', 500);
         }
         $output->setStatusHeader($status);
         // 错误信息返回格式可参考：[https://developer.github.com/v3/]
@@ -179,7 +181,12 @@ class Controller extends \PG\MSF\Controllers\Controller
                 $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
             } else {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
+                // set status in header
+                if (!isset(Output::$codes[$ce->getCode()])) {
+                    $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
+                } else {
+                    $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
+                }
             }
         } catch (\Throwable $ne) {
             echo 'Call Controller::onExceptionHandle Error', "\n";
