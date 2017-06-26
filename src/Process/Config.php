@@ -73,7 +73,7 @@ class Config
                 'task_queue_bytes'     => 0,
             ],
         ];
-        
+
         $workerIds   = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
         foreach ($workerIds as $workerId) {
             $workerInfo = $this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
@@ -114,7 +114,7 @@ class Config
 
     public function checkRedisProxy()
     {
-        $redisProxyConfig = $this->config->get('redisProxy', null);
+        $redisProxyConfig = $this->config->get('redis_proxy', null);
         $redisConfig = $this->config->get('redis', null);
 
         if ($redisProxyConfig) {

@@ -11,6 +11,7 @@ namespace PG\MSF\Proxy;
 use Flexihash\Flexihash;
 use Flexihash\Hasher\Md5Hasher;
 use PG\MSF\Base\Exception;
+use PG\MSF\DataBase\RedisAsynPool;
 
 class RedisProxyCluster extends Flexihash implements IProxy
 {
@@ -66,7 +67,13 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $this->goodPools = [];
         foreach ($this->pools as $pool => $weight) {
             try {
-                if (getInstance()->getAsynPool($pool)->getSync()
+                $poolInstance = getInstance()->getAsynPool($pool);
+                if (!$poolInstance) {
+                    $poolInstance = new RedisAsynPool(getInstance()->config, $pool);
+                    getInstance()->addAsynPool($pool, $poolInstance, true);
+                }
+
+                if ($poolInstance->getSync()
                     ->set('msf_active_cluster_check', 1, 5)
                 ) {
                     $this->goodPools[$pool] = $weight;

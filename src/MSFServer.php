@@ -219,15 +219,15 @@ abstract class MSFServer extends WebSocketServer
      */
     public function initRedisProxies()
     {
-        if ($this->config->get('redisProxy.active')) {
-            $activeProxies = $this->config->get('redisProxy.active');
+        if ($this->config->get('redis_proxy.active')) {
+            $activeProxies = $this->config->get('redis_proxy.active');
             if (is_string($activeProxies)) {
                 $activeProxies = explode(',', $activeProxies);
             }
 
             foreach ($activeProxies as $activeProxy) {
                 $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy($activeProxy,
-                    $this->config['redisProxy'][$activeProxy]);
+                    $this->config['redis_proxy'][$activeProxy]);
             }
         }
     }
