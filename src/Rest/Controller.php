@@ -182,10 +182,10 @@ class Controller extends \PG\MSF\Controllers\Controller
             } else {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
                 // set status in header
-                if (!isset(Output::$codes[$ce->getCode()])) {
-                    $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
-                } else {
+                if (isset(Output::$codes[$ce->getCode()])) {
                     $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
+                } else {
+                    $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
                 }
             }
         } catch (\Throwable $ne) {
