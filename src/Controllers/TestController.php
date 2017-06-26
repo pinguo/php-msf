@@ -47,7 +47,7 @@ class TestController extends Controller
 
     public function httpRedisProxy()
     {
-        $redis = $this->getRedisProxy('redisProxy');
+        $redis = $this->getRedisProxy('redis_proxy');
         $data = [];
         yield $redis->incrBy('aaa', 1);
         $data[] = yield $redis->get('aaa');
@@ -81,7 +81,7 @@ class TestController extends Controller
     public function httpRedisProxyMS()
     {
         $data = [];
-        $redis = $this->getRedisProxy('redisProxy1');
+        $redis = $this->getRedisProxy('redis_proxy1');
         yield $redis->incrBy('rw', 1);
         $data[] = yield $redis->get('rw');
 

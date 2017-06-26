@@ -205,7 +205,17 @@ function dumpInternal(&$output, $var, $level, $format = true)
                 } else {
                     $dumpValues = (array)$var;
                 }
+                $i = 0;
                 foreach ($dumpValues as $key => $value) {
+                    if ($i >= 100) {
+                        if ($format) {
+                            $output .= "\n" . $spaces . "    [...] => ...";
+                        } else {
+                            $output .= "... => ...";
+                        }
+                        break;
+                    }
+                    $i++;
                     $key = str_replace('*', '', $key);
                     $key = strtr(trim($key), "\0", ':');
                     if (in_array($key, $sleepProperties) || empty($sleepProperties)) {

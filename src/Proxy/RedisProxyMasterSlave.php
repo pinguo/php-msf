@@ -9,6 +9,7 @@
 namespace PG\MSF\Proxy;
 
 use PG\MSF\Base\Exception;
+use PG\MSF\DataBase\RedisAsynPool;
 
 class RedisProxyMasterSlave implements IProxy
 {
@@ -50,7 +51,13 @@ class RedisProxyMasterSlave implements IProxy
         //探测主节点
         foreach ($this->pools as $pool) {
             try {
-                if (getInstance()->getAsynPool($pool)->getSync()
+                $poolInstance = getInstance()->getAsynPool($pool);
+                if (!$poolInstance) {
+                    $poolInstance = new RedisAsynPool(getInstance()->config, $pool);
+                    getInstance()->addAsynPool($pool, $poolInstance, true);
+                }
+
+                if ($poolInstance->getSync()
                     ->set('msf_active_master_slave_check', 1, 5)
                 ) {
                     $this->master = $pool;
@@ -70,9 +77,15 @@ class RedisProxyMasterSlave implements IProxy
             $this->slaves[] = $this->master;
         } else {
             foreach ($this->pools as $pool) {
+                $poolInstance = getInstance()->getAsynPool($pool);
+                if (!$poolInstance) {
+                    $poolInstance = new RedisAsynPool(getInstance()->config, $pool);
+                    getInstance()->addAsynPool($pool, $poolInstance, true);
+                }
+
                 if ($pool != $this->master) {
                     try {
-                        if (getInstance()->getAsynPool($pool)->getSync()
+                        if ($poolInstance->getSync()
                                 ->get('msf_active_master_slave_check') == 1
                         ) {
                             $this->slaves[] = $pool;
@@ -114,10 +127,10 @@ class RedisProxyMasterSlave implements IProxy
             $redisPoolName = $this->master;
         }
 
-        if (!isset(RedisProxy::$redisCoroutines[$redisPoolName])) {
-            RedisProxy::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
+        if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+            RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
         }
-        $redisPoolCoroutine = RedisProxy::$redisCoroutines[$redisPoolName];
+        $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
 
         if ($method === 'cache') {
             return call_user_func_array([$redisPoolCoroutine, $method], $arguments);
