@@ -148,4 +148,43 @@ class Controller extends \PG\MSF\Controllers\Controller
             $output->end();
         }
     }
+
+    /**
+     * 异常的回调
+     * @param \Throwable $e
+     * @throws \Throwable
+     */
+    public function onExceptionHandle(\Throwable $e)
+    {
+        try {
+            if ($e->getPrevious()) {
+                $ce = $e->getPrevious();
+                $errMsg = dump($ce, false, true);
+            } else {
+                $errMsg = dump($e, false, true);
+                $ce = $e;
+            }
+
+            if ($ce instanceof ParameterValidationExpandException) {
+                $this->getContext()->getLog()->warning($errMsg . ' with code 401');
+                $this->outputJson(parent::$stdClass, $ce->getMessage(), 401);
+            } elseif ($ce instanceof PrivilegeException) {
+                $this->getContext()->getLog()->warning($errMsg . ' with code 403');
+                $this->outputJson(parent::$stdClass, $ce->getMessage(), 403);
+            } elseif ($ce instanceof \MongoException) {
+                $this->getContext()->getLog()->error($errMsg . ' with code 500');
+                $this->outputJson(parent::$stdClass, Output::$codes[500], 500);
+            } elseif ($ce instanceof CException) {
+                $this->getContext()->getLog()->error($errMsg . ' with code 500');
+                $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
+            } else {
+                $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
+                $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
+            }
+        } catch (\Throwable $ne) {
+            echo 'Call Controller::onExceptionHandle Error', "\n";
+            echo 'Last Exception: ', dump($ce), "\n";
+            echo 'Handle Exception: ', dump($ne), "\n";
+        }
+    }
 }
