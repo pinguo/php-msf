@@ -3,7 +3,7 @@
  * @desc: 协程Tcp客户端
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/3/21
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Coroutine;
