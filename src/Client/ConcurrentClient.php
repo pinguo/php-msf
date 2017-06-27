@@ -3,7 +3,7 @@
  * @desc: 并行httpClient
  * @author: leandre <niulingyun@camera360.com>
  * @date: 14/06/2017
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Client;
@@ -87,7 +87,7 @@ class ConcurrentClient
 
             //解析结果
             $parser = $item['parser'];
-            $result[$name] = self::$parser($response, $parent);
+            $result[$name] = $parser === 'noneParser' ? $response : self::$parser($response, $parent);
         }
 
         return $result;

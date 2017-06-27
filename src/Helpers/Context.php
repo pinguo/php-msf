@@ -4,7 +4,7 @@
  * @desc: 上下文实体对象
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/3/17
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Helpers;

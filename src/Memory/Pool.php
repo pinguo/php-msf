@@ -3,7 +3,7 @@
  * @desc: 对象复用池
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/3/7
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Memory;

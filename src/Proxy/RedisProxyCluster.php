@@ -3,7 +3,7 @@
  * @desc:
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/4/12
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Proxy;

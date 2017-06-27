@@ -4,7 +4,7 @@
  * @desc:  Redis 实现分布式锁 (使用时必须在协程环境中)
  * @author: leandre <niulingyun@camera360.com>
  * @date: 2017/3/7
- * @copyright All rights reserved.
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Memory;
