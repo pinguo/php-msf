@@ -281,6 +281,10 @@ class CoroutineRedisHelp
             return false;
         }
 
+        if ('OK' === $data) {
+            return $data;
+        }
+
         try {
             //mget
             if (!empty($keys) && is_array($data)) {
@@ -299,7 +303,7 @@ class CoroutineRedisHelp
                         }
                     }
 
-                    if (is_string($val) && $this->phpSerialize) {
+                    if (is_string($val) && $this->phpSerialize && in_array(substr($val, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:'])) {
                         switch ($this->phpSerialize) {
                             case Marco::SERIALIZE_PHP:
                                 $val = unserialize($val);
@@ -308,10 +312,11 @@ class CoroutineRedisHelp
                                 $val = @igbinary_unserialize($val);
                                 break;
                         }
-                    }
 
-                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
-                        $val = $val[0];
+                        //兼容yii逻辑
+                        if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                            $val = $val[0];
+                        }
                     }
 
                     $ret[$key] = $val;
@@ -354,7 +359,7 @@ class CoroutineRedisHelp
                     }
                 }
 
-                if (is_string($data) && $this->phpSerialize) {
+                if (is_string($data) && $this->phpSerialize && in_array(substr($data, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:'])) {
                     switch ($this->phpSerialize) {
                         case Marco::SERIALIZE_PHP:
                             $data = unserialize($data);
@@ -363,10 +368,11 @@ class CoroutineRedisHelp
                             $data = @igbinary_unserialize($data);
                             break;
                     }
-                }
 
-                if (is_array($data) && count($data) === 2 && $data[1] === null) {
-                    $data = $data[0];
+                    //兼容yii逻辑
+                    if (is_array($data) && count($data) === 2 && $data[1] === null) {
+                        $data = $data[0];
+                    }
                 }
             }
         } catch (\Exception $exception) {
