@@ -139,7 +139,11 @@ function dumpInternal(&$output, $var, $level, $format = true)
             $output .= "$var";
             break;
         case 'string':
-            $output .= "'" . addslashes($var) . "'";
+            if (defined('DUMP_TRUNCATED')) {
+                $output .= "'*<truncated>*'";
+            } else {
+                $output .= "'" . addslashes($var) . "'";
+            }
             break;
         case 'resource':
             $output .= '{resource}';
