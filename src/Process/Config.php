@@ -22,7 +22,7 @@ class Config
 
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        echo "启动了configManager\n";
+        echo 'Enable Config Manager: Success', "\n";
         $this->config = $config;
         $this->MSFServer  = $MSFServer;
         $this->lastMinute     = ceil(time() / 60);

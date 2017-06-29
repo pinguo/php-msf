@@ -531,66 +531,48 @@ abstract class Server extends Child
     protected static function displayUI()
     {
         $setConfig = self::$_worker->setServerSet();
-        echo "\033[2J";
-        echo "\033[1A\n\033[K-------------\033[47;30m MSF \033[0m--------------\n\033[0m";
-        echo 'System:', PHP_OS, "\n";
-        echo 'MSF version:', self::version, "\n";
-        echo 'Swoole version: ', SWOOLE_VERSION, "\n";
-        echo 'PHP version: ', PHP_VERSION, "\n";
-        echo 'worker_num: ', $setConfig['worker_num'], "\n";
-        echo 'task_num: ', $setConfig['task_worker_num']??0, "\n";
-        echo "-------------------\033[47;30m" . self::$_worker->name . "\033[0m----------------------\n";
-        echo "\033[47;30mtype\033[0m", str_pad('',
-            self::$_maxShowLength - strlen('type')), "\033[47;30msocket\033[0m", str_pad('',
-            self::$_maxShowLength - strlen('socket')), "\033[47;30mport\033[0m", str_pad('',
-            self::$_maxShowLength - strlen('port')), "\033[47;30m", "status\033[0m\n";
+        $ascii     = file_get_contents(__DIR__ . '/../ascii.ui');
+        echo $ascii, "\n";
+        echo str_pad("   SERVER ENV  ", 120, "#", STR_PAD_BOTH), "\n";
+        echo 'MSF    Version:   ', self::version, "\n";
+        echo 'Swoole Version:   ', SWOOLE_VERSION, "\n";
+        echo 'PHP    Version:   ', PHP_VERSION, "\n";
+        echo 'Worker  Number:   ', $setConfig['worker_num'], "\n";
+        echo 'Task    Number:   ', $setConfig['task_worker_num']??0, "\n";
+        echo str_pad(" START SERVICE ", 120, "#", STR_PAD_BOTH), "\n";
+        echo "Protocol", str_pad('',
+            self::$_maxShowLength - strlen('Protocol')), "Addr", str_pad('',
+            self::$_maxShowLength - strlen('Addr')), "Port", str_pad('',
+            self::$_maxShowLength - strlen('Port')), "\n";
+
         switch (self::$_worker->name) {
             case MSFServer::SERVER_NAME:
-                echo str_pad('TCP',
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.socket', '--'),
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.port', '--'),
-                    self::$_maxShowLength - 2);
                 if (self::$_worker->tcpEnable??false) {
-                    echo " \033[32;40m [OPEN] \033[0m\n";
-                } else {
-                    echo " \033[31;40m [CLOSE] \033[0m\n";
+                    echo str_pad('TCP',
+                        self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.socket', '--'),
+                        self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.port', '--'),
+                        self::$_maxShowLength - 2), "\n";
                 }
-                echo str_pad('HTTP',
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.socket', '--'),
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.port', '--'),
-                    self::$_maxShowLength - 2);
+
                 if (self::$_worker->httpEnable??false) {
-                    echo " \033[32;40m [OPEN] \033[0m\n";
-                } else {
-                    echo " \033[31;40m [CLOSE] \033[0m\n";
+                    echo str_pad('HTTP',
+                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.socket', '--'),
+                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.port', '--'),
+                        self::$_maxShowLength - 2), "\n";
                 }
-                echo str_pad('WEBSOCKET',
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.socket', '--'),
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.port', '--'),
-                    self::$_maxShowLength - 2);
+
                 if (self::$_worker->websocketEnable??false) {
-                    echo " \033[32;40m [OPEN] \033[0m\n";
-                } else {
-                    echo " \033[31;40m [CLOSE] \033[0m\n";
+                    echo str_pad('WEBSOCKET',
+                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.socket', '--'),
+                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.port', '--'),
+                        self::$_maxShowLength - 2), "\n";
                 }
-                echo str_pad('DISPATCH',
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.socket', '--'),
-                    self::$_maxShowLength), str_pad(self::$_worker->config->get('server.dispatch_port', '--'),
-                    self::$_maxShowLength - 2);
-                if (self::$_worker->config->get('use_dispatch', false)) {
-                    echo " \033[32;40m [OPEN] \033[0m\n";
-                } else {
-                    echo " \033[31;40m [CLOSE] \033[0m\n";
-                }
+
                 break;
         }
-        echo "-----------------------------------------------\n";
+        echo str_pad("     OTHER     ", 120, "#", STR_PAD_BOTH), "\n";
         if (self::$daemonize) {
-            global $argv;
-            $startFile = $argv[0];
-            echo "Input \"php $startFile stop\" to quit. Start success.\n";
-        } else {
-            echo "Press Ctrl-C to quit. Start success.\n";
+            echo "Press Ctrl-C to quit. Start Success.\n";
         }
     }
 
@@ -789,7 +771,7 @@ abstract class Server extends Child
                 $controllerInstance->context->setOutput($output);
                 $controllerInstance->context->setControllerName($controllerName);
                 $controllerInstance->context->setActionName($methodName);
-                
+
                 $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
                 $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
@@ -805,7 +787,7 @@ abstract class Server extends Child
                 call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
             }
         } while (0);
-        
+
 
         if ($error !== '') {
             if ($controllerInstance != null) {
