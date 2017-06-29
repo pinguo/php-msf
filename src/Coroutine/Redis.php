@@ -31,16 +31,16 @@ class Redis extends Base
         parent::init(3000);
         $this->context = $context;
 
-        $this->redisAsynPool  = $redisAsynPool;
-        $this->hashKey        = $redisAsynPool->hashKey;
-        $this->phpSerialize   = $redisAsynPool->phpSerialize;
-        $this->keyPrefix      = $redisAsynPool->keyPrefix;
+        $this->redisAsynPool = $redisAsynPool;
+        $this->hashKey = $redisAsynPool->hashKey;
+        $this->phpSerialize = $redisAsynPool->phpSerialize;
+        $this->keyPrefix = $redisAsynPool->keyPrefix;
         $this->redisSerialize = $redisAsynPool->redisSerialize;
 
-        $this->name      = $name;
+        $this->name = $name;
         $this->arguments = $arguments;
-        $this->request   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
-        $logId           = $context->getLogId();
+        $this->request = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
+        $logId = $context->getLogId();
 
         $context->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
@@ -119,7 +119,9 @@ class Redis extends Base
                     if (is_string($val)) {
                         switch ($this->redisSerialize) {
                             case Marco::SERIALIZE_PHP:
-                                $val = unserialize($val);
+                                if ($this->canUnserialize($val)) {
+                                    $val = unserialize($val);
+                                }
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
@@ -130,16 +132,19 @@ class Redis extends Base
                     if (is_string($val) && $this->phpSerialize) {
                         switch ($this->phpSerialize) {
                             case Marco::SERIALIZE_PHP:
-                                $val = unserialize($val);
+                                if ($this->canUnserialize($val)) {
+                                    $val = unserialize($val);
+                                }
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
                                 break;
                         }
-                    }
 
-                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
-                        $val = $val[0];
+                        //兼容yii逻辑
+                        if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                            $val = $val[0];
+                        }
                     }
 
                     $ret[$key] = $val;
@@ -153,7 +158,9 @@ class Redis extends Base
                     if (is_string($val)) {
                         switch ($this->redisSerialize) {
                             case Marco::SERIALIZE_PHP:
-                                $val = unserialize($val);
+                                if ($this->canUnserialize($val)) {
+                                    $val = unserialize($val);
+                                }
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
@@ -161,6 +168,7 @@ class Redis extends Base
                         }
                     }
 
+                    //兼容yii逻辑
                     if (is_array($val) && count($val) === 2 && $val[1] === null) {
                         $val = $val[0];
                     }
@@ -174,7 +182,9 @@ class Redis extends Base
                 if (is_string($data) && $this->redisSerialize) {
                     switch ($this->redisSerialize) {
                         case Marco::SERIALIZE_PHP:
-                            $data = unserialize($data);
+                            if ($this->canUnserialize($data)) {
+                                $data = unserialize($data);
+                            }
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
@@ -182,20 +192,22 @@ class Redis extends Base
                     }
                 }
 
-                if (is_string($data) && $this->phpSerialize && in_array(substr($data, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:'])) {
+                if (is_string($data) && $this->phpSerialize) {
                     switch ($this->phpSerialize) {
                         case Marco::SERIALIZE_PHP:
-                            //var_dump($this->name, $this->keyPrefix, $data);
-                            $data = unserialize($data);
+                            if ($this->canUnserialize($data)) {
+                                $data = unserialize($data);
+                            }
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
                             break;
                     }
-                }
 
-                if (is_array($data) && count($data) === 2 && $data[1] === null) {
-                    $data = $data[0];
+                    //兼容yii逻辑
+                    if (is_array($data) && count($data) === 2 && $data[1] === null) {
+                        $data = $data[0];
+                    }
                 }
             }
         } catch (\Exception $exception) {
@@ -203,5 +215,16 @@ class Redis extends Base
         }
 
         return $data;
+    }
+
+    /**
+     * 是否可以反序列化
+     * @param string $string
+     * @return bool
+     */
+    private function canUnserialize(string $string)
+    {
+        $head = substr($string, 0, 2);
+        return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
     }
 }
