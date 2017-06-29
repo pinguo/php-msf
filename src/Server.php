@@ -380,7 +380,6 @@ abstract class Server extends Child
         $startFile = $argv[0];
         if (!isset($argv[1])) {
             $argv[1] = 'start';
-            echo("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
         }
 
         // Get command.
@@ -389,14 +388,6 @@ abstract class Server extends Child
 
         // Start command.
         $mode = '';
-        if ($command === 'start') {
-            if ($command2 === '-d') {
-                $mode = 'in DAEMON mode';
-            } else {
-                $mode = 'in DEBUG mode';
-            }
-        }
-        echo("Swoole[$startFile] $command $mode \n");
         if (file_exists(self::$pidFile)) {
             $pids = explode(',', file_get_contents(self::$pidFile));
             // Get master process PID.
@@ -409,11 +400,11 @@ abstract class Server extends Child
         // Master is still alive?
         if ($masterIsAlive) {
             if ($command === 'start' || $command === 'test') {
-                echo("Swoole[$startFile] already running\n");
+                echo("MSF[$startFile] already running\n");
                 exit;
             }
         } elseif ($command !== 'start' && $command !== 'test') {
-            echo("Swoole[$startFile] not run\n");
+            echo("MSF[$startFile] not run\n");
             exit;
         }
 
@@ -426,7 +417,7 @@ abstract class Server extends Child
                 break;
             case 'stop':
                 @unlink(self::$pidFile);
-                echo("Swoole[$startFile] is stoping ...\n");
+                echo("MSF[$startFile] is stoping ...\n");
                 // Send stop signal to master process.
                 $masterPid && posix_kill($masterPid, SIGTERM);
                 // Timeout.
@@ -438,7 +429,7 @@ abstract class Server extends Child
                     if ($masterIsAlive) {
                         // Timeout?
                         if (time() - $startTime >= $timeout) {
-                            echo("Swoole[$startFile] stop fail\n");
+                            echo("MSF[$startFile] stop fail\n");
                             exit;
                         }
                         // Waiting amoment.
@@ -446,18 +437,18 @@ abstract class Server extends Child
                         continue;
                     }
                     // Stop success.
-                    echo("Swoole[$startFile] stop success\n");
+                    echo("MSF[$startFile] stop success\n");
                     break;
                 }
                 exit(0);
                 break;
             case 'reload':
                 posix_kill($managerPid, SIGUSR1);
-                echo("Swoole[$startFile] reload\n");
+                echo("MSF[$startFile] reload\n");
                 exit;
             case 'restart':
                 @unlink(self::$pidFile);
-                echo("Swoole[$startFile] is stoping ...\n");
+                echo("MSF[$startFile] is stoping ...\n");
                 // Send stop signal to master process.
                 $masterPid && posix_kill($masterPid, SIGTERM);
                 // Timeout.
@@ -469,7 +460,7 @@ abstract class Server extends Child
                     if ($masterIsAlive) {
                         // Timeout?
                         if (time() - $startTime >= $timeout) {
-                            echo("Swoole[$startFile] stop fail\n");
+                            echo("MSF[$startFile] stop fail\n");
                             exit;
                         }
                         // Waiting amoment.
@@ -477,7 +468,7 @@ abstract class Server extends Child
                         continue;
                     }
                     // Stop success.
-                    echo("Swoole[$startFile] stop success\n");
+                    echo("MSF[$startFile] stop success\n");
                     break;
                 }
                 self::$daemonize = true;
@@ -487,7 +478,6 @@ abstract class Server extends Child
                 self::$testUnityDir = $command2;
                 break;
             default:
-                exit("Usage: php yourfile.php {start|stop|reload|restart|test}\n");
         }
     }
 
