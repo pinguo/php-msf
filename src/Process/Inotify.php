@@ -18,14 +18,14 @@ class Inotify
 
     public function __construct($server)
     {
-        $notice = "启动了autoReload ";
+        $notice = 'Enable Inotify Auto Reload: ';
         $this->server     = $server;
         $this->monitorDir = realpath(ROOT_PATH . '/');
         if (!extension_loaded('inotify')) {
-            $notice .= "failed(未安装inotify扩展)\n";
+            $notice .= "Failed(未安装inotify扩展)\n";
         } else {
             $this->useInotify();
-            $notice .= "success\n";
+            $notice .= "Success\n";
         }
 
         echo $notice;

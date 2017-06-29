@@ -408,9 +408,6 @@ abstract class MSFServer extends WebSocketServer
                     $this->asnyPoolManager->registAsyn($pool);
                 }
             }
-            //初始化异步Client
-            $this->client = new HttpClient();
-            $this->tcpClient = new TcpClient();
         } else {
             //注册中断信号
             pcntl_signal(SIGUSR1, function () {
