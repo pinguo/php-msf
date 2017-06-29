@@ -119,7 +119,9 @@ class Redis extends Base
                     if (is_string($val)) {
                         switch ($this->redisSerialize) {
                             case Marco::SERIALIZE_PHP:
-                                $val = unserialize($val);
+                                if ($this->canUnserialize($val)) {
+                                    $val = unserialize($val);
+                                }
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
@@ -127,10 +129,12 @@ class Redis extends Base
                         }
                     }
 
-                    if (is_string($val) && $this->phpSerialize && in_array(substr($val, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:'])) {
+                    if (is_string($val) && $this->phpSerialize) {
                         switch ($this->phpSerialize) {
                             case Marco::SERIALIZE_PHP:
-                                $val = unserialize($val);
+                                if ($this->canUnserialize($val)) {
+                                    $val = unserialize($val);
+                                }
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
@@ -154,7 +158,9 @@ class Redis extends Base
                     if (is_string($val)) {
                         switch ($this->redisSerialize) {
                             case Marco::SERIALIZE_PHP:
-                                $val = unserialize($val);
+                                if ($this->canUnserialize($val)) {
+                                    $val = unserialize($val);
+                                }
                                 break;
                             case Marco::SERIALIZE_IGBINARY:
                                 $val = @igbinary_unserialize($val);
@@ -176,7 +182,9 @@ class Redis extends Base
                 if (is_string($data) && $this->redisSerialize) {
                     switch ($this->redisSerialize) {
                         case Marco::SERIALIZE_PHP:
-                            $data = unserialize($data);
+                            if ($this->canUnserialize($data)) {
+                                $data = unserialize($data);
+                            }
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
@@ -184,11 +192,12 @@ class Redis extends Base
                     }
                 }
 
-                if (is_string($data) && $this->phpSerialize && in_array(substr($data, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:'])) {
+                if (is_string($data) && $this->phpSerialize) {
                     switch ($this->phpSerialize) {
                         case Marco::SERIALIZE_PHP:
-                            //var_dump($this->name, $this->keyPrefix, $data);
-                            $data = unserialize($data);
+                            if ($this->canUnserialize($data)) {
+                                $data = unserialize($data);
+                            }
                             break;
                         case Marco::SERIALIZE_IGBINARY:
                             $data = @igbinary_unserialize($data);
@@ -206,5 +215,16 @@ class Redis extends Base
         }
 
         return $data;
+    }
+
+    /**
+     * 是否可以反序列化
+     * @param string $string
+     * @return bool
+     */
+    private function canUnserialize(string $string)
+    {
+        $head = substr($string, 0, 2);
+        return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
     }
 }
