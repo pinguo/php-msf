@@ -192,7 +192,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
 
         if ($method === 'cache') {
-            $result = call_user_func_array([$redisPoolCoroutine, $method], $arguments);
+            $result = $redisPoolCoroutine->$method(...$arguments);
         } else {
             $result = $redisPoolCoroutine->__call($method, $arguments);
         }
@@ -263,8 +263,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
             $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
 
             if ($method === 'cache') {
-                $opData[$redisPoolName] = call_user_func_array([$redisPoolCoroutine, $method],
-                    [$arguments[0], $op]);
+                $opData[$redisPoolName] = $redisPoolCoroutine->$method(...[$arguments[0], $op]);
             } else {
                 $opData[$redisPoolName] = $redisPoolCoroutine->__call($method, [$arguments[0], $op]);
             }

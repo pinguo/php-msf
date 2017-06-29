@@ -38,7 +38,7 @@ class TestModel extends Model
         $this->redisPool->get('test', function ($uid) use ($callback) {
             $this->mysqlPool->dbQueryBuilder->select('*')->from('account')->where('uid', $uid);
             $this->mysqlPool->query(function ($result) use ($callback) {
-                call_user_func($callback, $result);
+                $callback($result);
             });
         });
     }

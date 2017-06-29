@@ -53,7 +53,7 @@ class AsynPoolManager
         $read = $this->process->read();
         $baodata = unserialize($read);
         $asyn = $this->registDir[$baodata['asyn_name']];
-        call_user_func([$asyn, 'execute'], $baodata);
+        $asyn->execute($baodata);
     }
 
     /**
@@ -63,7 +63,7 @@ class AsynPoolManager
     public function distribute($data)
     {
         $asyn = $this->registDir[$data['asyn_name']];
-        call_user_func([$asyn, 'distribute'], $data);
+        $asyn->distribute($data);
     }
 
     /**
@@ -85,7 +85,7 @@ class AsynPoolManager
     public function writePipe(IAsynPool $asyn, $data, $workerId)
     {
         if ($this->notEventAdd) {
-            call_user_func([$asyn, 'execute'], $data);
+            $asyn->execute($data);
         } else {
             $data['asyn_name'] = $asyn->getAsynName();
             $data['worker_id'] = $workerId;
@@ -101,7 +101,7 @@ class AsynPoolManager
     public function sendMessageToWorker(IAsynPool $asyn, $data)
     {
         if ($this->notEventAdd) {
-            call_user_func([$asyn, 'distribute'], $data);
+            $asyn->distribute($data);
         } else {
             $workerID = $data['worker_id'];
             $message = $this->swooleServer->packSerevrMessageBody(Marco::MSG_TYPR_ASYN, $data);

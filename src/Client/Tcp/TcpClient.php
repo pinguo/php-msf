@@ -114,7 +114,7 @@ class TcpClient extends Core
         $this->client->on('receive', function ($cli, $recData) use ($callback) {
             $recData = $this->pack->unPack($this->decode($recData));
             if ($callback != null) {
-                call_user_func($callback, $cli, $recData);
+                $callback($cli, $recData);
             }
         });
 

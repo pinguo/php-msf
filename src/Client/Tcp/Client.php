@@ -98,7 +98,7 @@ class Client extends Core
 
         $tcpClient = $this->getContext()->getObjectPool()->get(TcpClient::class);
         $tcpClient->initialization($c, $ip, $data['port'], $timeOut / 1000);
-        call_user_func($data['callBack'], $tcpClient);
+        ($data['callBack'])($tcpClient);
     }
 
     /**

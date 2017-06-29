@@ -155,7 +155,7 @@ class RpcController extends Controller
         }
         //$response = $handlerInstance->{$this->method}(...$this->reqParams);
         $this->preRunMethod();
-        $response = yield call_user_func_array([$handlerInstance, $this->method], $this->methodParams ?? $this->reqParams);
+        $response = yield $handlerInstance->{$this->method}(...($this->methodParams ?? $this->reqParams));
 
         $this->outputJson($response);
     }
