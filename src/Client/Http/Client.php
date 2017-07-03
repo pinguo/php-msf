@@ -22,47 +22,56 @@ class Client extends Core
 
     /**
      * 获取一个http客户端
-     * @param $baseUrl
+     * @param string | array $baseUrl
      * @param $callBack
      * @throws \PG\MSF\Base\Exception
      */
     public function getHttpClient($baseUrl, $callBack, array $headers = [])
     {
-        $data               = [];
-        $data['url']        = $baseUrl;
-        $data['callBack']   = $callBack;
-        $data['port']       = 80;
-        $data['ssl']        = false;
-        $parseBaseUrlResult = explode(":", $baseUrl);
-
-        if (count($parseBaseUrlResult) == 2) {
-            $urlHead = $parseBaseUrlResult[0];
-            $urlHost = $parseBaseUrlResult[1];
-        } elseif (count($parseBaseUrlResult) == 3) {
-            $urlHead = $parseBaseUrlResult[0];
-            $urlHost = $parseBaseUrlResult[1];
-            $urlPort = $parseBaseUrlResult[2];
-        } else {
-            throw new Exception($baseUrl . ' 不合法,请检查配置或者参数');
-        }
-
-        if (!empty($urlPort)) {
-            $data['port'] = $urlPort;
-        } else {
-            if ($urlHead == "https") {
-                $data['port'] = 443;
+        $data             = [];
+        $data['callBack'] = $callBack;
+        if (is_array($baseUrl)) {
+            $data['url']      = $baseUrl['scheme'] . '://' . $baseUrl['host'] . ':' . $baseUrl['port'];
+            $data['port']     = $baseUrl['port'];
+            $urlHost          = $baseUrl['host'];
+            if ($baseUrl['scheme'] == 'https') {
+                $data['ssl'] = true;
             }
-        }
+        } else {
+            $data['url'] = $baseUrl;
+            $data['port'] = 80;
+            $data['ssl'] = false;
+            $parseBaseUrlResult = explode(":", $baseUrl);
 
-        if ($urlHead == 'https') {
-            $data['ssl'] = true;
-        }
+            if (count($parseBaseUrlResult) == 2) {
+                $urlHead = $parseBaseUrlResult[0];
+                $urlHost = $parseBaseUrlResult[1];
+            } elseif (count($parseBaseUrlResult) == 3) {
+                $urlHead = $parseBaseUrlResult[0];
+                $urlHost = $parseBaseUrlResult[1];
+                $urlPort = $parseBaseUrlResult[2];
+            } else {
+                throw new Exception($baseUrl . ' 不合法,请检查配置或者参数');
+            }
 
-        $urlHost = substr($urlHost, 2);
+            if (!empty($urlPort)) {
+                $data['port'] = $urlPort;
+            } else {
+                if ($urlHead == "https") {
+                    $data['port'] = 443;
+                }
+            }
+
+            if ($urlHead == 'https') {
+                $data['ssl'] = true;
+            }
+
+            $urlHost = substr($urlHost, 2);
+        }
 
         $ip = self::getDnsCache($urlHost);
         if ($ip !== null) {
-            $this->coroutineCallBack($urlHost, $ip, $data, $headers);
+            $this->coroutineCallBack($urlHost, $ip, $data, $headers, true);
         } else {
             $logId = $this->getContext()->getLogId();
             swoole_async_dns_lookup($urlHost, function ($host, $ip) use (&$data, &$headers, $logId) {
@@ -158,8 +167,7 @@ class Client extends Core
             $parseUrlResult['query'] = '?' . $parseUrlResult['query'];
         }
 
-        $baseUrl      = $parseUrlResult['scheme'] . '://' . $parseUrlResult['host'] . ':' . $parseUrlResult['port'];
-        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, 300, $headers);
+        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $parseUrlResult, 300, $headers);
         /**
          * @var $httpClient HttpClient
          */
@@ -212,8 +220,7 @@ class Client extends Core
             $parseUrlResult['query'] = '?' . $parseUrlResult['query'];
         }
 
-        $baseUrl      = $parseUrlResult['scheme'] . '://' . $parseUrlResult['host'] . ':' . $parseUrlResult['port'];
-        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $baseUrl, 300, $headers);
+        $sendDnsQuery = $this->getContext()->getObjectPool()->get(GetHttpClient::class)->initialization($this, $parseUrlResult, 300, $headers);
         /**
          * @var $httpClient HttpClient
          */
@@ -231,9 +238,10 @@ class Client extends Core
      * @param $ip string 主机名对应的IP
      * @param $data array
      * @param $headers array
+     * @param $dnsCache boolean
      * @return bool
      */
-    public function coroutineCallBack($host, $ip, $data, $headers)
+    public function coroutineCallBack($host, $ip, $data, $headers, $dnsCache = false)
     {
         if (empty($this->context) || empty($this->context->getLog())) {
             return true;
@@ -248,7 +256,7 @@ class Client extends Core
         ]);
 
         $httpClient->setHeaders($headers);
-        ($data['callBack'])($httpClient);
+        ($data['callBack'])($httpClient, $dnsCache);
     }
 
     /**

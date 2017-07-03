@@ -22,7 +22,7 @@ class Task
      *
      * @var \Generator
      */
-    public $routine;
+    protected $routine;
 
     /**
      * 任务销毁标识
@@ -88,7 +88,7 @@ class Task
      * @param \Generator $routine
      * @return $this
      */
-    public function resetRoutine(\Generator $routine)
+    public function resetRoutine(\Generator $routine = null)
     {
         $this->routine = null;
         $this->routine = $routine;
@@ -131,19 +131,17 @@ class Task
      */
     public function run()
     {
-        $routine = &$this->routine;
         try {
-            if (!$routine) {
-                return;
-            }
             if ($this->exception) {
                 throw $this->exception;
             }
-            $value = $routine->current();
+
+            $value = $this->routine->current();
             //嵌套的协程
             if ($value instanceof \Generator) {
-                $this->stack->push($routine);
-                $routine = $value;
+                $this->stack->push($this->routine);
+                $this->routine = $value;
+                $value = null;
                 return;
             }
 
@@ -155,29 +153,41 @@ class Task
                         $this->handleTaskTimeout($e, $value);
                     }
                     unset($value);
-                    $routine->send(false);
+                    $this->routine->send(false);
                 } else {
                     $result = $value->getResult();
                     if ($result !== CNull::getInstance()) {
-                        unset($value);
-                        $routine->send($result);
+                        $this->routine->send($result);
                     }
-                }
 
-                while (!empty($this->stack) && !$this->routine->valid() && !$this->stack->isEmpty()) {
-                    $result = $routine->getReturn();
-                    $this->routine = $this->stack->pop();
-                    $this->routine->send($result);
-                }
-            } else {
-                if ($routine instanceof \Generator && $routine->valid()) {
-                    $routine->send($value);
-                } else {
-                    if (count($this->stack) > 0) {
-                        $result = $routine->getReturn();
+                    while (!$this->routine->valid() && !empty($this->stack) && !$this->stack->isEmpty()) {
+                        try {
+                            $result = $this->routine->getReturn();
+                        } catch (\Throwable $e) {
+                            // not todo
+                            $result = null;
+                        }
+                        $this->routine = null;
                         $this->routine = $this->stack->pop();
                         $this->routine->send($result);
                     }
+                }
+            } else {
+                if ($this->routine instanceof \Generator && $this->routine->valid()) {
+                    $this->routine->send($value);
+                } else {
+                    try {
+                        $result = $this->routine->getReturn();
+                    } catch (\Throwable $e) {
+                        // not todo
+                        $result = null;
+                    }
+
+                    if (!empty($this->stack) && !$this->stack->isEmpty()) {
+                        $this->routine = null;
+                        $this->routine = $this->stack->pop();
+                    }
+                    $this->routine->send($result);
                 }
             }
         } catch (\Throwable $e) {
@@ -191,7 +201,7 @@ class Task
                 if ($this->controller) {
                     $this->controller->onExceptionHandle($runTaskException);
                 } else {
-                    $routine->throw($runTaskException);
+                    $this->routine->throw($runTaskException);
                 }
             }
 
@@ -210,7 +220,7 @@ class Task
         }
 
         $runTaskException = new Exception($message, $e->getCode(), $e);
-        $this->context->getLog()->warning($message);
+        $this->getContext()->getLog()->warning($message);
 
         if (!empty($value) && $value instanceof IBase && method_exists($value, 'destroy')) {
             $value->destroy();
@@ -277,7 +287,7 @@ class Task
      */
     public function isFinished()
     {
-        return !empty($this->stack) && $this->stack->isEmpty() && !$this->routine->valid();
+        return (empty($this->stack) || $this->stack->isEmpty()) && !$this->routine->valid();
     }
 
     public function getRoutine()
