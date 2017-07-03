@@ -205,7 +205,7 @@ class Scheduler
 
         try {
             if ($ioBack) {
-                getInstance()->server->defer(function() use ($task) {
+                swoole_timer_after(1, function() use ($task) {
                     $this->schedule($task);
                 });
             } else {
