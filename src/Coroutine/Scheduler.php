@@ -18,18 +18,11 @@ use PG\MSF\Models\ModelFactory;
 class Scheduler
 {
     public $IOCallBack;
-    public $taskQueue;
     public $taskMap = [];
     public $cache;
 
     public function __construct()
     {
-        $this->taskQueue = new \SplQueue();
-
-        getInstance()->sysTimers[] = swoole_timer_tick(1, function ($timerId) {
-            $this->run();
-        });
-
         getInstance()->sysTimers[] = swoole_timer_tick(1000, function ($timerId) {
             // 当前进程的协程统计信息
             if (getInstance()::mode != 'console') {
@@ -55,7 +48,7 @@ class Scheduler
             }
         });
 
-        swoole_timer_tick(60000, function ($timerId) {
+        swoole_timer_tick(300000, function ($timerId) {
             if (!empty(getInstance()->objectPool->map)) {
                 foreach (getInstance()->objectPool->map as $class => &$objectsMap) {
                     while ($objectsMap->count()) {
@@ -203,39 +196,37 @@ class Scheduler
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
-    public function run()
+    public function schedule(Task $task, $ioBack = false)
     {
-        while (!$this->taskQueue->isEmpty()) {
-            $task = $this->taskQueue->dequeue();
+        if (!$ioBack) {
             /* @var $task Task */
             $task->run();
-            if (empty($task->routine)) {
-                continue;
-            }
-            try {
-                if ($task->routine->valid() && ($task->routine->current() instanceof IBase)) {
+        }
+
+        try {
+            if ($ioBack) {
+                getInstance()->server->defer(function() use ($task) {
+                    $this->schedule($task);
+                });
+            } else {
+                if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
                 } else {
                     if ($task->isFinished()) {
+                        $task->resetRoutine();
                         if (is_callable($task->getCallBack())) {
                             ($task->getCallBack())();
                             $task->resetCallBack();
-                        } else {
-                            $task->destroy();
                         }
                     } else {
                         $this->schedule($task);
                     }
                 }
-            } catch (\Throwable $e) {
-                $task->setException($e);
-                $this->schedule($task);
             }
+        } catch (\Throwable $e) {
+            $task->setException($e);
+            $this->schedule($task);
         }
-    }
 
-    public function schedule(Task $task)
-    {
-        $this->taskQueue->enqueue($task);
         return $this;
     }
 
@@ -243,7 +234,7 @@ class Scheduler
     {
         $task = $context->getObjectPool()->get(Task::class)->initialization($routine, $context, $controller, $callBack);
         $this->IOCallBack[$context->getLogId()] = [];
-        $this->taskMap[$context->getLogId()] = $task;
-        $this->taskQueue->enqueue($task);
+        $this->taskMap[$context->getLogId()]    = $task;
+        $this->schedule($task);
     }
 }

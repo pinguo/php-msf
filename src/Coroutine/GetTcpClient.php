@@ -28,13 +28,13 @@ class GetTcpClient extends Base
 
         $this->client->context->getLog()->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($tcpClient) use ($profileName, $logId) {
+        $this->send(function ($tcpClient, $dnsCache = false) use ($profileName, $logId) {
             $this->result = $tcpClient;
             $this->responseTime = microtime(true);
             if (!empty($this->client) && !empty($this->client->context->getLog())) {
                 $this->client->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($logId);
+                $this->nextRun($logId, $dnsCache);
             }
         });
 

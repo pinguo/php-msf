@@ -22,7 +22,11 @@ class GetHttpClient extends Base
     public function initialization(Client $client, $baseUrl, $timeout, $headers = [])
     {
         parent::init($timeout);
-        $this->baseUrl = $baseUrl;
+        if (is_array($baseUrl)) {
+            $this->baseUrl = $baseUrl['scheme'] . '://' . $baseUrl['host'] . ':' . $baseUrl['port'];
+        } else {
+            $this->baseUrl = $baseUrl;
+        }
         $this->client  = $client;
         $this->headers = $headers;
         $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
@@ -30,13 +34,13 @@ class GetHttpClient extends Base
 
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->client->context->getLog()->profileStart($profileName);
-        $this->send(function ($httpClient) use ($profileName, $logId) {
+        $this->send(function ($httpClient, $dnsCache = false) use ($profileName, $logId) {
             $this->result = $httpClient;
             $this->responseTime = microtime(true);
             if (!empty($this->client) && !empty($this->client->context->getLog())) {
                 $this->client->context->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($logId);
+                $this->nextRun($logId, $dnsCache);
             }
         });
 
