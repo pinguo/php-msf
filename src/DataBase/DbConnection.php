@@ -1561,7 +1561,7 @@ class DbConnection
      */
     public function col($col)
     {
-        return call_user_func_array(array($this, 'addCol'), func_get_args());
+        return $this->addCol(...$col);
     }
 
     // ----------Dml---------------

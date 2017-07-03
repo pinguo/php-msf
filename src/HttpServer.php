@@ -213,14 +213,14 @@ abstract class HttpServer extends Server
                 $init = $controllerInstance->initialization($controllerName, $methodName);
                 if ($init instanceof \Generator) {
                     $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
-                        $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                        $generator = $controllerInstance->$methodName($this->route->getParams());
                         if ($generator instanceof \Generator) {
                             $this->coroutine->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
                             $this->coroutine->schedule($this->coroutine->taskMap[$controllerInstance->context->getLogId()]);
                         }
                     });
                 } else {
-                    $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                    $generator = $controllerInstance->$methodName($this->route->getParams());
                     if ($generator instanceof \Generator) {
                         $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                     }
@@ -231,7 +231,7 @@ abstract class HttpServer extends Server
                 }
                 break;
             } catch (\Throwable $e) {
-                call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
+                $controllerInstance->onExceptionHandle($e);
             }
         } while (0);
 

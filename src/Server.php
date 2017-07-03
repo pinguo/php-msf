@@ -764,7 +764,7 @@ abstract class Server extends Child
 
                 $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
-                $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                $generator = $controllerInstance->$methodName($this->route->getParams());
                 if ($generator instanceof \Generator) {
                     $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                 }
@@ -774,7 +774,7 @@ abstract class Server extends Child
                 }
                 break;
             } catch (\Throwable $e) {
-                call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
+                $controllerInstance->onExceptionHandle($e);
             }
         } while (0);
 
@@ -886,7 +886,7 @@ abstract class Server extends Child
         $log .= json_encode($data);
         $this->log->error($log);
         if ($this->onErrorHandel != null) {
-            call_user_func($this->onErrorHandel, '【！！！】服务器进程异常退出', $log);
+            $this->onErrorHandel('【！！！】服务器进程异常退出', $log);
         }
     }
 
@@ -938,7 +938,7 @@ abstract class Server extends Child
      */
     public function __call($name, $arguments)
     {
-        return call_user_func_array(array($this->server, $name), $arguments);
+        return $this->server->$name(...$arguments);
     }
 
     /**
@@ -959,7 +959,7 @@ abstract class Server extends Child
         $log .= "$errorString ($filename:$line)";
         $this->log->error($log);
         if ($this->onErrorHandel != null) {
-            call_user_func($this->onErrorHandel, '服务器发生严重错误', $log);
+            $this->onErrorHandel('服务器发生严重错误', $log);
         }
     }
 
@@ -1004,7 +1004,7 @@ abstract class Server extends Child
                     }
                     $this->log->alert($log);
                     if ($this->onErrorHandel != null) {
-                        call_user_func($this->onErrorHandel, '服务器发生崩溃事件', $log);
+                        $this->onErrorHandel('服务器发生崩溃事件', $log);
                     }
                     break;
                 default:

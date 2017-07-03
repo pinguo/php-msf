@@ -199,7 +199,7 @@ class Task
 
             if ($runTaskException instanceof \Throwable) {
                 if ($this->controller) {
-                    call_user_func([$this->controller, 'onExceptionHandle'], $runTaskException);
+                    $this->controller->onExceptionHandle($runTaskException);
                 } else {
                     $this->routine->throw($runTaskException);
                 }

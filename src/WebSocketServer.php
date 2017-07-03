@@ -215,7 +215,7 @@ abstract class WebSocketServer extends HttpServer
 
                 $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
 
-                $generator = call_user_func([$controllerInstance, $methodName], $this->route->getParams());
+                $generator = $controllerInstance->$methodName($this->route->getParams());
                 if ($generator instanceof \Generator) {
                     $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                 }
@@ -225,7 +225,7 @@ abstract class WebSocketServer extends HttpServer
                 }
                 break;
             } catch (\Throwable $e) {
-                call_user_func([$controllerInstance, 'onExceptionHandle'], $e);
+                $controllerInstance->onExceptionHandle($e);
             }
         } while (0);
 

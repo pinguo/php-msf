@@ -256,7 +256,7 @@ class Client extends Core
         ]);
 
         $httpClient->setHeaders($headers);
-        call_user_func($data['callBack'], $httpClient, $dnsCache);
+        ($data['callBack'])($httpClient, $dnsCache);
     }
 
     /**

@@ -8,12 +8,12 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Controllers\Controller;
-use PG\MSF\Marco;
-use PG\MSF\Controllers\ControllerFactory;
-use PG\MSF\Models\ModelFactory;
-use PG\MSF\Helpers\Context;
 use PG\MSF\Base\Core;
+use PG\MSF\Controllers\Controller;
+use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Helpers\Context;
+use PG\MSF\Marco;
+use PG\MSF\Models\ModelFactory;
 
 class Scheduler
 {
@@ -104,7 +104,7 @@ class Scheduler
             // 内存使用
             'memory' => [
                 // 峰值
-                'peak'  => '',
+                'peak' => '',
                 // 当前使用
                 'usage' => '',
             ],
@@ -136,11 +136,11 @@ class Scheduler
         ];
         $routineList = getInstance()->coroutine->taskMap;
         $data['pid'] = getInstance()->server->worker_pid;
-        $data['coroutine']['total']   = count($routineList);
-        $data['memory']['peak_byte']  = memory_get_peak_usage();
+        $data['coroutine']['total'] = count($routineList);
+        $data['memory']['peak_byte'] = memory_get_peak_usage();
         $data['memory']['usage_byte'] = memory_get_usage();
-        $data['memory']['peak']       = strval(number_format($data['memory']['peak_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
-        $data['memory']['usage']      = strval(number_format($data['memory']['usage_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['memory']['peak'] = strval(number_format($data['memory']['peak_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['memory']['usage'] = strval(number_format($data['memory']['usage_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
         $data['request']['worker_request_count'] = getInstance()->server->stats()['worker_request_count'];
 
         if (!empty(getInstance()->objectPool->map)) {
@@ -148,7 +148,7 @@ class Scheduler
                 if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
                         $data['object_poll'][$class][] = [
-                            'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
+                            'gen_time' => property_exists($object, 'genTime') ? $object->genTime : 0,
                             'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
                             'ref_count' => refcount($object) - 1,
                         ];
@@ -164,7 +164,7 @@ class Scheduler
                 if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
                         $data['controller_poll'][$class][] = [
-                            'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
+                            'gen_time' => property_exists($object, 'genTime') ? $object->genTime : 0,
                             'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
                             'ref_count' => refcount($object) - 1,
                         ];
@@ -180,7 +180,7 @@ class Scheduler
                 if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
                         $data['model_poll'][$class][] = [
-                            'gen_time'  => property_exists($object, 'genTime')  ? $object->genTime : 0,
+                            'gen_time' => property_exists($object, 'genTime') ? $object->genTime : 0,
                             'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
                             'ref_count' => refcount($object) - 1,
                         ];
@@ -192,7 +192,7 @@ class Scheduler
         }
 
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
-        $data['dns_cache_tcp']  = \PG\MSF\Client\Tcp\Client::$dnsCache;
+        $data['dns_cache_tcp'] = \PG\MSF\Client\Tcp\Client::$dnsCache;
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
@@ -214,7 +214,7 @@ class Scheduler
                     if ($task->isFinished()) {
                         $task->resetRoutine();
                         if (is_callable($task->getCallBack())) {
-                            call_user_func($task->getCallBack());
+                            ($task->getCallBack())();
                             $task->resetCallBack();
                         }
                     } else {

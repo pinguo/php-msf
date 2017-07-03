@@ -277,7 +277,7 @@ abstract class MSFServer extends WebSocketServer
                     if (method_exists($task, $taskFucName)) {
                         //给task做初始化操作
                         $task->initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName, $taskContext);
-                        $result = call_user_func_array(array($task, $taskFucName), $taskData);
+                        $result = $task->$taskFucName(...$taskData);
                     } else {
                         throw new Exception("method $taskFucName not exist in $taskName");
                     }

@@ -205,7 +205,7 @@ class CoroutineRedisHelp
         // value serialize end
 
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            $value = call_user_func_array([getInstance()->getRedis(), $name], $arguments);
+            $value = getInstance()->getRedis()->$name(...$arguments);
             // return value unserialize start
             if ($name === 'get') {
                 $value = $this->unSerializeHandler($value);

@@ -38,7 +38,7 @@ class Select extends Base
                 continue;
             }
             if (isset($this->matchFunc)) {
-                if (call_user_func($this->matchFunc, $result)) {
+                if ($this->matchFunc($result)) {
                     break;
                 }
             } else {
