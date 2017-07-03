@@ -95,7 +95,7 @@ abstract class Base implements IBase
         return false;
     }
 
-    public function nextRun($logId)
+    public function nextRun($logId, $ioBack = false)
     {
         if (empty(getInstance()->coroutine->IOCallBack[$logId])) {
             return true;
@@ -104,7 +104,7 @@ abstract class Base implements IBase
         foreach (getInstance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
             if ($coroutine->ioBack && !empty(getInstance()->coroutine->taskMap[$logId])) {
                 unset(getInstance()->coroutine->IOCallBack[$logId][$k]);
-                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$logId]);
+                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$logId], $ioBack);
             } else {
                 break;
             }

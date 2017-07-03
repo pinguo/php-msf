@@ -23,6 +23,11 @@ class TestController extends Controller
     public $testModel;
 
     /**
+     * @var array
+     */
+    private $dns;
+
+    /**
      * @return boolean
      */
     public function isIsDestroy()
@@ -110,5 +115,42 @@ class TestController extends Controller
         $obj->initialization();
         $data = yield $obj->getUserInfo('0108d9571b25aec97cbf5b57', '', true, true);
         $this->outputJson($data);
+    }
+
+    public function httpWeatherApi()
+    {
+        $data = yield $this->getContext()->getObjectPool()
+            ->get(\PG\MSF\Client\Http\Client::class)
+            ->coroutineGet('http://www.weather.com.cn/data/sk/101110101.html');
+        $this->getContext()->getOutput()->end($data);
+    }
+
+    public function httpWeatherApiCallBack()
+    {
+        $ip = getInstance()->sysCache->get('www.weather.com.cn');
+        if ($ip) {
+            $cli = new \swoole_http_client($ip, 80);
+            $cli->setHeaders([
+                'Host' => 'www.weather.com.cn',
+                "User-Agent" => 'Chrome/49.0.2587.3',
+            ]);
+
+            $cli->get('/data/sk/101110101.html', function ($cli) {
+                $this->getContext()->getOutput()->end($cli->body);
+            });
+        } else {
+            swoole_async_dns_lookup("www.weather.com.cn", function ($host, $ip) {
+                getInstance()->sysCache->set('www.weather.com.cn', $ip);
+                $cli = new \swoole_http_client($ip, 80);
+                $cli->setHeaders([
+                    'Host' => $host,
+                    "User-Agent" => 'Chrome/49.0.2587.3',
+                ]);
+
+                $cli->get('/data/sk/101110101.html', function ($cli) {
+                    $this->getContext()->getOutput()->end($cli->body);
+                });
+            });
+        }
     }
 }

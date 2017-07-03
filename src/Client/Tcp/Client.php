@@ -24,10 +24,10 @@ class Client extends Core
      * 获取一个tcp客户端
      * @param $baseUrl
      * @param $callBack
-     * @param $timeOut
+     * @param $timeout
      * @throws Exception
      */
-    public function getTcpClient($baseUrl, $callBack, $timeOut)
+    public function getTcpClient($baseUrl, $callBack, $timeout)
     {
         $data               = [];
         $parseBaseUrlResult = explode(":", $baseUrl);
@@ -42,10 +42,10 @@ class Client extends Core
 
         $ip = self::getDnsCache($data['host']);
         if ($ip !== null) {
-            $this->coroutineCallBack($data['host'], $ip, $data, $timeOut);
+            $this->coroutineCallBack($data['host'], $ip, $data, $timeout, true);
         } else {
             $logId = $this->getContext()->getLogId();
-            swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeOut, $logId) {
+            swoole_async_dns_lookup($data['host'], function ($host, $ip) use (&$data, $timeout, $logId) {
                 if (empty(getInstance()->coroutine->taskMap[$logId])) {
                     return;
                 }
@@ -54,7 +54,7 @@ class Client extends Core
                     $this->context->getLog()->warning($data['url'] . ' DNS查询失败');
                 } else {
                     self::setDnsCache($host, $ip);
-                    $this->coroutineCallBack($host, $ip, $data, $timeOut);
+                    $this->coroutineCallBack($host, $ip, $data, $timeout);
                 }
             });
         }
@@ -77,10 +77,11 @@ class Client extends Core
      * @param $host string 主机名
      * @param $ip string 主机名对应的IP
      * @param $data array
-     * @param $headers array
+     * @param $timeout int
+     * @param $dnsCache boolean
      * @return bool
      */
-    public function coroutineCallBack($host, $ip, $data, $timeOut)
+    public function coroutineCallBack($host, $ip, $data, $timeout, $dnsCache = false)
     {
         if (empty($this->context)) {
             return true;
@@ -97,8 +98,8 @@ class Client extends Core
         });
 
         $tcpClient = $this->getContext()->getObjectPool()->get(TcpClient::class);
-        $tcpClient->initialization($c, $ip, $data['port'], $timeOut / 1000);
-        call_user_func($data['callBack'], $tcpClient);
+        $tcpClient->initialization($c, $ip, $data['port'], $timeout / 1000);
+        call_user_func($data['callBack'], $tcpClient, $dnsCache);
     }
 
     /**
