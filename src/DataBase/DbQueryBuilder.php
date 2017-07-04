@@ -8,7 +8,7 @@
 
 namespace PG\MSF\DataBase;
 
-use PG\MSF\Base\Exception;
+use Exception;
 
 class DbQueryBuilder
 {

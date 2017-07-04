@@ -15,6 +15,9 @@ use PG\MSF\Models\TestModel;
 use PG\MSF\Client\Http\Client;
 use PG\MSF\Client\Tcp\Client as TClient;
 
+class a extends \Exception{
+
+}
 class TestController extends Controller
 {
     /**
@@ -121,7 +124,7 @@ class TestController extends Controller
     {
         $data = yield $this->getContext()->getObjectPool()
             ->get(\PG\MSF\Client\Http\Client::class)
-            ->coroutineGet('http://www.weather.com.cn/data/sk/101110101.html');
+            ->coroutinePost('http://www.weather.com.cn/data/sk/101110101.html');
         $this->getContext()->getOutput()->end($data);
     }
 

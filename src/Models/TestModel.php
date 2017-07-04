@@ -9,7 +9,7 @@
 namespace PG\MSF\Models;
 
 use PG\MSF\Models\Model;
-use PG\MSF\Base\Exception;
+use Exception;
 
 class TestModel extends Model
 {

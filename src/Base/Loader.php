@@ -8,6 +8,7 @@
 
 namespace PG\MSF\Base;
 
+use Exception;
 use PG\MSF\Tasks\TaskProxy;
 use PG\MSF\Models\ModelFactory;
 

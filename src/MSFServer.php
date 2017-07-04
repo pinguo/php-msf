@@ -19,7 +19,7 @@ use PG\MSF\DataBase\MysqlAsynPool;
 use PG\MSF\DataBase\RedisAsynPool;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
-use PG\MSF\Base\Exception;
+use Exception;
 use \PG\MSF\Tasks\Task as TaskBase;
 use PG\AOP\Wrapper;
 

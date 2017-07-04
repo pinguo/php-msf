@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\Exception;
+use Exception;
 
 class CException extends Exception
 {

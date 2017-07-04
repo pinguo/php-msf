@@ -19,7 +19,7 @@ use PG\MSF\Coroutine\Task;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Console\Request;
 use PG\MSF\Controllers\ControllerFactory;
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Base\Input;
 use PG\MSF\Helpers\Context;

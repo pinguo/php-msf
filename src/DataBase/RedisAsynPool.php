@@ -8,7 +8,7 @@
 
 namespace PG\MSF\DataBase;
 
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\Coroutine\Redis;
 
 class RedisAsynPool extends AsynPool

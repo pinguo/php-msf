@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Controllers\Controller;
 use PG\AOP\MI;
@@ -219,14 +219,13 @@ class Task
             $message = 'message: ' . $e->getMessage();
         }
 
-        $runTaskException = new Exception($message, $e->getCode(), $e);
         $this->getContext()->getLog()->warning($message);
 
         if (!empty($value) && $value instanceof IBase && method_exists($value, 'destroy')) {
             $value->destroy();
         }
 
-        return $runTaskException;
+        return $e;
     }
 
     public function handleTaskException(\Throwable $e, $value)
@@ -239,12 +238,10 @@ class Task
             $message = $e->getMessage();
         }
 
-        $runTaskException = new Exception($message, $e->getCode(), $e);
-
         while (!empty($this->stack) && !$this->stack->isEmpty()) {
             $this->routine = $this->stack->pop();
             try {
-                $this->routine->throw($runTaskException);
+                $this->routine->throw($e);
                 break;
             } catch (\Exception $e) {
             }
@@ -255,7 +252,7 @@ class Task
         }
 
         if (!empty($this->stack) && $this->stack->isEmpty()) {
-            return $runTaskException;
+            return $e;
         }
 
         return true;

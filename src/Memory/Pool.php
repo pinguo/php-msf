@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Memory;
 
-use PG\MSF\Base\Exception;
+use Exception;
 
 class Pool
 {

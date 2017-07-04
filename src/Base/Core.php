@@ -14,6 +14,7 @@ use PG\MSF\DataBase\RedisAsynPool;
 use PG\AOP\Wrapper;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\DataBase\CoroutineRedisHelp;
+use Exception;
 
 class Core extends Child
 {

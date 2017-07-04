@@ -9,7 +9,7 @@
 
 namespace PG\MSF\Controllers;
 
-use PG\MSF\Base\Exception;
+use Exception;
 
 class RpcController extends Controller
 {

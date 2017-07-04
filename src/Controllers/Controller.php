@@ -15,7 +15,7 @@ use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
 use PG\MSF\Base\Core;
 use PG\MSF\Base\AOPFactory;
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\Marco;
 use PG\MSF\Server;
 use PG\MSF\Coroutine\CException;
