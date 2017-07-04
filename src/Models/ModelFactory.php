@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Models;
 
-use PG\MSF\Base\Exception;
+use Exception;
 
 class ModelFactory
 {

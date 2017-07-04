@@ -192,34 +192,26 @@ class Scheduler
         }
 
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
-        $data['dns_cache_tcp'] = \PG\MSF\Client\Tcp\Client::$dnsCache;
+        $data['dns_cache_tcp']  = \PG\MSF\Client\Tcp\Client::$dnsCache;
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
-    public function schedule(Task $task, $ioBack = false)
+    public function schedule(Task $task)
     {
-        if (!$ioBack) {
-            /* @var $task Task */
-            $task->run();
-        }
+        /* @var $task Task */
+        $task->run();
 
         try {
-            if ($ioBack) {
-                swoole_timer_after(1, function() use ($task) {
-                    $this->schedule($task);
-                });
+            if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
             } else {
-                if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
-                } else {
-                    if ($task->isFinished()) {
-                        $task->resetRoutine();
-                        if (is_callable($task->getCallBack())) {
-                            ($task->getCallBack())();
-                            $task->resetCallBack();
-                        }
-                    } else {
-                        $this->schedule($task);
+                if ($task->isFinished()) {
+                    $task->resetRoutine();
+                    if (is_callable($task->getCallBack())) {
+                        ($task->getCallBack())();
+                        $task->resetCallBack();
                     }
+                } else {
+                    $this->schedule($task);
                 }
             }
         } catch (\Throwable $e) {

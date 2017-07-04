@@ -13,7 +13,7 @@ use PG\Log\PGLog;
 use PG\MSF\Base\Child;
 use PG\MSF\Controllers\ControllerFactory;
 use PG\MSF\Base\Loader;
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\Base\Core;
 use PG\MSF\Pack\IPack;
 use PG\MSF\Route\IRoute;

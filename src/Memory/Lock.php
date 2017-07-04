@@ -9,7 +9,7 @@
 
 namespace PG\MSF\Memory;
 
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\DataBase\RedisAsynPool;
 
 class Lock

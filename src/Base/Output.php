@@ -8,6 +8,7 @@
 
 namespace PG\MSF\Base;
 
+use Exception;
 use PG\MSF\Marco;
 use PG\MSF\Controllers\Controller;
 

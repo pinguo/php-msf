@@ -126,7 +126,7 @@ function clearTimes()
  * @param $var
  * @param $level
  */
-function dumpInternal(&$output, $var, $level, $format = true)
+function dumpInternal(&$output, $var, $level, $format = true, $truncated = true)
 {
     switch (gettype($var)) {
         case 'boolean':
@@ -139,7 +139,7 @@ function dumpInternal(&$output, $var, $level, $format = true)
             $output .= "$var";
             break;
         case 'string':
-            if (defined('DUMP_TRUNCATED') && strlen($var) > 512) {
+            if ($truncated && defined('DUMP_TRUNCATED') && strlen($var) > 512) {
                 $output .= "'*<truncated>*'";
             } else {
                 $output .= "'" . addslashes($var) . "'";
@@ -188,11 +188,31 @@ function dumpInternal(&$output, $var, $level, $format = true)
             }
             break;
         case 'object':
+            if ($var instanceof \Throwable) {
+                $truncated  = false;
+                $dumpValues = [
+                    'message' => $var->getMessage(),
+                    'code'    => $var->getCode(),
+                    'line'    => $var->getLine(),
+                    'file'    => $var->getFile(),
+                    'trace'   => $var->getTraceAsString(),
+                ];
+            } else {
+                $dumpValues = (array)$var;
+                $truncated  = true;
+            }
             if (method_exists($var, '__sleep')) {
                 $sleepProperties = $var->__sleep();
             } else {
-                $sleepProperties = [];
+                $sleepProperties = array_keys($dumpValues);
             }
+
+            if (method_exists($var, '__unsleep')) {
+                $unsleepProperties = $var->__unsleep();
+            } else {
+                $unsleepProperties = [];
+            }
+            $sleepProperties = array_diff($sleepProperties, $unsleepProperties);
 
             if (4 <= $level) {
                 $output .= get_class($var) . '(...)';
@@ -204,13 +224,13 @@ function dumpInternal(&$output, $var, $level, $format = true)
                 } else {
                     $output .= "$className(";
                 }
-                if ('__PHP_Incomplete_Class' !== get_class($var) && method_exists($var, '__debugInfo')) {
-                    $dumpValues = $var->__debugInfo();
-                } else {
-                    $dumpValues = (array)$var;
-                }
+
                 $i = 0;
                 foreach ($dumpValues as $key => $value) {
+                    if (!in_array($key, $sleepProperties)) {
+                        break;
+                    }
+
                     if ($i >= 100) {
                         if ($format) {
                             $output .= "\n" . $spaces . "    [...] => ...";
@@ -222,17 +242,15 @@ function dumpInternal(&$output, $var, $level, $format = true)
                     $i++;
                     $key = str_replace('*', '', $key);
                     $key = strtr(trim($key), "\0", ':');
-                    if (in_array($key, $sleepProperties) || empty($sleepProperties)) {
-                        $keyDisplay = strtr(trim($key), "\0", ':');
-                        if ($format) {
-                            $output .= "\n" . $spaces . "    [$keyDisplay] => ";
-                        } else {
-                            $output .= "$keyDisplay => ";
-                        }
-                        dumpInternal($output, $value, $level + 1, $format);
-                        if (!$format) {
-                            $output .= ', ';
-                        }
+                    $keyDisplay = strtr(trim($key), "\0", ':');
+                    if ($format) {
+                        $output .= "\n" . $spaces . "    [$keyDisplay] => ";
+                    } else {
+                        $output .= "$keyDisplay => ";
+                    }
+                    dumpInternal($output, $value, $level + 1, $format, $truncated);
+                    if (!$format) {
+                        $output .= ', ';
                     }
                 }
 

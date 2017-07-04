@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Pack;
 
-use PG\MSF\Base\Exception;
+use Exception;
 
 class JsonPack implements IPack
 {

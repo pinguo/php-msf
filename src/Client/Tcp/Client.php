@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Client\Tcp;
 
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\Base\Core;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Coroutine\GetTcpClient;

@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\MSF\DataBase\MysqlAsynPool;
 use PG\MSF\Helpers\Context;
 

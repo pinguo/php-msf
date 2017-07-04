@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Base\Exception;
+use Exception;
 use PG\AOP\MI;
 
 abstract class Base implements IBase
@@ -21,6 +21,7 @@ abstract class Base implements IBase
      * @var string
      */
     public $request;
+
     public $result;
 
     /**
@@ -95,7 +96,7 @@ abstract class Base implements IBase
         return false;
     }
 
-    public function nextRun($logId, $ioBack = false)
+    public function nextRun($logId)
     {
         if (empty(getInstance()->coroutine->IOCallBack[$logId])) {
             return true;
@@ -104,7 +105,7 @@ abstract class Base implements IBase
         foreach (getInstance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
             if ($coroutine->ioBack && !empty(getInstance()->coroutine->taskMap[$logId])) {
                 unset(getInstance()->coroutine->IOCallBack[$logId][$k]);
-                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$logId], $ioBack);
+                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$logId]);
             } else {
                 break;
             }
@@ -116,5 +117,10 @@ abstract class Base implements IBase
     public function destroy()
     {
         $this->ioBack = false;
+    }
+
+    public function __unsleep()
+    {
+        return ['context'];
     }
 }
