@@ -6,6 +6,7 @@
   "homepage": "https://github.com/PGWireless/php-msf",
   "require": {
     "php": ">=7.0",
+    "ext-swoole": ">=1.9.15",
     "PGWireless/php-log": "dev-master",
     "PGWireless/php-context": "dev-master",
     "PGWireless/php-aop": "dev-master",

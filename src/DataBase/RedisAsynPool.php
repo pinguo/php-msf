@@ -391,7 +391,8 @@ class RedisAsynPool extends AsynPool
                 $this->asynManager->sendMessageToWorker($this, $data);
                 //回归连接
                 if (((time() - $client->genTime) < 5)
-                    || (($this->redisMaxCount + $this->waitConnetNum) <= 10)) {
+                    || (($this->redisMaxCount + $this->waitConnetNum) <= 10)
+                ) {
                     $this->pushToPool($client);
                 } else {
                     $client->close();
@@ -416,83 +417,35 @@ class RedisAsynPool extends AsynPool
      */
     public function reconnect($client = null)
     {
-        $check = new \stdClass();
-        $check->isKill = true;
-
         $this->waitConnetNum++;
         if ($client == null) {
-            $client = new \swoole_redis();
+            $settings = ['timeout' => 0.5];
+            //存在密码
+            if ($this->config->has('redis.' . $this->active . '.password')) {
+                $settings['password'] = $this->config['redis'][$this->active]['password'];
+            }
+            //存在选库
+            if ($this->config->has('redis.' . $this->active . '.select')) {
+                $settings['database'] = $this->config['redis'][$this->active]['select'];
+            }
+            $client = new \swoole_redis($settings);
             $client->genTime = time();
         }
 
-        $callback = function ($client, $result) use ($check) {
-            $check->isKill = false;
-            $this->waitConnetNum--;
+        $this->connect = [$this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']];
+
+        $client->on('close', [$this, 'onClose']);
+        $client->connect($this->connect[0], $this->connect[1], function ($client, $result) {
             if (!$result) {
                 throw new Exception($client->errMsg);
             }
-            if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
-                $client->auth($this->config['redis'][$this->active]['password'], function ($client, $result) {
-                    if (!$result) {
-                        $errMsg = $client->errMsg;
-                        unset($client);
-                        throw new Exception($errMsg);
-                    }
-                    if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
-                        $client->select($this->config['redis'][$this->active]['select'], function ($client, $result) {
-                            if (!$result) {
-                                throw new Exception($client->errMsg);
-                            }
-                            $client->isClose = false;
-                            if (!isset($client->client_id)) {
-                                $client->client_id = $this->redisMaxCount;
-                                $this->redisMaxCount++;
-                            }
-                            $this->pushToPool($client);
-                        });
-                    } else {
-                        $client->isClose = false;
-                        if (!isset($client->client_id)) {
-                            $client->client_id = $this->redisMaxCount;
-                            $this->redisMaxCount++;
-                        }
-                        $this->pushToPool($client);
-                    }
-                });
-            } else {
-                if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
-                    $client->select($this->config['redis'][$this->active]['select'], function ($client, $result) {
-                        if (!$result) {
-                            throw new Exception($client->errMsg);
-                        }
-                        $client->isClose = false;
-                        if (!isset($client->client_id)) {
-                            $client->client_id = $this->redisMaxCount;
-                            $this->redisMaxCount++;
-                        }
-                        $this->pushToPool($client);
-                    });
-                } else {
-                    $client->isClose = false;
-                    if (!isset($client->client_id)) {
-                        $client->client_id = $this->redisMaxCount;
-                        $this->redisMaxCount++;
-                    }
-                    $this->pushToPool($client);
-                }
+            $this->waitConnetNum--;
+            $client->isClose = false;
+            if (!isset($client->client_id)) {
+                $client->client_id = $this->redisMaxCount;
+                $this->redisMaxCount++;
             }
-        };
-
-        $this->connect = [$this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']];
-        $client->on('Close', [$this, 'onClose']);
-        $client->connect($this->connect[0], $this->connect[1], $callback);
-
-        swoole_timer_after(50, function () use ($client, $check) {
-            if ($check->isKill) {
-                $this->waitConnetNum--;
-                $client = null;
-                throw new Exception('Took 50ms to connect redis, redis server went away');
-            }
+            $this->pushToPool($client);
         });
     }
 
