@@ -183,8 +183,13 @@ class RpcClient
 
     /**
      * 非 Rpc 模式执行远程调用
-     * @param string $url
-     * @param mixed $args
+     *
+     * @param Core $obj
+     * @param $method
+     * @param array $args
+     * @param RpcClient $rpc
+     * @return mixed
+     * @throws Exception
      */
     public static function remoteTcpCall(Core $obj, $method, array $args, RpcClient $rpc)
     {
@@ -204,38 +209,48 @@ class RpcClient
         }
         $response = yield $tcpClient->coroutineSend(['path' => '/', 'data' => $reqParams]);
 
-        return static::parseResponse($response);
+        $request = ['host' => $rpc->host, 'params' => $reqParams];
+
+        return static::parseResponse($request, $response);
     }
 
     /**
      * 生产秘钥
      * @param $params
-     * @param string $appsecret
+     * @param string $appSecret
      * @return bool|string
      */
-    public static function genSig($params, $appsecret)
+    public static function genSig($params, $appSecret)
     {
-        if ($appsecret === '') {
+        if ($appSecret === '') {
             return '';
         }
-        $sig = SecurityHelper::sign($params, $appsecret);
+        $sig = SecurityHelper::sign($params, $appSecret);
 
         return $sig;
     }
 
     /**
      * 解析返回值，可被继承覆盖，用于根据自己具体业务进行分析
+     *
+     * @param array $request
      * @param mixed $response
      * @return mixed
      */
-    protected static function parseResponse($response)
+    protected static function parseResponse(array $request, $response)
     {
         return $response;
     }
 
     /**
      * Rpc 模式执行远程调用
-     * @param string $pack_data 打包好的数据
+     *
+     * @param Core $obj
+     * @param $method
+     * @param array $args
+     * @param RpcClient $rpc
+     * @return mixed
+     * @throws Exception
      */
     public static function remoteHttpCall(Core $obj, $method, array $args, RpcClient $rpc)
     {
@@ -270,8 +285,10 @@ class RpcClient
         } else {
             $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
         }
+        $request = ['host' => $rpc->host, 'api' => $rpc->urlPath, 'method' => $rpc->verb, 'params' => $sendData];
+
         if (!isset($response['body'])) {
-            throw new Exception('The response of body is not found with response: ' . json_encode($response));
+            throw new Exception('The response of body is not found with response: ' . json_encode($response) . ' Request: ' . json_encode($request));
         }
         $body = json_decode($response['body'], true);
         if ($body === null) {
@@ -279,7 +296,7 @@ class RpcClient
             throw new Exception('json decode failure: ' . $error . ' caused by ' . $response['body']);
         }
 
-        return static::parseResponse($body);
+        return static::parseResponse($request, $body);
     }
 
     /**

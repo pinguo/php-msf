@@ -82,9 +82,11 @@ class ConcurrentClient
         foreach ($list as $name => $item) {
             $response = yield $item['http'];
 
+            $request = ['host' => $item['host'], 'api' => $item['api'], 'method' => $item['api'], 'params' => $item['params']];
+
             // http 失败
             if (!isset($response['body'])) {
-                $parent->getContext()->getLog()->error('Request for ' . $item['host'] . $item['api'] . ' Failed, Method: ' . $item['method'] . ' Params: ' . json_encode($item['params']) . ' Response: ' . json_encode($response));
+                $parent->getContext()->getLog()->error('The response of body is not found with response: ' . json_encode($response) . ' Request: ' . json_encode($request));
                 $result[$name] = false;
                 unset($list[$name]);
                 continue;
@@ -92,7 +94,7 @@ class ConcurrentClient
 
             //解析结果
             $parser = $item['parser'];
-            $result[$name] = $parser === 'noneParser' ? $response : self::$parser($response, $parent);
+            $result[$name] = $parser === 'noneParser' ? $response : self::$parser($request, $response, $parent);
         }
 
         return $result;
@@ -100,20 +102,22 @@ class ConcurrentClient
 
     /**
      * 结果解析器(常规)
+     *
+     * @param array $request
      * @param array $response
      * @param Core $parent
      * @return mixed|null
      */
-    protected static function normalParser(array $response, Core $parent)
+    protected static function normalParser(array $request, array $response, Core $parent)
     {
         try {
             $body = json_decode($response['body'], true);
             if ($body === null) {
                 $error = static::jsonLastErrorMsg();
-                throw new BusinessException('json decode failure: ' . $error . ' caused by ' . $response['body']);
+                throw new BusinessException('json decode failure: ' . $error . ' caused by ' . $response['body'] . ' Request: ' . json_encode($request));
             }
 
-            return static::parseResponse($body);
+            return static::parseResponse($request, $body);
         } catch (BusinessException $businessException) {
             $parent->getContext()->getLog()->error($businessException->getMessage());
             return null;
@@ -127,16 +131,16 @@ class ConcurrentClient
      * @return mixed
      * @throws BusinessException
      */
-    private static function parseResponse($responseBody)
+    private static function parseResponse(array $request, $responseBody)
     {
         if (isset($responseBody['status']) == false
             || array_key_exists('data', $responseBody) == false
             || isset($responseBody['message']) == false
         ) {
-            throw new BusinessException('Response The result array is incomplete. response=' . json_encode($responseBody));
+            throw new BusinessException('Response The result array is incomplete. response=' . json_encode($responseBody). ' Request: ' . json_encode($request));
         }
         if ($responseBody['status'] != 200) {
-            throw new BusinessException('Response returns the result status is not equal to 200. response=' . json_encode($responseBody));
+            throw new BusinessException('Response returns the result status is not equal to 200. response=' . json_encode($responseBody). ' Request: ' . json_encode($request));
         }
 
         return $responseBody['data'];
