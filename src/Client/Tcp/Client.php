@@ -10,7 +10,6 @@ namespace PG\MSF\Client\Tcp;
 
 use Exception;
 use PG\MSF\Base\Core;
-use PG\MSF\Helpers\Context;
 use PG\MSF\Coroutine\GetTcpClient;
 
 class Client extends Core

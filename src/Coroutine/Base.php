@@ -13,15 +13,27 @@ use PG\AOP\MI;
 
 abstract class Base implements IBase
 {
+    // use property and method insert
     use MI;
 
-    public static $MAX_TIMERS = 0;
     /**
-     * 请求语句
+     * 协程运行的最大超时时间
+     *
+     * @var int
+     */
+    public static $maxTimeout = 0;
+
+    /**
+     * 请求参数
      * @var string
      */
     public $request;
 
+    /**
+     * IO协程运行的结束
+     *
+     * @var mixed
+     */
     public $result;
 
     /**
@@ -42,37 +54,38 @@ abstract class Base implements IBase
     public $responseTime = 0.0;
 
     /**
-     * @var Task
-     */
-    public $coroutine;
-
-    /**
+     * IO协程是否返回数据
+     *
      * @var bool
      */
     public $ioBack = false;
 
     /**
-     * Base constructor.
+     * 协程对象初始化（优先执行）
+     *
      * @param int $timeout
      */
     public function init($timeout = 0)
     {
-        if (self::$MAX_TIMERS == 0) {
-            self::$MAX_TIMERS = getInstance()->config->get('coroutine.timeout', 30000);
+        if (self::$maxTimeout == 0) {
+            self::$maxTimeout = getInstance()->config->get('coroutine.timeout', 30000);
         }
 
         if ($timeout > 0) {
             $this->timeout = $timeout;
         } else {
-            $this->timeout = self::$MAX_TIMERS;
+            $this->timeout = self::$maxTimeout;
         }
 
-        $this->result = CNull::getInstance();
+        $this->result      = CNull::getInstance();
         $this->requestTime = microtime(true);
     }
 
-    abstract public function send($callback);
-
+    /**
+     * 获取协程执行结果
+     *
+     * @return mixed|null
+     */
     public function getResult()
     {
         if ($this->isTimeout() && !$this->ioBack) {
@@ -82,11 +95,21 @@ abstract class Base implements IBase
         return $this->result;
     }
 
-    public function throwException()
+    /**
+     * 协程超时异常
+     *
+     * @throws Exception
+     */
+    public function throwTimeOutException()
     {
-        throw new Exception("[Task]: Time Out!, [Request]: $this->request");
+        throw new Exception("[coroutine]: Time Out, [class]: " . get_class($this) . ", [Request]: $this->request");
     }
 
+    /**
+     * 判断协程是否超时
+     *
+     * @return bool
+     */
     public function isTimeout()
     {
         if (!$this->ioBack && (1000 * (microtime(true) - $this->requestTime) > $this->timeout)) {
@@ -96,6 +119,12 @@ abstract class Base implements IBase
         return false;
     }
 
+    /**
+     * 通知调度器进行下一次迭代
+     *
+     * @param $logId
+     * @return bool
+     */
     public function nextRun($logId)
     {
         if (empty(getInstance()->coroutine->IOCallBack[$logId])) {
@@ -114,13 +143,23 @@ abstract class Base implements IBase
         return true;
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         $this->ioBack = false;
     }
 
+    /**
+     * 属性不用于序列化
+     *
+     * @return array
+     */
     public function __unsleep()
     {
         return ['context'];
     }
+
+    abstract public function send($callback);
 }

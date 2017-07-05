@@ -15,17 +15,62 @@ use PG\MSF\Marco;
 class Redis extends Base
 {
     /**
+     * Redis操作指令
+     * @var string
+     */
+    public $name;
+
+    /**
+     * Redis操作指令的参数
+     *
+     * @var array
+     */
+    public $arguments;
+
+    /**
+     * Key前缀
+     *
+     * @var string
+     */
+    public $keyPrefix = '';
+
+    /**
+     * 是否自动Hash Key
+     *
+     * @var bool
+     */
+    public $hashKey = false;
+
+    /**
+     * 是否启用PHP的自动序列化
+     *
+     * @var bool
+     */
+    public $phpSerialize = false;
+
+    /**
+     * 是否启用Redis的自动序列化
+     *
+     * @var bool
+     */
+    public $redisSerialize = false;
+
+    /**
+     * Redis异步连接池
+     *
      * @var RedisAsynPool
      */
     public $redisAsynPool;
-    public $name;
-    public $arguments;
 
-    public $keyPrefix = '';
-    public $hashKey = false;
-    public $phpSerialize = false;
-    public $redisSerialize = false;
-
+    /**
+     * 初始化Redis异步请求的协程对象
+     *
+     * @param Context $context
+     * @param RedisAsynPool $redisAsynPool
+     * @param string $name
+     * @param array $arguments
+     * @return $this
+     */
     public function initialization(Context $context, $redisAsynPool, $name, $arguments)
     {
         parent::init(3000);
@@ -80,15 +125,15 @@ class Redis extends Base
         return $this;
     }
 
+    /**
+     * 发送异步的Redis请求
+     *
+     * @param $callback
+     */
     public function send($callback)
     {
         $this->arguments[] = $callback;
         $this->redisAsynPool->__call($this->name, $this->arguments);
-    }
-
-    public function destroy()
-    {
-        parent::destroy();
     }
 
     /**
@@ -226,5 +271,13 @@ class Redis extends Base
     {
         $head = substr($string, 0, 2);
         return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
+    }
+
+    /**
+     * 销毁
+     */
+    public function destroy()
+    {
+        parent::destroy();
     }
 }

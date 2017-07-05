@@ -221,9 +221,9 @@ class Core extends Child
     }
 
     /**
-     * 对象复用
+     * 对象已使用标识
      */
-    public function reUse()
+    public function isUse()
     {
         $this->isDestroy = false;
     }

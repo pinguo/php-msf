@@ -10,10 +10,10 @@ namespace PG\MSF\Models;
 
 use Exception;
 
-class ModelFactory
+class Factory
 {
     /**
-     * @var ModelFactory
+     * @var Factory
      */
     private static $instance;
     public $pool = [];
@@ -28,12 +28,12 @@ class ModelFactory
 
     /**
      * 获取单例
-     * @return ModelFactory
+     * @return Factory
      */
     public static function getInstance()
     {
         if (self::$instance == null) {
-            new ModelFactory();
+            new Factory();
         }
         return self::$instance;
     }
@@ -72,14 +72,13 @@ class ModelFactory
 
         if (!$models->isEmpty()) {
             $modelInstance = $models->shift();
-            $modelInstance->reUse();
+            $modelInstance->isUse();
             $modelInstance->useCount++;
             return $modelInstance;
         }
 
         $modelInstance = new $className;
         $modelInstance->coreName = $className;
-        $modelInstance->afterConstruct();
         $modelInstance->genTime  = time();
         $modelInstance->useCount = 1;
 

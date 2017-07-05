@@ -15,6 +15,7 @@ use PG\AOP\MI;
 
 class Task
 {
+    // use property and method insert
     use MI;
 
     /**
@@ -148,7 +149,7 @@ class Task
             if ($value != null && $value instanceof IBase) {
                 if ($value->isTimeout()) {
                     try {
-                        $value->throwException();
+                        $value->throwTimeOutException();
                     } catch (\Exception $e) {
                         $this->handleTaskTimeout($e, $value);
                     }
@@ -209,6 +210,13 @@ class Task
         }
     }
 
+    /**
+     * 处理协程任务的超时
+     *
+     * @param \Throwable $e
+     * @param $value
+     * @return \Throwable
+     */
     public function handleTaskTimeout(\Throwable $e, $value)
     {
         if ($value != '') {
@@ -228,6 +236,13 @@ class Task
         return $e;
     }
 
+    /**
+     * 处理协程任务的异常
+     *
+     * @param \Throwable $e
+     * @param $value
+     * @return bool|Exception|\Throwable
+     */
     public function handleTaskException(\Throwable $e, $value)
     {
         if ($value != '') {
@@ -287,6 +302,11 @@ class Task
         return (empty($this->stack) || $this->stack->isEmpty()) && !$this->routine->valid();
     }
 
+    /**
+     * 获取协程任务当前正在运行的迭代器
+     *
+     * @return \Generator
+     */
     public function getRoutine()
     {
         return $this->routine;

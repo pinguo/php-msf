@@ -16,10 +16,38 @@ class HttpClientRequest extends Base
      * @var HttpClient
      */
     public $httpClient;
+
+    /**
+     * 发送的数据
+     *
+     * @var string|array
+     */
     public $data;
+
+    /**
+     * 请求的 URL PATH
+     *
+     * @var string
+     */
     public $path;
+
+    /**
+     * 请求的方法
+     *
+     * @var string
+     */
     public $method;
 
+    /**
+     * 初始化Http异步请求协程对象
+     *
+     * @param HttpClient $httpClient
+     * @param string $method
+     * @param string $path
+     * @param string|array $data
+     * @param int $timeout
+     * @return $this
+     */
     public function initialization(HttpClient $httpClient, $method, $path, $data, $timeout)
     {
         parent::init($timeout);
@@ -45,6 +73,11 @@ class HttpClientRequest extends Base
         return $this;
     }
 
+    /**
+     * 发送异步的Http请求
+     *
+     * @param callable $callback
+     */
     public function send($callback)
     {
         switch ($this->method) {
@@ -57,6 +90,9 @@ class HttpClientRequest extends Base
         }
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         parent::destroy();

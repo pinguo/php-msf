@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Client\Http;
 
-use PG\MSF\Helpers\Context;
 use PG\MSF\Base\Core;
 use PG\MSF\Coroutine\HttpClientRequest;
 
@@ -75,6 +74,7 @@ class HttpClient extends Core
 
     /**
      * 协程方式Get
+     *
      * @param $path
      * @param $query
      * @param $timeout int 超时时间
@@ -101,6 +101,7 @@ class HttpClient extends Core
 
     /**
      * 协程方式Post
+     *
      * @param $path
      * @param $data
      * @param $timeout int 超时时间

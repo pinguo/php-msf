@@ -23,38 +23,45 @@ use PG\MSF\Coroutine\CException;
 class Controller extends Core
 {
     /**
-     * 是否来自http的请求不是就是来自tcp
-     * @var string
-     */
-    public $requestType;
-    /**
      * @var Wrapper|\PG\MSF\Memory\Pool
      */
     protected $objectPool;
+
     /**
      * @var array
      */
     public $objectPoolBuckets = [];
+
+    /**
+     * 是否来自http的请求不是就是来自tcp
+     * @var string
+     */
+    public $requestType;
+
     /**
      * fd
      * @var int
      */
     public $fd;
+
     /**
      * uid
      * @var int
      */
     public $uid;
+
     /**
      * 用户数据
      * @var
      */
     public $clientData;
+
     /**
      * 用于单元测试模拟捕获服务器发出的消息
      * @var array
      */
     public $testUnitSendStack = [];
+
     /**
      * @var float 请求开始处理的时间
      */

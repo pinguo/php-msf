@@ -10,35 +10,28 @@ namespace PG\MSF\Base;
 
 use Exception;
 use PG\MSF\Tasks\TaskProxy;
-use PG\MSF\Models\ModelFactory;
+use PG\MSF\Tasks\Task;
+use PG\MSF\Models\Factory as ModelFactory;
+use PG\MSF\Models\Model;
 
 class Loader
 {
     /**
-     * Tasks list
+     * Tasks list（Task进程中单例模式）
      * @var array
      */
     private $_tasks = [];
-    private $_modelFactory;
-
-    public function __construct()
-    {
-        $this->_modelFactory = ModelFactory::getInstance();
-    }
 
     /**
-     * 获取一个model
+     * 获取Model
+     *
      * @param $model
      * @param Child $parent
-     * @return mixed|null
+     * @return Model|null
      * @throws Exception
      */
     public function model($model, Child $parent)
     {
-        if (!$parent->getIsConstruct()) {
-            $parentName = get_class($parent);
-            throw new Exception("class:$parentName,error:loader model 方法不允许在__construct内使用！");
-        }
         if (empty($model)) {
             return null;
         }
@@ -53,17 +46,17 @@ class Loader
             $root = $root->parent??null;
         }
 
-        $modelInstance = $this->_modelFactory->getModel($model, $parent);
+        $modelInstance = ModelFactory::getInstance()->getModel($model);
         $parent->addChild($modelInstance);
         $modelInstance->initialization($parent->getContext());
         return $modelInstance;
     }
 
     /**
-     * 获取一个task
+     * 获取Task
      * @param $task
      * @param Child $parent
-     * @return mixed|null|TaskProxy
+     * @return null|Task||TaskProxy
      * @throws Exception
      */
     public function task($task, Child $parent = null)
@@ -112,7 +105,7 @@ class Loader
 
         if (key_exists($task, $this->_tasks)) {
             $taskInstance = $this->_tasks[$task];
-            $taskInstance->reUse();
+            $taskInstance->isUse();
 
             return $taskInstance;
         } else {
@@ -125,6 +118,7 @@ class Loader
 
     /**
      * view 返回一个模板
+     *
      * @param $template
      * @return \League\Plates\Template\Template
      */

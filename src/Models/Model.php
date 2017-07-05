@@ -33,6 +33,6 @@ class Model extends Core
     public function destroy()
     {
         parent::destroy();
-        ModelFactory::getInstance()->revertModel($this);
+        Factory::getInstance()->revertModel($this);
     }
 }

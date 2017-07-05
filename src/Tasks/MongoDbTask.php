@@ -41,16 +41,17 @@ class MongoDbTask extends Task
     private $profileName = '';
 
     /**
-     * __construct之后执行，仅一次
+     * 构造方法
+     *
      * @throws \MongoConnectionException
      */
-    public function afterConstruct()
+    public function __construct()
     {
         if (empty($this->mongoConf)) {
             throw new \MongoConnectionException('No $mongoConf in this class or no server config in $mongoConf');
         }
         $this->prepare($this->mongoConf[0], $this->mongoConf[1] ?? '', $this->mongoConf[2] ?? '');
-        parent::afterConstruct();
+        parent::__construct();
     }
 
     /**

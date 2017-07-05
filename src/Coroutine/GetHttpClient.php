@@ -17,9 +17,26 @@ class GetHttpClient extends Base
      * @var Client
      */
     public $client;
+
+    /**
+     * @var array|string
+     */
     public $baseUrl;
+
+    /**
+     * @var array
+     */
     public $headers;
 
+    /**
+     * 初始化获取Http Client的协程对象（异步DNS解析）
+     *
+     * @param Client $client
+     * @param array|string $baseUrl
+     * @param int $timeout
+     * @param array $headers
+     * @return $this|HttpClient
+     */
     public function initialization(Client $client, $baseUrl, $timeout, $headers = [])
     {
         parent::init($timeout);
@@ -66,6 +83,12 @@ class GetHttpClient extends Base
         return $this;
     }
 
+    /**
+     * 标准化解析URL
+     *
+     * @param $url
+     * @return bool|mixed
+     */
     protected function parseUrl($url)
     {
         $parseUrlResult = parse_url($url);
@@ -106,11 +129,19 @@ class GetHttpClient extends Base
         return $parseUrlResult;
     }
 
+    /**
+     * 发送DNS请求
+     *
+     * @param callable $callback
+     */
     public function send($callback)
     {
         $this->client->getHttpClient($this->baseUrl, $callback, $this->headers);
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         parent::destroy();

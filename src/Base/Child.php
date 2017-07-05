@@ -13,12 +13,14 @@ use PG\AOP\MI;
 
 class Child
 {
-    // use method insert
+    // use property and method insert
     use MI;
+
     /**
      * @var array
      */
     protected static $reflections = [];
+
     /**
      * 名称
      * @var string
@@ -33,25 +35,7 @@ class Child
     public $childList = [];
 
     /**
-     * 判断是否执行了__construct
-     */
-    protected $isConstruct = false;
-
-    /**
-     * after constructor
-     */
-    public function afterConstruct()
-    {
-        $this->isConstruct = true;
-    }
-
-    public function getIsConstruct()
-    {
-        return $this->isConstruct;
-    }
-
-    /**
-     * 加入一个插件
+     * 添加树的节点
      *
      * @param $child Child
      * @return $this
@@ -64,7 +48,7 @@ class Child
     }
 
     /**
-     * 被加入列表时
+     * 添加节点触发的事件
      *
      * @param $parent
      * @return $this
@@ -76,7 +60,7 @@ class Child
     }
 
     /**
-     * 是否存在插件
+     * 某一个类是否在树上已经存在
      *
      * @param $name
      * @return bool
@@ -87,7 +71,7 @@ class Child
     }
 
     /**
-     * 获取插件
+     * 获取树的节点
      *
      * @param $name
      * @return mixed|null
