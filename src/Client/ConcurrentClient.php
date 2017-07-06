@@ -82,7 +82,7 @@ class ConcurrentClient
         foreach ($list as $name => $item) {
             $response = yield $item['http'];
 
-            $request = ['host' => $item['host'], 'api' => $item['api'], 'method' => $item['api'], 'params' => $item['params']];
+            $request = ['host' => $item['host'], 'api' => $item['api'], 'method' => $item['method'], 'params' => $item['params']];
 
             // http 失败
             if (!isset($response['body'])) {
