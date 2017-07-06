@@ -22,19 +22,21 @@ class TcpClientRequest extends Base
         $this->tcpClient = $tcpClient;
         $this->data      = $data;
         $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-tcp:' . $path;
-        $logId           = $this->tcpClient->context->getLogId();
+        $logId           = $this->getContext()->getLogId();
 
-        $this->tcpClient->context->getLog()->profileStart($profileName);
+        $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->send(function ($cli, $recData) use ($profileName, $logId) {
+            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                return;
+            }
+            
             $this->result = $recData;
             $this->responseTime = microtime(true);
             $cli->close();
-            if (!empty($this->tcpClient) && !empty($this->tcpClient->context->getLog())) {
-                $this->tcpClient->context->getLog()->profileEnd($profileName);
-                $this->ioBack = true;
-                $this->nextRun($logId);
-            }
+            $this->getContext()->getLog()->profileEnd($profileName);
+            $this->ioBack = true;
+            $this->nextRun($logId);
         });
 
         return $this;

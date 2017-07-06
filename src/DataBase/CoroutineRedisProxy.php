@@ -1,6 +1,6 @@
 <?php
 /**
- * CoroutineRedisHelp
+ * CoroutineRedisProxy
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -12,7 +12,7 @@ use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Marco;
 
-class CoroutineRedisHelp
+class CoroutineRedisProxy
 {
     private $redisAsynPool;
 
@@ -218,7 +218,7 @@ class CoroutineRedisHelp
 
             return $value;
         } else {
-            return $arguments[0]->getObjectPool()->get(Redis::class)->initialization($arguments[0], $this->redisAsynPool, $name, array_slice($arguments, 1));
+            return $arguments[0]->getObjectPool()->get(Redis::class)->initialization($this->redisAsynPool, $name, array_slice($arguments, 1));
         }
     }
 

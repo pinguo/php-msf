@@ -17,9 +17,26 @@ class GetHttpClient extends Base
      * @var Client
      */
     public $client;
+
+    /**
+     * @var array|string
+     */
     public $baseUrl;
+
+    /**
+     * @var array
+     */
     public $headers;
 
+    /**
+     * 初始化获取Http Client的协程对象（异步DNS解析）
+     *
+     * @param Client $client
+     * @param array|string $baseUrl
+     * @param int $timeout
+     * @param array $headers
+     * @return $this|HttpClient
+     */
     public function initialization(Client $client, $baseUrl, $timeout, $headers = [])
     {
         parent::init($timeout);
@@ -32,7 +49,7 @@ class GetHttpClient extends Base
         $this->client  = $client;
         $this->headers = $headers;
         $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $logTag;
-        $logId         = $this->client->context->getLogId();
+        $logId         = $this->getContext()->getLogId();
 
         if (!is_array($this->baseUrl)) {
             $this->baseUrl = $this->parseUrl($this->baseUrl);
@@ -45,27 +62,35 @@ class GetHttpClient extends Base
             $httpClient->initialization($client);
             $headers = array_merge($headers, [
                 'Host'        => $this->baseUrl['host'],
-                'X-Ngx-LogId' => $this->context->getLogId(),
+                'X-Ngx-LogId' => $this->getContext()->getLogId(),
             ]);
             $httpClient->setHeaders($headers);
             return $httpClient;
         } else {
             getInstance()->coroutine->IOCallBack[$logId][] = $this;
-            $this->client->context->getLog()->profileStart($profileName);
+            $this->getContext()->getLog()->profileStart($profileName);
             $this->send(function ($httpClient) use ($profileName, $logId) {
+                if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                    return;
+                }
+
                 $this->result       = $httpClient;
                 $this->responseTime = microtime(true);
-                if (!empty($this->client) && !empty($this->client->context->getLog())) {
-                    $this->client->context->getLog()->profileEnd($profileName);
-                    $this->ioBack = true;
-                    $this->nextRun($logId);
-                }
+                $this->getContext()->getLog()->profileEnd($profileName);
+                $this->ioBack = true;
+                $this->nextRun($logId);
             });
         }
 
         return $this;
     }
 
+    /**
+     * 标准化解析URL
+     *
+     * @param $url
+     * @return bool|mixed
+     */
     protected function parseUrl($url)
     {
         $parseUrlResult = parse_url($url);
@@ -106,11 +131,19 @@ class GetHttpClient extends Base
         return $parseUrlResult;
     }
 
+    /**
+     * 发送DNS请求
+     *
+     * @param callable $callback
+     */
     public function send($callback)
     {
         $this->client->getHttpClient($this->baseUrl, $callback, $this->headers);
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         parent::destroy();

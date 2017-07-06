@@ -27,7 +27,6 @@ class TaskProxy extends Core
     public function __construct()
     {
         parent::__construct();
-        $this->afterConstruct();
     }
 
     /**

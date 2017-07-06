@@ -10,19 +10,35 @@ namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Core;
 use PG\MSF\Controllers\Controller;
-use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Controllers\Factory as ControllerFactory;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Marco;
-use PG\MSF\Models\ModelFactory;
+use PG\MSF\Models\Factory as ModelFactory;
 
 class Scheduler
 {
-    public $IOCallBack;
-    public $taskMap = [];
-    public $cache;
+    /**
+     * 正在运行的IO协程对象列表
+     *
+     * @var array
+     */
+    public $IOCallBack = [];
 
+    /**
+     * 所有正在调度的协程任务（即请求）
+     *
+     * @var array
+     */
+    public $taskMap = [];
+
+    /**
+     * 初始化协程调度器
+     */
     public function __construct()
     {
+        /**
+         * 每隔1s检查超时的协程任务
+         */
         getInstance()->sysTimers[] = swoole_timer_tick(1000, function ($timerId) {
             // 当前进程的协程统计信息
             if (getInstance()::mode != 'console') {
@@ -48,6 +64,9 @@ class Scheduler
             }
         });
 
+        /**
+         * 每隔300s清理对象池中的对象
+         */
         swoole_timer_tick(300000, function ($timerId) {
             if (!empty(getInstance()->objectPool->map)) {
                 foreach (getInstance()->objectPool->map as $class => &$objectsMap) {
@@ -91,6 +110,9 @@ class Scheduler
         });
     }
 
+    /**
+     * Worker进程协程统计信息写入共享内存
+     */
     public function stat()
     {
         $data = [
@@ -196,6 +218,12 @@ class Scheduler
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
+    /**
+     * 调度协程任务（请求）
+     *
+     * @param Task $task
+     * @return $this
+     */
     public function schedule(Task $task)
     {
         /* @var $task Task */
@@ -222,6 +250,15 @@ class Scheduler
         return $this;
     }
 
+
+    /**
+     * 开始执行调度请求
+     *
+     * @param \Generator $routine
+     * @param Context $context
+     * @param Controller $controller
+     * @param callable|null $callBack
+     */
     public function start(\Generator $routine, Context $context, Controller $controller, callable $callBack = null)
     {
         $task = $context->getObjectPool()->get(Task::class)->initialization($routine, $context, $controller, $callBack);

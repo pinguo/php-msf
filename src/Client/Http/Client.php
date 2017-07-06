@@ -201,8 +201,10 @@ class Client extends Core
     /**
      * 解析URL并返回Http Client
      *
-     * @param $url
+     * @param string $url
+     * @param array $headers
      * @return GetHttpClient|HttpClient
+     * @throws Exception
      */
     protected function getHttpClientOrDnsQuery($url, array $headers = [])
     {

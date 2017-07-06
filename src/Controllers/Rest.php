@@ -9,6 +9,7 @@
 namespace PG\MSF\Controllers;
 
 use PG\MSF\Rest\Controller;
+use PG\MSF\Base\Output;
 
 /**
  * Restful 测试

@@ -10,11 +10,31 @@ namespace PG\MSF\Console;
 
 class Request
 {
+    /**
+     * @var array 运行环境参数
+     */
     public $server;
+
+    /**
+     * @var array 用于兼容和Web一样的方式获取参数
+     */
     public $get;
+
+    /**
+     * @var array 用于兼容和Web一样的方式获取参数
+     */
     public $post;
+
+    /**
+     * @var array 用于兼容和Web一样的方式获取参数
+     */
     public $header;
 
+    /**
+     * 获取服务器相关变量（兼容Web模式）
+     *
+     * @return array|null
+     */
     public function getServer()
     {
         if ($this->server === null) {
@@ -29,11 +49,21 @@ class Request
         return $this->server;
     }
 
+    /**
+     * 设置服务器相关变量（兼容Web模式）
+     *
+     * @param $params
+     */
     public function setServer($params)
     {
         $this->server = $params;
     }
 
+    /**
+     * 解析命令行参数
+     *
+     * @return array
+     */
     public function resolve()
     {
         $rawParams = $this->getServer();

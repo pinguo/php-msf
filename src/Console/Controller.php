@@ -9,9 +9,6 @@
 namespace PG\MSF\Console;
 
 use PG\MSF\Controllers\Controller as BController;
-use PG\Log\PGLog;
-use PG\MSF\Marco;
-use PG\MSF\Helpers\Context;
 
 class Controller extends BController
 {
@@ -19,6 +16,9 @@ class Controller extends BController
     {
     }
 
+    /**
+     * 请求结束销毁
+     */
     public function destroy()
     {
         if ($this->getContext()) {

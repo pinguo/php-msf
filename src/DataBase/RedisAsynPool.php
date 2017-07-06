@@ -57,7 +57,7 @@ class RedisAsynPool extends AsynPool
             $this->keyPrefix = $config['keyPrefix'];
         }
 
-        $this->coroutineRedisHelp = new CoroutineRedisHelp($this);
+        $this->coroutineRedisHelp = new CoroutineRedisProxy($this);
     }
 
     public function serverInit($swooleServer, $asynManager)
@@ -96,7 +96,7 @@ class RedisAsynPool extends AsynPool
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return $this->getSync()->$name(...$arg);
         } else {
-            return $context->getObjectPool()->get(Redis::class)->initialization($context, $this, $name, $arg);
+            return $context->getObjectPool()->get(Redis::class)->initialization($this, $name, $arg);
         }
     }
 

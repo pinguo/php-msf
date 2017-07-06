@@ -8,12 +8,18 @@
 
 namespace PG\MSF\Controllers;
 
-class ControllerFactory
+class Factory
 {
     /**
-     * @var ControllerFactory
+     * @var Factory
      */
     private static $instance;
+
+    /**
+     * 控制器对象池
+     *
+     * @var array
+     */
     public $pool = [];
 
     /**
@@ -26,12 +32,12 @@ class ControllerFactory
 
     /**
      * 获取单例
-     * @return ControllerFactory
+     * @return Factory
      */
     public static function getInstance()
     {
         if (self::$instance == null) {
-            new ControllerFactory();
+            new Factory();
         }
         return self::$instance;
     }
@@ -73,14 +79,13 @@ class ControllerFactory
 
         if (!$controllers->isEmpty()) {
             $controllerInstance = $controllers->shift();
-            $controllerInstance->reUse();
+            $controllerInstance->isUse();
             $controllerInstance->useCount++;
             return $controllerInstance;
         }
 
         $controllerInstance = new $className;
         $controllerInstance->coreName = $className;
-        $controllerInstance->afterConstruct();
         $controllerInstance->genTime  = time();
         $controllerInstance->useCount = 1;
 
@@ -124,14 +129,13 @@ class ControllerFactory
 
         if (!$controllers->isEmpty()) {
             $controllerInstance = $controllers->shift();
-            $controllerInstance->reUse();
+            $controllerInstance->isUse();
             $controllerInstance->useCount++;
             return $controllerInstance;
         }
 
         $controllerInstance = new $className;
         $controllerInstance->coreName = $className;
-        $controllerInstance->afterConstruct();
         $controllerInstance->genTime  = time();
         $controllerInstance->useCount = 1;
 
@@ -139,7 +143,8 @@ class ControllerFactory
     }
 
     /**
-     * 归还一个controller
+     * 归还controller
+     *
      * @param $controller Controller
      */
     public function revertController(&$controller)

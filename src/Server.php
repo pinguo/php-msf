@@ -11,7 +11,7 @@ namespace PG\MSF;
 use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\Base\Child;
-use PG\MSF\Controllers\ControllerFactory;
+use PG\MSF\Controllers\Factory as ControllerFactory;
 use PG\MSF\Base\Loader;
 use Exception;
 use PG\MSF\Base\Core;
@@ -27,7 +27,7 @@ abstract class Server extends Child
     /**
      * 版本
      */
-    const version = "2.1.7";
+    const version = "2.1.8-dev";
     /**
      * 运行方式（web/console）
      */
@@ -218,7 +218,6 @@ abstract class Server extends Child
     public function __construct()
     {
         $this->MSFSrcDir = __DIR__;
-        $this->afterConstruct();
         $this->onErrorHandel = [$this, 'onErrorHandel'];
         self::$_worker = $this;
         // 加载配置 支持加载环境子目录配置

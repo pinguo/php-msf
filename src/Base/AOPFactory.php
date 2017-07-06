@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Base;
 
-use PG\MSF\DataBase\CoroutineRedisHelp;
+use PG\MSF\DataBase\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
 use PG\AOP\Factory;
@@ -17,17 +17,20 @@ use PG\AOP\Wrapper;
 class AOPFactory extends Factory
 {
     /**
+     * 通过反射获取类的public属性默认值（销毁对象）
+     *
      * @var array
      */
     protected static $reflections = [];
 
     /**
      * 获取协程redis
-     * @param CoroutineRedisHelp $redisPoolCoroutine
+     *
+     * @param CoroutineRedisProxy $redisPoolCoroutine
      * @param Core $coreBase
-     * @return Wrapper |CoroutineRedisHelp
+     * @return Wrapper |CoroutineRedisProxy
      */
-    public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, $coreBase)
+    public static function getRedisPoolCoroutine(CoroutineRedisProxy $redisPoolCoroutine, $coreBase)
     {
         $AOPRedisPoolCoroutine = new Wrapper($redisPoolCoroutine);
         $AOPRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
@@ -42,6 +45,7 @@ class AOPFactory extends Factory
 
     /**
      * 获取redis proxy
+     *
      * @param $redisProxy
      * @param Core $coreBase
      * @return Wrapper|\Redis
@@ -63,6 +67,7 @@ class AOPFactory extends Factory
 
     /**
      * 获取对象池实例
+     *
      * @param Pool $pool
      * @param Core $coreBase
      * @return Wrapper|Pool

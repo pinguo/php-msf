@@ -13,7 +13,7 @@ use PG\MSF\Pack\IPack;
 use PG\MSF\DataBase\RedisAsynPool;
 use PG\AOP\Wrapper;
 use PG\MSF\Proxy\RedisProxyFactory;
-use PG\MSF\DataBase\CoroutineRedisHelp;
+use PG\MSF\DataBase\CoroutineRedisProxy;
 use Exception;
 
 class Core extends Child
@@ -126,7 +126,7 @@ class Core extends Child
     /**
      * 获取redis连接池
      * @param string $poolName
-     * @return bool|Wrapper|CoroutineRedisHelp|\Redis
+     * @return bool|Wrapper|CoroutineRedisProxy|\Redis
      */
     public function getRedisPool(string $poolName)
     {
@@ -148,7 +148,7 @@ class Core extends Child
      * 获取redis代理
      *
      * @param string $proxyName
-     * @return bool|Wrapper|CoroutineRedisHelp|\Redis
+     * @return bool|Wrapper|CoroutineRedisProxy|\Redis
      * @throws Exception
      */
     public function getRedisProxy(string $proxyName)
@@ -221,9 +221,9 @@ class Core extends Child
     }
 
     /**
-     * 对象复用
+     * 对象已使用标识
      */
-    public function reUse()
+    public function isUse()
     {
         $this->isDestroy = false;
     }
