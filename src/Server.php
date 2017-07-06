@@ -523,11 +523,12 @@ abstract class Server extends Child
         $ascii     = file_get_contents(__DIR__ . '/../ascii.ui');
         echo $ascii, "\n";
         echo str_pad("   SERVER ENV  ", 120, "#", STR_PAD_BOTH), "\n";
-        echo 'MSF    Version:   ', self::version, "\n";
-        echo 'Swoole Version:   ', SWOOLE_VERSION, "\n";
-        echo 'PHP    Version:   ', PHP_VERSION, "\n";
-        echo 'Worker  Number:   ', $setConfig['worker_num'], "\n";
-        echo 'Task    Number:   ', $setConfig['task_worker_num']??0, "\n";
+        echo 'MSF     Version:   ', self::version, "\n";
+        echo 'Swoole  Version:   ', SWOOLE_VERSION, "\n";
+        echo 'PHP     Version:   ', PHP_VERSION, "\n";
+        echo 'Application ENV:   ', APPLICATION_ENV, "\n";
+        echo 'Worker   Number:   ', $setConfig['worker_num'], "\n";
+        echo 'Task     Number:   ', $setConfig['task_worker_num']??0, "\n";
         echo str_pad(" START SERVICE ", 120, "#", STR_PAD_BOTH), "\n";
         echo "Protocol", str_pad('',
             self::$_maxShowLength - strlen('Protocol')), "Addr", str_pad('',
