@@ -124,7 +124,7 @@ class TestController extends Controller
     {
         $data = yield $this->getContext()->getObjectPool()
             ->get(\PG\MSF\Client\Http\Client::class)
-            ->coroutinePost('http://www.weather.com.cn/data/sk/101110101.html');
+            ->coroutineGet('http://www.weather.com.cn/data/sk/101110101.html');
         $this->getContext()->getOutput()->end($data);
     }
 
