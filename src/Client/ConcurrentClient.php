@@ -85,7 +85,7 @@ class ConcurrentClient
             $request = ['host' => $item['host'], 'api' => $item['api'], 'method' => $item['method'], 'params' => $item['params']];
 
             // http 失败
-            if (!isset($response['body'])) {
+            if (!isset($response['body']) || empty($response['body'])) {
                 $parent->getContext()->getLog()->error('The response of body is not found with response: ' . json_encode($response) . ' Request: ' . json_encode($request));
                 $result[$name] = false;
                 unset($list[$name]);
