@@ -58,6 +58,7 @@ class GetHttpClient extends Base
 
         if ($ip !== null) {
             $client     = new \swoole_http_client($ip, $this->baseUrl['port'], $this->baseUrl['ssl']);
+            $client->set(['timeout' => -1]);
             $httpClient = $this->getContext()->getObjectPool()->get(HttpClient::class);
             $httpClient->initialization($client);
             $headers = array_merge($headers, [

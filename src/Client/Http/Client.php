@@ -216,6 +216,7 @@ class Client extends Core
         $ip = self::getDnsCache($parseUrlResult['host']);
         if ($ip !== null) {
             $client     = new \swoole_http_client($ip, $parseUrlResult['port'], $parseUrlResult['ssl']);
+            $client->set(['timeout' => -1]);
             $httpClient = $this->getContext()->getObjectPool()->get(HttpClient::class);
             $httpClient->initialization($client);
             $headers = array_merge($headers, [
@@ -246,6 +247,7 @@ class Client extends Core
         }
 
         $client     = new \swoole_http_client($ip, $data['port'], $data['ssl']);
+        $client->set(['timeout' => -1]);
         $httpClient = $this->getContext()->getObjectPool()->get(HttpClient::class);
         $httpClient->initialization($client);
         $headers = array_merge($data['headers'], [
