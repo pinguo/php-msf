@@ -213,7 +213,7 @@ class Controller extends Core
             }
         }
         parent::destroy();
-        ControllerFactory::getInstance()->revertController($this);
+        Factory::getInstance()->revertController($this);
     }
 
     /**

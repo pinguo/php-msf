@@ -37,7 +37,7 @@ class Factory
     public static function getInstance()
     {
         if (self::$instance == null) {
-            new ControllerFactory();
+            new Factory();
         }
         return self::$instance;
     }

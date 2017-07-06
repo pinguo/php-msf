@@ -9,7 +9,6 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\DataBase\RedisAsynPool;
-use PG\MSF\Helpers\Context;
 use PG\MSF\Marco;
 
 class Redis extends Base
@@ -65,16 +64,14 @@ class Redis extends Base
     /**
      * 初始化Redis异步请求的协程对象
      *
-     * @param Context $context
      * @param RedisAsynPool $redisAsynPool
      * @param string $name
      * @param array $arguments
      * @return $this
      */
-    public function initialization(Context $context, $redisAsynPool, $name, $arguments)
+    public function initialization($redisAsynPool, $name, $arguments)
     {
         parent::init(3000);
-        $this->context = $context;
 
         $this->redisAsynPool = $redisAsynPool;
         $this->hashKey = $redisAsynPool->hashKey;
@@ -85,16 +82,16 @@ class Redis extends Base
         $this->name = $name;
         $this->arguments = $arguments;
         $this->request = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
-        $logId = $context->getLogId();
+        $logId = $this->getContext()->getLogId();
 
-        $context->getLog()->profileStart($this->request);
+        $this->getContext()->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->send(function ($result) use ($name, $logId) {
             if (empty(getInstance()->coroutine->taskMap[$logId])) {
                 return;
             }
 
-            $this->context->getLog()->profileEnd($this->request);
+            $this->getContext()->getLog()->profileEnd($this->request);
 
             switch ($name) {
                 case 'get':

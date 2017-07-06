@@ -21,15 +21,14 @@ class MySql extends Base
     public $bindId;
     public $sql;
 
-    public function initialization(Context $context, $_mysqlAsynPool, $_bind_id = null, $_sql = null)
+    public function initialization($_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
         parent::init();
         $this->mysqlAsynPool = $_mysqlAsynPool;
         $this->bindId        = $_bind_id;
         $this->sql           = $_sql;
         $this->request       = 'mysql(' . $_sql . ')';
-        $this->context       = $context;
-        $logId               = $this->context->getLogId();
+        $logId               = $this->getContext()->getLogId();
 
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->send(function ($result) use ($logId) {
@@ -37,7 +36,7 @@ class MySql extends Base
                 return;
             }
 
-            $this->context->getLog()->profileEnd($this->request);
+            $this->getContext()->getLog()->profileEnd($this->request);
             $this->result = $result;
             $this->ioBack = true;
             $this->nextRun($logId);

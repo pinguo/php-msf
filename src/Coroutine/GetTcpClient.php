@@ -36,18 +36,20 @@ class GetTcpClient extends Base
         $this->baseUrl = $baseUrl;
         $this->client  = $client;
         $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
-        $logId         = $this->client->getContext()->getLogId();
+        $logId         = $this->getContext()->getLogId();
 
-        $this->client->getContext()->getLog()->profileStart($profileName);
+        $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($tcpClient, $dnsCache = false) use ($profileName, $logId) {
-            $this->result = $tcpClient;
-            $this->responseTime = microtime(true);
-            if (!empty($this->client) && !empty($this->client->getContext()->getLog())) {
-                $this->client->getContext()->getLog()->profileEnd($profileName);
-                $this->ioBack = true;
-                $this->nextRun($logId, $dnsCache);
+        $this->send(function ($tcpClient) use ($profileName, $logId) {
+            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                return;
             }
+            
+            $this->result       = $tcpClient;
+            $this->responseTime = microtime(true);
+            $this->getContext()->getLog()->profileEnd($profileName);
+            $this->ioBack = true;
+            $this->nextRun($logId);
         });
 
         return $this;

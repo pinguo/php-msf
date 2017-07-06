@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Base;
 
-use PG\MSF\DataBase\CoroutineRedisHelp;
+use PG\MSF\DataBase\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
 use PG\AOP\Factory;
@@ -26,11 +26,11 @@ class AOPFactory extends Factory
     /**
      * 获取协程redis
      *
-     * @param CoroutineRedisHelp $redisPoolCoroutine
+     * @param CoroutineRedisProxy $redisPoolCoroutine
      * @param Core $coreBase
-     * @return Wrapper |CoroutineRedisHelp
+     * @return Wrapper |CoroutineRedisProxy
      */
-    public static function getRedisPoolCoroutine(CoroutineRedisHelp $redisPoolCoroutine, $coreBase)
+    public static function getRedisPoolCoroutine(CoroutineRedisProxy $redisPoolCoroutine, $coreBase)
     {
         $AOPRedisPoolCoroutine = new Wrapper($redisPoolCoroutine);
         $AOPRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {

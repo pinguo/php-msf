@@ -56,18 +56,20 @@ class HttpClientRequest extends Base
         $this->method     = $method;
         $this->data       = $data;
         $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
-        $logId            = $this->httpClient->context->getLogId();
+        $logId            = $this->getContext()->getLogId();
 
-        $this->httpClient->context->getLog()->profileStart($profileName);
+        $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$logId][] = $this;
         $this->send(function ($client) use ($profileName, $logId) {
+            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                return;
+            }
+
             $this->result       = (array)$client;
             $this->responseTime = microtime(true);
-            if (!empty($this->httpClient) && !empty($this->httpClient->context->getLog())) {
-                $this->httpClient->context->getLog()->profileEnd($profileName);
-                $this->ioBack = true;
-                $this->nextRun($logId);
-            }
+            $this->getContext()->getLog()->profileEnd($profileName);
+            $this->ioBack = true;
+            $this->nextRun($logId);
         });
 
         return $this;
