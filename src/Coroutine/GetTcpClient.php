@@ -33,15 +33,22 @@ class GetTcpClient extends Base
     public function initialization(Client $client, $baseUrl, $timeout)
     {
         parent::init($timeout);
-        $this->baseUrl = $baseUrl;
-        $this->client  = $client;
-        $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
-        $logId         = $this->getContext()->getLogId();
+        $this->baseUrl   = $baseUrl;
+        $this->client    = $client;
+        $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $this->requestId = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($tcpClient) use ($profileName, $logId) {
-            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
+        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $this->ioBackKey = array_pop($keys);
+
+        $this->send(function ($tcpClient) use ($profileName) {
+            if ($this->isBreak) {
+                return;
+            }
+
+            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
                 return;
             }
             
@@ -49,7 +56,7 @@ class GetTcpClient extends Base
             $this->responseTime = microtime(true);
             $this->getContext()->getLog()->profileEnd($profileName);
             $this->ioBack = true;
-            $this->nextRun($logId);
+            $this->nextRun();
         });
 
         return $this;
