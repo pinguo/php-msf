@@ -143,7 +143,7 @@ class RedisProxyMasterSlave implements IProxy
         }
         $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
 
-        if ($method === 'cache') {
+        if ($method === 'cache' || $method === 'evalMock') {
             return $redisPoolCoroutine->$method(...$arguments);
         } else {
             return $redisPoolCoroutine->__call($method, $arguments);
