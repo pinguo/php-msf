@@ -121,6 +121,10 @@ class CoroutineRedisProxy
         if (isset($arguments[1]) && $name !== 'eval') {
             $key = $arguments[1];
             if (is_array($key)) {
+                // mset mget mdelete等为空
+                if (empty($key)) {
+                    return false;
+                }
                 $isAssoc = array_keys($key) !== range(0, count($key) - 1); //true关联 false索引
                 $newKey = [];
                 foreach ($key as $k => $v) {
