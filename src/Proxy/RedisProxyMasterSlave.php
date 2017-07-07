@@ -19,6 +19,22 @@ class RedisProxyMasterSlave implements IProxy
     private $slaves;
     private $goodPools;
 
+    private static $readOperation = [
+        // Strings
+        'GET', 'MGET', 'BITCOUNT', 'STRLEN', 'GETBIT', 'GETRANGE',
+        // Keys
+        'KEYS', 'TYPE', 'SCAN', 'EXISTS', 'PTTL', 'TTL',
+        // Hashes
+        'HEXISTS', 'HGETALL', 'HKEYS', 'HLEN', 'HGET', 'HMGET',
+        // Set
+        'SISMEMBER', 'SMEMBERS', 'SRANDMEMBER', 'SSCAN', 'SCARD', 'SDIFF', 'SINTER',
+        // List
+        'LINDEX', 'LLEN', 'LRANGE',
+        // Sorted Set
+        'ZCARD', 'ZCOUNT', 'ZRANGE', 'ZRANGEBYSCORE', 'ZRANK', 'ZREVRANGE', 'ZREVRANGEBYSCORE',
+        'ZREVRANK', 'ZSCAN', 'ZSCORE',
+    ];
+
     /**
      * RedisProxyMasterSlave constructor.
      * @param string $name
@@ -112,14 +128,9 @@ class RedisProxyMasterSlave implements IProxy
      */
     public function handle(string $method, array $arguments)
     {
+        $upMethod = strtoupper($method);
         //读
-        $lowerMethod = strtolower($method);
-        if (strpos($lowerMethod, 'get') !== false ||
-            strpos($lowerMethod, 'exists') !== false ||
-            strpos($lowerMethod, 'range') !== false ||
-            strpos($lowerMethod, 'count') !== false ||
-            strpos($lowerMethod, 'size') !== false
-        ) {
+        if (in_array($upMethod, self::$readOperation)) {
             $rand = array_rand($this->slaves);
             $redisPoolName = $this->slaves[$rand];
         } else {
