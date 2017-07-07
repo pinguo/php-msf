@@ -28,18 +28,25 @@ class MySql extends Base
         $this->bindId        = $_bind_id;
         $this->sql           = $_sql;
         $this->request       = 'mysql(' . $_sql . ')';
-        $logId               = $this->getContext()->getLogId();
+        $this->requestId     = $this->getContext()->getLogId();
 
-        getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($result) use ($logId) {
-            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
+        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $this->ioBackKey = array_pop($keys);
+
+        $this->send(function ($result) {
+            if ($this->isBreak) {
+                return;
+            }
+
+            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
                 return;
             }
 
             $this->getContext()->getLog()->profileEnd($this->request);
             $this->result = $result;
             $this->ioBack = true;
-            $this->nextRun($logId);
+            $this->nextRun();
         });
 
         return $this;
@@ -57,6 +64,16 @@ class MySql extends Base
             throw new Exception($result['error']);
         }
         return $result;
+    }
+
+    /**
+     * 属性不用于序列化
+     *
+     * @return array
+     */
+    public function __unsleep()
+    {
+        return ['context', 'mysqlAsynPool'];
     }
 
     public function destroy()

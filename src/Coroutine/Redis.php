@@ -71,23 +71,30 @@ class Redis extends Base
      */
     public function initialization($redisAsynPool, $name, $arguments)
     {
-        parent::init(3000);
+        parent::init(1000);
 
-        $this->redisAsynPool = $redisAsynPool;
-        $this->hashKey = $redisAsynPool->hashKey;
-        $this->phpSerialize = $redisAsynPool->phpSerialize;
-        $this->keyPrefix = $redisAsynPool->keyPrefix;
+        $this->redisAsynPool  = $redisAsynPool;
+        $this->hashKey        = $redisAsynPool->hashKey;
+        $this->phpSerialize   = $redisAsynPool->phpSerialize;
+        $this->keyPrefix      = $redisAsynPool->keyPrefix;
         $this->redisSerialize = $redisAsynPool->redisSerialize;
 
-        $this->name = $name;
+        $this->name      = $name;
         $this->arguments = $arguments;
-        $this->request = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
-        $logId = $this->getContext()->getLogId();
+        $this->request   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
+        $this->requestId = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($this->request);
-        getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($result) use ($name, $logId) {
-            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
+        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $this->ioBackKey = array_pop($keys);
+
+        $this->send(function ($result) use ($name) {
+            if ($this->isBreak) {
+                return;
+            }
+
+            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
                 return;
             }
 
@@ -116,7 +123,7 @@ class Redis extends Base
 
             $this->result = $result;
             $this->ioBack = true;
-            $this->nextRun($logId);
+            $this->nextRun();
         });
 
         return $this;
@@ -268,6 +275,16 @@ class Redis extends Base
     {
         $head = substr($string, 0, 2);
         return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
+    }
+
+    /**
+     * 属性不用于序列化
+     *
+     * @return array
+     */
+    public function __unsleep()
+    {
+        return ['context', 'redisAsynPool'];
     }
 
     /**

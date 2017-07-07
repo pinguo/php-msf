@@ -45,11 +45,11 @@ class GetHttpClient extends Base
         } else {
             $logTag = $baseUrl;
         }
-        $this->baseUrl = $baseUrl;
-        $this->client  = $client;
-        $this->headers = $headers;
-        $profileName   = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $logTag;
-        $logId         = $this->getContext()->getLogId();
+        $this->baseUrl   = $baseUrl;
+        $this->client    = $client;
+        $this->headers   = $headers;
+        $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $logTag;
+        $this->requestId = $this->getContext()->getLogId();
 
         if (!is_array($this->baseUrl)) {
             $this->baseUrl = $this->parseUrl($this->baseUrl);
@@ -68,10 +68,17 @@ class GetHttpClient extends Base
             $httpClient->setHeaders($headers);
             return $httpClient;
         } else {
-            getInstance()->coroutine->IOCallBack[$logId][] = $this;
+            getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
             $this->getContext()->getLog()->profileStart($profileName);
-            $this->send(function ($httpClient) use ($profileName, $logId) {
-                if (empty(getInstance()->coroutine->taskMap[$logId])) {
+            $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+            $this->ioBackKey = array_pop($keys);
+
+            $this->send(function ($httpClient) use ($profileName) {
+                if ($this->isBreak) {
+                    return;
+                }
+
+                if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
                     return;
                 }
 
@@ -79,7 +86,7 @@ class GetHttpClient extends Base
                 $this->responseTime = microtime(true);
                 $this->getContext()->getLog()->profileEnd($profileName);
                 $this->ioBack = true;
-                $this->nextRun($logId);
+                $this->nextRun();
             });
         }
 

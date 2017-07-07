@@ -61,6 +61,27 @@ abstract class Base implements IBase
     public $ioBack = false;
 
     /**
+     * ioBack标识
+     *
+     * @var int|null
+     */
+    public $ioBackKey = null;
+
+    /**
+     * 是否发送异步请求后不需要执行回调
+     *
+     * @var bool
+     */
+    public $isBreak = false;
+
+    /**
+     * 整个请求标识
+     *
+     * @var string | null
+     */
+    public $requestId = null;
+
+    /**
      * 协程对象初始化（优先执行）
      *
      * @param int $timeout
@@ -122,19 +143,18 @@ abstract class Base implements IBase
     /**
      * 通知调度器进行下一次迭代
      *
-     * @param $logId
      * @return bool
      */
-    public function nextRun($logId)
+    public function nextRun()
     {
-        if (empty(getInstance()->coroutine->IOCallBack[$logId])) {
+        if (empty(getInstance()->coroutine->IOCallBack[$this->requestId])) {
             return true;
         }
 
-        foreach (getInstance()->coroutine->IOCallBack[$logId] as $k => $coroutine) {
-            if ($coroutine->ioBack && !empty(getInstance()->coroutine->taskMap[$logId])) {
-                unset(getInstance()->coroutine->IOCallBack[$logId][$k]);
-                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$logId]);
+        foreach (getInstance()->coroutine->IOCallBack[$this->requestId] as $k => $coroutine) {
+            if ($coroutine->ioBack && !empty(getInstance()->coroutine->taskMap[$this->requestId])) {
+                unset(getInstance()->coroutine->IOCallBack[$this->requestId][$k]);
+                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$this->requestId]);
             } else {
                 break;
             }
@@ -148,7 +168,10 @@ abstract class Base implements IBase
      */
     public function destroy()
     {
-        $this->ioBack = false;
+        $this->ioBack    = false;
+        $this->ioBackKey = null;
+        $this->isBreak   = false;
+        $this->requestId = null;
     }
 
     /**
@@ -159,6 +182,33 @@ abstract class Base implements IBase
     public function __unsleep()
     {
         return ['context'];
+    }
+
+    /**
+     * 发送异步请求后不需要执行回调
+     *
+     * @return $this
+     */
+    public function break()
+    {
+        if ($this->requestId && $this->ioBackKey !== null) {
+            unset(getInstance()->coroutine->IOCallBack[$this->requestId][$this->ioBackKey]);
+            $this->isBreak = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * 手工设置超时时间
+     *
+     * @param $timeout
+     * @return $this
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+        return $this;
     }
 
     abstract public function send($callback);
