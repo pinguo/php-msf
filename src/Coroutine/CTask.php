@@ -38,19 +38,26 @@ class CTask extends Base
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];
-        $logId               = $this->getContext()->getLogId();
+        $this->requestId     = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$logId][] = $this;
-        $this->send(function ($serv, $taskId, $data) use ($profileName, $logId) {
-            if (empty(getInstance()->coroutine->taskMap[$logId])) {
+        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
+        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $this->ioBackKey = array_pop($keys);
+
+        $this->send(function ($serv, $taskId, $data) use ($profileName) {
+            if ($this->isBreak) {
+                return;
+            }
+
+            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
                 return;
             }
 
             $this->getContext()->getLog()->profileEnd($profileName);
             $this->result = $data;
             $this->ioBack = true;
-            $this->nextRun($logId);
+            $this->nextRun();
         });
         
         return $this;
