@@ -30,7 +30,7 @@ class ConcurrentClient
      * @param Core $parent
      * @return array
      */
-    public static function requestByConcurrent(array $requests, Core $parent)
+    public static function request(array $requests, Core $parent)
     {
         $config = $parent->getConfig();
         $serviceConf = $config->get('params.service', null);
