@@ -8,11 +8,11 @@
 
 namespace PG\MSF\Base;
 
+use PG\AOP\Factory;
+use PG\AOP\Wrapper;
 use PG\MSF\DataBase\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
-use PG\AOP\Factory;
-use PG\AOP\Wrapper;
 
 class AOPFactory extends Factory
 {
@@ -84,6 +84,12 @@ class AOPFactory extends Factory
                 $class = get_class($arguments[0]);
                 if (!empty(self::$reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
                     $arguments[0]->resetProperties(self::$reflections[$class]);
+                } else {
+                    if (!empty(self::$reflections[$class])) {
+                        foreach (self::$reflections[$class] as $prop => $val) {
+                            $arguments[0]->{$prop} = $val;
+                        }
+                    }
                 }
             }
             $data['method'] = $method;
@@ -98,13 +104,13 @@ class AOPFactory extends Factory
                 $result->useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
                 $result->context = &$coreBase->context;
-                $result->parent  = &$coreBase;
+                $result->parent = &$coreBase;
                 $class = get_class($result);
                 if (!isset(self::$reflections[$class])) {
-                    $reflection  = new \ReflectionClass($class);
-                    $default     = $reflection->getDefaultProperties();
-                    $ps          = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-                    $ss          = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
+                    $reflection = new \ReflectionClass($class);
+                    $default = $reflection->getDefaultProperties();
+                    $ps = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+                    $ss = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
                     $autoDestroy = [];
                     foreach ($ps as $val) {
                         $autoDestroy[$val->getName()] = $default[$val->getName()];
