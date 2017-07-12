@@ -322,7 +322,7 @@ class CoroutineRedisProxy
                         }
 
                         //兼容yii逻辑
-                        if (is_array($val) && count($val) === 2 && isset($val[1]) && $val[1] === null) {
+                        if (is_array($val) && count($val) === 2 && array_key_exists(1, $val) && $val[1] === null) {
                             $val = $val[0];
                         }
                     }
@@ -349,7 +349,7 @@ class CoroutineRedisProxy
                     }
 
                     //兼容yii逻辑
-                    if (is_array($val) && count($val) === 2 && isset($val[1]) && $val[1] === null) {
+                    if (is_array($val) && count($val) === 2 && array_key_exists(1, $val) && $val[1] === null) {
                         $val = $val[0];
                     }
 
@@ -385,7 +385,7 @@ class CoroutineRedisProxy
                     }
 
                     //兼容yii逻辑
-                    if (is_array($data) && count($data) === 2 && isset($data[1]) && $data[1] === null) {
+                    if (is_array($data) && count($data) === 2 && array_key_exists(1, $data) && $data[1] === null) {
                         $data = $data[0];
                     }
                 }
