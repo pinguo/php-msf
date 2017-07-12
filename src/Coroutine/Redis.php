@@ -191,7 +191,7 @@ class Redis extends Base
                         }
 
                         //兼容yii逻辑
-                        if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                        if (is_array($val) && count($val) === 2 && isset($val[1]) && $val[1] === null) {
                             $val = $val[0];
                         }
                     }
@@ -218,7 +218,7 @@ class Redis extends Base
                     }
 
                     //兼容yii逻辑
-                    if (is_array($val) && count($val) === 2 && $val[1] === null) {
+                    if (is_array($val) && count($val) === 2 && isset($val[1]) && $val[1] === null) {
                         $val = $val[0];
                     }
 
@@ -254,7 +254,7 @@ class Redis extends Base
                     }
 
                     //兼容yii逻辑
-                    if (is_array($data) && count($data) === 2 && $data[1] === null) {
+                    if (is_array($data) && count($data) === 2 && isset($data[1]) && $data[1] === null) {
                         $data = $data[0];
                     }
                 }
