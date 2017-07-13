@@ -28,90 +28,132 @@ abstract class Server extends Child
      * 版本
      */
     const version = "2.1.9-dev";
+
     /**
      * 运行方式（web/console）
      */
     const mode = 'web';
+
     /**
      * 实例
      * @var Server
      */
     protected static $instance;
+
     /**
      * Daemonize.
      *
      * @var bool
      */
     public static $daemonize = false;
+
     /**
      * 单元测试
      * @var bool
      */
     public static $testUnity = false;
+
     /**
      * 单元测试文件目录
      * @var string
      */
     public static $testUnityDir = '';
+
     /**
      * The file to store master process PID.
      *
      * @var string
      */
     public static $pidFile = '';
+
     /**
      * The PID of master process.
      *
      * @var int
      */
     protected static $_masterPid = 0;
+
     /**
      * Log file.
      *
      * @var mixed
      */
     protected static $logFile = '';
+
     /**
      * Start file.
      *
      * @var string
      */
     protected static $_startFile = '';
+
     /**
      * worker instance.
      *
      * @var Server
      */
     protected static $_worker = null;
+
     /**
      * Maximum length of the show names.
      *
      * @var int
      */
     protected static $_maxShowLength = 12;
+
     /**
      * 协程调度器
+     *
      * @var Coroutine
      */
     public $coroutine;
+
     /**
      * server name
      * @var string
      */
     public $name = '';
+
     /**
      * server user
+     *
      * @var string
      */
     public $user = '';
+
     /**
-     * worker数量
+     * Worker数量
+     *
      * @var int
      */
     public $workerNum = 0;
+
+    /**
+     * Tasker数量
+     *
+     * @var int
+     */
     public $taskNum = 0;
+
+    /**
+     * 监听地址
+     *
+     * @var string
+     */
     public $socketName;
+
+    /**
+     * 监听端口
+     *
+     * @var int
+     */
     public $port;
+
+    /**
+     * 监听协程
+     *
+     * @var string
+     */
     public $socketType;
 
     /**
@@ -125,35 +167,42 @@ abstract class Server extends Child
      * @var IPack
      */
     public $pack;
+
     /**
      * 路由器
      * @var IRoute
      */
     protected $route;
+
     /**
      * 加载器
      * @var Loader
      */
     public $loader;
+
     /**
      * Emitted when worker processes stoped.
      *
      * @var callback
      */
     public $onErrorHandel = null;
+
     /**
      * @var \swoole_server
      */
     public $server;
+
     /**
      * @var Config
      */
     public $config;
+
     /**
      * 日志
      * @var PGLog
      */
     public $log;
+
     /**
      * 是否开启tcp
      * @var bool
@@ -232,16 +281,16 @@ abstract class Server extends Child
         $this->setConfig();
 
         // 日志初始化
-        $this->log = new PGLog($this->name, $this->config['server']['log']);
+        $this->log = new PGLog($this->name, $this->config->get('server.log', ['handlers' => []]));
 
         register_shutdown_function(array($this, 'checkErrors'));
         set_error_handler(array($this, 'displayErrorHandler'));
         //pack class
-        $packClassName = "\\App\\Pack\\" . $this->config['server']['pack_tool'];
+        $packClassName = "\\App\\Pack\\" . $this->config->get('server.pack_tool', 'JsonPack');
         if (class_exists($packClassName)) {
             $this->pack = new $packClassName;
         } else {
-            $packClassName = "\\PG\\MSF\\Pack\\" . $this->config['server']['pack_tool'];
+            $packClassName = "\\PG\\MSF\\Pack\\" . $this->config->get('server.pack_tool', 'JsonPack');
             if (class_exists($packClassName)) {
                 $this->pack = new $packClassName;
             } else {
@@ -249,7 +298,7 @@ abstract class Server extends Child
             }
         }
         // route class
-        $routeTool = $this->config['server']['route_tool'];
+        $routeTool = $this->config->get('server.route_tool', 'NormalRoute');
         if (class_exists($routeTool)) {
             $routeClassName = $routeTool;
         } else {
@@ -302,25 +351,11 @@ abstract class Server extends Child
      */
     public static function run()
     {
-        self::checkSapiEnv();
         static::init();
         static::parseCommand();
         static::initWorkers();
         static::displayUI();
         static::startSwooles();
-    }
-
-    /**
-     * Check sapi.
-     *
-     * @return void
-     */
-    protected static function checkSapiEnv()
-    {
-        // Only for cli.
-        if (php_sapi_name() != "cli") {
-            exit("Only run in command line mode \n");
-        }
     }
 
     /**
@@ -330,22 +365,17 @@ abstract class Server extends Child
      */
     protected static function init()
     {
-        // Start file.
-        $backtrace = debug_backtrace();
+        $backtrace        = debug_backtrace();
         self::$_startFile = $backtrace[count($backtrace) - 1]['file'];
 
-        // Pid file.
         if (empty(self::$pidFile)) {
-            self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_',
-                    self::$_startFile) . ".pid";
+            self::$pidFile = self::$_worker->config->get('server.pid_path') . str_replace('/', '_', self::$_startFile) . ".pid";
             if (!is_dir(self::$_worker->config->get('server.pid_path'))) {
                 mkdir(self::$_worker->config->get('server.pid_path'), 0777, true);
             }
         }
 
-        // Process title.
         self::setProcessTitle(self::$_worker->config->get('server.process_title'));
-        // stdClass
         self::$stdClass = new \stdClass();
         Core::$stdClass = self::$stdClass;
     }
@@ -358,7 +388,6 @@ abstract class Server extends Child
      */
     public static function setProcessTitle($title)
     {
-        // >=php 5.5
         if (function_exists('cli_set_process_title') && !isMac()) {
             @cli_set_process_title($title);
         } else {
@@ -368,7 +397,6 @@ abstract class Server extends Child
 
     /**
      * Parse command.
-     * php yourfile.php start | stop | reload
      *
      * @return void
      */
@@ -1024,8 +1052,8 @@ abstract class Server extends Child
     }
 
     /**
-     * 判断这个fd是不是一个WebSocket连接，用于区分tcp和websocket
-     * 握手后才识别为websocket
+     * 判断这个fd是不是一个WebSocket连接
+     *
      * @param $fd
      * @return bool
      * @throws \Exception

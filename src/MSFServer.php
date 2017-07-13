@@ -12,6 +12,7 @@ use PG\MSF\Client\Http\Client as HttpClient;
 use PG\MSF\Client\Tcp\Client as TcpClient;
 use PG\MSF\Process\Config;
 use PG\MSF\Process\Inotify;
+use PG\MSF\Process\Timer;
 use PG\MSF\DataBase\AsynPool;
 use PG\MSF\DataBase\AsynPoolManager;
 use PG\MSF\DataBase\Miner;
@@ -21,7 +22,6 @@ use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use Exception;
 use \PG\MSF\Tasks\Task as TaskBase;
-use PG\AOP\Wrapper;
 
 abstract class MSFServer extends WebSocketServer
 {
@@ -184,6 +184,14 @@ abstract class MSFServer extends WebSocketServer
                 new Config($this->config, $this);
             }, false, 2);
             $this->server->addProcess($configProcess);
+        }
+        //业务自定义定时器进程
+        if ($this->config->get('user_timer_enable', false)) {
+            $timerProcess = new \swoole_process(function ($process) {
+                $process->name($this->config['server.process_title'] . '-TIMER');
+                new Timer($this->config, $this);
+            }, false, 2);
+            $this->server->addProcess($timerProcess);
         }
 
         //初始化对象池
@@ -425,11 +433,13 @@ abstract class MSFServer extends WebSocketServer
     }
 
     /**
-     * 开服初始化(支持协程)
+     * 初始化自定义业务定时器（在独立进程中）
+     *
      * @return mixed
      */
-    public function onOpenServiceInitialization()
+    public function onInitTimer()
     {
+
     }
 
     /**
