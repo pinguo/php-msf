@@ -305,8 +305,8 @@ class CoroutineRedisProxy
                 $ret = [];
                 array_walk($data, function ($val, $k) use (&$ret) {
                     if (is_array($val)) {
-                        foreach ($val as $k => $v) {
-                            $val[$k] = $this->realUnserialize($v);
+                        foreach ($val as $i => $v) {
+                            $val[$i] = $this->realUnserialize($v);
                         }
                     } else {
                         $val = $this->realUnserialize($val);
