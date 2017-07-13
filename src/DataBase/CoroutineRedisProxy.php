@@ -295,38 +295,7 @@ class CoroutineRedisProxy
                 $ret = [];
                 array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
                     $key = substr($keys[$k], $len);
-
-                    if (is_string($val)) {
-                        switch ($this->redisSerialize) {
-                            case Marco::SERIALIZE_PHP:
-                                if ($this->canUnserialize($val)) {
-                                    $val = unserialize($val);
-                                }
-                                break;
-                            case Marco::SERIALIZE_IGBINARY:
-                                $val = @igbinary_unserialize($val);
-                                break;
-                        }
-                    }
-
-                    if (is_string($val) && $this->phpSerialize) {
-                        switch ($this->phpSerialize) {
-                            case Marco::SERIALIZE_PHP:
-                                if ($this->canUnserialize($val)) {
-                                    $val = unserialize($val);
-                                }
-                                break;
-                            case Marco::SERIALIZE_IGBINARY:
-                                $val = @igbinary_unserialize($val);
-                                break;
-                        }
-
-                        //兼容yii逻辑
-                        if (is_array($val) && count($val) === 2 && array_key_exists(1, $val) && $val[1] === null) {
-                            $val = $val[0];
-                        }
-                    }
-
+                    $val = $this->realUnserialize($val);
                     $ret[$key] = $val;
                 });
 
@@ -335,22 +304,12 @@ class CoroutineRedisProxy
                 //eval sRandMember...
                 $ret = [];
                 array_walk($data, function ($val, $k) use (&$ret) {
-                    if (is_string($val)) {
-                        switch ($this->redisSerialize) {
-                            case Marco::SERIALIZE_PHP:
-                                if ($this->canUnserialize($val)) {
-                                    $val = unserialize($val);
-                                }
-                                break;
-                            case Marco::SERIALIZE_IGBINARY:
-                                $val = @igbinary_unserialize($val);
-                                break;
+                    if (is_array($val)) {
+                        foreach ($val as $k => $v) {
+                            $val[$k] = $this->realUnserialize($v);
                         }
-                    }
-
-                    //兼容yii逻辑
-                    if (is_array($val) && count($val) === 2 && array_key_exists(1, $val) && $val[1] === null) {
-                        $val = $val[0];
+                    } else {
+                        $val = $this->realUnserialize($val);
                     }
 
                     $ret[$k] = $val;
@@ -359,36 +318,7 @@ class CoroutineRedisProxy
                 $data = $ret;
             } else {
                 //get
-                if (is_string($data) && $this->redisSerialize) {
-                    switch ($this->redisSerialize) {
-                        case Marco::SERIALIZE_PHP:
-                            if ($this->canUnserialize($data)) {
-                                $data = unserialize($data);
-                            }
-                            break;
-                        case Marco::SERIALIZE_IGBINARY:
-                            $data = @igbinary_unserialize($data);
-                            break;
-                    }
-                }
-
-                if (is_string($data) && $this->phpSerialize) {
-                    switch ($this->phpSerialize) {
-                        case Marco::SERIALIZE_PHP:
-                            if ($this->canUnserialize($data)) {
-                                $data = unserialize($data);
-                            }
-                            break;
-                        case Marco::SERIALIZE_IGBINARY:
-                            $data = @igbinary_unserialize($data);
-                            break;
-                    }
-
-                    //兼容yii逻辑
-                    if (is_array($data) && count($data) === 2 && array_key_exists(1, $data) && $data[1] === null) {
-                        $data = $data[0];
-                    }
-                }
+                $data = $this->realUnserialize($data);
             }
         } catch (\Exception $exception) {
             // do noting
@@ -406,5 +336,46 @@ class CoroutineRedisProxy
     {
         $head = substr($string, 0, 2);
         return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
+    }
+
+    /**
+     * 真正反序列化
+     * @param string $data
+     * @return mixed|string
+     */
+    private function realUnserialize($data)
+    {
+        //get
+        if (is_string($data) && $this->redisSerialize) {
+            switch ($this->redisSerialize) {
+                case Marco::SERIALIZE_PHP:
+                    if ($this->canUnserialize($data)) {
+                        $data = unserialize($data);
+                    }
+                    break;
+                case Marco::SERIALIZE_IGBINARY:
+                    $data = @igbinary_unserialize($data);
+                    break;
+            }
+        }
+
+        if (is_string($data) && $this->phpSerialize) {
+            switch ($this->phpSerialize) {
+                case Marco::SERIALIZE_PHP:
+                    if ($this->canUnserialize($data)) {
+                        $data = unserialize($data);
+                    }
+                    break;
+                case Marco::SERIALIZE_IGBINARY:
+                    $data = @igbinary_unserialize($data);
+                    break;
+            }
+
+            //兼容yii逻辑
+            if (is_array($data) && count($data) === 2 && array_key_exists(1, $data) && $data[1] === null) {
+                $data = $data[0];
+            }
+        }
+        return $data;
     }
 }
