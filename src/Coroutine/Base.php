@@ -187,7 +187,7 @@ abstract class Base implements IBase
     /**
      * 发送异步请求后不需要执行回调
      *
-     * @return $this
+     * @return bool
      */
     public function break()
     {
@@ -196,7 +196,7 @@ abstract class Base implements IBase
             $this->isBreak = true;
         }
 
-        return $this;
+        return true;
     }
 
     /**
