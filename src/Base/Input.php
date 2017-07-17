@@ -145,6 +145,56 @@ class Input extends Core
     }
 
     /**
+     * 设置POST请求参数
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setPost($key, $value)
+    {
+        $this->request->post[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * 设置GET请求参数
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setGet($key, $value)
+    {
+        $this->request->get[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * 设置所有POST请求参数
+     *
+     * @param $post
+     * @return $this
+     */
+    public function setAllPost(array $post)
+    {
+        $this->request->post = $post;
+        return $this;
+    }
+
+    /**
+     * 设置所有GET请求参数
+     *
+     * @param $get
+     * @return $this
+     */
+    public function setAllGet(array $get)
+    {
+        $this->request->get = $get;
+        return $this;
+    }
+
+    /**
      * cookie
      * @param $index
      * @param $xssClean
