@@ -101,9 +101,6 @@ class Redis extends Base
             $this->getContext()->getLog()->profileEnd($this->request);
 
             switch ($name) {
-                case 'get':
-                    $result = $this->unSerializeHandler($result);
-                    break;
                 case 'mget';
                     $keys = $this->arguments[0];
                     $len = strlen($this->keyPrefix);
@@ -203,8 +200,7 @@ class Redis extends Base
      */
     private function canUnserialize(string $string)
     {
-        $head = substr($string, 0, 2);
-        return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
+        return in_array(substr($string, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
     }
 
     /**

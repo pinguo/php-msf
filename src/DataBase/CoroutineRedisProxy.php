@@ -211,12 +211,22 @@ class CoroutineRedisProxy
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             $value = getInstance()->getRedis()->$name(...$arguments);
             // return value unserialize start
-            if ($name === 'get') {
-                $value = $this->unSerializeHandler($value);
-            } elseif ($name === 'mget') {
-                $keys = $arguments[0];
-                $len = strlen($this->keyPrefix);
-                $value = $this->unSerializeHandler($value, $keys, $len);
+            switch ($name) {
+                case 'mget';
+                    $keys = $this->arguments[0];
+                    $len = strlen($this->keyPrefix);
+                    $value = $this->unSerializeHandler($value, $keys, $len);
+                    break;
+                case 'eval':
+                    //如果redis中的数据本身没有进行序列化，同时返回值是json，那么解析成array
+                    $decodeVal = @json_decode($value, true);
+                    if (is_array($decodeVal)) {
+                        $value = $decodeVal;
+                    }
+                    $value = $this->unSerializeHandler($value);
+                    break;
+                default:
+                    $value = $this->unSerializeHandler($value);
             }
             // return value unserialize end
 
@@ -334,8 +344,7 @@ class CoroutineRedisProxy
      */
     private function canUnserialize(string $string)
     {
-        $head = substr($string, 0, 2);
-        return in_array($head, ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
+        return in_array(substr($string, 0, 2), ['s:', 'i:', 'b:', 'N', 'a:', 'O:', 'd:']);
     }
 
     /**
