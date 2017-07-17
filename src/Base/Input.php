@@ -101,6 +101,23 @@ class Input extends Core
     }
 
     /**
+     * 获取所有的post
+     */
+    public function getAllPost()
+    {
+        return $this->request->post;
+    }
+
+    /**
+     * 获取所有的get
+     */
+    public function getAllGet()
+    {
+        return $this->request->get;
+    }
+
+
+    /**
      * getAllHeader
      * @return array
      */
