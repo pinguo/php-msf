@@ -27,7 +27,7 @@ abstract class Server extends Child
     /**
      * 版本
      */
-    const version = "2.1.9";
+    const version = "2.1.10-dev";
 
     /**
      * 运行方式（web/console）
@@ -1076,7 +1076,7 @@ abstract class Server extends Child
      */
     public function isTaskWorker()
     {
-        return $this->server->taskworker;
+        return !empty($this->server) && $this->server->taskworker;
     }
 
     /**
