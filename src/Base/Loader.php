@@ -84,7 +84,7 @@ class Loader
             throw new Exception("class {$taskClass} not exists");
         } while (0);
 
-        if (!getInstance()->server->taskworker) { // worker进程
+        if (!empty(getInstance()->server) && !getInstance()->server->taskworker) { // worker进程
             if ($parent != null && method_exists($parent, 'getObjectPool')) {
                 $taskProxy = $parent->getObjectPool()->get(TaskProxy::class);
             } else {
