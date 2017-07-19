@@ -106,14 +106,20 @@ class Loader
         if (key_exists($task, $this->_tasks)) {
             $taskInstance = $this->_tasks[$task];
             $taskInstance->isUse();
-
-            return $taskInstance;
         } else {
             $taskInstance        = new $taskClass;
             $this->_tasks[$task] = $taskInstance;
-
-            return $taskInstance;
         }
+
+        if (getInstance()::mode == 'console') {
+            if ($parent != null) {
+                $parent->addChild($taskInstance);
+                $taskInstance->setContext($parent->getContext());
+            }
+            $taskInstance->coreName = $taskClass;
+        }
+
+        return $taskInstance;
     }
 
     /**
