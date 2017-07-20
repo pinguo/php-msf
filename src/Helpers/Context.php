@@ -160,7 +160,7 @@ class Context extends AbstractContext
     /**
      * 返回方法名称
      *
-     * @return $this
+     * @return string
      */
     public function getActionName()
     {
