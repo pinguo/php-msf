@@ -210,6 +210,15 @@ class Input extends Core
     }
 
     /**
+     * file
+     * @param  string $index form field name
+     * @return array file upload information
+     */
+    public function file($index) {
+        return $this->request->files[$index] ?? '';
+    }
+
+    /**
      * 获取Server相关的数据
      * @param $index
      * @param bool $xssClean
