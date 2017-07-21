@@ -126,12 +126,6 @@ class RedisAsynPool extends AsynPool
             $this->redisClient->select($this->config['redis'][$this->active]['select']);
         }
 
-        //序列化
-        $this->redisSerialize && $this->redisClient->setOption(\Redis::OPT_SERIALIZER, $this->redisSerialize);
-
-        //前缀
-        $this->keyPrefix && $this->redisClient->setOption(\Redis::OPT_PREFIX, $this->keyPrefix);
-
         return $this->redisClient;
     }
 
