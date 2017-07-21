@@ -31,10 +31,12 @@ abstract class MSFServer extends WebSocketServer
      * @var Pool
      */
     public $objectPool;
+
     /**
      * @var MysqlAsynPool
      */
     public $mysqlPool;
+
     /**
      * http client
      * @var HttpClient
@@ -151,6 +153,9 @@ abstract class MSFServer extends WebSocketServer
         //创建task用的锁
         $this->taskLock = new \swoole_lock(SWOOLE_MUTEX);
 
+        //初始化对象池
+        $this->objectPool = Pool::getInstance();
+
         //创建异步连接池进程
         if ($this->config->get('asyn_process_enable', false)) {//代表启动单独进程进行管理
             $this->poolProcess = new \swoole_process(function ($process) {
@@ -193,9 +198,6 @@ abstract class MSFServer extends WebSocketServer
             }, false, 2);
             $this->server->addProcess($timerProcess);
         }
-
-        //初始化对象池
-        $this->objectPool = Pool::getInstance();
     }
 
     /**
@@ -333,7 +335,7 @@ abstract class MSFServer extends WebSocketServer
             throw new Exception('pool key is exists!');
         }
         $this->asynPools[$name] = $pool;
-        if ($isRegister) {
+        if ($isRegister && $this->asnyPoolManager) {
             $pool->workerInit($this->server->worker_id);
             $this->asnyPoolManager->registAsyn($pool);
         }

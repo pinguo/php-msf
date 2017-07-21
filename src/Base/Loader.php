@@ -84,7 +84,7 @@ class Loader
             throw new Exception("class {$taskClass} not exists");
         } while (0);
 
-        if (!empty(getInstance()->server) && !getInstance()->server->taskworker) { // worker进程
+        if (!empty(getInstance()->server) && property_exists(getInstance()->server, 'taskworker') && !getInstance()->server->taskworker) { // worker进程
             if ($parent != null && method_exists($parent, 'getObjectPool')) {
                 $taskProxy = $parent->getObjectPool()->get(TaskProxy::class);
             } else {
@@ -111,13 +111,11 @@ class Loader
             $this->_tasks[$task] = $taskInstance;
         }
 
-        if (getInstance()::mode == 'console') {
-            if ($parent != null) {
-                $parent->addChild($taskInstance);
-                $taskInstance->setContext($parent->getContext());
-            }
-            $taskInstance->coreName = $taskClass;
+        if ($parent != null) {
+            $parent->addChild($taskInstance);
+            $taskInstance->setContext($parent->getContext());
         }
+        $taskInstance->coreName = $taskClass;
 
         return $taskInstance;
     }
