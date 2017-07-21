@@ -999,7 +999,7 @@ abstract class Server extends Child
      * @param int $ms 定时器间隔毫秒
      * @param callable $callBack 定时器执行的回调
      */
-    public function runTimer($ms, callable $callBack, $params = [])
+    public function registerTimer($ms, callable $callBack, $params = [])
     {
         swoole_timer_tick($ms, function($timerId, $params) use ($callBack) {
             $this->getTimerContext();
