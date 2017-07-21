@@ -165,9 +165,10 @@ class CoroutineRedisProxy
         // value serialize start
         switch (strtolower($name)) {
             case 'set':
+                $arguments[2] = $this->serializeHandler($arguments[2], true);
+                break;
             case 'setex':
-                $last = count($arguments) - 1;
-                $arguments[$last] = $this->serializeHandler($arguments[$last], true);
+                $arguments[3] = $this->serializeHandler($arguments[3], true);
                 break;
             case 'mset':
                 $keysValues = $arguments[1];
