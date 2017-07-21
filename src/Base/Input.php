@@ -97,7 +97,7 @@ class Input extends Core
      */
     public function getAllPostGet()
     {
-        return $this->request->post??$this->request->get??[];
+        return $this->request->post ?? $this->request->get ?? [];
     }
 
     /**
@@ -105,7 +105,7 @@ class Input extends Core
      */
     public function getAllPost()
     {
-        return $this->request->post;
+        return $this->request->post ?? [];
     }
 
     /**
@@ -113,7 +113,7 @@ class Input extends Core
      */
     public function getAllGet()
     {
-        return $this->request->get;
+        return $this->request->get ?? [];
     }
 
 
@@ -123,7 +123,7 @@ class Input extends Core
      */
     public function getAllHeader()
     {
-        return $this->request->header;
+        return $this->request->header ?? [];
     }
 
     /**
@@ -132,7 +132,7 @@ class Input extends Core
      */
     public function getAllServer()
     {
-        return $this->request->server;
+        return $this->request->server ?? [];
     }
 
     /**
