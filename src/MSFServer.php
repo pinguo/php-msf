@@ -279,7 +279,7 @@ abstract class MSFServer extends WebSocketServer
             case Marco::SERVER_TYPE_TASK://task任务
                 try {
                     $taskName    = $message['task_name'];
-                    $task        = $this->loader->task($taskName, $this);
+                    $task        = $this->loader->task($taskName);
                     $taskFucName = $message['task_fuc_name'];
                     $taskData    = $message['task_fuc_data'];
                     $taskId      = $message['task_id'];
