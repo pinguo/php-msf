@@ -49,8 +49,8 @@ class Task extends TaskProxy
 
     public function destroy()
     {
-        $this->getContext()->getLog() && $this->getContext()->getLog()->appendNoticeLog();
-        getInstance()->tidPidTable->del($this->taskId);
+        $this->parent == null && $this->getContext()->getLog() && $this->getContext()->getLog()->appendNoticeLog();
+        $this->taskId && getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
         $this->taskId = 0;
     }
@@ -74,14 +74,5 @@ class Task extends TaskProxy
         }
 
         return false;
-    }
-
-    /**
-     * 获取同步mysql
-     * @return \PG\MSF\DataBase\Miner
-     */
-    protected function getMysql()
-    {
-        return getInstance()->getMysql();
     }
 }
