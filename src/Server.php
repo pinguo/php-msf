@@ -21,6 +21,7 @@ use PG\MSF\Helpers\Context;
 use PG\MSF\Base\Input;
 use PG\MSF\Base\Output;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
+use PG\MSF\Base\AOPFactory;
 
 abstract class Server extends Child
 {
@@ -314,6 +315,29 @@ abstract class Server extends Child
         $this->loader = new Loader();
     }
 
+    public function getTimerContext()
+    {
+        $context = new Context();
+        $PGLog   = null;
+        $PGLog   = clone getInstance()->log;
+        $PGLog->accessRecord['beginTime'] = time();
+        $PGLog->accessRecord['uri']       = '/timerTick';
+        $PGLog->logId = $this->genLogId(null);
+        defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+        $PGLog->init();
+        $PGLog->pushLog('controller', 'timerTick');
+        $PGLog->pushLog('method', 'timerTick');
+
+        // 构造请求上下文成员
+        $context->setLogId($PGLog->logId);
+        $context->setLog($PGLog);
+        $context->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $this));
+        $context->setControllerName('timerTick');
+        $context->setActionName('timerTick');
+        $this->setContext($context);
+
+        return $this->getContext();
+    }
     /**
      * 获取实例
      * @return MSFServer
@@ -967,6 +991,21 @@ abstract class Server extends Child
     public function __call($name, $arguments)
     {
         return $this->server->$name(...$arguments);
+    }
+
+    /**
+     * 定时器包装（用于业务Timer进程）
+     *
+     * @param int $ms 定时器间隔毫秒
+     * @param callable $callBack 定时器执行的回调
+     */
+    public function runTimer($ms, callable $callBack, $params = [])
+    {
+        swoole_timer_tick($ms, function($timerId, $params) use ($callBack) {
+            $this->getTimerContext();
+            $callBack($timerId, $params);
+            $this->getContext()->getLog()->appendNoticeLog();
+        }, $params);
     }
 
     /**

@@ -210,7 +210,8 @@ class CoroutineRedisProxy
         // value serialize end
 
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            $value = getInstance()->getRedis()->$name(...$arguments);
+            array_shift($arguments);
+            $value = $this->redisAsynPool->getSync()->$name(...$arguments);
             // return value unserialize start
             switch ($name) {
                 case 'mget';
