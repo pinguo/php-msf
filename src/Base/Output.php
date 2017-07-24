@@ -335,22 +335,6 @@ class Output extends Core
     }
 
     /**
-     * 输出文件
-     * @param $root_file
-     * @param $file_name
-     * @param bool $destroy
-     * @return mixed
-     */
-    public function endFile($root_file, $file_name, $destroy = true)
-    {
-        $result = httpEndFile($root_file . '/' . $file_name, $this->request, $this->response);
-        if ($destroy) {
-            $this->controller->destroy();
-        }
-        return $result;
-    }
-
-    /**
      * 销毁,解除引用
      */
     public function destroy()
