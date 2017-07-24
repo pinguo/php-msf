@@ -119,7 +119,6 @@ abstract class HttpServer extends Server
     public function setTemplateEngine()
     {
         $this->templateEngine = new Engine();
-        $this->templateEngine->registerFunction('getWww', 'getWww');
     }
 
     /**
@@ -136,13 +135,8 @@ abstract class HttpServer extends Server
 
         do {
             if ($this->route->getPath() == '') {
-                list($host) = explode(':', $request->header['host'] ?? '');
-                $wwwPath    = $this->getHostRoot($host) . $this->getHostIndex($host);
-                $result     = httpEndFile($wwwPath, $request, $response);
-                if (!$result) {
-                    $error = 'Index not found';
-                    $code  = 404;
-                }
+                $error = 'Index not found';
+                $code  = 404;
                 break;
             }
 

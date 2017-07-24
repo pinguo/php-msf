@@ -39,57 +39,49 @@ class Input extends Core
     /**
      * postGet
      * @param $index
-     * @param $xssClean
+     * @param $clean
      * @return string
      */
-    public function postGet($index, $xssClean = true)
+    public function postGet($index, $clean = true)
     {
         return isset($this->request->post[$index])
-            ? $this->post($index, $xssClean)
-            : $this->get($index, $xssClean);
+            ? $this->post($index, $clean)
+            : $this->get($index, $clean);
     }
 
     /**
      * post
      * @param $index
-     * @param $xssClean
+     * @param $clean
      * @return string
      */
-    public function post($index, $xssClean = true)
+    public function post($index, $clean = true)
     {
-        if ($xssClean) {
-            return XssClean::getXssClean()->xss_clean($this->request->post[$index]??'');
-        } else {
-            return $this->request->post[$index]??'';
-        }
+        return $this->request->post[$index] ?? '';
     }
 
     /**
      * get
      * @param $index
-     * @param $xssClean
+     * @param $clean
      * @return string
      */
-    public function get($index, $xssClean = true)
+    public function get($index, $clean = true)
     {
-        if ($xssClean) {
-            return XssClean::getXssClean()->xss_clean($this->request->get[$index]??'');
-        } else {
-            return $this->request->get[$index]??'';
-        }
+        return $this->request->get[$index] ?? '';
     }
 
     /**
      * getPost
      * @param $index
-     * @param $xssClean
+     * @param $clean
      * @return string
      */
-    public function getPost($index, $xssClean = true)
+    public function getPost($index, $clean = true)
     {
         return isset($this->request->get[$index])
-            ? $this->get($index, $xssClean)
-            : $this->post($index, $xssClean);
+            ? $this->get($index, $clean)
+            : $this->post($index, $clean);
     }
 
     /**
@@ -197,16 +189,12 @@ class Input extends Core
     /**
      * cookie
      * @param $index
-     * @param $xssClean
+     * @param $clean
      * @return string
      */
-    public function cookie($index, $xssClean = true)
+    public function cookie($index, $clean = true)
     {
-        if ($xssClean) {
-            return XssClean::getXssClean()->xss_clean($this->request->cookie[$index]??'');
-        } else {
-            return $this->request->cookie[$index]??'';
-        }
+        return $this->request->cookie[$index] ?? '';
     }
 
     /**
@@ -221,16 +209,12 @@ class Input extends Core
     /**
      * 获取Server相关的数据
      * @param $index
-     * @param bool $xssClean
+     * @param bool $clean
      * @return array|bool|string
      */
-    public function server($index, $xssClean = true)
+    public function server($index, $clean = true)
     {
-        if ($xssClean) {
-            return XssClean::getXssClean()->xss_clean($this->request->server[$index]??'');
-        } else {
-            return $this->request->server[$index]??'';
-        }
+        return $this->request->server[$index] ?? '';
     }
 
     /**
@@ -288,16 +272,12 @@ class Input extends Core
     /**
      * getRequestHeader
      * @param $index
-     * @param $xssClean
+     * @param $clean
      * @return string
      */
-    public function getRequestHeader($index, $xssClean = false)
+    public function getRequestHeader($index, $clean = false)
     {
-        if ($xssClean) {
-            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
-        } else {
-            return $this->request->header[$index]??'';
-        }
+        return $this->request->header[$index] ?? '';
     }
 
     /**

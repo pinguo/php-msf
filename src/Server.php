@@ -412,7 +412,7 @@ abstract class Server extends Child
      */
     public static function setProcessTitle($title)
     {
-        if (function_exists('cli_set_process_title') && !isMac()) {
+        if (function_exists('cli_set_process_title') && PHP_OS == 'Darwin') {
             @cli_set_process_title($title);
         } else {
             @swoole_set_process_name($title);
