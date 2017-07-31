@@ -20,14 +20,22 @@ class Config
 
     public $lastMinute;
 
+    protected $redisCheckLock;
+
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         echo 'Enable Config Manager: Success', "\n";
         $this->config = $config;
-        $this->MSFServer  = $MSFServer;
-        $this->lastMinute     = ceil(time() / 60);
+        $this->MSFServer = $MSFServer;
+        $this->lastMinute = ceil(time() / 60);
+        $this->redisCheckLock = new \swoole_lock();
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
+    }
+
+    public function __destruct()
+    {
+        unset($this->redisCheckLock);
     }
 
     public function stats()
@@ -54,38 +62,38 @@ class Config
                 //'worker_request_count' => 0,
                 //],
             ],
-            'tcp'    => [
+            'tcp' => [
                 // 服务器启动的时间
-                'start_time'           => '',
+                'start_time' => '',
                 // 当前连接的数量
-                'connection_num'       => 0,
+                'connection_num' => 0,
                 // 接受了多少个连接
-                'accept_count'         => 0,
+                'accept_count' => 0,
                 // 关闭的连接数量
-                'close_count'          => 0,
+                'close_count' => 0,
                 // 当前正在排队的任务数
-                'tasking_num'          => 0,
+                'tasking_num' => 0,
                 // Server收到的请求次数
-                'request_count'        => 0,
+                'request_count' => 0,
                 // 消息队列中的Task数量
-                'task_queue_num'       => 0,
+                'task_queue_num' => 0,
                 // 消息队列的内存占用字节数
-                'task_queue_bytes'     => 0,
+                'task_queue_bytes' => 0,
             ],
         ];
 
-        $workerIds   = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
+        $workerIds = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
         foreach ($workerIds as $workerId) {
             $workerInfo = $this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
             if ($workerInfo) {
-                $data['worker']['worker' . $workerId] =  $workerInfo;
+                $data['worker']['worker' . $workerId] = $workerInfo;
             } else {
                 $data['worker']['worker' . $workerId] = [];
             }
         }
 
-        $lastStats              = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
-        $data['tcp']            = $this->MSFServer->server->stats();
+        $lastStats = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
+        $data['tcp'] = $this->MSFServer->server->stats();
         $data['running']['qps'] = $data['tcp']['request_count'] - $lastStats['tcp']['request_count'];
 
         if (!isset($lastStats['running']['last_qpm'])) {
@@ -104,7 +112,7 @@ class Config
             if (!empty($lastStats['running']['qpm'])) {
                 $data['running']['last_qpm'] = $lastStats['running']['qpm'];
             }
-            $data['running']['qpm']          = $data['running']['qps'];
+            $data['running']['qpm'] = $data['running']['qps'];
             $this->lastMinute = ceil(time() / 60);
         }
 
@@ -114,6 +122,12 @@ class Config
 
     public function checkRedisProxy()
     {
+        if (!$this->redisCheckLock->lock()) {
+            return;
+        }
+
+        //todo: retry_timeout， failure_limit
+
         $redisProxyConfig = $this->config->get('redis_proxy', null);
         $redisConfig = $this->config->get('redis', null);
 
@@ -188,6 +202,7 @@ class Config
             }
         }
 
+        $this->redisCheckLock->unlock();
         return true;
     }
 }

@@ -179,6 +179,7 @@ class CoroutineRedisProxy
                 $arguments[1] = $newValues;
                 break;
             case 'sadd':
+            case 'srem':
                 //member是array
                 if (is_array($arguments[2])) {
                     $newValues = [];
