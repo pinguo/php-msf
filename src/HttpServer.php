@@ -205,7 +205,7 @@ abstract class HttpServer extends Server
                 $controllerInstance->context->setActionName($methodName);
                 $controllerInstance->setRequestType(Marco::HTTP_REQUEST);
                 $init = $controllerInstance->initialization($controllerName, $methodName);
-                
+
                 if ($init instanceof \Generator) {
                     $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
                         $isRpc = $this->route->getIsRpc();
