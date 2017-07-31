@@ -127,8 +127,8 @@ class Config
                         foreach ($pools as $pool => $weight) {
                             try {
                                 $redis = new \Redis();
-                                @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 0.5);
-                                if ($redis->set('msf_active_cluster_check', 1, 5)) {
+                                @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                                if ($redis->set('msf_active_cluster_check', 1, 3)) {
                                     $goodPools[$pool] = $weight;
                                 }
                             } catch (\Throwable $e) {
@@ -149,8 +149,8 @@ class Config
                             }
                             try {
                                 $redis = new \Redis();
-                                @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 0.5);
-                                if ($redis->set('msf_active_master_slave_check', 1, 5)) {
+                                @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                                if ($redis->set('msf_active_master_slave_check', 1, 3)) {
                                     $master = $pool;
                                 }
                             } catch (\Throwable $e) {
@@ -170,7 +170,7 @@ class Config
                                 }
                                 try {
                                     $redis = new \Redis();
-                                    @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 0.05);
+                                    @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
                                     if ($redis->get('msf_active_master_slave_check') == 1) {
                                         $slaves[] = $pool;
                                     }

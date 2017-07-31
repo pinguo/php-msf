@@ -413,7 +413,7 @@ class RedisAsynPool extends AsynPool
     {
         $this->waitConnetNum++;
         if ($client == null) {
-            $settings = ['timeout' => 0.5];
+            $settings = ['timeout' => 1.5];
             //存在密码
             if ($this->config->has('redis.' . $this->active . '.password')) {
                 $settings['password'] = $this->config['redis'][$this->active]['password'];
