@@ -74,7 +74,7 @@ class RedisProxyMasterSlave implements IProxy
                 }
 
                 if ($poolInstance->getSync()
-                    ->set('msf_active_master_slave_check', 1, 5)
+                    ->set('msf_active_master_slave_check_' . gethostname(), 1, 5)
                 ) {
                     $this->master = $pool;
                     break;
@@ -102,7 +102,7 @@ class RedisProxyMasterSlave implements IProxy
                 if ($pool != $this->master) {
                     try {
                         if ($poolInstance->getSync()
-                                ->get('msf_active_master_slave_check') == 1
+                                ->get('msf_active_master_slave_check_' . gethostname()) == 1
                         ) {
                             $this->slaves[] = $pool;
                         }
@@ -167,6 +167,7 @@ class RedisProxyMasterSlave implements IProxy
             $newSlaves = $this->goodPools['slaves'];
 
             if (empty($newMaster)) {
+                echo RedisProxyFactory::getLogTitle() . 'No master redis server in master-slave config!';
                 throw new Exception('No master redis server in master-slave config!');
             }
 
@@ -176,6 +177,7 @@ class RedisProxyMasterSlave implements IProxy
             }
 
             if (empty($newSlaves)) {
+                echo RedisProxyFactory::getLogTitle() . 'No slave redis server in master-slave config!';
                 throw new Exception('No slave redis server in master-slave config!');
             }
 

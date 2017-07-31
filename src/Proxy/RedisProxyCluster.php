@@ -74,7 +74,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
                 }
 
                 if ($poolInstance->getSync()
-                    ->set('msf_active_cluster_check', 1, 5)
+                    ->set('msf_active_cluster_check_' . gethostname(), 1, 5)
                 ) {
                     $this->goodPools[$pool] = $weight;
                 } else {
