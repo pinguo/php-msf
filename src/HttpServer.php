@@ -205,26 +205,23 @@ abstract class HttpServer extends Server
                 $controllerInstance->context->setActionName($methodName);
                 $controllerInstance->setRequestType(Marco::HTTP_REQUEST);
                 $init = $controllerInstance->initialization($controllerName, $methodName);
+                
                 if ($init instanceof \Generator) {
                     $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
-                        $params = array_values($this->route->getParams());
-                        if (empty($this->route->getParams())) {
-                            $params = [];
-                        }
+                        $isRpc = $this->route->getIsRpc();
+                        $params = $isRpc ? $this->route->getParams() : array_values($this->route->getParams());
 
-                        $generator = $controllerInstance->$methodName(...$params);
+                        $generator = $isRpc ? $controllerInstance->$methodName($params) : $controllerInstance->$methodName(...$params);
                         if ($generator instanceof \Generator) {
                             $this->coroutine->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
                             $this->coroutine->schedule($this->coroutine->taskMap[$controllerInstance->context->getLogId()]);
                         }
                     });
                 } else {
-                    $params = array_values($this->route->getParams());
-                    if (empty($this->route->getParams())) {
-                        $params = [];
-                    }
+                    $isRpc = $this->route->getIsRpc();
+                    $params = $isRpc ? $this->route->getParams() : array_values($this->route->getParams());
 
-                    $generator = $controllerInstance->$methodName(...$params);
+                    $generator = $isRpc ? $controllerInstance->$methodName($params) : $controllerInstance->$methodName(...$params);
                     if ($generator instanceof \Generator) {
                         $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                     }
