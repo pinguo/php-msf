@@ -219,7 +219,7 @@ class Config
                                 $redis->close();
 
                                 //容忍一定次数的从节点错误
-                                if (in_array($pool, [$slaves])) {
+                                if (in_array($pool, $slaves)) {
                                     $this->redisRetryTimes[$pool] = 0;
                                 } else {
                                     @$this->redisRetryTimes[$pool]++;
