@@ -105,7 +105,7 @@ class MSFCli extends MSFServer
             $init = $controllerInstance->initialization($controllerName, $methodName);
             if ($init instanceof \Generator) {
                 $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
-                    $params = $this->route->getParams();
+                    $params = array_values($this->route->getParams());
                     if (empty($this->route->getParams())) {
                         $params = [];
                     }
@@ -119,7 +119,7 @@ class MSFCli extends MSFServer
                     }
                 });
             } else {
-                $params = $this->route->getParams();
+                $params = array_values($this->route->getParams());
                 if (empty($this->route->getParams())) {
                     $params = [];
                 }

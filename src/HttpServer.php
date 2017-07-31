@@ -207,7 +207,7 @@ abstract class HttpServer extends Server
                 $init = $controllerInstance->initialization($controllerName, $methodName);
                 if ($init instanceof \Generator) {
                     $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
-                        $params = $this->route->getParams();
+                        $params = array_values($this->route->getParams());
                         if (empty($this->route->getParams())) {
                             $params = [];
                         }
@@ -219,7 +219,7 @@ abstract class HttpServer extends Server
                         }
                     });
                 } else {
-                    $params = $this->route->getParams();
+                    $params = array_values($this->route->getParams());
                     if (empty($this->route->getParams())) {
                         $params = [];
                     }
