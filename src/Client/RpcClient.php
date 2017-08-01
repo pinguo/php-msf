@@ -271,8 +271,13 @@ class RpcClient
                 'X-RPC' => 1,
             ];
         } else {
-            $sendData = $args[0];
-            $sendData['sig'] = static::genSig($args[0], $rpc->appsecret);
+            $preParams = [
+                '__appVersion' => $obj->getContext()->getInput()->postGet('__appVersion') ?? $obj->getContext()->getInput()->postGet('appVersion'),
+                '__locale' => $obj->getContext()->getInput()->postGet('__locale') ?? $obj->getContext()->getInput()->postGet('locale'),
+                '__platform' => $obj->getContext()->getInput()->postGet('__platform') ?? $obj->getContext()->getInput()->postGet('platform')
+            ];
+            $sendData = array_merge($args[0], $preParams);
+            $sendData['sig'] = static::genSig($sendData, $rpc->appsecret);
         }
 
         $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
