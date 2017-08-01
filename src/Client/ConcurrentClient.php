@@ -36,6 +36,12 @@ class ConcurrentClient
         $serviceConf = $config->get('params.service', null);
         $parallelConf = $config->get('params.parallel');
 
+        $preParams = [
+            '__appVersion' => $parent->getContext()->getInput()->postGet('__appVersion') ?? $parent->getContext()->getInput()->postGet('appVersion'),
+            '__locale' => $parent->getContext()->getInput()->postGet('__locale') ?? $parent->getContext()->getInput()->postGet('locale'),
+            '__platform' => $parent->getContext()->getInput()->postGet('__platform') ?? $parent->getContext()->getInput()->postGet('platform')
+        ];
+
         $list = $result = [];
         foreach ($requests as $name => $params) {
             if (isset($parallelConf[$name])) {
@@ -46,6 +52,7 @@ class ConcurrentClient
                 $list[$name]['api'] = $parallelConf[$name]['url'];
                 //优先使用parallel配置，然后有参数有POST，无参用GET
                 $list[$name]['method'] = $parallelConf[$name]['method'] ?? (empty($params) ? 'GET' : 'POST');
+                $params = array_merge($params, $preParams); //合并参数
                 $list[$name]['params'] = $list[$name]['method'] == 'POST' ? $params : http_build_query($params);
                 //结果解析方法
                 $list[$name]['parser'] = ($parallelConf[$name]['parser'] ?? 'normal') . 'Parser';
@@ -137,10 +144,10 @@ class ConcurrentClient
             || array_key_exists('data', $responseBody) == false
             || isset($responseBody['message']) == false
         ) {
-            throw new BusinessException('Response The result array is incomplete. response=' . json_encode($responseBody). ' Request: ' . json_encode($request));
+            throw new BusinessException('Response The result array is incomplete. response=' . json_encode($responseBody) . ' Request: ' . json_encode($request));
         }
         if ($responseBody['status'] != 200) {
-            throw new BusinessException('Response returns the result status is not equal to 200. response=' . json_encode($responseBody). ' Request: ' . json_encode($request));
+            throw new BusinessException('Response returns the result status is not equal to 200. response=' . json_encode($responseBody) . ' Request: ' . json_encode($request));
         }
 
         return $responseBody['data'];
