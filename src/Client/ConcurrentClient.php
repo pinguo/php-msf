@@ -37,9 +37,9 @@ class ConcurrentClient
         $parallelConf = $config->get('params.parallel');
 
         $preParams = [
-            '__appVersion' => $parent->getContext()->getInput()->postGet('__appVersion') ?? $parent->getContext()->getInput()->postGet('appVersion'),
-            '__locale' => $parent->getContext()->getInput()->postGet('__locale') ?? $parent->getContext()->getInput()->postGet('locale'),
-            '__platform' => $parent->getContext()->getInput()->postGet('__platform') ?? $parent->getContext()->getInput()->postGet('platform')
+            '__appVersion' => !empty($parent->getContext()->getInput()->postGet('__appVersion')) ? $parent->getContext()->getInput()->postGet('__appVersion') : $parent->getContext()->getInput()->postGet('appVersion'),
+            '__locale' => !empty($parent->getContext()->getInput()->postGet('__locale')) ? $parent->getContext()->getInput()->postGet('__locale') : $parent->getContext()->getInput()->postGet('locale'),
+            '__platform' => !empty($parent->getContext()->getInput()->postGet('__platform')) ? $parent->getContext()->getInput()->postGet('__platform') : $parent->getContext()->getInput()->postGet('platform')
         ];
 
         $list = $result = [];
