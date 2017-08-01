@@ -52,8 +52,7 @@ class ConcurrentClient
                 $list[$name]['api'] = $parallelConf[$name]['url'];
                 //优先使用parallel配置，然后有参数有POST，无参用GET
                 $list[$name]['method'] = $parallelConf[$name]['method'] ?? (empty($params) ? 'GET' : 'POST');
-                $params = array_merge($params, $preParams); //合并参数
-                $list[$name]['params'] = $list[$name]['method'] == 'POST' ? $params : http_build_query($params);
+                $list[$name]['params'] = array_merge($params, $preParams); //合并参数;
                 //结果解析方法
                 $list[$name]['parser'] = ($parallelConf[$name]['parser'] ?? 'normal') . 'Parser';
 
