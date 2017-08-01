@@ -7,11 +7,12 @@
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
+
 namespace PG\MSF\Client;
 
+use Exception;
 use PG\Helper\SecurityHelper;
 use PG\MSF\Base\Core;
-use Exception;
 use PG\MSF\Client\Http\Client;
 use PG\MSF\Client\Tcp\Client as TClient;
 
@@ -104,10 +105,10 @@ class RpcClient
         if ($config['host'] === '') {
             throw new Exception('Host configuration not found.');
         }
-        if (! isset($config['useRpc'])) {
+        if (!isset($config['useRpc'])) {
             $config['useRpc'] = getInstance()->config->get('params.service.' . $root . '.useRpc', false);
         }
-        if (! isset($config['timeout'])) {
+        if (!isset($config['timeout'])) {
             $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
         }
         if (!isset($config['appsecret'])) {
@@ -139,7 +140,7 @@ class RpcClient
      */
     public static function serv($service)
     {
-        if (! isset(static::$services[$service])) {
+        if (!isset(static::$services[$service])) {
             static::$services[$service] = new static($service);
         }
 
@@ -272,9 +273,9 @@ class RpcClient
             ];
         } else {
             $preParams = [
-                '__appVersion' => $obj->getContext()->getInput()->postGet('__appVersion') ?? $obj->getContext()->getInput()->postGet('appVersion'),
-                '__locale' => $obj->getContext()->getInput()->postGet('__locale') ?? $obj->getContext()->getInput()->postGet('locale'),
-                '__platform' => $obj->getContext()->getInput()->postGet('__platform') ?? $obj->getContext()->getInput()->postGet('platform')
+                '__appVersion' => !empty($obj->getContext()->getInput()->postGet('__appVersion')) ? $obj->getContext()->getInput()->postGet('__appVersion') : $obj->getContext()->getInput()->postGet('appVersion'),
+                '__locale' => !empty($obj->getContext()->getInput()->postGet('__locale')) ? $obj->getContext()->getInput()->postGet('__locale') : $obj->getContext()->getInput()->postGet('locale'),
+                '__platform' => !empty($obj->getContext()->getInput()->postGet('__platform')) ? $obj->getContext()->getInput()->postGet('__platform') : $obj->getContext()->getInput()->postGet('platform')
             ];
             $sendData = array_merge($args[0], $preParams);
             $sendData['sig'] = static::genSig($sendData, $rpc->appsecret);
