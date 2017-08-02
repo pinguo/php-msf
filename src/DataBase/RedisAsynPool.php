@@ -431,7 +431,7 @@ class RedisAsynPool extends AsynPool
         $client->on('close', [$this, 'onClose']);
         $client->connect($this->connect[0], $this->connect[1], function ($client, $result) {
             if (!$result) {
-                throw new Exception($client->errMsg .  "with Redis {$this->config['redis'][$this->active]['ip']}:$this->config['redis'][$this->active]['port']");
+                throw new Exception($client->errMsg .  "with Redis {$this->connect[0]}:{$this->connect[1]}");
             }
             $this->waitConnetNum--;
             $client->isClose = false;
