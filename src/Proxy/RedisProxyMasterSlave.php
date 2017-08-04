@@ -139,6 +139,9 @@ class RedisProxyMasterSlave implements IProxy
         }
 
         if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+            if (getInstance()->getAsynPool($redisPoolName) == null) {
+                return false;
+            }
             RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
         }
         $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
