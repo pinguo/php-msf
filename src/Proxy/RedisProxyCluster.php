@@ -148,6 +148,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $ret = array();
         foreach ($arrRedis as $index => $redisPoolName) {
             if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+                if (getInstance()->getAsynPool($redisPoolName) == null) {
+                    return [];
+                }
                 RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
             }
             $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
@@ -187,6 +190,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $redisPoolName = $this->lookup($this->generateUniqueKey($key));
 
         if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+            if (getInstance()->getAsynPool($redisPoolName) == null) {
+                return false;
+            }
             RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
         }
         $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
@@ -258,6 +264,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
         $opData = [];
         foreach ($opArr as $redisPoolName => $op) {
             if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+                if (getInstance()->getAsynPool($redisPoolName) == null) {
+                    return [];
+                }
                 RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
             }
             $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
