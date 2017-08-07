@@ -48,7 +48,7 @@ class NormalRoute implements IRoute
     {
         $this->clientData->path = rtrim($request->server['path_info'], '/');
         $this->clientData->verb = $this->parseVerb($request);
-        $this->setParams($request->get);
+        $this->setParams($request->get ?? []);
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->clientData->isRpc          = true;
