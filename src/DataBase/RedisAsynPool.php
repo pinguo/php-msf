@@ -131,7 +131,7 @@ class RedisAsynPool extends AsynPool
 
     /**
      * 协程模式 更加便捷
-     * @return \Redis
+     * @return \Redis|coroutineRedisProxy
      */
     public function getCoroutine()
     {
@@ -384,8 +384,8 @@ class RedisAsynPool extends AsynPool
                 //给worker发消息
                 $this->asynManager->sendMessageToWorker($this, $data);
                 //回归连接
-                if (((time() - $client->genTime) < 5)
-                    || (($this->redisMaxCount + $this->waitConnetNum) <= 10)
+                if (((time() - $client->genTime) < 3600)
+                    || (($this->redisMaxCount + $this->waitConnetNum) <= 30)
                 ) {
                     $this->pushToPool($client);
                 } else {
