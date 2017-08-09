@@ -436,6 +436,7 @@ class RedisAsynPool extends AsynPool
 
             if (!$result) {
                 getInstance()->log->error($client->errMsg .  " with Redis {$this->connect[0]}:{$this->connect[1]}");
+                return false;
             }
 
             $client->isClose = false;
