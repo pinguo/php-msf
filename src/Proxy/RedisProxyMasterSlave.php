@@ -84,10 +84,6 @@ class RedisProxyMasterSlave implements IProxy
             }
         }
 
-        if ($this->master === null) {
-            return false;
-        }
-
         //探测从节点
         if (count($this->pools) === 1) {
             $this->slaves[] = $this->master;

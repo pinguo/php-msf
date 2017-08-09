@@ -149,11 +149,13 @@ class RedisAsynPool extends AsynPool
             $this->commands->push($data);
         } else {
             $client = $this->pool->shift();
+
             if ($client->isClose) {
                 $this->reconnect($client);
                 $this->commands->push($data);
                 return;
             }
+
             $arguments = $data['arguments'];
             $dataName = strtolower($data['name']);
             //异步的时候有些命令不存在进行替换
@@ -430,10 +432,12 @@ class RedisAsynPool extends AsynPool
 
         $client->on('close', [$this, 'onClose']);
         $client->connect($this->connect[0], $this->connect[1], function ($client, $result) {
-            if (!$result) {
-                throw new Exception($client->errMsg .  "with Redis {$this->connect[0]}:{$this->connect[1]}");
-            }
             $this->waitConnetNum--;
+
+            if (!$result) {
+                getInstance()->log->error($client->errMsg .  " with Redis {$this->connect[0]}:{$this->connect[1]}");
+            }
+
             $client->isClose = false;
             if (!isset($client->client_id)) {
                 $client->client_id = $this->redisMaxCount;
