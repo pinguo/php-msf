@@ -20,8 +20,6 @@ class Config
 
     public $lastMinute;
 
-    protected $redisCheckLock;
-
     protected $redisRetryTimes = [];
 
     const FAILURE_LIMIT = 2;
@@ -32,14 +30,8 @@ class Config
         $this->config = $config;
         $this->MSFServer = $MSFServer;
         $this->lastMinute = ceil(time() / 60);
-        $this->redisCheckLock = new \swoole_lock();
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
-    }
-
-    public function __destruct()
-    {
-        unset($this->redisCheckLock);
     }
 
     public function stats()
@@ -126,117 +118,135 @@ class Config
 
     public function checkRedisProxy()
     {
-        if (!$this->redisCheckLock->lock()) {
-            return;
+        $host             = gethostname();
+        $redisProxyConfig = $this->config->get('redis_proxy', null);
+        $redisConfig      = $this->config->get('redis', null);
+
+        if (empty($redisProxyConfig)) {
+            return true;
         }
 
-        $host = gethostname();
+        foreach ($redisProxyConfig as $proxyName => $proxyConfig) {
+            if ($proxyName == 'active') {
+                continue;
+            }
 
-        $redisProxyConfig = $this->config->get('redis_proxy', null);
-        $redisConfig = $this->config->get('redis', null);
-
-        if ($redisProxyConfig) {
-            foreach ($redisProxyConfig as $proxyName => $proxyConfig) {
-                if ($proxyName != 'active') {
-                    //分布式
-                    if ($proxyConfig['mode'] == Marco::CLUSTER) {
-                        $pools = $proxyConfig['pools'];
-                        $goodPools = [];
-                        foreach ($pools as $pool => $weight) {
-                            try {
-                                $redis = new \Redis();
-                                @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
-                                if ($redis->set('msf_active_cluster_check_' . $host, 1, 3)) {
-                                    $goodPools[$pool] = $weight;
-                                }
-                            } catch (\Throwable $e) {
-                                $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
-                                $this->MSFServer->log->error($error);
-                            }
-                            $redis->close();
-
-                            //容忍一定次数的错误重试
-                            if (isset($goodPools[$pool])) {
-                                $this->redisRetryTimes[$pool] = 0;
-                            } else {
-                                @$this->redisRetryTimes[$pool]++;
-                                if ($this->redisRetryTimes[$pool] < self::FAILURE_LIMIT) {
-                                    $goodPools[$pool] = $weight;
-                                }
-                            }
+            //分布式
+            if ($proxyConfig['mode'] == Marco::CLUSTER) {
+                $pools     = $proxyConfig['pools'];
+                $goodPools = [];
+                foreach ($pools as $pool => $weight) {
+                    try {
+                        $redis = new \Redis();
+                        $redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                        if ($redis->set('msf_active_cluster_check_' . $host, 1, 3)) {
+                            $goodPools[$pool] = $weight;
                         }
-                        $this->MSFServer->sysCache->set($proxyName, $goodPools);
-                    } elseif ($proxyConfig['mode'] == Marco::MASTER_SLAVE) { //主从
-                        $oldConfig = $this->MSFServer->sysCache->get($proxyName);
+                    } catch (\Throwable $e) {
+                        $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
+                        $this->MSFServer->log->error($error);
+                    }
+                    $redis->close();
 
-                        $pools = $proxyConfig['pools'];
-                        $master = '';
-                        $slaves = [];
-                        //主
-                        foreach ($pools as $pool) {
-                            if ($master != '') {
-                                break;
-                            }
-                            try {
-                                $redis = new \Redis();
-                                @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
-                                if ($redis->set('msf_active_master_slave_check_' . $host, 1, 3)) {
-                                    $master = $pool;
-                                }
-                            } catch (\Throwable $e) {
-                                $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
-                                $this->MSFServer->log->error($error);
-                            }
-                            $redis->close();
+                    //容忍一定次数的错误重试
+                    if (isset($goodPools[$pool])) {
+                        $this->redisRetryTimes[$pool] = 0;
+                    } else {
+                        if (!isset($this->redisRetryTimes[$pool])) {
+                            $this->redisRetryTimes[$pool] = 0;
                         }
 
-                        //永远不主动踢出master节点
-                        if ($master != '') {
-                            $this->redisRetryTimes['master'] = 0;
-                        } else {
-                            @$this->redisRetryTimes['master']++;
-                            $master = $oldConfig['master'] ?? '';
+                        $this->redisRetryTimes[$pool]++;
+                        if ($this->redisRetryTimes[$pool] < self::FAILURE_LIMIT) {
+                            $goodPools[$pool] = $weight;
                         }
-
-                        //从
-                        if (count($pools) == 1) {
-                            $slaves[] = $master;
-                        } else {
-                            foreach ($pools as $pool) {
-                                if ($master == $pool) {
-                                    continue;
-                                }
-                                try {
-                                    $redis = new \Redis();
-                                    @$redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
-                                    if ($redis->get('msf_active_master_slave_check_' . $host) == 1) {
-                                        $slaves[] = $pool;
-                                    }
-                                } catch (\Throwable $e) {
-                                    $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
-                                    $this->MSFServer->log->error($error);
-                                }
-                                $redis->close();
-
-                                //容忍一定次数的从节点错误
-                                if (in_array($pool, $slaves)) {
-                                    $this->redisRetryTimes[$pool] = 0;
-                                } else {
-                                    @$this->redisRetryTimes[$pool]++;
-                                    if ($this->redisRetryTimes[$pool] < self::FAILURE_LIMIT) {
-                                        $slaves[] = $pool;
-                                    }
-                                }
-                            }
-                        }
-
-                        $this->MSFServer->sysCache->set($proxyName, ['master' => $master, 'slaves' => $slaves]);
                     }
                 }
+                $this->MSFServer->sysCache->set($proxyName, $goodPools);
+            }
+
+            //主从
+            if ($proxyConfig['mode'] == Marco::MASTER_SLAVE) {
+                $oldConfig = $this->MSFServer->sysCache->get($proxyName);
+                $pools     = $proxyConfig['pools'];
+                $master    = '';
+                $slaves    = [];
+                //主
+                foreach ($pools as $pool) {
+                    if ($master != '') {
+                        break;
+                    }
+
+                    try {
+                        $redis = new \Redis();
+                        $redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                        if ($redis->set('msf_active_master_slave_check_' . $host, 1, 3)) {
+                            $master = $pool;
+                        }
+                    } catch (\Throwable $e) {
+                        $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
+                        $this->MSFServer->log->error($error);
+                    }
+                    $redis->close();
+                }
+
+                // 避免主从同步的延迟
+                sleep(1);
+
+                //永远不主动踢出master节点
+                if ($master != '') {
+                    $this->redisRetryTimes[$proxyName] = 0;
+                } else {
+                    if (!isset($this->redisRetryTimes[$proxyName])) {
+                        $this->redisRetryTimes[$proxyName] = 0;
+                    }
+
+                    $this->redisRetryTimes[$proxyName]++;
+                    $master = $oldConfig['master'] ?? '';
+                }
+
+                //从
+                if (count($pools) == 1) {
+                    $slaves[] = $master;
+                    $this->MSFServer->sysCache->set($proxyName, ['master' => $master, 'slaves' => $slaves]);
+                    continue;
+                }
+
+                foreach ($pools as $pool) {
+                    if ($master == $pool) {
+                        continue;
+                    }
+
+                    try {
+                        $redis = new \Redis();
+                        $redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                        if ($redis->get('msf_active_master_slave_check_' . $host) == 1) {
+                            $slaves[] = $pool;
+                        }
+                    } catch (\Throwable $e) {
+                        $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
+                        $this->MSFServer->log->error($error);
+                    }
+                    $redis->close();
+
+                    //容忍一定次数的从节点错误
+                    if (in_array($pool, $slaves)) {
+                        $this->redisRetryTimes[$pool] = 0;
+                    } else {
+                        if (!isset($this->redisRetryTimes[$pool])) {
+                            $this->redisRetryTimes[$pool] = 0;
+                        }
+                        $this->redisRetryTimes[$pool]++;
+                        if ($this->redisRetryTimes[$pool] < self::FAILURE_LIMIT) {
+                            $slaves[] = $pool;
+                        }
+                    }
+                }
+
+                $this->MSFServer->sysCache->set($proxyName, ['master' => $master, 'slaves' => $slaves]);
             }
         }
 
-        $this->redisCheckLock->unlock();
         return true;
     }
 }
