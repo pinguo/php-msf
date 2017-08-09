@@ -126,7 +126,7 @@ class RedisProxyMasterSlave implements IProxy
     {
         $upMethod = strtoupper($method);
         //读
-        if (in_array($upMethod, self::$readOperation)) {
+        if (in_array($upMethod, self::$readOperation) && !empty($this->slaves)) {
             $rand = array_rand($this->slaves);
             $redisPoolName = $this->slaves[$rand];
         } else {
