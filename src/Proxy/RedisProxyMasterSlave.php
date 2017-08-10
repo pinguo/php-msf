@@ -134,7 +134,7 @@ class RedisProxyMasterSlave implements IProxy
             $redisPoolName = $this->master;
         }
 
-        // EVALMOCK
+        // EVALMOCK在指定了脚本仅读操作时，可以在从节点上执行
         if ($upMethod == 'EVALMOCK' && isset($arguments[3])) {
             if ($arguments[3]) {
                 $rand          = array_rand($this->slaves);
