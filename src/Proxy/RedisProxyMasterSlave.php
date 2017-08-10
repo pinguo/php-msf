@@ -127,11 +127,21 @@ class RedisProxyMasterSlave implements IProxy
         $upMethod = strtoupper($method);
         //读
         if (in_array($upMethod, self::$readOperation) && !empty($this->slaves)) {
-            $rand = array_rand($this->slaves);
+            $rand          = array_rand($this->slaves);
             $redisPoolName = $this->slaves[$rand];
         } else {
             //写
             $redisPoolName = $this->master;
+        }
+
+        // EVALMOCK在指定了脚本仅读操作时，可以在从节点上执行
+        if ($upMethod == 'EVALMOCK' && isset($arguments[3])) {
+            if ($arguments[3]) {
+                $rand          = array_rand($this->slaves);
+                $redisPoolName = $this->slaves[$rand];
+            }
+
+            array_pop($arguments);
         }
 
         if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
