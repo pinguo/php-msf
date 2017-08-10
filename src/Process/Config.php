@@ -80,7 +80,7 @@ class Config
 
         $workerIds = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
         foreach ($workerIds as $workerId) {
-            $workerInfo = $this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
+            $workerInfo = @$this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
             if ($workerInfo) {
                 $data['worker']['worker' . $workerId] = $workerInfo;
             } else {
