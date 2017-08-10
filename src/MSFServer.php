@@ -143,8 +143,8 @@ abstract class MSFServer extends WebSocketServer
         //创建task用的Atomic
         $this->taskAtomic = new \swoole_atomic(0);
 
-        //创建task用的id->pid共享内存表不至于同时超过1024个任务
-        $this->tidPidTable = new \swoole_table(1024);
+        //创建task用的id->pid共享内存表，进程最多可以同时处理8096个任务
+        $this->tidPidTable = new \swoole_table(8096);
         $this->tidPidTable->column('pid', \swoole_table::TYPE_INT, 8);
         $this->tidPidTable->column('des', \swoole_table::TYPE_STRING, 50);
         $this->tidPidTable->column('start_time', \swoole_table::TYPE_INT, 8);
