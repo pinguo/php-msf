@@ -184,8 +184,11 @@ class Config
                             $master = $pool;
                         }
                     } catch (\Throwable $e) {
-                        $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . " " . $e->getMessage();
-                        $this->MSFServer->log->error($error);
+                        //探测主节点时忽略写从的异常信息
+                        if (stripos($e->getMessage(), 'readonly') === false) {
+                            $error = $redisConfig[$pool]['ip'] . ':' . $redisConfig[$pool]['port'] . ' ' . $e->getMessage();
+                            $this->MSFServer->log->error($error);
+                        }
                     }
                     $redis->close();
                 }
