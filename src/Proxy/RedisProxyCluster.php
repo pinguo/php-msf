@@ -245,7 +245,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
             foreach ($opData as $redisPoolName => $op) {
                 $keys = $opArr[$redisPoolName];
                 $values = yield $op;
-                $retData = array_merge($retData, array_combine($keys, $values));
+                if (is_array($values)) { //$values有可能超时返回false
+                    $retData = array_merge($retData, array_combine($keys, $values));
+                }
             }
 
             return $retData;
