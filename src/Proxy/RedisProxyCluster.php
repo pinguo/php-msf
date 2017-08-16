@@ -8,9 +8,9 @@
 
 namespace PG\MSF\Proxy;
 
+use Exception;
 use Flexihash\Flexihash;
 use Flexihash\Hasher\Md5Hasher;
-use Exception;
 use PG\MSF\DataBase\RedisAsynPool;
 
 class RedisProxyCluster extends Flexihash implements IProxy
@@ -23,6 +23,10 @@ class RedisProxyCluster extends Flexihash implements IProxy
 
     private $keyPrefix = '';
     private $hashKey = false;
+    /**
+     * @var bool 随机选择一个redis，一般用于redis前面有twemproxy等代理，每个代理都可以处理请求，随机即可
+     */
+    private $isRandom = false;
 
     /**
      * RedisProxyCluster constructor.
@@ -33,7 +37,12 @@ class RedisProxyCluster extends Flexihash implements IProxy
     {
         $this->name = $name;
         $this->pools = $config['pools'];
+
+        $this->keyPrefix = $config['keyPrefix'] ?? '';
+        $this->hashKey = $config['hashKey'] ?? false;
+        $this->isRandom = $config['random'] ?? false;
         $hasher = $config['hasher'] ?? Md5Hasher::class;
+
         $hasher = new $hasher;
         try {
             parent::__construct($hasher);
@@ -97,6 +106,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
     public function handle(string $method, array $arguments)
     {
         try {
+            if ($this->isRandom) {
+                return $this->random($method, $arguments);
+            }
             if ($method === 'evalMock') {
                 return $this->evalMock($arguments);
             } else {
@@ -176,6 +188,32 @@ class RedisProxyCluster extends Flexihash implements IProxy
     private function generateUniqueKey(string $key)
     {
         return $this->hashKey ? md5($this->keyPrefix . $key) : $this->keyPrefix . $key;
+    }
+
+    /**
+     * 随机策略
+     * @param string $method
+     * @param array $arguments
+     * @return bool
+     */
+    private function random(string $method, array $arguments)
+    {
+        $redisPoolName = array_rand($this->goodPools);
+        if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+            if (getInstance()->getAsynPool($redisPoolName) == null) {
+                return false;
+            }
+            RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
+        }
+        $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
+
+        if ($method === 'cache') {
+            $result = $redisPoolCoroutine->$method(...$arguments);
+        } else {
+            $result = $redisPoolCoroutine->__call($method, $arguments);
+        }
+
+        return $result;
     }
 
     /**
