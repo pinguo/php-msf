@@ -183,6 +183,12 @@ class Client extends Core
                 $parseUrlResult['port'] = 443;
                 $parseUrlResult['ssl']  = true;
             }
+        } else {
+            if ($parseUrlResult['scheme'] == 'http') {
+                $parseUrlResult['ssl']  = false;
+            } else {
+                $parseUrlResult['ssl']  = true;
+            }
         }
 
         if (empty($parseUrlResult['path'])) {
