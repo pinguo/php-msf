@@ -1,8 +1,8 @@
 <?php
 /**
- * @desc: AOP类工厂
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/3/28
+ * AOP类工厂
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -22,6 +22,12 @@ class AOPFactory extends Factory
      * @var array
      */
     protected static $reflections = [];
+
+    /**
+     * 所有为Task类的标识
+     * @var array
+     */
+    protected static $taskClasses = [];
 
     /**
      * 获取协程redis
@@ -91,7 +97,50 @@ class AOPFactory extends Factory
                         }
                     }
                 }
+                $arguments[0]->__isContruct = false;
             }
+
+            if ($method === 'get') {
+                $className = $arguments[0];
+                // 支持TaskProxy
+                do {
+                    if (isset(self::$taskClasses[$className])) {
+                        break;
+                    }
+
+                    $parents = class_parents($className, true);
+                    if (empty($parents)) {
+                        self::$taskClasses[$className] = 0;
+                        break;
+                    }
+
+                    $flag = false;
+                    foreach ($parents as $parentClassName) {
+                        if ($parentClassName == 'PG\MSF\Tasks\Task') {
+                            self::$taskClasses[$className] = 1;
+                            $flag = true;
+                            break;
+                        }
+                    }
+
+                    if ($flag) {
+                        break;
+                    }
+
+                    self::$taskClasses[$className] = 0;
+                } while (0);
+
+                if (self::$taskClasses[$className]) {
+                    // worker进程
+                    if (!empty(getInstance()->server)
+                        && property_exists(getInstance()->server, 'taskworker')
+                        && !getInstance()->server->taskworker) {
+                        $arguments[0] = '\PG\MSF\Tasks\TaskProxy';
+                        array_push($arguments, $className);
+                    }
+                }
+            }
+
             $data['method'] = $method;
             $data['arguments'] = $arguments;
             return $data;
@@ -101,11 +150,24 @@ class AOPFactory extends Factory
             //取得对象后放入请求内部bucket
             if ($method === 'get' && is_object($result)) {
                 //使用次数+1
-                $result->useCount++;
+                $result->__useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
                 $result->context = &$coreBase->context;
+                if (!empty($result->context)) {
+                    $result->context->setOwner($result);
+                }
                 $result->parent = &$coreBase;
                 $class = get_class($result);
+                // 支持TaskProxy
+                if ($result instanceof \PG\MSF\Tasks\TaskProxy) {
+                    $result->taskName = array_pop($arguments);
+                }
+                // 自动调用构造方法
+                if (method_exists($result, '__construct') && $result->__isContruct == false) {
+                    $result->__isContruct = true;
+                    $result->__construct(...array_slice($arguments, 1));
+                }
+                // 支持自动销毁public成员变量
                 if (!isset(self::$reflections[$class])) {
                     $reflection = new \ReflectionClass($class);
                     $default = $reflection->getDefaultProperties();
@@ -118,9 +180,8 @@ class AOPFactory extends Factory
                     foreach ($ss as $val) {
                         unset($autoDestroy[$val->getName()]);
                     }
-                    unset($autoDestroy['useCount']);
-                    unset($autoDestroy['genTime']);
-                    unset($autoDestroy['coreName']);
+                    unset($autoDestroy['__useCount']);
+                    unset($autoDestroy['__genTime']);
                     self::$reflections[$class] = $autoDestroy;
                 }
                 unset($reflection);

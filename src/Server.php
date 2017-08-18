@@ -28,7 +28,7 @@ abstract class Server extends Child
     /**
      * 版本
      */
-    const version = "2.2.8";
+    const version = "3.0.0";
 
     /**
      * 运行方式（web/console）
@@ -176,12 +176,6 @@ abstract class Server extends Child
     protected $route;
 
     /**
-     * 加载器
-     * @var Loader
-     */
-    public $loader;
-
-    /**
      * Emitted when worker processes stoped.
      *
      * @var callback
@@ -312,7 +306,6 @@ abstract class Server extends Child
             }
         }
         $this->route  = new $routeClassName;
-        $this->loader = new Loader();
     }
 
     public function getTimerContext()

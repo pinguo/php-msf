@@ -14,18 +14,47 @@ use PG\MSF\Coroutine\CTask;
 
 class TaskProxy extends Core
 {
-    protected $taskId;
+
     /**
-     * task代理数据
+     * 任务执行超时时间
+     *
+     * @var int
+     */
+    protected $timeout = 0;
+
+    /**
+     * 任务ID
+     *
+     * @var int
+     */
+    protected $taskId;
+
+    /**
+     * task执行数据
+     *
      * @var mixed
      */
     private $taskProxyData;
 
     /**
-     * TaskProxy constructor.
+     * 执行的Task Name
+     *
+     * @var string
      */
-    public function __construct()
+    public $taskName;
+
+    /**
+     * Task构造参数
+     */
+    public $taskConstruct;
+
+    /**
+     * TaskProxy constructor.
+     * @param array ...$args
+     */
+    public function __construct(...$args)
     {
+        $this->taskConstruct = $args;
         parent::__construct();
     }
 
@@ -48,15 +77,39 @@ class TaskProxy extends Core
         $this->taskProxyData = [
             'type'    => Marco::SERVER_TYPE_TASK,
             'message' => [
-                'task_name'     => $this->coreName,
-                'task_fuc_name' => $name,
-                'task_fuc_data' => $arguments,
-                'task_id'       => $this->taskId,
-                'task_context'  => $this->getContext(),
+                'task_name'      => $this->taskName,
+                'task_fuc_name'  => $name,
+                'task_fuc_data'  => $arguments,
+                'task_id'        => $this->taskId,
+                'task_context'   => $this->getContext(),
+                'task_construct' => $this->taskConstruct,
             ]
         ];
 
-        return $this->taskId;
+        return $this->getContext()->getObjectPool()->get(CTask::class)->initialization($this->taskProxyData, -1, $this->timeout);
+    }
+
+    /**
+     * 设置任务执行超时时间
+     *
+     * @param int $timeout
+     * @return $this
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+        return $this;
+    }
+
+    /**
+     * 获取任务执行超时时间
+     *
+     * @param int $timeout
+     * @return int
+     */
+    public function getTimeout($timeout)
+    {
+        return $this->timeout;
     }
 
     /**

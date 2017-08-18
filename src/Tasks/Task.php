@@ -1,8 +1,7 @@
 <?php
 /**
  * Task 异步任务
- * 在worker中的Task会被构建成TaskProxy。这个实例是单例的，
- * 所以发起task请求时每次都要使用loader给TaskProxy赋值，不能缓存重复使用，以免数据错乱。
+ * 在worker进程通过TaskProxy代理执行请求，在Tasker进程为单例
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -21,7 +20,7 @@ class Task extends TaskProxy
         parent::__construct();
     }
 
-    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
+    public function __initialization($taskId, $workerPid, $taskName, $methodName, $context)
     {
         /**
          * @var Context $context
@@ -53,26 +52,5 @@ class Task extends TaskProxy
         $this->taskId && getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
         $this->taskId = 0;
-    }
-
-    /**
-     * 检查中断信号返回本Task是否该中断
-     * @return bool
-     */
-    protected function checkInterrupted()
-    {
-        $interrupted = pcntl_signal_dispatch();
-        if ($interrupted == false) {
-            return false;
-        }
-        //表总0获得值代表的是需要中断的id
-        $interruptedTaskId = getInstance()->tidPidTable->get(0)['pid'];
-        //读取后可以释放锁了
-        getInstance()->taskLock->unlock();
-        if ($interruptedTaskId == $this->taskId) {
-            return true;
-        }
-
-        return false;
     }
 }

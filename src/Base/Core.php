@@ -21,18 +21,18 @@ class Core extends Child
     /**
      * @var int
      */
-    public $useCount;
+    public $__useCount;
 
     /**
      * @var int
      */
-    public $genTime;
+    public $__genTime;
 
     /**
      * 销毁标志
      * @var bool
      */
-    protected $isDestroy = false;
+    protected $__isDestroy = false;
 
     /**
      * @var null
@@ -54,9 +54,17 @@ class Core extends Child
     protected $redisProxies;
 
     /**
-     * Task constructor.
+     * 构造方法
      */
     public function __construct()
+    {
+
+    }
+
+    /**
+     * 支持自动销毁public修饰的成员属性
+     */
+    public function __supportAutoDestroy()
     {
         if (empty(Child::$reflections[static::class])) {
             $reflection  = new \ReflectionClass(static::class);
@@ -70,9 +78,9 @@ class Core extends Child
             foreach ($ss as $val) {
                 unset($autoDestroy[$val->getName()]);
             }
-            unset($autoDestroy['useCount']);
-            unset($autoDestroy['genTime']);
-            unset($autoDestroy['coreName']);
+            unset($autoDestroy['__useCount']);
+            unset($autoDestroy['__genTime']);
+            unset($autoDestroy['__coreName']);
             Child::$reflections[static::class] = $autoDestroy;
             unset($reflection);
             unset($default);
@@ -88,15 +96,7 @@ class Core extends Child
      */
     public function __sleep()
     {
-        return ['useCount', 'genTime'];
-    }
-
-    /**
-     * @return Loader
-     */
-    public function getLoader()
-    {
-        return getInstance()->loader;
+        return ['__useCount', '__genTime'];
     }
 
     /**
@@ -214,9 +214,9 @@ class Core extends Child
      */
     public function destroy()
     {
-        if (!$this->isDestroy) {
+        if (!$this->__isDestroy) {
             parent::destroy();
-            $this->isDestroy = true;
+            $this->__isDestroy = true;
         }
     }
 
@@ -225,7 +225,7 @@ class Core extends Child
      */
     public function isUse()
     {
-        $this->isDestroy = false;
+        $this->__isDestroy = false;
     }
 
     /**
@@ -235,6 +235,6 @@ class Core extends Child
      */
     public function getIsDestroy()
     {
-        return $this->isDestroy;
+        return $this->__isDestroy;
     }
 }
