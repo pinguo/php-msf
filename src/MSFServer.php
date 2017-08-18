@@ -20,8 +20,9 @@ use PG\MSF\DataBase\MysqlAsynPool;
 use PG\MSF\DataBase\RedisAsynPool;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
+use PG\MSF\Tasks\Task as TaskBase;
+use PG\MSF\Base\AOPFactory;
 use Exception;
-use \PG\MSF\Tasks\Task as TaskBase;
 
 abstract class MSFServer extends WebSocketServer
 {
@@ -98,6 +99,13 @@ abstract class MSFServer extends WebSocketServer
     protected $redisProxyManager = [];
 
     /**
+     * Tasks list（Task进程中单例模式）
+     *
+     * @var array
+     */
+    protected $_tasks = [];
+
+    /**
      * MSFServer constructor.
      */
     public function __construct()
@@ -154,7 +162,7 @@ abstract class MSFServer extends WebSocketServer
         $this->taskLock = new \swoole_lock(SWOOLE_MUTEX);
 
         //初始化对象池
-        $this->objectPool = Pool::getInstance();
+        $this->objectPool    = Pool::getInstance();
 
         //创建异步连接池进程
         if ($this->config->get('asyn_process_enable', false)) {//代表启动单独进程进行管理
@@ -267,6 +275,7 @@ abstract class MSFServer extends WebSocketServer
      */
     public function onSwooleTask($serv, $taskId, $fromId, $data)
     {
+
         if (is_string($data)) {
             $unserializeData = unserialize($data);
         } else {
@@ -278,15 +287,23 @@ abstract class MSFServer extends WebSocketServer
         switch ($type) {
             case Marco::SERVER_TYPE_TASK://task任务
                 try {
-                    $taskName    = $message['task_name'];
-                    $task        = $this->loader->task($taskName);
-                    $taskFucName = $message['task_fuc_name'];
-                    $taskData    = $message['task_fuc_data'];
-                    $taskId      = $message['task_id'];
-                    $taskContext = $message['task_context'];
+                    $taskName      = $message['task_name'];
+                    $taskFucName   = $message['task_fuc_name'];
+                    $taskData      = $message['task_fuc_data'];
+                    $taskId        = $message['task_id'];
+                    $taskContext   = $message['task_context'];
+                    $taskConstruct = $message['task_construct'];
+
+                    if (key_exists($taskName, $this->_tasks)) {
+                        $task = $this->_tasks[$taskName];
+                    } else {
+                        $task                    = new $taskName(...$taskConstruct);
+                        $this->_tasks[$taskName] = $task;
+                    }
+
                     if (method_exists($task, $taskFucName)) {
                         //给task做初始化操作
-                        $task->initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName, $taskContext);
+                        $task->__initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName, $taskContext);
                         $result = $task->$taskFucName(...$taskData);
                     } else {
                         throw new Exception("method $taskFucName not exist in $taskName");

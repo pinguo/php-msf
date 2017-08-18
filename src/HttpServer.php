@@ -167,7 +167,7 @@ abstract class HttpServer extends Server
             }
 
             try {
-                $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
+                $controllerInstance->context  = $controllerInstance->__getObjectPool()->get(Context::class);
 
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
@@ -185,17 +185,17 @@ abstract class HttpServer extends Server
                 // 构造请求上下文成员
                 $controllerInstance->context->setLogId($PGLog->logId);
                 $controllerInstance->context->setLog($PGLog);
-                $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
+                $controllerInstance->context->setObjectPool($controllerInstance->__getObjectPool());
 
                 /**
                  * @var $input Input
                  */
-                $input    = $controllerInstance->getObjectPool()->get(Input::class);
+                $input    = $controllerInstance->__getObjectPool()->get(Input::class);
                 $input->set($request);
                 /**
                  * @var $output Output
                  */
-                $output   = $controllerInstance->getObjectPool()->get(Output::class);
+                $output   = $controllerInstance->__getObjectPool()->get(Output::class);
                 $output->set($request, $response);
                 $output->initialization($controllerInstance);
 
@@ -232,6 +232,7 @@ abstract class HttpServer extends Server
                 }
                 break;
             } catch (\Throwable $e) {
+                dump($e);
                 $controllerInstance->onExceptionHandle($e);
             }
         } while (0);

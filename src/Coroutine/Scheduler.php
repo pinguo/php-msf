@@ -95,18 +95,6 @@ class Scheduler
                     }
                 }
             }
-
-            if (!empty(ModelFactory::getInstance()->pool)) {
-                foreach (ModelFactory::getInstance()->pool as $class => &$objectsMPool) {
-                    while ($objectsMPool->count()) {
-                        $obj = $objectsMPool->shift();
-                        $obj->setRedisPools(null);
-                        $obj->setRedisProxies(null);
-                        $obj = null;
-                        unset($obj);
-                    }
-                }
-            }
         });
     }
 
@@ -169,14 +157,14 @@ class Scheduler
             foreach (getInstance()->objectPool->map as $class => $objects) {
                 if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
-                        $data['object_poll'][$class][] = [
-                            'gen_time' => property_exists($object, 'genTime') ? $object->genTime : 0,
-                            'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
+                        $data['object_pool'][$class][] = [
+                            'gen_time' => property_exists($object, '__genTime') ? $object->__genTime : 0,
+                            'use_count' => property_exists($object, '__useCount') ? $object->__useCount : 0,
                             'ref_count' => refcount($object) - 1,
                         ];
                     }
                 } else {
-                    $data['object_poll'][$class] = $objects->count() + $data['coroutine']['total'];
+                    $data['object_pool'][$class] = $objects->count() + $data['coroutine']['total'];
                 }
             }
         }
@@ -185,30 +173,14 @@ class Scheduler
             foreach (ControllerFactory::getInstance()->pool as $class => $objects) {
                 if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
                     foreach ($objects as $object) {
-                        $data['controller_poll'][$class][] = [
-                            'gen_time' => property_exists($object, 'genTime') ? $object->genTime : 0,
-                            'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
+                        $data['controller_pool'][$class][] = [
+                            'gen_time' => property_exists($object, '__genTime') ? $object->__genTime : 0,
+                            'use_count' => property_exists($object, '__useCount') ? $object->__useCount : 0,
                             'ref_count' => refcount($object) - 1,
                         ];
                     }
                 } else {
-                    $data['controller_poll'][$class] = $objects->count() + $data['coroutine']['total'];
-                }
-            }
-        }
-
-        if (!empty(ModelFactory::getInstance()->pool)) {
-            foreach (ModelFactory::getInstance()->pool as $class => $objects) {
-                if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
-                    foreach ($objects as $object) {
-                        $data['model_poll'][$class][] = [
-                            'gen_time' => property_exists($object, 'genTime') ? $object->genTime : 0,
-                            'use_count' => property_exists($object, 'useCount') ? $object->useCount : 0,
-                            'ref_count' => refcount($object) - 1,
-                        ];
-                    }
-                } else {
-                    $data['model_poll'][$class] = $objects->count() + $data['coroutine']['total'];
+                    $data['controller_pool'][$class] = $objects->count() + $data['coroutine']['total'];
                 }
             }
         }

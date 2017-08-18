@@ -225,13 +225,13 @@ class Output extends Core
 
         try {
             $viewFile = ROOT_PATH . '/app/Views/' . $view;
-            $template = $this->getLoader()->view($viewFile);
+            $template = getInstance()->templateEngine->make($viewFile);
             $response = $template->render($data);
         } catch (\Throwable $e) {
             $template = null;
             $viewFile = getInstance()->MSFSrcDir . '/Views/' . $view;
             try {
-                $template = $this->getLoader()->view($viewFile);
+                $template = getInstance()->templateEngine->make($viewFile);
                 $response = $template->render($data);
             } catch (\Throwable $e) {
                 throw new Exception('app view and server view both not exist, please check again', 500);

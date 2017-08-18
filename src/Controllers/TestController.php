@@ -35,7 +35,7 @@ class TestController extends Controller
      */
     public function isIsDestroy()
     {
-        return $this->isDestroy;
+        return $this->__isDestroy;
     }
 
     public function HttpTcp()

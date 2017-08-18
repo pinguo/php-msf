@@ -72,8 +72,16 @@ class Controller extends Core
      */
     final public function __construct()
     {
-        parent::__construct();
+        $this->__supportAutoDestroy();
         $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
+    }
+
+    /**
+     * @return Wrapper|\PG\MSF\Memory\Pool
+     */
+    public function __getObjectPool()
+    {
+        return $this->objectPool;
     }
 
     /**
@@ -81,7 +89,7 @@ class Controller extends Core
      */
     public function getObjectPool()
     {
-        return $this->objectPool;
+        return $this->getContext()->getObjectPool();
     }
 
     /**
@@ -184,7 +192,7 @@ class Controller extends Core
      */
     public function send($data, $destroy = true)
     {
-        if ($this->isDestroy) {
+        if ($this->__isDestroy) {
             throw new Exception('controller is destroy can not send data');
         }
         $data = getInstance()->encode($this->pack->pack($data));
@@ -211,6 +219,7 @@ class Controller extends Core
                 $this->objectPoolBuckets[$k] = null;
                 unset($this->objectPoolBuckets[$k]);
             }
+            $this->objectPool->setCurrentObjParent(null);
         }
         parent::destroy();
         Factory::getInstance()->revertController($this);

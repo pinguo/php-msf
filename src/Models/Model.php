@@ -13,26 +13,4 @@ use PG\MSF\Base\Core;
 
 class Model extends Core
 {
-    final public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * 当被loader时会调用这个方法进行初始化
-     * @param \PG\MSF\Helpers\Context $context
-     */
-    public function initialization($context)
-    {
-        $this->setContext($context);
-    }
-
-    /**
-     * 销毁回归对象池
-     */
-    public function destroy()
-    {
-        parent::destroy();
-        Factory::getInstance()->revertModel($this);
-    }
 }

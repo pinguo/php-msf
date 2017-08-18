@@ -80,14 +80,14 @@ class Factory
         if (!$controllers->isEmpty()) {
             $controllerInstance = $controllers->shift();
             $controllerInstance->isUse();
-            $controllerInstance->useCount++;
+            $controllerInstance->__useCount++;
             return $controllerInstance;
         }
 
         $controllerInstance = new $className;
-        $controllerInstance->coreName = $className;
-        $controllerInstance->genTime  = time();
-        $controllerInstance->useCount = 1;
+        $controllerInstance->__coreName = $className;
+        $controllerInstance->__genTime  = time();
+        $controllerInstance->__useCount = 1;
 
         return $controllerInstance;
     }
@@ -130,14 +130,14 @@ class Factory
         if (!$controllers->isEmpty()) {
             $controllerInstance = $controllers->shift();
             $controllerInstance->isUse();
-            $controllerInstance->useCount++;
+            $controllerInstance->__useCount++;
             return $controllerInstance;
         }
 
         $controllerInstance = new $className;
-        $controllerInstance->coreName = $className;
-        $controllerInstance->genTime  = time();
-        $controllerInstance->useCount = 1;
+        $controllerInstance->__coreName = $className;
+        $controllerInstance->__genTime  = time();
+        $controllerInstance->__useCount = 1;
 
         return $controllerInstance;
     }
@@ -153,6 +153,6 @@ class Factory
             $controller->destroy();
         }
 
-        $this->pool[$controller->coreName]->push($controller);
+        $this->pool[$controller->__coreName]->push($controller);
     }
 }
