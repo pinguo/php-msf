@@ -23,7 +23,7 @@ use PG\MSF\Proxy\RedisProxyFactory;
 use Exception;
 use \PG\MSF\Tasks\Task as TaskBase;
 
-abstract class MSFServer extends WebSocketServer
+abstract class MSFServer extends HttpServer
 {
     const SERVER_NAME = 'SERVER';
 
