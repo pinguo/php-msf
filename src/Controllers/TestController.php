@@ -99,7 +99,7 @@ class TestController extends Controller
     public function HttpTestCoroutine()
     {
         $client        = $this->getContext()->getObjectPool()->get(Client::class);
-        $httpClient    = $client->coroutineGetHttpClient('http://phototask-feed-ms.360in.com');
+        $httpClient    = $client->dnsLookup('http://phototask-feed-ms.360in.com');
         $httpClientDns = yield $httpClient;
         if (!$httpClientDns) {
             $this->outputJson('network error', 500);

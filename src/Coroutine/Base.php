@@ -86,7 +86,7 @@ abstract class Base implements IBase
      *
      * @param int $timeout
      */
-    public function init($timeout = 0)
+    public function __construct($timeout = 0)
     {
         if (self::$maxTimeout == 0) {
             self::$maxTimeout = getInstance()->config->get('coroutine.timeout', 30000);

@@ -1,16 +1,17 @@
 <?php
 /**
- * @desc: 协程Tcp客户端
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/3/21
+ * 协程http客户端
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Client\Tcp\Client;
+use PG\MSF\Client\Http\Client;
+use PG\MSF\Client\Http\HttpClient;
 
-class GetTcpClient extends Base
+class Dns extends Base
 {
     /**
      * @var Client
@@ -18,32 +19,38 @@ class GetTcpClient extends Base
     public $client;
 
     /**
-     * @var string
+     * @var array|string
      */
     public $baseUrl;
 
     /**
-     * 初始化获取Tcp Client的协程对象（异步DNS解析）
+     * @var array
+     */
+    public $headers;
+
+    /**
+     * Dns constructor.
      *
      * @param Client $client
-     * @param string $baseUrl
-     * @param int $timeout
-     * @return $this
+     * @param $timeout
+     * @param array $headers
      */
-    public function initialization(Client $client, $baseUrl, $timeout)
+    public function __construct(Client $client, $timeout, $headers = [])
     {
-        parent::init($timeout);
-        $this->baseUrl   = $baseUrl;
+        parent::__construct($timeout);
+        $logTag = $client->urlData['url'];
+
         $this->client    = $client;
-        $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->baseUrl;
+        $this->headers   = $headers;
+        $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $logTag;
         $this->requestId = $this->getContext()->getLogId();
 
-        $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
+        $this->getContext()->getLog()->profileStart($profileName);
         $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function ($tcpClient) use ($profileName) {
+        $this->send(function (Client $client) use ($profileName) {
             if ($this->isBreak) {
                 return;
             }
@@ -51,22 +58,28 @@ class GetTcpClient extends Base
             if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
                 return;
             }
-            
-            $this->result       = $tcpClient;
+
+            $this->result       = $client;
             $this->responseTime = microtime(true);
             $this->getContext()->getLog()->profileEnd($profileName);
             $this->ioBack = true;
             $this->nextRun();
         });
-
-        return $this;
     }
 
+    /**
+     * 发送DNS请求
+     *
+     * @param callable $callback
+     */
     public function send($callback)
     {
-        $this->client->getTcpClient($this->baseUrl, $callback, $this->timeout);
+        $this->client->asyncDNSLookup($callback, $this->headers);
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         parent::destroy();

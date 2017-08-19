@@ -13,6 +13,7 @@ use PG\MSF\Controllers\Factory as ControllerFactory;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Base\Input;
 use PG\MSF\Base\Output;
+use PG\MSF\Base\AOPFactory;
 
 abstract class HttpServer extends Server
 {
@@ -131,7 +132,7 @@ abstract class HttpServer extends Server
         $error              = '';
         $code               = 500;
         $controllerInstance = null;
-        $this->route->handleClientRequest($request);
+        $this->route->handleHttpRequest($request);
 
         do {
             if ($this->route->getPath() == '') {
@@ -140,33 +141,33 @@ abstract class HttpServer extends Server
                 break;
             }
 
-            $controllerName     = $this->route->getControllerName();
-            $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
-            $methodPrefix       = $this->config->get('http.method_prefix', '');
-            $methodDefault      = $this->config->get('http.default_method', 'Index');
-            if ($controllerInstance == null) {
-                $controllerName     = $controllerName . "\\" . $this->route->getMethodName();
-                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
-                $this->route->setControllerName($controllerName);
-                $methodName = $methodPrefix . $methodDefault;
-                $this->route->setMethodName($methodDefault);
-            } else {
-                $methodName = $methodPrefix . $this->route->getMethodName();
-            }
-
-            if ($controllerInstance == null) {
+            $controllerName      = $this->route->getControllerName();
+            $controllerClassName = $this->route->getControllerClassName();
+            if ($controllerClassName == '') {
                 $error = 'Api not found controller(' . $controllerName . ')';
                 $code  = 404;
                 break;
             }
 
-            if (!method_exists($controllerInstance, $methodName)) {
-                $error = 'Api not found method(' . $methodName . ')';
-                $code  = 404;
-                break;
-            }
+            $methodPrefix = $this->config->get('http.method_prefix', '');
+            $methodName   = $methodPrefix . $this->route->getMethodName();
 
             try {
+                /**
+                 * @var \PG\MSF\Controllers\Controller $controllerInstance
+                 */
+                $controllerInstance = self::getInstance()->objectPool->get($controllerClassName, $controllerName, $methodName);
+                $controllerInstance->__useCount++;
+                if (empty($controllerInstance->__getObjectPool())) {
+                    $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
+                }
+
+                if (!method_exists($controllerInstance, $methodName)) {
+                    $error = 'Api not found method(' . $methodName . ')';
+                    $code  = 404;
+                    break;
+                }
+
                 $controllerInstance->context  = $controllerInstance->__getObjectPool()->get(Context::class);
 
                 // 初始化控制器
@@ -190,21 +191,20 @@ abstract class HttpServer extends Server
                 /**
                  * @var $input Input
                  */
-                $input    = $controllerInstance->__getObjectPool()->get(Input::class);
+                $input    = $controllerInstance->context->getObjectPool()->get(Input::class);
                 $input->set($request);
                 /**
                  * @var $output Output
                  */
-                $output   = $controllerInstance->__getObjectPool()->get(Output::class);
+                $output   = $controllerInstance->context->getObjectPool()->get(Output::class, $controllerInstance);
                 $output->set($request, $response);
-                $output->initialization($controllerInstance);
 
                 $controllerInstance->context->setInput($input);
                 $controllerInstance->context->setOutput($output);
                 $controllerInstance->context->setControllerName($controllerName);
                 $controllerInstance->context->setActionName($methodName);
                 $controllerInstance->setRequestType(Marco::HTTP_REQUEST);
-                $init = $controllerInstance->initialization($controllerName, $methodName);
+                $init = $controllerInstance->__construct($controllerName, $methodName);
 
                 if ($init instanceof \Generator) {
                     $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
@@ -228,7 +228,7 @@ abstract class HttpServer extends Server
                 }
 
                 if ($this->route->getEnableCache() && !$this->route->getRouteCache($this->route->getPath())) {
-                    $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
+                    $this->route->setRouteCache($this->route->getPath(), [$controllerName, $this->route->getMethodName(), $controllerClassName]);
                 }
                 break;
             } catch (\Throwable $e) {

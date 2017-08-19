@@ -8,14 +8,14 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\Client\Http\HttpClient;
+use PG\MSF\Client\Http\Client;
 
-class HttpClientRequest extends Base
+class Http extends Base
 {
     /**
-     * @var HttpClient
+     * @var Client
      */
-    public $httpClient;
+    public $client;
 
     /**
      * 发送的数据
@@ -41,21 +41,21 @@ class HttpClientRequest extends Base
     /**
      * 初始化Http异步请求协程对象
      *
-     * @param HttpClient $httpClient
+     * @param Client $client
      * @param string $method
      * @param string $path
      * @param string|array $data
      * @param int $timeout
      * @return $this
      */
-    public function initialization(HttpClient $httpClient, $method, $path, $data, $timeout)
+    public function __construct(Client $client, $method, $path, $data, $timeout)
     {
-        parent::init($timeout);
-        $this->httpClient = $httpClient;
+        parent::__construct($timeout);
+        $this->client     = $client;
         $this->path       = $path;
         $this->method     = $method;
         $this->data       = $data;
-        $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->httpClient->headers['Host'] . $this->path;
+        $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->client->headers['Host'] . $this->path;
         $this->requestId  = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($profileName);
@@ -91,10 +91,11 @@ class HttpClientRequest extends Base
     {
         switch ($this->method) {
             case 'POST':
-                $this->httpClient->post($this->path, $this->data, $callback);
+                var_dump($this->client->getHeaders());
+                $this->client->post($this->path, $this->data, $callback);
                 break;
             case 'GET':
-                $this->httpClient->get($this->path, $this->data, $callback);
+                $this->client->get($this->path, $this->data, $callback);
                 break;
         }
     }

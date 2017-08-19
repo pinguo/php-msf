@@ -14,10 +14,8 @@ use PG\Exception\ParameterValidationExpandException;
 use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
 use PG\MSF\Base\Core;
-use PG\MSF\Base\AOPFactory;
+use PG\MSF\Base\Child;
 use Exception;
-use PG\MSF\Marco;
-use PG\MSF\Server;
 use PG\MSF\Coroutine\CException;
 
 class Controller extends Core
@@ -33,34 +31,10 @@ class Controller extends Core
     public $objectPoolBuckets = [];
 
     /**
-     * 是否来自http的请求不是就是来自tcp
-     * @var string
-     */
-    public $requestType;
-
-    /**
      * fd
      * @var int
      */
     public $fd;
-
-    /**
-     * uid
-     * @var int
-     */
-    public $uid;
-
-    /**
-     * 用户数据
-     * @var
-     */
-    public $clientData;
-
-    /**
-     * 用于单元测试模拟捕获服务器发出的消息
-     * @var array
-     */
-    public $testUnitSendStack = [];
 
     /**
      * @var float 请求开始处理的时间
@@ -68,12 +42,21 @@ class Controller extends Core
     public $requestStartTime = 0.0;
 
     /**
-     * Controller constructor.
+     * 请求类型
+     * @var string TCP_REQUEST|HTTP_REQUEST
      */
-    final public function __construct()
+    public $requestType;
+
+    /**
+     * Controller constructor.
+     *
+     * @param string $controllerName controller名称
+     * @param string $methodName method名称
+     */
+    public function __construct($controllerName, $methodName)
     {
         $this->__supportAutoDestroy();
-        $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
+        $this->requestStartTime = microtime(true);
     }
 
     /**
@@ -103,23 +86,9 @@ class Controller extends Core
     }
 
     /**
-     * 设置客户端协议数据
-     * @param $uid
-     * @param $fd
-     * @param $clientData
-     * @param $controllerName
-     * @param $methodName
-     */
-    public function setClientData($uid, $fd, $clientData, $controllerName, $methodName)
-    {
-        $this->uid = $uid;
-        $this->fd  = $fd;
-        $this->clientData = $clientData;
-        $this->initialization($controllerName, $methodName);
-    }
-
-    /**
-     * @param string $requestType
+     * 设置请求类型
+     *
+     * @param string $requestType TCP_REQUEST|HTTP_REQUEST
      * @return $this
      */
     public function setRequestType($requestType)
@@ -129,21 +98,13 @@ class Controller extends Core
     }
 
     /**
+     * 返回请求类型
+     *
      * @return string
      */
     public function getRequestType()
     {
         return $this->requestType;
-    }
-
-    /**
-     * 初始化每次执行方法之前都会执行initialization
-     * @param string $controllerName 准备执行的controller名称
-     * @param string $methodName 准备执行的method名称
-     */
-    public function initialization($controllerName, $methodName)
-    {
-        $this->requestStartTime = microtime(true);
     }
 
     /**
@@ -185,28 +146,6 @@ class Controller extends Core
     }
 
     /**
-     * 向当前客户端发送消息
-     * @param $data
-     * @param $destroy
-     * @throws Exception
-     */
-    public function send($data, $destroy = true)
-    {
-        if ($this->__isDestroy) {
-            throw new Exception('controller is destroy can not send data');
-        }
-        $data = getInstance()->encode($this->pack->pack($data));
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'send', 'fd' => $this->fd, 'data' => $data];
-        } else {
-            getInstance()->send($this->fd, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
      * 销毁
      */
     public function destroy()
@@ -221,50 +160,10 @@ class Controller extends Core
             }
             $this->objectPool->setCurrentObjParent(null);
         }
+        $this->resetProperties(Child::$reflections[static::class]);
+        $this->__isContruct = false;
+        getInstance()->objectPool->push($this);
         parent::destroy();
-        Factory::getInstance()->revertController($this);
-    }
-
-    /**
-     * 获取单元测试捕获的数据
-     * @return array
-     */
-    public function getTestUnitResult()
-    {
-        $stack = $this->testUnitSendStack;
-        $this->testUnitSendStack = [];
-        return $stack;
-    }
-
-    /**
-     * 当控制器方法不存在的时候的默认方法
-     */
-    public function defaultMethod()
-    {
-        if ($this->requestType == Marco::HTTP_REQUEST) {
-            $this->getContext()->getOutput()->setHeader('HTTP/1.1', '404 Not Found');
-            $template = $this->getLoader()->view('server::error_404');
-            $this->getContext()->getOutput()->end($template->render());
-        } else {
-            throw new Exception('method not exist');
-        }
-    }
-
-    /**
-     * 断开链接
-     * @param $fd
-     * @param bool $autoDestroy
-     */
-    protected function close($fd, $autoDestroy = true)
-    {
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'close', 'fd' => $fd];
-        } else {
-            getInstance()->close($fd);
-        }
-        if ($autoDestroy) {
-            $this->destroy();
-        }
     }
 
     /**

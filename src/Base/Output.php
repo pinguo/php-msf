@@ -121,11 +121,11 @@ class Output extends Core
     protected $controller;
 
     /**
-     * 初始化Output
+     * 构造方法
      *
      * @param Controller $controller
      */
-    public function initialization($controller)
+    public function __construct($controller)
     {
         $this->controller = $controller;
     }

@@ -21,9 +21,9 @@ class MySql extends Base
     public $bindId;
     public $sql;
 
-    public function initialization($_mysqlAsynPool, $_bind_id = null, $_sql = null)
+    public function __construct($_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
-        parent::init();
+        parent::__construct();
         $this->mysqlAsynPool = $_mysqlAsynPool;
         $this->bindId        = $_bind_id;
         $this->sql           = $_sql;

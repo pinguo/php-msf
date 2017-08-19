@@ -240,7 +240,7 @@ class CoroutineRedisProxy
 
             return $value;
         } else {
-            return $arguments[0]->getObjectPool()->get(Redis::class)->initialization($this->redisAsynPool, $name, array_slice($arguments, 1));
+            return $arguments[0]->getObjectPool()->get(Redis::class, $this->redisAsynPool, $name, array_slice($arguments, 1));
         }
     }
 

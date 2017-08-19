@@ -36,9 +36,9 @@ class Controller extends \PG\MSF\Controllers\Controller
      * @param string $controllerName
      * @param string $methodName
      */
-    public function initialization($controllerName, $methodName)
+    public function __construct($controllerName, $methodName)
     {
-        parent::initialization($controllerName, $methodName);
+        parent::__construct($controllerName, $methodName);
         $this->verb = $this->getContext()->getInput()->getRequestMethod();
     }
 

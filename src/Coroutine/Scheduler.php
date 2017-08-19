@@ -10,10 +10,8 @@ namespace PG\MSF\Coroutine;
 
 use PG\MSF\Base\Core;
 use PG\MSF\Controllers\Controller;
-use PG\MSF\Controllers\Factory as ControllerFactory;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Marco;
-use PG\MSF\Models\Factory as ModelFactory;
 
 class Scheduler
 {
@@ -76,20 +74,11 @@ class Scheduler
                             $obj->setRedisPools(null);
                             $obj->setRedisProxies(null);
                         }
-                        $obj = null;
-                        unset($obj);
-                    }
-                }
-            }
 
-            if (!empty(ControllerFactory::getInstance()->pool)) {
-                foreach (ControllerFactory::getInstance()->pool as $class => &$objectsCPool) {
-                    while ($objectsCPool->count()) {
-                        $obj = $objectsCPool->shift();
-                        $obj->getObjectPool()->destroy();
-                        $obj->setObjectPool(null);
-                        $obj->setRedisPools(null);
-                        $obj->setRedisProxies(null);
+                        if ($obj instanceof Controller) {
+                            $obj->__getObjectPool()->destroy();
+                            $obj->setObjectPool(null);
+                        }
                         $obj = null;
                         unset($obj);
                     }
@@ -169,24 +158,7 @@ class Scheduler
             }
         }
 
-        if (!empty(ControllerFactory::getInstance()->pool)) {
-            foreach (ControllerFactory::getInstance()->pool as $class => $objects) {
-                if (APPLICATION_ENV == 'docker' && function_exists('refcount')) {
-                    foreach ($objects as $object) {
-                        $data['controller_pool'][$class][] = [
-                            'gen_time' => property_exists($object, '__genTime') ? $object->__genTime : 0,
-                            'use_count' => property_exists($object, '__useCount') ? $object->__useCount : 0,
-                            'ref_count' => refcount($object) - 1,
-                        ];
-                    }
-                } else {
-                    $data['controller_pool'][$class] = $objects->count() + $data['coroutine']['total'];
-                }
-            }
-        }
-
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
-        $data['dns_cache_tcp']  = \PG\MSF\Client\Tcp\Client::$dnsCache;
         getInstance()->sysCache->set(Marco::SERVER_STATS . getInstance()->server->worker_id, $data);
     }
 
@@ -233,7 +205,7 @@ class Scheduler
      */
     public function start(\Generator $routine, Context $context, Controller $controller, callable $callBack = null)
     {
-        $task = $context->getObjectPool()->get(Task::class)->initialization($routine, $context, $controller, $callBack);
+        $task = $context->getObjectPool()->get(Task::class, $routine, $context, $controller, $callBack);
         $this->IOCallBack[$context->getLogId()] = [];
         $this->taskMap[$context->getLogId()]    = $task;
         $this->schedule($task);

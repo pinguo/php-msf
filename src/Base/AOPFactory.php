@@ -156,7 +156,7 @@ class AOPFactory extends Factory
                 if (!empty($result->context)) {
                     $result->context->setOwner($result);
                 }
-                $result->parent = &$coreBase;
+                $result->parent = getInstance()->objectPool->__currentObjParent;
                 $class = get_class($result);
                 // 支持TaskProxy
                 if ($result instanceof \PG\MSF\Tasks\TaskProxy) {

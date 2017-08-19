@@ -72,7 +72,7 @@ class Task
      * @param $callBack callable|null
      * @return $this
      */
-    public function initialization(\Generator $routine, Context &$context, Controller &$controller, callable $callBack = null)
+    public function __construct(\Generator $routine, Context &$context, Controller &$controller, callable $callBack = null)
     {
         $this->routine    = $routine;
         $this->context    = $context;
@@ -80,7 +80,6 @@ class Task
         $this->stack      = new \SplStack();
         $this->id         = $context->getLogId();
         $this->callBack   = $callBack;
-        return $this;
     }
 
     /**

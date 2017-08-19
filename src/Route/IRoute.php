@@ -10,11 +10,11 @@ namespace PG\MSF\Route;
 
 interface IRoute
 {
-    function handleClientData($data);
-
-    function handleClientRequest($request);
+    function handleHttpRequest($request);
 
     function getControllerName();
+
+    function getControllerClassName();
 
     function getMethodName();
 
