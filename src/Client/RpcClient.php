@@ -281,7 +281,7 @@ class RpcClient
             $sendData['sig'] = static::genSig($sendData, $rpc->appsecret);
         }
 
-        $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($rpc->host, $rpc->timeout, $headers);
+        $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->dnsLookup($rpc->host, $rpc->timeout, $headers);
         if ($httpClient == null) {
             throw new Exception('Coroutine get HttpClient failed');
         }

@@ -102,7 +102,7 @@ class MSFCli extends MSFServer
             $controllerInstance->context->setInput($input);
             $controllerInstance->context->setControllerName($controllerName);
             $controllerInstance->context->setActionName($methodName);
-            $init = $controllerInstance->initialization($controllerName, $methodName);
+            $init = $controllerInstance->__construct($controllerName, $methodName);
             if ($init instanceof \Generator) {
                 $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
                     $params = array_values($this->route->getParams());

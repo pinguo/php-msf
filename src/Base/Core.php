@@ -19,14 +19,25 @@ use Exception;
 class Core extends Child
 {
     /**
+     * 作用计数
+     *
      * @var int
      */
     public $__useCount;
 
     /**
+     * 创建时间
+     *
      * @var int
      */
     public $__genTime;
+
+    /**
+     * 是否执行构造方法
+     *
+     * @var bool
+     */
+    public $__isContruct = false;
 
     /**
      * 销毁标志

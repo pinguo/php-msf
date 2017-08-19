@@ -12,7 +12,7 @@ use PG\MSF\Controllers\Controller as BController;
 
 class Controller extends BController
 {
-    public function initialization($controllerName, $methodName)
+    public function __construct($controllerName, $methodName)
     {
     }
 

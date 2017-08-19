@@ -798,9 +798,8 @@ abstract class Server extends Child
                 /**
                  * @var $output Output
                  */
-                $output   = $controllerInstance->getObjectPool()->get(Output::class);
+                $output   = $controllerInstance->getObjectPool()->get(Output::class, $controllerInstance);
                 $output->set($clientData);
-                $output->initialization($controllerInstance);
 
                 $controllerInstance->context->setInput($input);
                 $controllerInstance->context->setOutput($output);

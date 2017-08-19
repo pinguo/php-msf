@@ -32,9 +32,9 @@ class CTask extends Base
      * @param int $timeout
      * @return $this
      */
-    public function initialization($taskProxyData, $id, $timeout)
+    public function __construct($taskProxyData, $id, $timeout)
     {
-        parent::init($timeout);
+        parent::__construct($timeout);
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];

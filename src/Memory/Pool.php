@@ -31,12 +31,12 @@ class Pool
      *
      * @var mixed
      */
-    private $__currentObjParent;
+    public $__currentObjParent;
 
     /**
      * 当前待创建对象的源对象的父对象
      */
-    private $__currentObjRoot;
+    public $__currentObjRoot;
 
     /**
      * Pool constructor.
@@ -92,14 +92,16 @@ class Pool
     /**
      * 获取一个
      * @param string $class
+     * @param array $args 可变参数列表
      * @return mixed
      */
-    public function get($class)
+    public function get($class, ...$args)
     {
         $poolName = trim($class, '\\');
-        if (is_object($this->__currentObjRoot) && $poolName == get_class($this->__currentObjRoot)) {
-            return $this->__currentObjRoot;
-        }
+//        if (is_object($this->__currentObjRoot)
+//            && $poolName == get_class($this->__currentObjRoot)) {
+//            return $this->__currentObjRoot;
+//        }
 
         $pool     = $this->map[$poolName] ?? null;
         if ($pool == null) {

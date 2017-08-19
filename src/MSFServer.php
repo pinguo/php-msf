@@ -24,7 +24,7 @@ use PG\MSF\Tasks\Task as TaskBase;
 use PG\MSF\Base\AOPFactory;
 use Exception;
 
-abstract class MSFServer extends WebSocketServer
+abstract class MSFServer extends HttpServer
 {
     const SERVER_NAME = 'SERVER';
 

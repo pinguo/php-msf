@@ -69,9 +69,9 @@ class Redis extends Base
      * @param array $arguments
      * @return $this
      */
-    public function initialization($redisAsynPool, $name, $arguments)
+    public function __construct($redisAsynPool, $name, $arguments)
     {
-        parent::init(6000);
+        parent::__construct(6000);
 
         $this->redisAsynPool = $redisAsynPool;
         $this->hashKey = $redisAsynPool->hashKey;
