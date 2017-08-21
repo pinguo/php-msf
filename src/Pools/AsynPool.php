@@ -2,57 +2,109 @@
 /**
  * 异步连接池基类
  *
+ * @author tmtbe
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use Noodlehaus\Config;
+use PG\MSF\MSFServer;
 
 abstract class AsynPool implements IAsynPool
 {
-    const MAX_TOKEN = 655360;
     /**
-     * @var Config
+     * TOKEN最大值
+     */
+    const MAX_TOKEN = 655360;
+
+    /**
+     * @var Config 配置对象
      */
     public $config;
-    protected $commands;
-    protected $pool;
-    protected $callBacks;
-    protected $workerId;
-    protected $server;
-    protected $swooleServer;
-    //避免爆发连接的锁
-    protected $token = 0;
-    protected $waitConnetNum = 0;
+
     /**
-     * @var AsynPoolManager
+     * @var \SplQueue 待执行命令队列
+     */
+    protected $commands;
+
+    /**
+     * @var \SplQueue 连接池
+     */
+    protected $pool;
+
+    /**
+     * @var array 回调函数
+     */
+    protected $callBacks;
+
+    /**
+     * @var int worker进程ID
+     */
+    protected $workerId;
+
+    /**
+     * @var \swoole_server swoole_server实例
+     */
+    protected $server;
+
+    /**
+     * @var MSFServer server运行实例
+     */
+    protected $swooleServer;
+
+    /**
+     * @var int 回调Token
+     */
+    protected $token = 0;
+
+    /**
+     * @var int 待连接数量
+     */
+    protected $waitConnectNum = 0;
+
+    /**
+     * @var AsynPoolManager 连接池管理器
      */
     protected $asynManager;
 
+    /**
+     * AsynPool constructor.
+     *
+     * @param $config
+     */
     public function __construct($config)
     {
-        $this->callBacks = new \SplFixedArray(self::MAX_TOKEN);
-        $this->commands = new \SplQueue();
-        $this->pool = new \SplQueue();
-        $this->config = $config;
+        $this->callBacks = [];
+        $this->commands  = new \SplQueue();
+        $this->pool      = new \SplQueue();
+        $this->config    = $config;
     }
 
+    /**
+     * 注册回调
+     *
+     * @param $callback
+     * @return int
+     */
     public function addTokenCallback($callback)
     {
-        $token = $this->token;
+        $token                   = $this->token;
         $this->callBacks[$token] = $callback;
         $this->token++;
         if ($this->token >= self::MAX_TOKEN) {
             $this->token = 0;
         }
+
         return $token;
     }
 
     /**
      * 分发消息
+     *
      * @param $data
+     * @return $this
      */
     public function distribute($data)
     {
@@ -61,29 +113,44 @@ abstract class AsynPool implements IAsynPool
         if ($callback != null) {
             $callback($data['result']);
         }
+
+        return $this;
     }
 
     /**
-     * @param $swooleServer
+     * 初始化
+     *
+     * @param MSFServer $swooleServer
      * @param $asynManager
+     * @return $this
      */
     public function serverInit($swooleServer, $asynManager)
     {
         $this->swooleServer = $swooleServer;
-        $this->server = $swooleServer->server;
-        $this->asynManager = $asynManager;
+        $this->server       = $swooleServer->server;
+        $this->asynManager  = $asynManager;
+
+        return $this;
     }
 
     /**
+     * 初始化workerId
+     *
      * @param $workerId
+     * @return $this
      */
     public function workerInit($workerId)
     {
         $this->workerId = $workerId;
+
+        return $this;
     }
 
     /**
-     * @param $client
+     * 归还连接
+     *
+     * @param mixed $client
+     * @return $this
      */
     public function pushToPool($client)
     {
@@ -92,10 +159,12 @@ abstract class AsynPool implements IAsynPool
             $command = $this->commands->shift();
             $this->execute($command);
         }
+        return $this;
     }
 
     /**
      * 获取同步
+     *
      * @return mixed
      */
     abstract public function getSync();

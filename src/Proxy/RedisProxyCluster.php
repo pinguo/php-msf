@@ -11,7 +11,7 @@ namespace PG\MSF\Proxy;
 use Exception;
 use Flexihash\Flexihash;
 use Flexihash\Hasher\Md5Hasher;
-use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Helpers\Context;
 
 class RedisProxyCluster extends Flexihash implements IProxy

@@ -10,10 +10,10 @@ namespace PG\MSF\Base;
 
 use Noodlehaus\Config;
 use PG\MSF\Pack\IPack;
-use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Pools\RedisAsynPool;
 use PG\AOP\Wrapper;
 use PG\MSF\Proxy\RedisProxyFactory;
-use PG\MSF\DataBase\CoroutineRedisProxy;
+use PG\MSF\Pools\CoroutineRedisProxy;
 use Exception;
 
 class Core extends Child

@@ -2,41 +2,66 @@
 /**
  * mysql异步客户端连接池
  *
+ * @author tmtbe
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use Exception;
 use PG\MSF\Coroutine\Mysql;
 
 class MysqlAsynPool extends AsynPool
 {
-    const AsynName = 'mysql';
     /**
-     * @var Miner
+     * 连接池类型名称
+     */
+    const AsynName = 'mysql';
+
+    /**
+     * @var Miner SQL Builder
      */
     public $dbQueryBuilder;
+
     /**
      * @var array
      */
     public $bindPool;
+
+    /**
+     * @var int 连接峰值
+     */
     protected $mysqlMaxCount = 0;
+
+    /**
+     * @var string 连接池标识
+     */
     private $active;
+
+    /**
+     * @var Miner 同步MySQL客户端
+     */
     private $mysqlClient;
 
+    /**
+     * MysqlAsynPool constructor.
+     *
+     * @param $config
+     * @param $active
+     */
     public function __construct($config, $active)
     {
         parent::__construct($config);
-        $this->active = $active;
-        $this->bindPool = [];
+        $this->active         = $active;
+        $this->bindPool       = [];
         $this->dbQueryBuilder = new Miner();
         $this->dbQueryBuilder->mysqlPool = $this;
     }
 
     /**
      * 执行mysql命令
+     *
      * @param $data
      * @throws Exception
      */
@@ -100,9 +125,18 @@ class MysqlAsynPool extends AsynPool
             //给worker发消息
             $this->asynManager->sendMessageToWorker($this, $data);
 
+
             //不是绑定的连接就回归连接
             if (!isset($data['bind_id'])) {
-                $this->pushToPool($client);
+                //回归连接
+                if (((time() - $client->genTime) < 3600)
+                    || (($this->mysqlMaxCount + $this->waitConnectNum) <= 30)
+                ) {
+                    $this->pushToPool($client);
+                } else {
+                    $client->close();
+                    $this->mysqlMaxCount--;
+                }
             } else {//事务
                 $bindId = $data['bind_id'];
                 if ($sql == 'commit' || $sql == 'rollback') {//结束事务
@@ -113,13 +147,10 @@ class MysqlAsynPool extends AsynPool
     }
 
     /**
-     * 准备一个mysql
+     * 创建一个Mysql连接
      */
     public function prepareOne()
     {
-        if ($this->mysqlMaxCount + $this->waitConnetNum >= $this->config->get('database.asyn_max_count', 10)) {
-            return;
-        }
         $this->reconnect();
     }
 
@@ -129,13 +160,14 @@ class MysqlAsynPool extends AsynPool
      */
     public function reconnect($client = null)
     {
-        $this->waitConnetNum++;
+        $this->waitConnectNum++;
         if ($client == null) {
             $client = new \swoole_mysql();
+            $client->genTime = time();
         }
         $set = $this->config['database'][$this->active];
         $client->connect($set, function ($client, $result) {
-            $this->waitConnetNum--;
+            $this->waitConnectNum--;
             if (!$result) {
                 throw new Exception($client->connect_error);
             } else {
@@ -152,6 +184,7 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 释放绑定
+     *
      * @param $bindId
      */
     public function freeBind($bindId)
@@ -165,6 +198,7 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 断开链接
+     *
      * @param $client
      */
     public function onClose($client)

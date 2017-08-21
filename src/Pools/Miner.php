@@ -3,11 +3,11 @@
  * A dead simple PHP class for building SQL statements. No manual string
  * concatenation necessary.
  *
- * @author camera360_server@camera360.com
+ * @author tmtbe
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use PG\MSF\Coroutine\MySql;
 

@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Coroutine;
 
-use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Marco;
 
 class Redis extends Base
@@ -59,20 +59,19 @@ class Redis extends Base
     {
         parent::__construct(6000);
 
-        $this->redisAsynPool = $redisAsynPool;
-        $this->hashKey = $redisAsynPool->hashKey;
-        $this->phpSerialize = $redisAsynPool->phpSerialize;
-        $this->keyPrefix = $redisAsynPool->keyPrefix;
+        $this->redisAsynPool  = $redisAsynPool;
+        $this->hashKey        = $redisAsynPool->hashKey;
+        $this->phpSerialize   = $redisAsynPool->phpSerialize;
+        $this->keyPrefix      = $redisAsynPool->keyPrefix;
         $this->redisSerialize = $redisAsynPool->redisSerialize;
-
-        $this->name = $name;
-        $this->arguments = $arguments;
-        $this->request = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
-        $this->requestId = $this->getContext()->getLogId();
+        $this->name           = $name;
+        $this->arguments      = $arguments;
+        $this->request        = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
+        $this->requestId      = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
-        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $keys            = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
         $this->send(function ($result) use ($name) {

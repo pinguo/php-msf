@@ -12,8 +12,8 @@ use Exception;
 use PG\MSF\Process\Config;
 use PG\MSF\Process\Inotify;
 use PG\MSF\Process\Timer;
-use PG\MSF\DataBase\AsynPool;
-use PG\MSF\DataBase\AsynPoolManager;
+use PG\MSF\Pools\AsynPool;
+use PG\MSF\Pools\AsynPoolManager;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Proxy\IProxy;
 use PG\MSF\Tasks\Task;
@@ -117,7 +117,7 @@ abstract class MSFServer extends HttpServer
                 $this->initAsynPools();
                 foreach ($this->asynPools as $pool) {
                     if ($pool) {
-                        $this->asynPoolManager->registAsyn($pool);
+                        $this->asynPoolManager->registerAsyn($pool);
                     }
                 }
                 $this->initRedisProxies();
@@ -305,7 +305,7 @@ abstract class MSFServer extends HttpServer
         $this->asynPools[$name] = $pool;
         if ($isRegister && $this->asynPoolManager) {
             $pool->workerInit($this->server->worker_id);
-            $this->asynPoolManager->registAsyn($pool);
+            $this->asynPoolManager->registerAsyn($pool);
         }
 
         return $this;
@@ -395,7 +395,7 @@ abstract class MSFServer extends HttpServer
             foreach ($this->asynPools as $pool) {
                 if ($pool) {
                     $pool->workerInit($workerId);
-                    $this->asynPoolManager->registAsyn($pool);
+                    $this->asynPoolManager->registerAsyn($pool);
                 }
             }
         } else {

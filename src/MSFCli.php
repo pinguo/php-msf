@@ -9,7 +9,7 @@
 namespace PG\MSF;
 
 use Exception;
-use PG\MSF\DataBase\AsynPoolManager;
+use PG\MSF\Pools\AsynPoolManager;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Console\Request;
 use PG\MSF\Memory\Pool;
@@ -181,7 +181,7 @@ class MSFCli extends MSFServer
         foreach ($this->asynPools as $pool) {
             if ($pool) {
                 $pool->workerInit($workerId);
-                $this->asynPoolManager->registAsyn($pool);
+                $this->asynPoolManager->registerAsyn($pool);
             }
         }
 

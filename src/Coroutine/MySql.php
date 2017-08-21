@@ -9,7 +9,7 @@
 namespace PG\MSF\Coroutine;
 
 use Exception;
-use PG\MSF\DataBase\MysqlAsynPool;
+use PG\MSF\Pools\MysqlAsynPool;
 
 class MySql extends Base
 {
@@ -17,9 +17,24 @@ class MySql extends Base
      * @var MysqlAsynPool
      */
     public $mysqlAsynPool;
+
+    /**
+     * @var string|null 绑定ID
+     */
     public $bindId;
+
+    /**
+     * @var string|null 执行的SQL
+     */
     public $sql;
 
+    /**
+     * MySql constructor.
+     *
+     * @param int $_mysqlAsynPool
+     * @param null $_bind_id
+     * @param null $_sql
+     */
     public function __construct($_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
         parent::__construct();
@@ -30,7 +45,7 @@ class MySql extends Base
         $this->requestId     = $this->getContext()->getLogId();
 
         getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
-        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $keys            = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
         $this->send(function ($result) {
@@ -47,15 +62,24 @@ class MySql extends Base
             $this->ioBack = true;
             $this->nextRun();
         });
-
-        return $this;
     }
 
+    /**
+     * 发送异步的MySQL请求
+     *
+     * @param $callback
+     */
     public function send($callback)
     {
         $this->mysqlAsynPool->query($callback, $this->bindId, $this->sql);
     }
 
+    /**
+     * 获取执行结果
+     *
+     * @return mixed|null
+     * @throws Exception
+     */
     public function getResult()
     {
         $result = parent::getResult();
@@ -75,6 +99,9 @@ class MySql extends Base
         return ['context', 'mysqlAsynPool'];
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         parent::destroy();
