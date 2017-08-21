@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @desc: 上下文实体对象
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/3/17
+ * 上下文实体对象
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -21,44 +21,37 @@ class Context extends AbstractContext
     use MI;
     
     /**
-     * @var Input
+     * @var Input 请求输入对象
      */
     protected $input;
 
     /**
-     * @var Output
+     * @var Output 请求响应对象
      */
     protected $output;
 
     /**
-     * 对象池对象
-     *
-     * @var Pool
+     * @var Pool 对象池对象
      */
     protected $objectPool;
 
     /**
-     * 执行的控制器名称
-     *
-     * @var string
+     * @var string 执行的控制器名称
      */
     protected $controllerName;
 
     /**
-     * 执行的方法名称
-     *
-     * @var string
+     * @var string 执行的方法名称
      */
     protected $actionName;
 
     /**
-     * 存储自定义的全局上下文数据
-     * @var array
+     * @var array 存储自定义的全局上下文数据
      */
     protected $userDefined = [];
 
     /**
-     * context的所有者对象
+     * @var \stdClass context的所有者对象
      */
     protected $owner;
 
@@ -229,11 +222,17 @@ class Context extends AbstractContext
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function __sleep()
     {
         return ['logId', 'input', 'controllerName', 'actionName', 'userDefined'];
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         $this->PGLog          = null;

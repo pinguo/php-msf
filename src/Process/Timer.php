@@ -16,13 +16,25 @@ use PG\MSF\MSFServer;
 
 class Timer
 {
+    /**
+     * @var Conf Server运行实例配置对象
+     */
     public $config;
 
+    /**
+     * @var MSFServer 运行的Server实例
+     */
     public $MSFServer;
 
+    /**
+     * Timer constructor.
+     *
+     * @param Conf $config
+     * @param MSFServer $MSFServer
+     */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        echo 'Enable User Timer: Success', "\n";
+        echo 'User      Timer: Enable', "\n";
         $MSFServer->onInitTimer();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * 协程任务
+ * 请求的协程
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -19,37 +19,27 @@ class Task
     use MI;
 
     /**
-     * 协程任务的迭代器
-     *
-     * @var \Generator
+     * @var \Generator 协程任务的迭代器
      */
     protected $routine;
 
     /**
-     * 任务销毁标识
-     *
-     * @var bool
+     * @var bool 任务销毁标识
      */
     public $destroy = false;
 
     /**
-     * 协程嵌套栈
-     *
-     * @var \SplStack
+     * @var \SplStack 协程嵌套栈
      */
     protected $stack;
 
     /**
-     * 请求的控制器
-     *
-     * @var Controller
+     * @var Controller 请求的控制器
      */
     protected $controller;
 
     /**
-     * 任务ID
-     *
-     * @var string
+     * @var string 任务ID
      */
     protected $id;
 
@@ -70,7 +60,6 @@ class Task
      * @param Context $context
      * @param Controller $controller
      * @param $callBack callable|null
-     * @return $this
      */
     public function __construct(\Generator $routine, Context &$context, Controller &$controller, callable $callBack = null)
     {
@@ -119,6 +108,8 @@ class Task
     }
 
     /**
+     * 设置调度时产生的异常
+     *
      * @param \Throwable $exception
      */
     public function setException(\Throwable $exception)
@@ -127,7 +118,7 @@ class Task
     }
 
     /**
-     * 协程调度
+     * 请求的协程调度
      */
     public function run()
     {
@@ -273,6 +264,25 @@ class Task
     }
 
     /**
+     * [isFinished 判断该task是否完成]
+     * @return boolean [description]
+     */
+    public function isFinished()
+    {
+        return (empty($this->stack) || $this->stack->isEmpty()) && !$this->routine->valid();
+    }
+
+    /**
+     * 获取协程任务当前正在运行的迭代器
+     *
+     * @return \Generator
+     */
+    public function getRoutine()
+    {
+        return $this->routine;
+    }
+
+    /**
      * 销毁
      */
     public function destroy()
@@ -290,24 +300,5 @@ class Task
             $this->id         = null;
             $this->callBack   = null;
         }
-    }
-
-    /**
-     * [isFinished 判断该task是否完成]
-     * @return boolean [description]
-     */
-    public function isFinished()
-    {
-        return (empty($this->stack) || $this->stack->isEmpty()) && !$this->routine->valid();
-    }
-
-    /**
-     * 获取协程任务当前正在运行的迭代器
-     *
-     * @return \Generator
-     */
-    public function getRoutine()
-    {
-        return $this->routine;
     }
 }

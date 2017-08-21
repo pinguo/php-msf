@@ -1,7 +1,6 @@
 <?php
 /**
- * Controller 控制器
- * 对象池模式，实例会被反复使用，成员变量缓存数据记得在销毁时清理
+ * Web Controller控制器基类
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -21,20 +20,14 @@ use PG\MSF\Coroutine\CException;
 class Controller extends Core
 {
     /**
-     * @var Wrapper|\PG\MSF\Memory\Pool
+     * @var Wrapper|\PG\MSF\Memory\Pool 对象池
      */
     protected $objectPool;
 
     /**
-     * @var array
+     * @var array 当前请求已使用的对象列表
      */
     public $objectPoolBuckets = [];
-
-    /**
-     * fd
-     * @var int
-     */
-    public $fd;
 
     /**
      * @var float 请求开始处理的时间
@@ -42,8 +35,7 @@ class Controller extends Core
     public $requestStartTime = 0.0;
 
     /**
-     * 请求类型
-     * @var string TCP_REQUEST|HTTP_REQUEST
+     * @var string TCP_REQUEST|HTTP_REQUEST 请求类型
      */
     public $requestType;
 
@@ -60,6 +52,8 @@ class Controller extends Core
     }
 
     /**
+     * 获取对象池（在请求上下文未初始完成时，框架内部使用）
+     *
      * @return Wrapper|\PG\MSF\Memory\Pool
      */
     public function __getObjectPool()
@@ -68,6 +62,8 @@ class Controller extends Core
     }
 
     /**
+     * 获取对象池
+     *
      * @return Wrapper|\PG\MSF\Memory\Pool
      */
     public function getObjectPool()
@@ -76,6 +72,8 @@ class Controller extends Core
     }
 
     /**
+     * 设置对象池
+     *
      * @param Wrapper|\PG\MSF\Memory\Pool|NULL $objectPool
      * @return $this
      */
@@ -109,6 +107,7 @@ class Controller extends Core
 
     /**
      * 异常的回调
+     *
      * @param \Throwable $e
      * @throws \Throwable
      */
@@ -146,7 +145,7 @@ class Controller extends Core
     }
 
     /**
-     * 销毁
+     * 请求处理完成销毁相关资源
      */
     public function destroy()
     {
@@ -175,17 +174,13 @@ class Controller extends Core
      * @param null $callback
      * @return void
      */
-    public function outputJson(
-        $data = null,
-        $message = '',
-        $status = 200,
-        $callback = null
-    ) {
+    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    {
         $this->getContext()->getOutput()->outputJson($data, $message, $status, $callback);
     }
 
     /**
-     * 响应通过模板输出的HTML
+     * 通过模板引擎响应输出HTML
      *
      * @param array $data
      * @param string|null $view

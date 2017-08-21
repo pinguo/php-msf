@@ -1,6 +1,6 @@
 <?php
 /**
- * NormalRoute
+ * Restful Api路由
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -15,8 +15,7 @@ namespace PG\MSF\Rest;
 class Route extends \PG\MSF\Route\NormalRoute
 {
     /**
-     * @var array
-     * support verb
+     * @var array 支持HTTP动作
      */
     public static $verbs = [
         'GET',      // 从服务器取出资源（一项或多项）
@@ -27,18 +26,22 @@ class Route extends \PG\MSF\Route\NormalRoute
         'HEAD',     // 获取 head 元数据
         'OPTIONS',  // 获取信息，关于资源的哪些属性是客户端可以改变的
     ];
+
     /**
-     * @var bool
+     * @var bool 路径cache
      */
     public $enableCache = false;
+
     /**
-     * @var array
+     * @var array 路径规则
      */
     public $restRules = [];
+
     /**
      * @var string
      */
     public $verb;
+
     /**
      * @var array
      */
@@ -62,7 +65,8 @@ class Route extends \PG\MSF\Route\NormalRoute
     }
 
     /**
-     * 处理http request
+     * HTTP请求解析
+     *
      * @param $request
      */
     public function handleClientRequest($request)
@@ -82,7 +86,8 @@ class Route extends \PG\MSF\Route\NormalRoute
     }
 
     /**
-     * parse Rest Rules, return path
+     * 解析路由规则
+     *
      * @return array
      */
     public function parseRule()
@@ -130,8 +135,9 @@ class Route extends \PG\MSF\Route\NormalRoute
     }
 
     /**
-     * init Rules
-     * @return array
+     * 初始化Rules
+     *
+     * @return array|mixed
      */
     protected function initRules()
     {
@@ -218,8 +224,7 @@ class Route extends \PG\MSF\Route\NormalRoute
     }
 
     /**
-     * Trim slashes in passed string. If string begins with '//', two slashes are left as is
-     * in the beginning of a string.
+     * 去掉下划线
      *
      * @param string $string
      * @return string

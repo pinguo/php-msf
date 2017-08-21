@@ -8,21 +8,14 @@
 
 namespace PG\MSF;
 
-use PG\MSF\Client\Http\Client as HttpClient;
-use PG\MSF\Client\Tcp\Client as TcpClient;
-use PG\MSF\DataBase\AsynPool;
+use Exception;
 use PG\MSF\DataBase\AsynPoolManager;
-use PG\MSF\DataBase\Miner;
-use PG\MSF\DataBase\MysqlAsynPool;
-use PG\MSF\DataBase\RedisAsynPool;
-use PG\MSF\Coroutine\Task;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Console\Request;
-use PG\MSF\Controllers\Factory as ControllerFactory;
-use Exception;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Base\Input;
 use PG\MSF\Helpers\Context;
+use PG\MSF\Base\AOPFactory;
 
 class MSFCli extends MSFServer
 {
@@ -40,6 +33,9 @@ class MSFCli extends MSFServer
         $this->coroutine = new Coroutine();
     }
 
+    /**
+     * 命令行请求回调
+     */
     public function onConsoleRequest()
     {
         parent::run();
@@ -50,35 +46,33 @@ class MSFCli extends MSFServer
         $this->route->handleClientRequest($request);
 
         do {
-            $controllerName = $this->route->getControllerName();
-            $controllerInstance = ControllerFactory::getInstance()->getConsoleController($controllerName);
-            $methodDefault = $this->config->get('http.default_method', 'Index');
-            if ($controllerInstance == null) {
-                $controllerName = $controllerName . "\\" . $this->route->getMethodName();
-                $controllerInstance = ControllerFactory::getInstance()->getConsoleController($controllerName);
-                $this->route->setControllerName($controllerName);
-                $methodName = $methodDefault;
-                $this->route->setMethodName($methodDefault);
-            } else {
-                $methodName = $this->route->getMethodName();
-            }
-
-            if ($controllerInstance == null) {
+            $controllerName      = $this->route->getControllerName();
+            $controllerClassName = $this->route->getControllerClassName();
+            $methodName          = $this->route->getMethodName();
+            if ($controllerClassName == '') {
                 clearTimes();
                 echo "not found controller $controllerName\n";
                 break;
             }
 
+            /**
+             * @var \PG\MSF\Controllers\Controller $controllerInstance
+             */
+            $controllerInstance = $this->objectPool->get($controllerClassName, $controllerName, $methodName);
+            $controllerInstance->__useCount++;
+            if (empty($controllerInstance->__getObjectPool())) {
+                $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
+            }
+            // 初始化控制器
+            $controllerInstance->requestStartTime = microtime(true);
             if (!method_exists($controllerInstance, $methodName)) {
                 echo "not found method $controllerName->$methodName\n";
                 $controllerInstance->destroy();
                 break;
             }
 
-            $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
+            $controllerInstance->context  = $controllerInstance->__getObjectPool()->get(Context::class);
 
-            // 初始化控制器
-            $controllerInstance->requestStartTime = microtime(true);
             $PGLog            = null;
             $PGLog            = clone getInstance()->log;
             $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
@@ -92,7 +86,7 @@ class MSFCli extends MSFServer
             // 构造请求上下文成员
             $controllerInstance->context->setLogId($PGLog->logId);
             $controllerInstance->context->setLog($PGLog);
-            $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
+            $controllerInstance->context->setObjectPool($controllerInstance->__getObjectPool());
 
             /**
              * @var $input Input
@@ -138,7 +132,7 @@ class MSFCli extends MSFServer
     /**
      * gen a logId
      *
-     * @param $request Request
+     * @param Request $request
      * @return string
      */
     public function genLogId($request)
@@ -148,7 +142,7 @@ class MSFCli extends MSFServer
     }
 
     /**
-     * 开始前创建共享内存保存USID值
+     * 服务启动前的初始化
      */
     public function beforeSwooleStart()
     {
@@ -171,28 +165,25 @@ class MSFCli extends MSFServer
 
 
     /**
-     * 重写onSwooleWorkerStart方法，添加异步redis,添加redisProxy
+     * 添加异步redis,添加redisProxy
+     *
      * @param $serv
      * @param $workerId
      * @throws Exception
      */
-    public function onSwooleWorkerStart($serv, $workerId)
+    public function onWorkerStart($serv, $workerId)
     {
         $this->initAsynPools();
         $this->initRedisProxies();
-        $this->mysqlPool = $this->asynPools['mysqlPool'];
         //注册
-        $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);
-        $this->asnyPoolManager->noEventAdd();
+        $this->asynPoolManager = new AsynPoolManager($this->poolProcess, $this);
+        $this->asynPoolManager->noEventAdd();
         foreach ($this->asynPools as $pool) {
             if ($pool) {
                 $pool->workerInit($workerId);
-                $this->asnyPoolManager->registAsyn($pool);
+                $this->asynPoolManager->registAsyn($pool);
             }
         }
-        //初始化异步Client
-        $this->client    = new HttpClient();
-        $this->tcpClient = new TcpClient();
 
         //redis proxy监测
         getInstance()->sysTimers[] = swoole_timer_tick(5000, function () {

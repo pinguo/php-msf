@@ -16,16 +16,12 @@ use PG\MSF\Marco;
 class Scheduler
 {
     /**
-     * 正在运行的IO协程对象列表
-     *
-     * @var array
+     * @var array 正在运行的IO协程对象列表
      */
     public $IOCallBack = [];
 
     /**
-     * 所有正在调度的协程任务（即请求）
-     *
-     * @var array
+     * @var array 所有正在调度的协程任务（即请求）
      */
     public $taskMap = [];
 
@@ -35,7 +31,7 @@ class Scheduler
     public function __construct()
     {
         /**
-         * 每隔1s检查超时的协程任务
+         * 每隔1s检查超时的协程
          */
         getInstance()->sysTimers[] = swoole_timer_tick(1000, function ($timerId) {
             // 当前进程的协程统计信息

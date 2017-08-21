@@ -16,6 +16,8 @@ interface IRoute
 
     function getControllerClassName();
 
+    function findControllerClassName();
+
     function getMethodName();
 
     function getParams();

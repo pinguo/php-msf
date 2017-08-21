@@ -11,16 +11,12 @@ namespace PG\MSF\Route;
 class NormalRoute implements IRoute
 {
     /**
-     * 是否开启路由缓存
-     *
-     * @var bool
+     * @var bool 是否开启路由缓存
      */
     public $enableCache = true;
 
     /**
-     * 路由缓存
-     *
-     * @var array
+     * @var array 路由缓存
      */
     public $routeCache;
 
@@ -30,9 +26,7 @@ class NormalRoute implements IRoute
     protected $clientData;
 
     /**
-     * 控制器完全命名空间类名
-     *
-     * @var string
+     * @var string 控制器完全命名空间类名
      */
     public $controllerClassName;
 
@@ -45,7 +39,8 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * 处理http request
+     * HTTP请求解析
+     *
      * @param $request
      */
     public function handleHttpRequest($request)
@@ -64,7 +59,12 @@ class NormalRoute implements IRoute
         }
     }
 
-    public function setControllerClassName()
+    /**
+     * 计算Controller Class Name
+     *
+     * @return bool
+     */
+    public function findControllerClassName()
     {
         $this->controllerClassName = '';
         do {
@@ -94,9 +94,10 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * 解析请求的URI
+     * 解析请求的URL PATH
      *
      * @param $path
+     * @return bool
      */
     public function parsePath($path)
     {
@@ -123,7 +124,7 @@ class NormalRoute implements IRoute
             $this->clientData->methodName     = $methodName;
             $this->controllerClassName        = '';
 
-            if ($this->setControllerClassName()) {
+            if ($this->findControllerClassName()) {
                 return true;
             }
 
@@ -132,7 +133,7 @@ class NormalRoute implements IRoute
             $this->setControllerName($controllerName);
             $this->setMethodName($methodDefault);
 
-            if ($this->setControllerClassName()) {
+            if ($this->findControllerClassName()) {
                 return true;
             }
 
@@ -141,6 +142,8 @@ class NormalRoute implements IRoute
     }
 
     /**
+     * 解析请求的方法
+     *
      * @param $request
      * @return string
      */
@@ -158,6 +161,7 @@ class NormalRoute implements IRoute
 
     /**
      * 获取控制器名称
+     *
      * @return string
      */
     public function getControllerName()
@@ -167,6 +171,8 @@ class NormalRoute implements IRoute
 
     /**
      * 获取请求对应的控制器完全命名空间类名
+     *
+     * @return string
      */
     public function getControllerClassName()
     {
@@ -175,6 +181,7 @@ class NormalRoute implements IRoute
 
     /**
      * 获取方法名称
+     *
      * @return string
      */
     public function getMethodName()
@@ -182,55 +189,111 @@ class NormalRoute implements IRoute
         return $this->clientData->methodName;
     }
 
+    /**
+     * 获取请求的PATH
+     *
+     * @return string
+     */
     public function getPath()
     {
         return $this->clientData->path;
     }
 
+    /**
+     * 判断请求是否为RPC请求
+     *
+     * @return bool
+     */
     public function getIsRpc()
     {
         return $this->clientData->isRpc ?? false;
     }
 
+    /**
+     * 获取请求的方法
+     *
+     * @return string|null
+     */
     public function getVerb()
     {
         return $this->clientData->verb ?? null;
     }
 
+    /**
+     * 获取请求的参数
+     *
+     * @return array
+     */
     public function getParams()
     {
         return $this->clientData->params ?? [];
     }
 
+    /**
+     * 设置请求的控制器标识
+     *
+     * @param string $name
+     * @return $this
+     */
     public function setControllerName($name)
     {
         $this->clientData->controllerName = $name;
         return $this;
     }
 
+    /**
+     * 设置请求控制器的方法标识
+     *
+     * @param string $name
+     * @return $this
+     */
     public function setMethodName($name)
     {
         $this->clientData->methodName = $name;
         return $this;
     }
 
+    /**
+     * 设置请求的参数
+     *
+     * @param array $params
+     * @return $this
+     */
     public function setParams($params)
     {
         $this->clientData->params = $params;
         return $this;
     }
 
+    /**
+     * 获取是否支持路由Cache
+     *
+     * @return bool
+     */
     public function getEnableCache()
     {
         return $this->enableCache;
     }
 
+    /**
+     * 缓存路由
+     *
+     * @param $path
+     * @param $callable
+     * @return $this
+     */
     public function setRouteCache($path, $callable)
     {
         $this->routeCache[$path] = $callable;
         return $this;
     }
 
+    /**
+     * 获取已缓存的路由信息
+     *
+     * @param $path
+     * @return mixed|null
+     */
     public function getRouteCache($path)
     {
         return $this->routeCache[$path] ?? null;

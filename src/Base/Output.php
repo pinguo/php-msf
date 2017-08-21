@@ -15,8 +15,8 @@ use PG\MSF\Controllers\Controller;
 class Output extends Core
 {
     /**
-     * [https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html]
-     * @var array
+     * @link https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+     * @var array HTTP状态码
      */
     public static $codes = [
         100 => 'Continue',
@@ -104,19 +104,17 @@ class Output extends Core
     ];
 
     /**
-     * http response
-     * @var \swoole_http_response
+     * @var \swoole_http_response HTTP响应对象
      */
     public $response;
 
     /**
-     * http request
-     * @var \swoole_http_request
+     * @var \swoole_http_request HTTP请求对象
      */
     public $request;
 
     /**
-     * @var Controller
+     * @var Controller 当前处理请求的控制器
      */
     protected $controller;
 
@@ -130,28 +128,33 @@ class Output extends Core
         $this->controller = $controller;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function __sleep()
     {
         return ['response', 'request'];
     }
 
     /**
-     * 设置
-     * @param $request
-     * @param $response
+     * 设置HTTP请求和HTTP响应对象
+     *
+     * @param \swoole_http_request $request
+     * @param \swoole_http_response|null $response
+     * @return $this
      */
     public function set(&$request, &$response = null)
     {
         $this->request  = $request;
         $this->response = $response;
+        return $this;
     }
 
     /**
-     * Set HTTP Status Header
+     * 设置HTTP响应状态码
      *
-     * @param    int    the status code
-     * @param    string
-     * @return HttpOutPut
+     * @param int $code
+     * @return $this
      */
     public function setStatusHeader($code = 200)
     {
@@ -162,12 +165,10 @@ class Output extends Core
     /**
      * 响应json格式数据
      *
-     * @param Controller $controller
-     * @param null $data
+     * @param mixed|null $data
      * @param string $message
      * @param int $status
-     * @param null $callback
-     * @return array
+     * @param callable|null $callback
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
@@ -202,14 +203,13 @@ class Output extends Core
     }
 
     /**
-     * 响应通过模板输出的HTML
+     * 通过模板引擎响应输出HTML
      *
      * @param array $data
      * @param string|null $view
      * @throws \Exception
      * @throws \Throwable
      * @throws Exception
-     * @return void
      */
     public function outputView(array $data, $view = null)
     {
@@ -245,7 +245,7 @@ class Output extends Core
     /**
      * 获取jsonp的callback名称
      *
-     * @param $callback
+     * @param string $callback
      * @return string
      */
     public function getCallback($callback)
@@ -266,9 +266,9 @@ class Output extends Core
     }
 
     /**
-     * Set Content-Type Header
+     * 设置响应的Content-Type报头
      *
-     * @param string $mime_type Extension of the file we're outputting
+     * @param string $mime_type
      * @return $this
      */
     public function setContentType($mime_type)
@@ -278,9 +278,10 @@ class Output extends Core
     }
 
     /**
-     * set_header
-     * @param $key
-     * @param $value
+     * 设置响应的其他HTTP报头
+     *
+     * @param string $key
+     * @param string $value
      * @return $this
      */
     public function setHeader($key, $value)
@@ -290,7 +291,27 @@ class Output extends Core
     }
 
     /**
-     * 发送
+     * 设置HTTP响应的cookie信息，与PHP的setcookie()参数一致
+     *
+     * @param string $key
+     * @param string $value
+     * @param int $expire
+     * @param string $path
+     * @param string $domain
+     * @param bool $secure
+     * @param bool $httponly
+     * @return $this
+     */
+    public function setCookie($key, $value = '', $expire = 0, $path = '/', $domain = '', $secure = false, $httponly = false
+    ) {
+        $this->response->cookie($key, $value, $expire, $path, $domain, $secure, $httponly);
+        return $this;
+    }
+
+
+    /**
+     * 结束HTTP请求，发送响应体
+     *
      * @param string $output
      * @param bool $gzip
      * @param bool $destroy
@@ -310,28 +331,6 @@ class Output extends Core
         if ($destroy) {
             $this->controller->destroy();
         }
-    }
-
-    /**
-     * 设置HTTP响应的cookie信息。此方法参数与PHP的setcookie完全一致。
-     * @param string $key
-     * @param string $value
-     * @param int $expire
-     * @param string $path
-     * @param string $domain
-     * @param bool $secure
-     * @param bool $httponly
-     */
-    public function setCookie(
-        string $key,
-        string $value = '',
-        int $expire = 0,
-        string $path = '/',
-        string $domain = '',
-        bool $secure = false,
-        bool $httponly = false
-    ) {
-        $this->response->cookie($key, $value, $expire, $path, $domain, $secure, $httponly);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * AOP类工厂
+ * AOP类工厂，基于AOP完善的支持请求上下文，Redis连接池及代理
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -17,15 +17,12 @@ use PG\MSF\Proxy\IProxy;
 class AOPFactory extends Factory
 {
     /**
-     * 通过反射获取类的public属性默认值（销毁对象）
-     *
-     * @var array
+     * @var array 通过反射获取类的public属性默认值（销毁对象）
      */
     protected static $reflections = [];
 
     /**
-     * 所有为Task类的标识
-     * @var array
+     * @var array 所有为Task类的标识
      */
     protected static $taskClasses = [];
 
@@ -75,7 +72,7 @@ class AOPFactory extends Factory
      * 获取对象池实例
      *
      * @param Pool $pool
-     * @param Core $coreBase
+     * @param Child $coreBase
      * @return Wrapper|Pool
      */
     public static function getObjectPool(Pool $pool, $coreBase)

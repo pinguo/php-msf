@@ -1,6 +1,6 @@
 <?php
 /**
- * Input
+ * 请求的输入对象（用于代替传统$_GET/$_POST/$_SERVER）
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -11,81 +11,87 @@ namespace PG\MSF\Base;
 class Input extends Core
 {
     /**
-     * @var \swoole_http_request|\stdClass
+     * @var \swoole_http_request|\PG\MSF\Console\Request 请求参数对象
      */
     public $request;
 
+    /**
+     * @inheritdoc
+     */
     public function __sleep()
     {
         return ['request'];
     }
 
     /**
-     * @param $request
+     * @param \swoole_http_request|\PG\MSF\Console\Request $request 设置请求参数对象
+     * @return $this
      */
     public function set($request)
     {
         $this->request = $request;
+        return $this;
     }
 
     /**
-     * 重置
+     * 重置请求参数对象
+     *
+     * @return $this
      */
     public function reset()
     {
         unset($this->request);
+        return $this;
     }
 
     /**
-     * postGet
-     * @param $index
-     * @param $clean
+     * 获取POST/GET参数，优先读取POST
+     *
+     * @param string $index
      * @return string
      */
-    public function postGet($index, $clean = true)
+    public function postGet($index)
     {
-        return isset($this->request->post[$index])
-            ? $this->post($index, $clean)
-            : $this->get($index, $clean);
+        return $this->request->post[$index] ?? $this->get($index);
     }
 
     /**
-     * post
-     * @param $index
-     * @param $clean
+     * 获取POST参数
+     *
+     * @param string $index
      * @return string
      */
-    public function post($index, $clean = true)
+    public function post($index)
     {
         return $this->request->post[$index] ?? '';
     }
 
     /**
-     * get
-     * @param $index
-     * @param $clean
+     * 获取GET参数
+     *
+     * @param string $index
      * @return string
      */
-    public function get($index, $clean = true)
+    public function get($index)
     {
         return $this->request->get[$index] ?? '';
     }
 
     /**
-     * getPost
-     * @param $index
-     * @param $clean
+     * 获取POST/GET参数，优先读取GET
+     *
+     * @param string $index
      * @return string
      */
-    public function getPost($index, $clean = true)
+    public function getPost($index)
     {
-        return isset($this->request->get[$index])
-            ? $this->get($index, $clean)
-            : $this->post($index, $clean);
+        return $this->request->get[$index] ?? $this->post($index);
     }
 
     /**
-     * 获取所有的post和get
+     * 获取所有的POST/GET参数
+     *
+     * @return array
      */
     public function getAllPostGet()
     {
@@ -93,7 +99,9 @@ class Input extends Core
     }
 
     /**
-     * 获取所有的post
+     * 获取所有的POST参数
+     *
+     * @return array
      */
     public function getAllPost()
     {
@@ -101,7 +109,9 @@ class Input extends Core
     }
 
     /**
-     * 获取所有的get
+     * 获取所有的GET参数
+     *
+     * @return array
      */
     public function getAllGet()
     {
@@ -110,7 +120,8 @@ class Input extends Core
 
 
     /**
-     * getAllHeader
+     * 获取请求的所有报头
+     *
      * @return array
      */
     public function getAllHeader()
@@ -119,7 +130,8 @@ class Input extends Core
     }
 
     /**
-     * getAllServer
+     * 获取处理请求的Server信息
+     *
      * @return array
      */
     public function getAllServer()
@@ -129,7 +141,8 @@ class Input extends Core
 
     /**
      * 获取原始的POST包体
-     * @return mixed
+     *
+     * @return string
      */
     public function getRawContent()
     {
@@ -187,38 +200,41 @@ class Input extends Core
     }
 
     /**
-     * cookie
-     * @param $index
-     * @param $clean
+     * 获取Cookie参数
+     *
+     * @param string $index
      * @return string
      */
-    public function cookie($index, $clean = true)
+    public function getCookie($index)
     {
         return $this->request->cookie[$index] ?? '';
     }
 
     /**
-     * file
-     * @param  string $index form field name
-     * @return array file upload information
+     * 获取上传文件信息
+     *
+     * @param string $index
+     * @return array
      */
-    public function file($index) {
+    public function getFile($index) {
         return $this->request->files[$index] ?? '';
     }
 
     /**
      * 获取Server相关的数据
-     * @param $index
-     * @param bool $clean
+     *
+     * @param string $index
      * @return array|bool|string
      */
-    public function server($index, $clean = true)
+    public function getServer($index)
     {
         return $this->request->server[$index] ?? '';
     }
 
     /**
-     * @return mixed
+     * 获取请求的方法
+     *
+     * @return string
      */
     public function getRequestMethod()
     {
@@ -233,7 +249,9 @@ class Input extends Core
     }
 
     /**
-     * @return mixed
+     * 获取请求的URI
+     *
+     * @return string
      */
     public function getRequestUri()
     {
@@ -241,7 +259,9 @@ class Input extends Core
     }
 
     /**
-     * @return mixed
+     * 获取请求的PATH
+     *
+     * @return string
      */
     public function getPathInfo()
     {
@@ -249,19 +269,21 @@ class Input extends Core
     }
 
     /**
+     * 获取请求的用户ID
+     *
      * @return string
      */
     public function getRemoteAddr()
     {
-        if (($ip = $this->getRequestHeader('x-forwarded-for')) || ($ip = $this->getRequestHeader('http_x_forwarded_for'))
-            || ($ip = $this->getRequestHeader('http_forwarded')) || ($ip = $this->getRequestHeader('http_forwarded_for'))
-            || ($ip = $this->getRequestHeader('http_forwarded'))
+        if (($ip = $this->getHeader('x-forwarded-for')) || ($ip = $this->getHeader('http_x_forwarded_for'))
+            || ($ip = $this->getHeader('http_forwarded')) || ($ip = $this->getHeader('http_forwarded_for'))
+            || ($ip = $this->getHeader('http_forwarded'))
         ) {
             $ip = explode(',', $ip);
             $ip = trim($ip[0]);
-        } elseif ($ip = $this->getRequestHeader('http_client_ip')) {
-        } elseif ($ip = $this->getRequestHeader('x-real-ip')) {
-        } elseif ($ip = $this->getRequestHeader('remote_addr')) {
+        } elseif ($ip = $this->getHeader('http_client_ip')) {
+        } elseif ($ip = $this->getHeader('x-real-ip')) {
+        } elseif ($ip = $this->getHeader('remote_addr')) {
         } elseif ($ip = $this->request->server['remote_addr']) {
             // todo
         }
@@ -270,12 +292,12 @@ class Input extends Core
     }
 
     /**
-     * getRequestHeader
-     * @param $index
-     * @param $clean
+     * 获取请求报头参数
+     *
+     * @param string $index
      * @return string
      */
-    public function getRequestHeader($index, $clean = false)
+    public function getHeader($index)
     {
         return $this->request->header[$index] ?? '';
     }

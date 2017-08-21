@@ -1,6 +1,6 @@
 <?php
 /**
- * http客户端,支持协程
+ * HTTP客户端
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -21,30 +21,22 @@ class Client extends Core
     public static $dnsCache;
 
     /**
-     * 请求报头
-     *
-     * @var array
+     * @var array 请求报头
      */
     public $headers;
 
     /**
-     * swoole http client
-     *
-     * @var \swoole_http_client
+     * @var \swoole_http_client swoole http client
      */
     public $client;
 
     /**
-     * 解析的URL结果
-     *
-     * @var array
+     * @var array 解析的URL结果
      */
     public $urlData;
 
     /**
-     * DNS解析超时时间
-     *
-     * @var int
+     * @var int DNS解析超时时间
      */
     public $dnsTimeout = 30000;
 
@@ -97,7 +89,6 @@ class Client extends Core
     /**
      * 获取当前请求报头
      *
-     * @param void
      * @return array
      */
     public function getHeaders()
@@ -155,7 +146,7 @@ class Client extends Core
     }
 
     /**
-     * 发起DNS查询
+     * 运行DNS查询协程
      *
      * @param string $url  如 https://www.baidu.com
      * @param int $timeout 协程超时时间
@@ -193,7 +184,7 @@ class Client extends Core
     }
 
     /**
-     * 在完成DNS查询的基础上发送POST请求
+     * 在完成DNS查询的基础上，运行POST请求协程
      *
      * @param string $url 请求的URL
      * @param array $data POST的数据
@@ -222,7 +213,7 @@ class Client extends Core
     }
 
     /**
-     * 在完成DNS查询的基础上协程发送GET请求
+     * 在完成DNS查询的基础上，运行GET请求协程
      *
      * @param string $url 请求的URL
      * @param array $query POST的数据
@@ -252,7 +243,7 @@ class Client extends Core
     }
 
     /**
-     * 单个独立协程直接发送POST请求（自动完成DNS查询、获取数据）
+     * 单个独立POST请求协程（自动完成DNS查询、获取数据）
      *
      * @param string $url 请求的URL
      * @param array $data POST的数据
@@ -278,7 +269,7 @@ class Client extends Core
     }
 
     /**
-     * 单个独立协程直接发送GET请求（自动完成DNS查询、获取数据）
+     * 单个独立GET请求协程（自动完成DNS查询、获取数据）
      *
      * @param string $url 请求的URL
      * @param array $query POST的数据
@@ -304,41 +295,48 @@ class Client extends Core
     }
 
     /**
-     * 并行协程发送POST或者Get请求（自动完成DNS查询、获取数据）
+     * 并行POST或者Get请求协程（自动完成DNS查询、获取数据）
+     *
+     * @param array $requests 格式如：
+     *   [
+     *       [
+     *           'url'         => 'http://www.baidu.com/xxx', // 必须为全路径URL
+     *           'method'      => 'GET', // 默认GET
+     *           'dns_timeout' => 1000, // 默认为30s
+     *           'timeout'     => 3000,  // 默认不超时
+     *           'headers'     => [],    // 默认为空
+     *           'data'        => ['a' => 'b'] // 发送数据
+     *       ],
+     *       [
+     *           'url'         => 'http://www.baidu.com/xxx',
+     *           'method'      => 'POST',
+     *           'timeout'     => 3000,
+     *           'headers'     => [],
+     *           'data'        => ['a' => 'b'] // 发送数据
+     *       ],
+     *       [
+     *           'url'         => 'http://www.baidu.com/xxx',
+     *           'method'      => 'POST',
+     *           'timeout'     => 3000,
+     *           'headers'     => [],
+     *           'data'        => ['a' => 'b'] // 发送数据
+     *       ],
+     *   ];
+     *
+     * @return array
+     * @throws Exception
      */
-    public function goConcurrent()
+    public function goConcurrent(array $requests)
     {
-        $requests = [
-            [
-                'url'        => 'http://www.baidu.com/xxx', // 必须为全路径URL
-                'method'      => 'GET', // 默认GET
-                'dns_timeout' => 1000, // 默认为30s
-                'timeout'     => 3000,  // 默认不超时
-                'headers'     => [],    // 默认为空
-                'data'        => ['a' => 'b'] // 发送数据
-            ],
-            [
-                'url'        => 'http://www.baidu.com/xxx',
-                'method'      => 'POST',
-                'timeout'     => 3000,
-                'headers'     => [],
-                'data'        => ['a' => 'b'] // 发送数据
-            ],
-            [
-                'url'        => 'http://www.baidu.com/xxx',
-                'method'      => 'POST',
-                'timeout'     => 3000,
-                'headers'     => [],
-                'data'        => ['a' => 'b'] // 发送数据
-            ],
-        ];
-
         if (empty($requests)) {
             throw new Exception('$requests is empty');
         }
 
-        $go     = [];
-        $result = [];
+        $go               = [];
+        $dns              = [];
+        $result           = [];
+        $sendHttpRequests = [];
+        // 格式化请求参数，并运行DNS查询协程
         foreach ($requests as $key => $request) {
             if (is_array($request)) {
                 if (empty($request['url'])) {
@@ -397,21 +395,29 @@ class Client extends Core
             }
 
             /**
-             * @var $go Client[]
+             * @var Client[] $go
              */
-            $go[$key] = $this->context->getObjectPool()->get(self::class)->goDnsLookup($url, $dnsTimeout, $headers);
+            $go[$key]  = $this->context->getObjectPool()->get(self::class);
+            /**
+             * @var Dns[] $dns
+             */
+            $dns[$key] = $go[$key]->goDnsLookup($url, $dnsTimeout, $headers);
         }
 
-        foreach ($go as $key => $client) {
-            $go[$key] = yield $client;
-            if (!$go[$key]) {
+        // 获取DNS查询结果
+        foreach ($dns as $key => $goDns) {
+            if ($goDns instanceof Client) {
+                continue;
+            }
+
+            if (!yield $goDns) {
                 $this->getContext()->getLog()->error('DNS lookup for ' . $requests[$key]['url'] . ' Failed');
                 $result[$key] = false;
                 continue;
             }
         }
 
-        $sendHttpRequests = [];
+        // 运行HTTP请求协程
         foreach ($go as $key => $client) {
             if (isset($result[$key])) {
                 continue;
@@ -426,6 +432,7 @@ class Client extends Core
             }
         }
 
+        // 获取HTTP请求结果
         foreach ($sendHttpRequests as $key => $httpRequest) {
             $result[$key] = yield $httpRequest;
         }
@@ -434,7 +441,7 @@ class Client extends Core
     }
 
     /**
-     * DNS查询返回协程的回调
+     * DNS查询返回时回调
      *
      * @param $ip string 主机名对应的IP
      * @return bool
@@ -460,7 +467,7 @@ class Client extends Core
     /**
      * 标准化解析URL
      *
-     * @param $url
+     * @param string $url
      * @return bool|mixed
      */
     public static function parseUrl($url)

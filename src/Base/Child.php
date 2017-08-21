@@ -17,7 +17,7 @@ class Child
     use MI;
 
     /**
-     * @var array
+     * @var array 反射类属性的默认值
      */
     protected static $reflections = [];
 

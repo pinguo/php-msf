@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @desc:  Redis 实现分布式锁 (使用时必须在协程环境中)
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/3/7
+ * 协程环境Redis实现的分布式锁
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -15,18 +14,20 @@ use PG\MSF\DataBase\RedisAsynPool;
 class Lock
 {
     const LOCK_PREFIX = '@PGLock.';
+
     /**
-     * 锁的标识
-     * @var int|string
+     * @var int|string 锁的标识
      */
     protected $lockId;
+
     /**
-     * @var RedisAsynPool
+     * @var RedisAsynPool Redis连接池
      */
     protected $redisPool;
 
     /**
      * Lock constructor.
+     *
      * @param $lockId
      * @param null $redisPoolName
      */
@@ -42,11 +43,12 @@ class Lock
 
     /**
      * 获得锁可以设置超时时间单位ms,返回使用锁的次数
+     *
      * @param int $maxTime
      * @return mixed
      * @throws Exception
      */
-    public function coroutineLock($maxTime = 5000)
+    public function goLock($maxTime = 5000)
     {
         $count = 0;
         do {
@@ -64,9 +66,10 @@ class Lock
 
     /**
      * 尝试获得锁
+     *
      * @return int
      */
-    public function coroutineTrylock()
+    public function goTryLock()
     {
         $result = yield $this->redisPool->getCoroutine()->setnx(self::LOCK_PREFIX . $this->lockId, 1);
         return $result;
@@ -74,6 +77,7 @@ class Lock
 
     /**
      * 解锁
+     *
      * @return int
      */
     public function coroutineUnlock()
@@ -84,6 +88,7 @@ class Lock
 
     /**
      * 获取lock_id
+     *
      * @return int|string
      */
     public function getLockId()

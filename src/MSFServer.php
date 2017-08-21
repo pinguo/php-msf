@@ -8,102 +8,58 @@
 
 namespace PG\MSF;
 
-use PG\MSF\Client\Http\Client as HttpClient;
-use PG\MSF\Client\Tcp\Client as TcpClient;
+use Exception;
 use PG\MSF\Process\Config;
 use PG\MSF\Process\Inotify;
 use PG\MSF\Process\Timer;
 use PG\MSF\DataBase\AsynPool;
 use PG\MSF\DataBase\AsynPoolManager;
-use PG\MSF\DataBase\Miner;
-use PG\MSF\DataBase\MysqlAsynPool;
-use PG\MSF\DataBase\RedisAsynPool;
-use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\RedisProxyFactory;
-use PG\MSF\Tasks\Task as TaskBase;
+use PG\MSF\Proxy\IProxy;
+use PG\MSF\Tasks\Task;
 use PG\MSF\Base\AOPFactory;
-use Exception;
 
 abstract class MSFServer extends HttpServer
 {
+    /**
+     * 默认服务名称
+     */
     const SERVER_NAME = 'SERVER';
 
     /**
-     * @var Pool
+     * var array Tasker进程内对象容器
      */
-    public $objectPool;
+    public $objectPoolBuckets = [];
 
     /**
-     * @var MysqlAsynPool
-     */
-    public $mysqlPool;
-
-    /**
-     * http client
-     * @var HttpClient
-     */
-    public $client;
-
-    /**
-     * tcp client
-     * @var TcpClient
-     */
-    public $tcpClient;
-    /**
-     * 覆盖set配置
-     * @var array
-     */
-    public $overrideSetConfig = [];
-    /**
-     * 404缓存
-     * @var string
-     */
-    public $cache404;
-    /**
-     * 生成task_id的原子
-     */
-    public $taskAtomic;
-    /**
-     * task_id和pid的映射
-     */
-    public $tidPidTable;
-    /**
-     * 中断task的id内存锁
-     */
-    public $taskLock;
-    /**
-     * @var \Redis
-     */
-    protected $redisClient;
-    /**
-     * @var Miner
-     */
-    protected $mysqlClient;
-    /**
-     * 连接池进程
-     * @var
+     * @var \swoole_process 连接池进程
      */
     protected $poolProcess;
+
     /**
-     * 连接池
-     * @var
-     */
-    protected $asynPools = [];
-    /**
-     * @var AsynPoolManager
-     */
-    protected $asnyPoolManager;
-    /**
-     * @var array
+     * @var array Redis代理管理器
      */
     protected $redisProxyManager = [];
 
     /**
-     * Tasks list（Task进程中单例模式）
-     *
-     * @var array
+     * @var \swoole_atomic task_id的原子
      */
-    protected $_tasks = [];
+    public $taskAtomic;
+
+    /**
+     * @var array task_id和pid的映射
+     */
+    public $tidPidTable;
+
+    /**
+     * @var array 连接池
+     */
+    protected $asynPools = [];
+
+    /**
+     * @var AsynPoolManager 连接池管理器
+     */
+    protected $asynPoolManager;
 
     /**
      * MSFServer constructor.
@@ -115,23 +71,17 @@ abstract class MSFServer extends HttpServer
         parent::__construct();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function start()
     {
         parent::start();
     }
 
-    /**
-     * 获取同步mysql
-     * @return Miner
-     * @throws Exception
-     */
-    public function getMysql()
-    {
-        return $this->mysqlPool->getSync();
-    }
 
     /**
-     * 设置配置
+     * @inheritdoc
      */
     public function setConfig()
     {
@@ -139,7 +89,7 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * 开始前创建共享内存保存USID值
+     * 服务启动前的初始化
      */
     public function beforeSwooleStart()
     {
@@ -153,27 +103,21 @@ abstract class MSFServer extends HttpServer
 
         //创建task用的id->pid共享内存表，进程最多可以同时处理8096个任务
         $this->tidPidTable = new \swoole_table(8096);
-        $this->tidPidTable->column('pid', \swoole_table::TYPE_INT, 8);
-        $this->tidPidTable->column('des', \swoole_table::TYPE_STRING, 50);
+        $this->tidPidTable->column('pid',        \swoole_table::TYPE_INT, 8);
+        $this->tidPidTable->column('des',        \swoole_table::TYPE_STRING, 50);
         $this->tidPidTable->column('start_time', \swoole_table::TYPE_INT, 8);
         $this->tidPidTable->create();
 
-        //创建task用的锁
-        $this->taskLock = new \swoole_lock(SWOOLE_MUTEX);
-
-        //初始化对象池
-        $this->objectPool    = Pool::getInstance();
-
         //创建异步连接池进程
-        if ($this->config->get('asyn_process_enable', false)) {//代表启动单独进程进行管理
+        if ($this->config->get('asyn_process_enable', false)) {
             $this->poolProcess = new \swoole_process(function ($process) {
                 $process->name($this->config['server.process_title'] . '-ASYN');
-                $this->asnyPoolManager = new AsynPoolManager($process, $this);
-                $this->asnyPoolManager->eventAdd();
+                $this->asynPoolManager = new AsynPoolManager($process, $this);
+                $this->asynPoolManager->eventAdd();
                 $this->initAsynPools();
                 foreach ($this->asynPools as $pool) {
                     if ($pool) {
-                        $this->asnyPoolManager->registAsyn($pool);
+                        $this->asynPoolManager->registAsyn($pool);
                     }
                 }
                 $this->initRedisProxies();
@@ -198,6 +142,7 @@ abstract class MSFServer extends HttpServer
             }, false, 2);
             $this->server->addProcess($configProcess);
         }
+
         //业务自定义定时器进程
         if ($this->config->get('user_timer_enable', false)) {
             $timerProcess = new \swoole_process(function ($process) {
@@ -209,7 +154,7 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * 初始化各种连接池
+     * 初始化连接池
      */
     public function initAsynPools()
     {
@@ -226,10 +171,7 @@ abstract class MSFServer extends HttpServer
             }
         }
 
-        $this->asynPools = array_merge([
-            'mysqlPool' => $this->config->get('database.active') ? new MysqlAsynPool($this->config,
-                $this->config->get('database.active')) : null,
-        ], $redisPools);
+        $this->asynPools = $redisPools;
     }
 
     /**
@@ -252,30 +194,29 @@ abstract class MSFServer extends HttpServer
 
     /**
      * 设置服务器配置参数
+     *
      * @return array
      */
     public function setServerSet()
     {
         $set = $this->config->get('server.set', []);
-        $set = array_merge($set, $this->probufSet);
-        $set = array_merge($set, $this->overrideSetConfig);
         $this->workerNum = $set['worker_num'];
         $this->taskNum = $set['task_worker_num'];
         return $set;
     }
 
     /**
-     * task异步任务
-     * @param $serv
-     * @param $taskId
-     * @param $fromId
-     * @param $data
+     * 异步Task任务回调
+     *
+     * @param \swoole_server $serv
+     * @param int $taskId
+     * @param int $fromId
+     * @param array $data
      * @return mixed|null
      * @throws Exception
      */
-    public function onSwooleTask($serv, $taskId, $fromId, $data)
+    public function onTask($serv, $taskId, $fromId, $data)
     {
-
         if (is_string($data)) {
             $unserializeData = unserialize($data);
         } else {
@@ -285,7 +226,7 @@ abstract class MSFServer extends HttpServer
         $message = $unserializeData['message'] ?? '';
         $result  = false;
         switch ($type) {
-            case Marco::SERVER_TYPE_TASK://task任务
+            case Marco::SERVER_TYPE_TASK:
                 try {
                     $taskName      = $message['task_name'];
                     $taskFucName   = $message['task_fuc_name'];
@@ -293,24 +234,30 @@ abstract class MSFServer extends HttpServer
                     $taskId        = $message['task_id'];
                     $taskContext   = $message['task_context'];
                     $taskConstruct = $message['task_construct'];
+                    $objectPool    = AOPFactory::getObjectPool($this->objectPool, $this);
+                    /**
+                     * @var Task $task
+                     */
+                    $task          = $objectPool->get($taskName, ...$taskConstruct);
 
-                    if (key_exists($taskName, $this->_tasks)) {
-                        $task = $this->_tasks[$taskName];
-                    } else {
-                        $task                    = new $taskName(...$taskConstruct);
-                        $this->_tasks[$taskName] = $task;
-                    }
-
+                    // 运行方法
                     if (method_exists($task, $taskFucName)) {
                         //给task做初始化操作
-                        $task->__initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName, $taskContext);
+                        $task->__initialization($taskId, $this->server->worker_pid, $taskName, $taskFucName, $taskContext, $objectPool);
                         $result = $task->$taskFucName(...$taskData);
                     } else {
                         throw new Exception("method $taskFucName not exist in $taskName");
                     }
-                    $task->destroy();
+
+                    //销毁对象
+                    foreach ($this->objectPoolBuckets as $k => $obj) {
+                        $objectPool->push($obj);
+                        $this->objectPoolBuckets[$k] = null;
+                        unset($this->objectPoolBuckets[$k]);
+                    }
+                    $objectPool->setCurrentObjParent(null);
                 } catch (\Throwable $e) {
-                    if (empty($task) || !($task instanceof TaskBase) || empty($task->getContext())) {
+                    if (empty($task) || !($task instanceof Task) || empty($task->getContext())) {
                         getInstance()->log->error(dump($e, false, true));
                     } else {
                         $error = dump($e, false, true);
@@ -319,32 +266,36 @@ abstract class MSFServer extends HttpServer
                 }
                 return $result;
             default:
-                return parent::onSwooleTask($serv, $taskId, $fromId, $data);
+                return parent::onTask($serv, $taskId, $fromId, $data);
         }
     }
 
     /**
      * PipeMessage
-     * @param $serv
-     * @param $fromWorkerId
-     * @param $message
+     *
+     * @param \swoole_server $serv
+     * @param int $fromWorkerId
+     * @param string $message
      */
-    public function onSwoolePipeMessage($serv, $fromWorkerId, $message)
+    public function onPipeMessage($serv, $fromWorkerId, $message)
     {
-        parent::onSwoolePipeMessage($serv, $fromWorkerId, $message);
+        parent::onPipeMessage($serv, $fromWorkerId, $message);
         $data = unserialize($message);
         switch ($data['type']) {
             case Marco::MSG_TYPR_ASYN:
-                $this->asnyPoolManager->distribute($data['message']);
+                $this->asynPoolManager->distribute($data['message']);
                 break;
         }
     }
 
     /**
-     * 添加AsynPool
-     * @param $name
+     * 手工添加AsynPool
+     *
+     * @param string $name
      * @param AsynPool $pool
+     * @param bool $isRegister
      * @throws Exception
+     * @return $this
      */
     public function addAsynPool($name, AsynPool $pool, $isRegister = false)
     {
@@ -352,15 +303,18 @@ abstract class MSFServer extends HttpServer
             throw new Exception('pool key is exists!');
         }
         $this->asynPools[$name] = $pool;
-        if ($isRegister && $this->asnyPoolManager) {
+        if ($isRegister && $this->asynPoolManager) {
             $pool->workerInit($this->server->worker_id);
-            $this->asnyPoolManager->registAsyn($pool);
+            $this->asynPoolManager->registAsyn($pool);
         }
+
+        return $this;
     }
 
     /**
      * 获取连接池
-     * @param $name
+     *
+     * @param string $name
      * @return AsynPool
      */
     public function getAsynPool($name)
@@ -369,10 +323,12 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * 添加redis代理
-     * @param $name
-     * @param $proxy
+     * 手工添加redis代理
+     *
+     * @param string $name
+     * @param IProxy $proxy
      * @throws Exception
+     * @return $this
      */
     public function addRedisProxy($name, $proxy)
     {
@@ -380,11 +336,14 @@ abstract class MSFServer extends HttpServer
             throw new Exception('proxy key is exists!');
         }
         $this->redisProxyManager[$name] = $proxy;
+
+        return $this;
     }
 
     /**
      * 获取redis代理
-     * @param $name
+     *
+     * @param string $name
      * @return mixed
      */
     public function getRedisProxy($name)
@@ -393,17 +352,21 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * 重新设置redis代理
-     * @param $name
-     * @param $proxy
+     * 设置redis代理
+     *
+     * @param string $name
+     * @param IProxy $proxy
+     * @return $this
      */
     public function setRedisProxy($name, $proxy)
     {
         $this->redisProxyManager[$name] = $proxy;
+        return $this;
     }
 
     /**
      * 获取所有的redisProxy
+     *
      * @return array
      */
     public function &getRedisProxies()
@@ -412,27 +375,27 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * 重写onSwooleWorkerStart方法，添加异步redis,添加redisProxy
-     * @param $serv
-     * @param $workerId
+     * 添加异步redis,添加redisProxy
+     *
+     * @param \swoole_server $serv
+     * @param int $workerId
      * @throws Exception
      */
-    public function onSwooleWorkerStart($serv, $workerId)
+    public function onWorkerStart($serv, $workerId)
     {
-        parent::onSwooleWorkerStart($serv, $workerId);
+        parent::onWorkerStart($serv, $workerId);
         $this->initAsynPools();
         $this->initRedisProxies();
-        $this->mysqlPool = $this->asynPools['mysqlPool'];
         if (!$serv->taskworker && !empty($this->asynPools)) {
             //注册
-            $this->asnyPoolManager = new AsynPoolManager($this->poolProcess, $this);
+            $this->asynPoolManager = new AsynPoolManager($this->poolProcess, $this);
             if (!$this->config['asyn_process_enable']) {
-                $this->asnyPoolManager->noEventAdd();
+                $this->asynPoolManager->noEventAdd();
             }
             foreach ($this->asynPools as $pool) {
                 if ($pool) {
                     $pool->workerInit($workerId);
-                    $this->asnyPoolManager->registAsyn($pool);
+                    $this->asynPoolManager->registAsyn($pool);
                 }
             }
         } else {
@@ -463,42 +426,21 @@ abstract class MSFServer extends HttpServer
 
     /**
      * 连接断开
-     * @param $serv
+     *
+     * @param \swoole_server $serv
      * @param $fd
      */
-    public function onSwooleClose($serv, $fd)
+    public function onClose($serv, $fd)
     {
-        parent::onSwooleClose($serv, $fd);
+        parent::onClose($serv, $fd);
     }
 
     /**
-     * 向task发送中断信号
-     * @param $taskId
-     * @throws Exception
-     */
-    public function interruptedTask($taskId)
-    {
-        $ok = $this->taskLock->trylock();
-        if ($ok) {
-            getInstance()->tidPidTable->set(0, ['pid' => $taskId]);
-            $taskPid = getInstance()->tidPidTable->get($taskId)['pid'];
-            if ($taskPid == false) {
-                $this->taskLock->unlock();
-                throw new Exception('中断Task 失败，可能是task已运行完，或者task_id不存在。');
-            }
-            //发送信号
-            posix_kill($taskPid, SIGUSR1);
-            print_r("向TaskID=$taskId ,PID=$taskPid 的进程发送中断信号\n");
-        } else {
-            throw new Exception('interruptedTask 获得锁失败，中断操作正在进行请稍后。');
-        }
-    }
-
-    /**
-     * 获取服务器上正在运行的Task
+     * 获取正在运行的Task
+     *
      * @return array
      */
-    public function getServerAllTaskMessage()
+    public function getAllTaskMessage()
     {
         $tasks = [];
         foreach ($this->tidPidTable as $id => $row) {
