@@ -272,11 +272,11 @@ class RpcClient
                 'X-RPC' => 1,
             ];
         } else {
-            $preParams = [
+            $preParams = array_filter([
                 '__appVersion' => !empty($obj->getContext()->getInput()->postGet('__appVersion')) ? $obj->getContext()->getInput()->postGet('__appVersion') : $obj->getContext()->getInput()->postGet('appVersion'),
                 '__locale' => !empty($obj->getContext()->getInput()->postGet('__locale')) ? $obj->getContext()->getInput()->postGet('__locale') : $obj->getContext()->getInput()->postGet('locale'),
                 '__platform' => !empty($obj->getContext()->getInput()->postGet('__platform')) ? $obj->getContext()->getInput()->postGet('__platform') : $obj->getContext()->getInput()->postGet('platform')
-            ];
+            ]);
             $sendData = array_merge($args[0], $preParams);
             $sendData['sig'] = static::genSig($sendData, $rpc->appsecret);
         }
