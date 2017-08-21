@@ -13,7 +13,7 @@ use Exception;
 class CException extends Exception
 {
     /**
-     * @return string
+     * @return string 获取前一个异常Message
      */
     public function getPreviousMessage()
     {
@@ -22,6 +22,7 @@ class CException extends Exception
 
     /**
      * Exception constructor.
+     *
      * @param string $message
      * @param int $code
      * @param \Exception|null $previous

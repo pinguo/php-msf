@@ -1,8 +1,8 @@
 <?php
 /**
- * @desc: 配置管理进程
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/4/17
+ * 配置管理进程类
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -14,19 +14,41 @@ use PG\MSF\MSFServer;
 
 class Config
 {
-    public $config;
 
-    public $MSFServer;
-
-    public $lastMinute;
-
-    protected $redisRetryTimes = [];
-
+    /**
+     * Redis探测失败次数上限
+     */
     const FAILURE_LIMIT = 2;
 
+    /**
+     * @var Conf Server运行实例配置对象
+     */
+    public $config;
+
+    /**
+     * @var MSFServer 运行的Server实例
+     */
+    public $MSFServer;
+
+    /**
+     * @var float 上一分钟
+     */
+    public $lastMinute;
+
+    /**
+     * @var array Redis探测retry次数
+     */
+    protected $redisRetryTimes = [];
+
+    /**
+     * Config constructor.
+     *
+     * @param Conf $config
+     * @param MSFServer $MSFServer
+     */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        echo 'Enable Config Manager: Success', "\n";
+        echo 'Config  Manager: Enable', "\n";
         $this->config = $config;
         $this->MSFServer = $MSFServer;
         $this->lastMinute = ceil(time() / 60);
@@ -34,6 +56,9 @@ class Config
         swoole_timer_tick(1000, [$this, 'stats']);
     }
 
+    /**
+     * 汇总各个Worker的运行状态信息
+     */
     public function stats()
     {
         $data = [
@@ -116,6 +141,11 @@ class Config
         $this->MSFServer->sysCache->set(Marco::SERVER_STATS, $data);
     }
 
+    /**
+     * 检测Redis Proxy状态
+     *
+     * @return bool
+     */
     public function checkRedisProxy()
     {
         $host             = gethostname();

@@ -17,67 +17,52 @@ abstract class Base implements IBase
     use MI;
 
     /**
-     * 协程运行的最大超时时间
-     *
-     * @var int
+     * @var int 协程运行的最大超时时间
      */
     public static $maxTimeout = 0;
 
     /**
-     * 请求参数
-     * @var string
+     * @var string 请求参数
      */
     public $request;
 
     /**
-     * IO协程运行的结束
-     *
-     * @var mixed
+     * @var mixed IO协程运行的结束
      */
     public $result;
 
     /**
-     * 协程执行的超时时间精确到ms
-     * @var int
+     * @var int 协程执行的超时时间精确到ms
      */
     public $timeout;
 
     /**
-     * 协程执行请求开始时间
-     * @var float
+     * @var float 协程执行请求开始时间
      */
     public $requestTime = 0.0;
 
     /**
-     * 协程执行请求结束时间
+     * @var float 协程执行请求结束时间
      */
     public $responseTime = 0.0;
 
     /**
-     * IO协程是否返回数据
-     *
-     * @var bool
+     * @var bool IO协程是否返回数据
      */
     public $ioBack = false;
 
     /**
-     * ioBack标识
-     *
-     * @var int|null
+     * @var int|null ioBack标识
      */
     public $ioBackKey = null;
 
     /**
-     * 是否发送异步请求后不需要执行回调
-     *
-     * @var bool
+     * @var bool 是否发送异步请求后不需要执行回调
      */
     public $isBreak = false;
 
     /**
-     * 整个请求标识
-     *
-     * @var string | null
+     * @var string|null 整个请求标识
      */
     public $requestId = null;
 
@@ -202,7 +187,7 @@ abstract class Base implements IBase
     /**
      * 手工设置超时时间
      *
-     * @param $timeout
+     * @param int $timeout
      * @return $this
      */
     public function setTimeout($timeout)

@@ -1,6 +1,6 @@
 <?php
 /**
- * 协程http客户端
+ * DNS查询协程
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -9,22 +9,16 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\Client\Http\Client;
-use PG\MSF\Client\Http\HttpClient;
 
 class Dns extends Base
 {
     /**
-     * @var Client
+     * @var Client HTTP客户端实例
      */
     public $client;
 
     /**
-     * @var array|string
-     */
-    public $baseUrl;
-
-    /**
-     * @var array
+     * @var array 请求的额外HTTP报头
      */
     public $headers;
 
@@ -38,11 +32,10 @@ class Dns extends Base
     public function __construct(Client $client, $timeout, $headers = [])
     {
         parent::__construct($timeout);
-        $logTag = $client->urlData['url'];
 
         $this->client    = $client;
         $this->headers   = $headers;
-        $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $logTag;
+        $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->client->urlData['host'];
         $this->requestId = $this->getContext()->getLogId();
 
         getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
@@ -68,13 +61,15 @@ class Dns extends Base
     }
 
     /**
-     * 发送DNS请求
+     * 发送DNS查询请求
      *
      * @param callable $callback
+     * @return $this
      */
     public function send($callback)
     {
         $this->client->asyncDNSLookup($callback, $this->headers);
+        return $this;
     }
 
     /**

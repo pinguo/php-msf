@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Rest Controller
+ * Restful Api控制器基类
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -13,26 +13,24 @@ use PG\Exception\PrivilegeException;
 use PG\MSF\Base\Output;
 use PG\MSF\Coroutine\CException;
 
-/**
- * Class Controller
- * @package PG\MSF\Controllers
- */
 class Controller extends \PG\MSF\Controllers\Controller
 {
     /**
-     * @var string
+     * @var string HTTP请求方法
      */
     public $verb = 'GET';
     /**
-     * @var array the HTTP verbs that are supported by the collection URL
+     * @var array 操作资源集合所支持的HTTP请求方法
      */
     public $collectionOptions = ['GET', 'POST', 'HEAD', 'OPTIONS'];
     /**
-     * @var array the HTTP verbs that are supported by the resource URL
+     * @var array 操作资源所支持的HTTP请求方法
      */
     public $resourceOptions = ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
     /**
+     * 构造方法
+     *
      * @param string $controllerName
      * @param string $methodName
      */
@@ -43,8 +41,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is a GET request.
-     * @return bool whether this is a GET request.
+     * 返回当前请求是否为GET
+     *
+     * @return bool
      */
     public function getIsGet()
     {
@@ -52,8 +51,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is an OPTIONS request.
-     * @return bool whether this is a OPTIONS request.
+     * 返回当前请求是否为OPTIONS
+     *
+     * @return bool
      */
     public function getIsOptions()
     {
@@ -61,8 +61,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is a HEAD request.
-     * @return bool whether this is a HEAD request.
+     * 返回当前请求是否为HEAD
+     *
+     * @return bool
      */
     public function getIsHead()
     {
@@ -70,8 +71,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is a POST request.
-     * @return bool whether this is a POST request.
+     * 返回当前请求是否为POST
+     *
+     * @return bool
      */
     public function getIsPost()
     {
@@ -79,8 +81,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is a DELETE request.
-     * @return bool whether this is a DELETE request.
+     * 返回当前请求是否为DELETE
+     *
+     * @return bool
      */
     public function getIsDelete()
     {
@@ -88,8 +91,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is a PUT request.
-     * @return bool whether this is a PUT request.
+     * 返回当前请求是否为PUT
+     *
+     * @return bool
      */
     public function getIsPut()
     {
@@ -97,8 +101,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * Returns whether this is a PATCH request.
-     * @return bool whether this is a PATCH request.
+     * 返回当前请求是否为PATCH
+     *
+     * @return bool
      */
     public function getIsPatch()
     {
@@ -106,11 +111,13 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * output Json
-     * @param null $data
+     * 响应json格式数据
+     *
+     * @param array|null $data
      * @param string $message
      * @param int $status
-     * @param null $callback
+     * @param string|null $callback
+     * @throws \Exception
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
@@ -135,7 +142,9 @@ class Controller extends \PG\MSF\Controllers\Controller
     }
 
     /**
-     * 对返回options的封装
+     * 响应options请求
+     *
+     * @param array $options
      */
     public function outputOptions(array $options)
     {
@@ -153,6 +162,7 @@ class Controller extends \PG\MSF\Controllers\Controller
 
     /**
      * 异常的回调
+     *
      * @param \Throwable $e
      * @throws \Throwable
      */
@@ -189,9 +199,8 @@ class Controller extends \PG\MSF\Controllers\Controller
                 }
             }
         } catch (\Throwable $ne) {
-            echo 'Call Controller::onExceptionHandle Error', "\n";
-            echo 'Last Exception: ', dump($ce), "\n";
-            echo 'Handle Exception: ', dump($ne), "\n";
+            getInstance()->log->error('previous exception ' . dump($ce, false, true));
+            getInstance()->log->error('handle exception ' . dump($ne, false, true));
         }
     }
 }

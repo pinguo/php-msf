@@ -1,6 +1,6 @@
 <?php
 /**
- * Redis
+ * Redis协程
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -14,50 +14,37 @@ use PG\MSF\Marco;
 class Redis extends Base
 {
     /**
-     * Redis操作指令
-     * @var string
+     * @var string Redis操作指令
      */
     public $name;
 
     /**
-     * Redis操作指令的参数
-     *
-     * @var array
+     * @var array Redis操作指令的参数
      */
     public $arguments;
 
     /**
-     * Key前缀
-     *
-     * @var string
+     * @var string Key前缀
      */
     public $keyPrefix = '';
 
     /**
-     * 是否自动Hash Key
-     *
-     * @var bool
+     * @var bool 是否自动Hash Key
      */
     public $hashKey = false;
 
     /**
-     * 是否启用PHP的自动序列化
-     *
-     * @var bool
+     * @var bool 是否启用PHP的自动序列化
      */
     public $phpSerialize = false;
 
     /**
-     * 是否启用Redis的自动序列化
-     *
-     * @var bool
+     * @var bool 是否启用Redis的自动序列化
      */
     public $redisSerialize = false;
 
     /**
-     * Redis异步连接池
-     *
-     * @var RedisAsynPool
+     * @var RedisAsynPool Redis异步连接池
      */
     public $redisAsynPool;
 
@@ -67,7 +54,6 @@ class Redis extends Base
      * @param RedisAsynPool $redisAsynPool
      * @param string $name
      * @param array $arguments
-     * @return $this
      */
     public function __construct($redisAsynPool, $name, $arguments)
     {
@@ -139,7 +125,8 @@ class Redis extends Base
 
     /**
      * 反序列化
-     * @param $data
+     *
+     * @param mixed $data
      * @param array $keys
      * @param int $len
      * @return array|bool|mixed
@@ -195,6 +182,7 @@ class Redis extends Base
 
     /**
      * 是否可以反序列化
+     *
      * @param string $string
      * @return bool
      */
@@ -205,6 +193,7 @@ class Redis extends Base
 
     /**
      * 真正反序列化
+     *
      * @param string $data
      * @return mixed|string
      */
@@ -236,7 +225,7 @@ class Redis extends Base
                     break;
             }
 
-            //兼容yii逻辑
+            //兼容Yii逻辑
             if (is_array($data) && count($data) === 2 && array_key_exists(1, $data) && $data[1] === null) {
                 $data = $data[0];
             }
@@ -245,9 +234,7 @@ class Redis extends Base
     }
 
     /**
-     * 属性不用于序列化
-     *
-     * @return array
+     * @inheritdoc
      */
     public function __unsleep()
     {

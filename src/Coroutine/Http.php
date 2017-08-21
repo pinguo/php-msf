@@ -1,6 +1,6 @@
 <?php
 /**
- * http请求客户端
+ * HTTP请求协程
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -13,28 +13,22 @@ use PG\MSF\Client\Http\Client;
 class Http extends Base
 {
     /**
-     * @var Client
+     * @var Client HTTP客户端实例
      */
     public $client;
 
     /**
-     * 发送的数据
-     *
-     * @var string|array
+     * @var string|array 发送的数据
      */
     public $data;
 
     /**
-     * 请求的 URL PATH
-     *
-     * @var string
+     * @var string 请求的URL PATH
      */
     public $path;
 
     /**
-     * 请求的方法
-     *
-     * @var string
+     * @var string 请求的方法
      */
     public $method;
 
@@ -46,7 +40,6 @@ class Http extends Base
      * @param string $path
      * @param string|array $data
      * @param int $timeout
-     * @return $this
      */
     public function __construct(Client $client, $method, $path, $data, $timeout)
     {
@@ -55,7 +48,7 @@ class Http extends Base
         $this->path       = $path;
         $this->method     = $method;
         $this->data       = $data;
-        $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->client->headers['Host'] . $this->path;
+        $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->client->urlData['host'] . ':' . $this->client->urlData['port'] . $this->path;
         $this->requestId  = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($profileName);
@@ -78,12 +71,10 @@ class Http extends Base
             $this->ioBack = true;
             $this->nextRun();
         });
-
-        return $this;
     }
 
     /**
-     * 发送异步的Http请求
+     * 发送异步的HTTP请求
      *
      * @param callable $callback
      */
@@ -91,7 +82,6 @@ class Http extends Base
     {
         switch ($this->method) {
             case 'POST':
-                var_dump($this->client->getHeaders());
                 $this->client->post($this->path, $this->data, $callback);
                 break;
             case 'GET':

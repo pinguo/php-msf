@@ -1,6 +1,6 @@
 <?php
 /**
- * MySql
+ * MySql协程
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -10,7 +10,6 @@ namespace PG\MSF\Coroutine;
 
 use Exception;
 use PG\MSF\DataBase\MysqlAsynPool;
-use PG\MSF\Helpers\Context;
 
 class MySql extends Base
 {

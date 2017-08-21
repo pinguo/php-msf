@@ -8,20 +8,17 @@
 
 namespace PG\MSF;
 
+use Exception;
 use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\Base\Child;
-use PG\MSF\Controllers\Factory as ControllerFactory;
-use PG\MSF\Base\Loader;
-use Exception;
 use PG\MSF\Base\Core;
-use PG\MSF\Pack\IPack;
 use PG\MSF\Route\IRoute;
 use PG\MSF\Helpers\Context;
-use PG\MSF\Base\Input;
-use PG\MSF\Base\Output;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
 use PG\MSF\Base\AOPFactory;
+use PG\MSF\Memory\Pool;
+use PG\MSF\Route\NormalRoute;
 
 abstract class Server extends Child
 {
@@ -36,151 +33,84 @@ abstract class Server extends Child
     const mode = 'web';
 
     /**
-     * 实例
-     * @var Server
+     * @var Server 实例
      */
     protected static $instance;
 
     /**
-     * Daemonize.
-     *
-     * @var bool
+     * @var bool Daemonize.
      */
     public static $daemonize = false;
 
     /**
-     * 单元测试
-     * @var bool
-     */
-    public static $testUnity = false;
-
-    /**
-     * 单元测试文件目录
-     * @var string
-     */
-    public static $testUnityDir = '';
-
-    /**
-     * The file to store master process PID.
-     *
-     * @var string
+     * @var string pid文件
      */
     public static $pidFile = '';
 
     /**
-     * The PID of master process.
-     *
-     * @var int
+     * @var int Master进程ID
      */
     protected static $_masterPid = 0;
 
     /**
-     * Log file.
-     *
-     * @var mixed
+     * @var mixed 日志文件
      */
     protected static $logFile = '';
 
     /**
-     * Start file.
-     *
-     * @var string
+     * @var string Start file.
      */
     protected static $_startFile = '';
 
     /**
-     * worker instance.
-     *
-     * @var Server
+     * @var Server worker instance.
      */
     protected static $_worker = null;
 
     /**
-     * Maximum length of the show names.
-     *
-     * @var int
+     * @var int Maximum length of the show names.
      */
     protected static $_maxShowLength = 12;
 
     /**
-     * 协程调度器
-     *
-     * @var Coroutine
+     * @var Coroutine 协程调度器
      */
     public $coroutine;
 
     /**
-     * server name
-     * @var string
+     * @var string server name
      */
     public $name = '';
 
     /**
-     * server user
-     *
-     * @var string
+     * @var string server user
      */
     public $user = '';
 
     /**
-     * Worker数量
-     *
-     * @var int
+     * @var int Worker数量
      */
     public $workerNum = 0;
 
     /**
-     * Tasker数量
-     *
-     * @var int
+     * @var int Tasker数量
      */
     public $taskNum = 0;
 
     /**
-     * 监听地址
-     *
-     * @var string
-     */
-    public $socketName;
-
-    /**
-     * 监听端口
-     *
-     * @var int
-     */
-    public $port;
-
-    /**
-     * 监听协程
-     *
-     * @var string
-     */
-    public $socketType;
-
-    /**
-     * 服务器到现在的毫秒数
-     * @var int
+     * @var int 服务器到现在的毫秒数
      */
     public $tickTime;
 
     /**
-     * 封包器
-     * @var IPack
-     */
-    public $pack;
-
-    /**
-     * 路由器
-     * @var IRoute
+     * @var IRoute|NormalRoute 路由器
      */
     protected $route;
 
     /**
-     * Emitted when worker processes stoped.
-     *
-     * @var callback
+     * @var callback 错误回调
      */
-    public $onErrorHandel = null;
+    public $onErrorHandle = null;
 
     /**
      * @var \swoole_server
@@ -188,54 +118,14 @@ abstract class Server extends Child
     public $server;
 
     /**
-     * @var Config
+     * @var Config 配置对象
      */
     public $config;
 
     /**
-     * 日志
-     * @var PGLog
+     * @var PGLog 日志对象
      */
     public $log;
-
-    /**
-     * 是否开启tcp
-     * @var bool
-     */
-    public $tcpEnable;
-
-    /**
-     * @var
-     */
-    public $packageLengthType;
-
-    /**
-     * @var int
-     */
-    public $packageLengthTypeLength;
-
-    /**
-     * @var
-     */
-    public $packageBodyOffset;
-
-    /**
-     * 协议设置
-     * @var
-     */
-    protected $probufSet = [
-        'open_length_check' => 1,
-        'package_length_type' => 'N',
-        'package_length_offset' => 0,       //第N个字节是包长度的值
-        'package_body_offset' => 0,       //第几个字节开始计算长度
-        'package_max_length' => 2000000,  //协议最大长度)
-    ];
-
-    /**
-     * 是否需要协程支持(默认开启)
-     * @var bool
-     */
-    protected $needCoroutine = true;
 
     /**
      * @var null
@@ -259,20 +149,26 @@ abstract class Server extends Child
      */
     public $MSFSrcDir;
 
+    /**
+     * @var Pool 对象池
+     */
+    public $objectPool;
+
+    /**
+     * Server constructor.
+     *
+     * @throws Exception
+     */
     public function __construct()
     {
         $this->MSFSrcDir = __DIR__;
-        $this->onErrorHandel = [$this, 'onErrorHandel'];
+        $this->onErrorHandle = [$this, 'onErrorHandle'];
         self::$_worker = $this;
         // 加载配置 支持加载环境子目录配置
         $this->config = new Config(defined('CONFIG_DIR') ? CONFIG_DIR : [
             ROOT_PATH . '/config',
             ROOT_PATH . '/config/' . APPLICATION_ENV
         ]);
-        $this->probufSet = $this->config->get('server.probuf_set', $this->probufSet);
-        $this->packageLengthType = $this->probufSet['package_length_type'];
-        $this->packageLengthTypeLength = strlen(pack($this->packageLengthType, 1));
-        $this->packageBodyOffset = $this->probufSet['package_body_offset'];
         $this->setConfig();
 
         // 日志初始化
@@ -280,19 +176,8 @@ abstract class Server extends Child
 
         register_shutdown_function(array($this, 'checkErrors'));
         set_error_handler(array($this, 'displayErrorHandler'));
-        //pack class
-        $packClassName = "\\App\\Pack\\" . $this->config->get('server.pack_tool', 'JsonPack');
-        if (class_exists($packClassName)) {
-            $this->pack = new $packClassName;
-        } else {
-            $packClassName = "\\PG\\MSF\\Pack\\" . $this->config->get('server.pack_tool', 'JsonPack');
-            if (class_exists($packClassName)) {
-                $this->pack = new $packClassName;
-            } else {
-                throw new Exception("class {$this->config['server']['pack_tool']} is not exist.");
-            }
-        }
-        // route class
+
+        // 初始化路由器
         $routeTool = $this->config->get('server.route_tool', 'NormalRoute');
         if (class_exists($routeTool)) {
             $routeClassName = $routeTool;
@@ -332,8 +217,9 @@ abstract class Server extends Child
         return $this->getContext();
     }
     /**
-     * 获取实例
-     * @return MSFServer
+     * 获取运行的Server实例
+     *
+     * @return Server|MSFServer
      */
     public static function &getInstance()
     {
@@ -341,15 +227,12 @@ abstract class Server extends Child
     }
 
     /**
-     * 设置配置
+     * 配置初始化
+     *
      * @return mixed
      */
     public function setConfig()
     {
-        $this->socketType = SWOOLE_SOCK_TCP;
-        $this->tcpEnable = $this->config->get('tcp.enable', false);
-        $this->socketName = $this->config->get('tcp.socket', '0.0.0.0');
-        $this->port = $this->config->get('tcp.port', 9501);
         $this->user = $this->config->get('server.set.user', '');
 
         //设置异步IO模式
@@ -362,7 +245,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Run all worker instances.
+     * 运行所有的服务进程
      *
      * @return void
      */
@@ -376,7 +259,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Init.
+     * 服务初始化
      *
      * @return void
      */
@@ -398,7 +281,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Set process name.
+     * 设置服务进程名称
      *
      * @param string $title
      * @return void
@@ -413,7 +296,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Parse command.
+     * 解析命令行参数
      *
      * @return void
      */
@@ -526,7 +409,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Init All worker instances.
+     * 初始化worker进程
      *
      * @return void
      */
@@ -547,7 +430,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Get unix user of current porcess.
+     * 获取当前进程用户
      *
      * @return string
      */
@@ -558,7 +441,7 @@ abstract class Server extends Child
     }
 
     /**
-     * Display staring UI.
+     * 显示命令行控制台信息
      *
      * @return void
      */
@@ -567,45 +450,14 @@ abstract class Server extends Child
         $setConfig = self::$_worker->setServerSet();
         $ascii     = file_get_contents(__DIR__ . '/../ascii.ui');
         echo $ascii, "\n";
-        echo str_pad("   SERVER ENV  ", 120, "#", STR_PAD_BOTH), "\n";
-        echo 'MSF     Version:   ', self::version, "\n";
-        echo 'Swoole  Version:   ', SWOOLE_VERSION, "\n";
-        echo 'PHP     Version:   ', PHP_VERSION, "\n";
-        echo 'Application ENV:   ', APPLICATION_ENV, "\n";
-        echo 'Worker   Number:   ', $setConfig['worker_num'], "\n";
-        echo 'Task     Number:   ', $setConfig['task_worker_num']??0, "\n";
-        echo str_pad(" START SERVICE ", 120, "#", STR_PAD_BOTH), "\n";
-        echo "Protocol", str_pad('',
-            self::$_maxShowLength - strlen('Protocol')), "Addr", str_pad('',
-            self::$_maxShowLength - strlen('Addr')), "Port", str_pad('',
-            self::$_maxShowLength - strlen('Port')), "\n";
-
-        switch (self::$_worker->name) {
-            case MSFServer::SERVER_NAME:
-                if (self::$_worker->tcpEnable??false) {
-                    echo str_pad('TCP',
-                        self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.socket', '--'),
-                        self::$_maxShowLength), str_pad(self::$_worker->config->get('tcp.port', '--'),
-                        self::$_maxShowLength - 2), "\n";
-                }
-
-                if (self::$_worker->httpEnable??false) {
-                    echo str_pad('HTTP',
-                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.socket', '--'),
-                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.port', '--'),
-                        self::$_maxShowLength - 2), "\n";
-                }
-
-                if (self::$_worker->websocketEnable??false) {
-                    echo str_pad('WEBSOCKET',
-                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.socket', '--'),
-                        self::$_maxShowLength), str_pad(self::$_worker->config->get('http_server.port', '--'),
-                        self::$_maxShowLength - 2), "\n";
-                }
-
-                break;
-        }
-        echo str_pad("     OTHER     ", 120, "#", STR_PAD_BOTH), "\n";
+        echo 'MSF     Version: ', self::version, "\n";
+        echo 'Swoole  Version: ', SWOOLE_VERSION, "\n";
+        echo 'PHP     Version: ', PHP_VERSION, "\n";
+        echo 'Application ENV: ', APPLICATION_ENV, "\n";
+        echo 'Worker   Number: ', $setConfig['worker_num'], "\n";
+        echo 'Task     Number: ', $setConfig['task_worker_num'] ?? 0, "\n";
+        echo "Listen     Addr: ", self::$_worker->config->get('http_server.socket'), "\n";
+        echo "Listen     Port: ", self::$_worker->config->get('http_server.port'), "\n";
         if (self::$daemonize) {
             echo "Press Ctrl-C to quit. Start Success.\n";
         }
@@ -613,6 +465,7 @@ abstract class Server extends Child
 
     /**
      * 设置服务器配置参数
+     *
      * @return mixed
      */
     abstract public function setServerSet();
@@ -628,38 +481,13 @@ abstract class Server extends Child
     }
 
     /**
-     * 启动
+     * 启动服务
      */
     public function start()
     {
         if (static::mode == 'console') {
             $this->beforeSwooleStart();
-            $this->onSwooleWorkerStart(null, null);
-        } else {
-            if ($this->tcpEnable) {
-                $this->server = new \swoole_server($this->socketName, $this->port, SWOOLE_PROCESS, $this->socketType);
-                $this->server->on('Start', [$this, 'onSwooleStart']);
-                $this->server->on('WorkerStart', [$this, 'onSwooleWorkerStart']);
-                $this->server->on('connect', [$this, 'onSwooleConnect']);
-                $this->server->on('receive', [$this, 'onSwooleReceive']);
-                $this->server->on('close', [$this, 'onSwooleClose']);
-                $this->server->on('WorkerStop', [$this, 'onSwooleWorkerStop']);
-                $this->server->on('Task', [$this, 'onSwooleTask']);
-                $this->server->on('Finish', [$this, 'onSwooleFinish']);
-                $this->server->on('PipeMessage', [$this, 'onSwoolePipeMessage']);
-                $this->server->on('WorkerError', [$this, 'onSwooleWorkerError']);
-                $this->server->on('ManagerStart', [$this, 'onSwooleManagerStart']);
-                $this->server->on('ManagerStop', [$this, 'onSwooleManagerStop']);
-                $this->server->on('Packet', [$this, 'onSwoolePacket']);
-                $set = $this->setServerSet();
-                $set['daemonize'] = self::$daemonize ? 1 : 0;
-                $this->server->set($set);
-                $this->beforeSwooleStart();
-                $this->server->start();
-            } else {
-                print_r("没有任何服务启动\n");
-                exit(0);
-            }
+            $this->onWorkerStart(null, null);
         }
     }
 
@@ -668,13 +496,16 @@ abstract class Server extends Child
      */
     public function beforeSwooleStart()
     {
+        //初始化对象池
+        $this->objectPool = Pool::getInstance();
     }
 
     /**
-     * onSwooleStart
+     * Server启动在主进程的主线程回调此函数
+     *
      * @param $serv
      */
-    public function onSwooleStart($serv)
+    public function onStart($serv)
     {
         self::$_masterPid = $serv->master_pid;
         file_put_contents(self::$pidFile, self::$_masterPid);
@@ -683,11 +514,12 @@ abstract class Server extends Child
     }
 
     /**
-     * onSwooleWorkerStart
+     * worker进程/task进程启动回调
+     *
      * @param $serv
      * @param $workerId
      */
-    public function onSwooleWorkerStart($serv, $workerId)
+    public function onWorkerStart($serv, $workerId)
     {
         if (function_exists('apc_clear_cache')) {
             apc_clear_cache();
@@ -699,9 +531,7 @@ abstract class Server extends Child
 
         file_put_contents(self::$pidFile, ',' . $serv->worker_pid, FILE_APPEND);
         if (!$serv->taskworker) {//worker进程
-            if ($this->needCoroutine) {//启动协程调度器
-                $this->coroutine = new Coroutine();
-            }
+            $this->coroutine = new Coroutine();
             self::setProcessTitle($this->config['server.process_title'] . '-Worker');
         } else {
             self::setProcessTitle($this->config['server.process_title'] . '-Tasker');
@@ -709,273 +539,106 @@ abstract class Server extends Child
     }
 
     /**
-     * onSwooleConnect
-     * @param $serv
-     * @param $fd
-     */
-    public function onSwooleConnect($serv, $fd)
-    {
-    }
-
-    /**
-     * 客户端有消息时
-     * @param $serv
-     * @param $fd
-     * @param $fromId
-     * @param $data
-     * @return Controllers\Controller|void
-     */
-    public function onSwooleReceive($serv, $fd, $fromId, $data)
-    {
-        $error = '';
-        $code  = 500;
-        $data  = substr($data, $this->packageLengthTypeLength);
-        //反序列化，出现异常断开连接
-        try {
-            $clientData = $this->pack->unPack($data);
-        } catch (\Exception $e) {
-            $serv->close($fd);
-            return;
-        }
-
-        //client_data进行处理
-        $clientData = $this->route->handleClientData($clientData);
-
-        do {
-            $controllerName     = $this->route->getControllerName();
-            $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
-            $methodPrefix       = $this->config->get('tcp.method_prefix', '');
-            $methodDefault      = $this->config->get('tcp.default_method', 'Index');
-            if ($controllerInstance == null) {
-                $controllerName     = $controllerName . "\\" . $this->route->getMethodName();
-                $controllerInstance = ControllerFactory::getInstance()->getController($controllerName);
-                $this->route->setControllerName($controllerName);
-                $methodName = $methodPrefix . $methodDefault;
-                $this->route->setMethodName($methodDefault);
-            } else {
-                $methodName = $methodPrefix . $this->route->getMethodName();
-            }
-
-            if ($controllerInstance == null) {
-                $error = 'Api not found controller(' . $controllerName . ')';
-                $code  = 404;
-                break;
-            }
-
-            if (!method_exists($controllerInstance, $methodName)) {
-                $error = 'Api not found method(' . $methodName . ')';
-                $code  = 404;
-                break;
-            }
-
-            $uid = $serv->connection_info($fd)['uid'] ?? 0;
-            try {
-                $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
-
-                // 初始化控制器
-                $controllerInstance->requestStartTime = microtime(true);
-                $PGLog            = null;
-                $PGLog            = clone getInstance()->log;
-                $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
-                $PGLog->accessRecord['uri']       = $this->route->getPath();
-                $PGLog->logId = $this->genLogId($clientData);
-                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
-                $PGLog->init();
-                $PGLog->pushLog('controller', $controllerName);
-                $PGLog->pushLog('method', $methodName);
-
-                // 构造请求上下文成员
-                $controllerInstance->context->setLogId($PGLog->logId);
-                $controllerInstance->context->setLog($PGLog);
-                $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
-                $controllerInstance->setContext($controllerInstance->context);
-
-                /**
-                 * @var $input Input
-                 */
-                $input    = $controllerInstance->getObjectPool()->get(Input::class);
-                $input->set($clientData);
-                /**
-                 * @var $output Output
-                 */
-                $output   = $controllerInstance->getObjectPool()->get(Output::class, $controllerInstance);
-                $output->set($clientData);
-
-                $controllerInstance->context->setInput($input);
-                $controllerInstance->context->setOutput($output);
-                $controllerInstance->context->setControllerName($controllerName);
-                $controllerInstance->context->setActionName($methodName);
-
-                $controllerInstance->setClientData($uid, $fd, $clientData, $controllerName, $methodName);
-
-                $generator = $controllerInstance->$methodName($this->route->getParams());
-                if ($generator instanceof \Generator) {
-                    $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
-                }
-
-                if (!$this->route->getRouteCache($this->route->getPath())) {
-                    $this->route->setRouteCache($this->route->getPath(), [$this->route->getControllerName(), $this->route->getMethodName()]);
-                }
-                break;
-            } catch (\Throwable $e) {
-                $controllerInstance->onExceptionHandle($e);
-            }
-        } while (0);
-
-
-        if ($error !== '') {
-            if ($controllerInstance != null) {
-                $controllerInstance->destroy();
-            }
-
-            $res = json_encode([
-                'data'       => self::$stdClass,
-                'message'    => $error,
-                'status'     => $code,
-                'serverTime' => microtime(true)
-            ]);
-            $response = getInstance()->encode($this->pack->pack($res));
-            getInstance()->send($fd, $response);
-        }
-    }
-
-    /**
-     * gen a logId
+     * TCP客户端连接关闭后，在worker进程中回调此函数
      *
-     * @param $clientData
-     * @return string
-     */
-    public function genLogId($clientData)
-    {
-        $logId = strval(new \MongoId());
-        return $logId;
-    }
-
-    /**
-     * 数据包编码
-     * @param $buffer
-     * @return string
-     */
-    public function encode($buffer)
-    {
-        $totalLength = $this->packageLengthTypeLength + strlen($buffer) - $this->packageBodyOffset;
-        return pack($this->packageLengthType, $totalLength) . $buffer;
-    }
-
-    /**
-     * onSwooleClose
      * @param $serv
      * @param $fd
      */
-    public function onSwooleClose($serv, $fd)
+    public function onClose($serv, $fd)
     {
     }
 
     /**
-     * onSwooleWorkerStop
+     * 此事件在worker进程终止时发生
+     *
      * @param $serv
      * @param $fd
      */
-    public function onSwooleWorkerStop($serv, $fd)
+    public function onWorkerStop($serv, $fd)
     {
     }
 
     /**
-     * onSwooleTask
+     * 在task_worker进程内被调用
+     *
      * @param $serv
      * @param $taskId
      * @param $fromId
      * @param $data
      * @return mixed
      */
-    public function onSwooleTask($serv, $taskId, $fromId, $data)
+    public function onTask($serv, $taskId, $fromId, $data)
     {
     }
 
     /**
-     * onSwooleFinish
+     * 当worker进程投递的任务在task_worker中完成时调用
+     *
      * @param $serv
      * @param $taskId
      * @param $data
      */
-    public function onSwooleFinish($serv, $taskId, $data)
+    public function onFinish($serv, $taskId, $data)
     {
     }
 
     /**
-     * onSwoolePipeMessage
+     * 当工作进程收到由sendMessage发送的管道消息时会触发onPipeMessage事件
+     *
      * @param $serv
      * @param $fromWorkerId
      * @param $message
      */
-    public function onSwoolePipeMessage($serv, $fromWorkerId, $message)
+    public function onPipeMessage($serv, $fromWorkerId, $message)
     {
     }
 
     /**
-     * onSwooleWorkerError
+     * 当worker/task_worker进程发生异常后会在Manager进程内回调此函数。
+     *
      * @param $serv
      * @param $workerId
      * @param $workerPid
      * @param $exitCode
      */
-    public function onSwooleWorkerError($serv, $workerId, $workerPid, $exitCode)
+    public function onWorkerError($serv, $workerId, $workerPid, $exitCode)
     {
         $data = [
-            'worker_id' => $workerId,
+            'worker_id'  => $workerId,
             'worker_pid' => $workerPid,
-            'exit_code' => $exitCode
+            'exit_code'  => $exitCode,
+            'message'    => error_get_last(),
         ];
         $log = "WORKER Error ";
         $log .= json_encode($data);
         $this->log->error($log);
-        if ($this->onErrorHandel != null) {
-            $this->onErrorHandel('【！！！】服务器进程异常退出', $log);
+        if ($this->onErrorHandle != null) {
+            $this->onErrorHandle('服务器进程异常退出', $log);
         }
     }
 
     /**
-     * ManagerStart
+     * 当管理进程启动时调用
+     *
      * @param $serv
      */
-    public function onSwooleManagerStart($serv)
+    public function onManagerStart($serv)
     {
         self::setProcessTitle($this->config['server.process_title'] . '-Manager');
     }
 
     /**
-     * ManagerStop
+     * 当管理进程结束时调
+     *
      * @param $serv
      */
-    public function onSwooleManagerStop($serv)
+    public function onManagerStop($serv)
     {
     }
 
     /**
-     * onPacket(UDP)
-     * @param $server
-     * @param string $data
-     * @param array $clientInfo
-     */
-    public function onSwoolePacket($server, $data, $clientInfo)
-    {
-    }
-
-    /**
-     * 包装SerevrMessageBody消息
-     * @param $type
-     * @param $message
-     * @return string
-     */
-    public function packSerevrMessageBody($type, $message)
-    {
-        $data['type'] = $type;
-        $data['message'] = $message;
-        return serialize($data);
-    }
-
-    /**
-     * 魔术方法
+     * __call魔术方法
+     *
      * @param $name
      * @param $arguments
      * @return mixed
@@ -1002,6 +665,7 @@ abstract class Server extends Child
 
     /**
      * 全局错误监听
+     *
      * @param $error
      * @param $errorString
      * @param $filename
@@ -1014,16 +678,17 @@ abstract class Server extends Child
         if (0 == error_reporting()) {
             return;
         }
+
         $log = "WORKER Error ";
         $log .= "$errorString ($filename:$line)";
         $this->log->error($log);
-        if ($this->onErrorHandel != null) {
-            $this->onErrorHandel('服务器发生严重错误', $log);
+        if ($this->onErrorHandle != null) {
+            $this->onErrorHandle('服务器发生严重错误', $log);
         }
     }
 
     /**
-     * Check errors when current process exited.
+     * 致命错误回调
      *
      * @return void
      */
@@ -1062,43 +727,14 @@ abstract class Server extends Child
                         $log .= '[QUERY] ' . $_SERVER['REQUEST_URI'];
                     }
                     $this->log->alert($log);
-                    if ($this->onErrorHandel != null) {
-                        $this->onErrorHandel('服务器发生崩溃事件', $log);
+                    if ($this->onErrorHandle != null) {
+                        $this->onErrorHandle('服务器发生崩溃事件', $log);
                     }
                     break;
                 default:
                     break;
             }
         }
-    }
-
-    /**
-     * Get socket name.
-     *
-     * @return string
-     */
-    public function getSocketName()
-    {
-        return $this->socketName ? lcfirst($this->socketName . ":" . $this->port) : 'none';
-    }
-
-    /**
-     * 判断这个fd是不是一个WebSocket连接
-     *
-     * @param $fd
-     * @return bool
-     * @throws \Exception
-     */
-    public function isWebSocket($fd)
-    {
-        $fdinfo = $this->server->connection_info($fd);
-        if (empty($fdinfo)) {
-            throw new \Exception('fd not exist');
-        }
-        if (key_exists('websocket_status', $fdinfo) && $fdinfo['websocket_status'] == WEBSOCKET_STATUS_FRAME) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1111,32 +747,21 @@ abstract class Server extends Child
     }
 
     /**
-     * 判断是tcp还是websocket进行发送
-     * @param $fd
-     * @param $data
-     */
-    public function send($fd, $data)
-    {
-        $this->server->send($fd, $data);
-    }
-
-    /**
      * 服务器主动关闭链接
-     * close fd
-     * @param $fd
+     *
+     * @param int $fd
      */
     public function close($fd)
     {
         $this->server->close($fd);
     }
 
-
     /**
      * 错误处理函数
      * @param $msg
      * @param $log
      */
-    public function onErrorHandel($msg, $log)
+    public function onErrorHandle($msg, $log)
     {
         print_r($msg . "\n");
         print_r($log . "\n");

@@ -22,6 +22,7 @@ class RpcClient
      * @var string 当前版本
      */
     public static $version = '0.9';
+
     /**
      * @var array json 错误码
      */
@@ -281,15 +282,15 @@ class RpcClient
             $sendData['sig'] = static::genSig($sendData, $rpc->appsecret);
         }
 
-        $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->dnsLookup($rpc->host, $rpc->timeout, $headers);
+        $httpClient = yield $obj->getContext()->getObjectPool()->get(Client::class)->goDnsLookup($rpc->host, $rpc->timeout, $headers);
         if ($httpClient == null) {
             throw new Exception('Coroutine get HttpClient failed');
         }
 
         if ($rpc->verb == 'POST') {
-            $response = yield $httpClient->coroutinePost($rpc->urlPath, $sendData, $rpc->timeout);
+            $response = yield $httpClient->goPost($rpc->urlPath, $sendData, $rpc->timeout);
         } else {
-            $response = yield $httpClient->coroutineGet($rpc->urlPath, $sendData, $rpc->timeout);
+            $response = yield $httpClient->goGet($rpc->urlPath, $sendData, $rpc->timeout);
         }
         $request = ['host' => $rpc->host, 'api' => $rpc->urlPath, 'method' => $rpc->verb, 'params' => $sendData];
 

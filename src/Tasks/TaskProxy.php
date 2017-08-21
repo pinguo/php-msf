@@ -16,35 +16,27 @@ class TaskProxy extends Core
 {
 
     /**
-     * 任务执行超时时间
-     *
-     * @var int
+     * @var int 任务执行超时时间
      */
     protected $timeout = 0;
 
     /**
-     * 任务ID
-     *
-     * @var int
+     * @var int 任务ID
      */
     protected $taskId;
 
     /**
-     * task执行数据
-     *
-     * @var mixed
+     * @var mixed task执行数据
      */
     private $taskProxyData;
 
     /**
-     * 执行的Task Name
-     *
-     * @var string
+     * @var string 执行的Task Name
      */
     public $taskName;
 
     /**
-     * Task构造参数
+     * @var array Task构造参数
      */
     public $taskConstruct;
 
@@ -59,10 +51,11 @@ class TaskProxy extends Core
     }
 
     /**
-     * 代理
-     * @param $name
-     * @param $arguments
-     * @return int
+     * __call魔术方法
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return CTask
      */
     public function __call($name, $arguments)
     {
@@ -113,22 +106,13 @@ class TaskProxy extends Core
     }
 
     /**
-     * 开始异步任务
+     * 异步任务
+     *
      * @param null $callback
      */
     public function startTask($callback = null)
     {
         getInstance()->server->task($this->taskProxyData, -1, $callback);
-    }
-
-    /**
-     * 开始同步任务
-     * @param float $timeOut
-     * @return mixed
-     */
-    public function startTaskWait($timeOut = 0.5)
-    {
-        return getInstance()->server->taskwait($this->taskProxyData, $timeOut, -1);
     }
 
     /**

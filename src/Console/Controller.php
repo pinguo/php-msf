@@ -12,8 +12,15 @@ use PG\MSF\Controllers\Controller as BController;
 
 class Controller extends BController
 {
+    /**
+     * Controller constructor.
+     *
+     * @param string $controllerName
+     * @param string $methodName
+     */
     public function __construct($controllerName, $methodName)
     {
+        parent::__construct($controllerName, $methodName);
     }
 
     /**

@@ -1,8 +1,8 @@
 <?php
 /**
- * @desc: proxy handle interface
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/4/11
+ * proxy handle interface
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 

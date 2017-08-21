@@ -19,29 +19,22 @@ use Exception;
 class Core extends Child
 {
     /**
-     * 作用计数
-     *
-     * @var int
+     * @var int 作用计数
      */
     public $__useCount;
 
     /**
-     * 创建时间
-     *
-     * @var int
+     * @var int 创建时间
      */
     public $__genTime;
 
     /**
-     * 是否执行构造方法
-     *
-     * @var bool
+     * @var bool 是否执行构造方法
      */
     public $__isContruct = false;
 
     /**
-     * 销毁标志
-     * @var bool
+     * @var bool 销毁标志
      */
     protected $__isDestroy = false;
 
@@ -51,16 +44,12 @@ class Core extends Child
     public static $stdClass = null;
 
     /**
-     * redis连接池
-     *
-     * @var array
+     * @var array redis连接池
      */
     protected $redisPools;
 
     /**
-     * redis代理池
-     *
-     * @var array
+     * @var array redis代理池
      */
     protected $redisProxies;
 
@@ -101,7 +90,7 @@ class Core extends Child
     }
 
     /**
-     * sleep
+     * 在序列化及dump对象时使用，代表哪些属于需要导出
      *
      * @return array
      */
@@ -111,14 +100,26 @@ class Core extends Child
     }
 
     /**
+     * 和__sleep作用相反
+     */
+    public function __unsleep()
+    {
+        return [];
+    }
+
+    /**
+     * 获取运行Server实例
+     *
      * @return \swoole_server
      */
-    public function getServer()
+    public function getServerInstance()
     {
         return getInstance()->server;
     }
 
     /**
+     * 获取运行server实例配置对象
+     *
      * @return Config
      */
     public function getConfig()
@@ -127,6 +128,8 @@ class Core extends Child
     }
 
     /**
+     * 获取运行server实例打包对象
+     *
      * @return IPack
      */
     public function getPack()
@@ -136,6 +139,7 @@ class Core extends Child
 
     /**
      * 获取redis连接池
+     *
      * @param string $poolName
      * @return bool|Wrapper|CoroutineRedisProxy|\Redis
      */
