@@ -2,11 +2,11 @@
 /**
  * DbQueryBuilder
  *
- * @author camera360_server@camera360.com
+ * @author tmtbe
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use Exception;
 

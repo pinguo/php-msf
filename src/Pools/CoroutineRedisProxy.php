@@ -2,11 +2,12 @@
 /**
  * CoroutineRedisProxy
  *
+ * @author tmtbe
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
@@ -14,20 +15,42 @@ use PG\MSF\Marco;
 
 class CoroutineRedisProxy
 {
+    /**
+     * @var RedisAsynPool Redis连接池
+     */
     private $redisAsynPool;
 
-
+    /**
+     * @var string Redis key前缀
+     */
     public $keyPrefix = '';
+
+    /**
+     * @var bool 是否需要hash key
+     */
     public $hashKey = false;
+
+    /**
+     * @var bool 是否启用PHP序列化
+     */
     public $phpSerialize = false;
+
+    /**
+     * @var bool 是否启用Redis序列化
+     */
     public $redisSerialize = false;
 
+    /**
+     * CoroutineRedisProxy constructor.
+     *
+     * @param RedisAsynPool $redisAsynPool
+     */
     public function __construct(RedisAsynPool $redisAsynPool)
     {
-        $this->redisAsynPool = $redisAsynPool;
-        $this->hashKey = $redisAsynPool->hashKey;
-        $this->phpSerialize = $redisAsynPool->phpSerialize;
-        $this->keyPrefix = $redisAsynPool->keyPrefix;
+        $this->redisAsynPool  = $redisAsynPool;
+        $this->hashKey        = $redisAsynPool->hashKey;
+        $this->phpSerialize   = $redisAsynPool->phpSerialize;
+        $this->keyPrefix      = $redisAsynPool->keyPrefix;
         $this->redisSerialize = $redisAsynPool->redisSerialize;
     }
 
@@ -97,8 +120,8 @@ class CoroutineRedisProxy
      */
     public function evalMock($context, string $script, array $args = array(), int $numKeys = 0)
     {
-        $keys = array_slice($args, 0, $numKeys);
-        $argvs = array_slice($args, $numKeys);
+        $keys         = array_slice($args, 0, $numKeys);
+        $evalMockArgs = array_slice($args, $numKeys);
 
         if (!empty($keys)) {
             foreach ($keys as $i => $key) {
@@ -107,14 +130,21 @@ class CoroutineRedisProxy
         }
 
         if (getInstance()->isTaskWorker()) {//task进程
-            $commandData = [$context, $script, array_merge($keys, $argvs), $numKeys];
+            $commandData = [$context, $script, array_merge($keys, $evalMockArgs), $numKeys];
         } else {
-            $commandData = array_merge([$context, $script, $numKeys], $keys, $argvs);
+            $commandData = array_merge([$context, $script, $numKeys], $keys, $evalMockArgs);
         }
 
         return $this->__call('eval', $commandData);
     }
 
+    /**
+     * __call魔术方法
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return array|bool|mixed
+     */
     public function __call(string $name, array $arguments)
     {
         // key start， 排除eval
@@ -245,6 +275,8 @@ class CoroutineRedisProxy
     }
 
     /**
+     * 生成唯一Redis Key
+     *
      * @param string $key a key identifying a value to be cached
      * @return string a key generated from the provided key which ensures the uniqueness across applications
      */
@@ -255,6 +287,7 @@ class CoroutineRedisProxy
 
     /**
      * 序列化
+     *
      * @param $data
      * @return string
      */
@@ -291,6 +324,7 @@ class CoroutineRedisProxy
 
     /**
      * 反序列化
+     *
      * @param $data
      * @param array $keys
      * @param int $len
@@ -347,6 +381,7 @@ class CoroutineRedisProxy
 
     /**
      * 是否可以反序列化
+     *
      * @param string $string
      * @return bool
      */
@@ -357,6 +392,7 @@ class CoroutineRedisProxy
 
     /**
      * 真正反序列化
+     *
      * @param string $data
      * @return mixed|string
      */

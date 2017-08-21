@@ -10,7 +10,7 @@ namespace PG\MSF\Base;
 
 use PG\AOP\Factory;
 use PG\AOP\Wrapper;
-use PG\MSF\DataBase\CoroutineRedisProxy;
+use PG\MSF\Pools\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
 

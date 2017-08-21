@@ -2,11 +2,11 @@
 /**
  * 数据库连接类，依赖PDO_MYSQL扩展
  *
- * @author camera360_server@camera360.com
+ * @author tmtbe
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use Exception;
 use PDO;
