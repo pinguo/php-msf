@@ -56,7 +56,7 @@ class Http extends Base
         $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function (Client $client) use ($profileName) {
+        $this->send(function ($client) use ($profileName) {
             if ($this->isBreak) {
                 return;
             }
