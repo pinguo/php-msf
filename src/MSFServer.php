@@ -131,7 +131,7 @@ abstract class MSFServer extends HttpServer
         if ($this->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理
             $reloadProcess = new \swoole_process(function ($process) {
                 $process->name($this->config['server.process_title'] . '-RELOAD');
-                new Inotify($this->server);
+                new Inotify($this->config, $this);
             }, false, 2);
             $this->server->addProcess($reloadProcess);
         }
@@ -251,7 +251,7 @@ abstract class MSFServer extends HttpServer
                     /**
                      * @var Task $task
                      */
-                    $task          = $objectPool->get($taskName, ...$taskConstruct);
+                    $task          = $objectPool->get($taskName, [$taskConstruct]);
 
                     // 运行方法
                     if (method_exists($task, $taskFucName)) {
@@ -423,6 +423,18 @@ abstract class MSFServer extends HttpServer
                 foreach ($this->redisProxyManager as $proxy) {
                     $proxy->check();
                 }
+            });
+        }
+
+        // Worker进程监听管理端口
+        if (!$this->isTaskWorker()) {
+            $listener = stream_socket_server("tcp://127.0.0.1:" . (9081 + $workerId), $errno, $errstr);
+            swoole_event_add($listener, function ($server) {
+                $client = stream_socket_accept($server, 0);
+                swoole_event_add($client, function ($client) {
+                    echo fread($client, 8192);
+                    fwrite($client, "hello");
+                });
             });
         }
     }

@@ -10,6 +10,8 @@ namespace PG\MSF\Base;
 
 use PG\AOP\Factory;
 use PG\AOP\Wrapper;
+use PG\AOP\MI;
+use PG\MSF\Marco;
 use PG\MSF\Pools\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
@@ -106,11 +108,11 @@ class AOPFactory extends Factory
                 method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
                 // 自动处理释放资源
                 $class = get_class($arguments[0]);
-                if (!empty(self::$reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
-                    $arguments[0]->resetProperties(self::$reflections[$class]);
+                if (!empty(MI::$__reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
+                    $arguments[0]->resetProperties();
                 } else {
-                    if (!empty(self::$reflections[$class])) {
-                        foreach (self::$reflections[$class] as $prop => $val) {
+                    if (!empty(MI::$__reflections[$class])) {
+                        foreach (MI::$__reflections[$class][Marco::DS_PUBLIC] as $prop => $val) {
                             $arguments[0]->{$prop} = $val;
                         }
                     }
@@ -153,8 +155,7 @@ class AOPFactory extends Factory
                     if (!empty(getInstance()->server)
                         && property_exists(getInstance()->server, 'taskworker')
                         && !getInstance()->server->taskworker) {
-                        $arguments[0] = '\PG\MSF\Tasks\TaskProxy';
-                        array_push($arguments, $className);
+                        array_unshift($arguments, '\PG\MSF\Tasks\TaskProxy');
                     }
                 }
             }
@@ -178,34 +179,21 @@ class AOPFactory extends Factory
                 $class = get_class($result);
                 // 支持TaskProxy
                 if ($result instanceof \PG\MSF\Tasks\TaskProxy) {
-                    $result->taskName = array_pop($arguments);
+                    array_shift($arguments);
+                    $result->taskName = $arguments[0];
                 }
                 // 自动调用构造方法
                 if (method_exists($result, '__construct') && $result->__isContruct == false) {
+                    if (!isset($arguments[1])) {
+                        $arguments[1] = [];
+                    }
                     $result->__isContruct = true;
-                    $result->__construct(...array_slice($arguments, 1));
+                    $result->__construct(...$arguments[1]);
                 }
-                // 支持自动销毁public成员变量
-                if (!isset(self::$reflections[$class])) {
-                    $reflection = new \ReflectionClass($class);
-                    $default = $reflection->getDefaultProperties();
-                    $ps = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-                    $ss = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
-                    $autoDestroy = [];
-                    foreach ($ps as $val) {
-                        $autoDestroy[$val->getName()] = $default[$val->getName()];
-                    }
-                    foreach ($ss as $val) {
-                        unset($autoDestroy[$val->getName()]);
-                    }
-                    unset($autoDestroy['__useCount']);
-                    unset($autoDestroy['__genTime']);
-                    self::$reflections[$class] = $autoDestroy;
-                }
-                unset($reflection);
-                unset($default);
-                unset($ps);
-                unset($ss);
+                // 支持自动销毁成员变量
+                MI::__supportAutoDestroy($class);
+                // 对象资源销毁级别
+                $result->__DSLevel = $arguments[2] ?? Marco::DS_PUBLIC;
             }
             $data['method'] = $method;
             $data['arguments'] = $arguments;

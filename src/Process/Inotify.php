@@ -8,7 +8,10 @@
 
 namespace PG\MSF\Process;
 
-class Inotify
+use Noodlehaus\Config as Conf;
+use PG\MSF\MSFServer;
+
+class Inotify extends ProcessBase
 {
     /**
      * @var bool|string 监控目录
@@ -21,19 +24,15 @@ class Inotify
     public $inotifyFd;
 
     /**
-     * @var \PG\MSF\MSFServer 运行的server实例
-     */
-    public $server;
-
-    /**
      * Inotify constructor.
      *
-     * @param $server
+     * @param Conf $config
+     * @param MSFServer $MSFServer
      */
-    public function __construct($server)
+    public function __construct(Conf $config, MSFServer $MSFServer)
     {
+        parent::__construct($config, $MSFServer);
         $notice = 'Inotify  Reload: ';
-        $this->server     = $server;
         $this->monitorDir = realpath(ROOT_PATH . '/');
         if (!extension_loaded('inotify')) {
             $notice .= "Failed(未安装inotify扩展)\n";
@@ -76,7 +75,7 @@ class Inotify
                     $wd = inotify_add_watch($inotifyFd, $file, IN_MODIFY);
                     $monitorFiles[$wd] = $file;
                 }
-                $this->server->reload();
+                $this->MSFServer->server->reload();
             }
         }, null, SWOOLE_EVENT_READ);
     }

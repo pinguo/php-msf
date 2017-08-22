@@ -68,41 +68,13 @@ class Core extends Child
     }
 
     /**
-     * 支持自动销毁public修饰的成员属性
-     */
-    public function __supportAutoDestroy()
-    {
-        if (empty(Child::$reflections[static::class])) {
-            $reflection  = new \ReflectionClass(static::class);
-            $default     = $reflection->getDefaultProperties();
-            $ps          = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-            $ss          = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
-            $autoDestroy = [];
-            foreach ($ps as $val) {
-                $autoDestroy[$val->getName()] = $default[$val->getName()];
-            }
-            foreach ($ss as $val) {
-                unset($autoDestroy[$val->getName()]);
-            }
-            unset($autoDestroy['__useCount']);
-            unset($autoDestroy['__genTime']);
-            unset($autoDestroy['__coreName']);
-            Child::$reflections[static::class] = $autoDestroy;
-            unset($reflection);
-            unset($default);
-            unset($ps);
-            unset($ss);
-        }
-    }
-
-    /**
      * 在序列化及dump对象时使用，代表哪些属于需要导出
      *
      * @return array
      */
     public function __sleep()
     {
-        return ['__useCount', '__genTime'];
+        return [];
     }
 
     /**

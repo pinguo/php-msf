@@ -58,7 +58,7 @@ class MSFCli extends MSFServer
             /**
              * @var \PG\MSF\Controllers\Controller $controllerInstance
              */
-            $controllerInstance = $this->objectPool->get($controllerClassName, $controllerName, $methodName);
+            $controllerInstance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
             $controllerInstance->__useCount++;
             if (empty($controllerInstance->__getObjectPool())) {
                 $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));

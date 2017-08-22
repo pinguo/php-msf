@@ -12,23 +12,13 @@ use Noodlehaus\Config as Conf;
 use PG\MSF\Marco;
 use PG\MSF\MSFServer;
 
-class Config
+class Config extends ProcessBase
 {
 
     /**
      * Redis探测失败次数上限
      */
     const FAILURE_LIMIT = 2;
-
-    /**
-     * @var Conf Server运行实例配置对象
-     */
-    public $config;
-
-    /**
-     * @var MSFServer 运行的Server实例
-     */
-    public $MSFServer;
 
     /**
      * @var float 上一分钟
@@ -48,9 +38,8 @@ class Config
      */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
+        parent::__construct($config, $MSFServer);
         echo 'Config  Manager: Enable', "\n";
-        $this->config = $config;
-        $this->MSFServer = $MSFServer;
         $this->lastMinute = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);

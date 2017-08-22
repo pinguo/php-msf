@@ -53,4 +53,29 @@ class Marco
      * HTTP请求
      */
     const HTTP_REQUEST = 'HTTP';
+
+    /**
+     * 不销毁成员变量资源
+     */
+    const DS_NONE = 0b0000;
+
+    /**
+     * 销毁PUBLIC成员变量资源，默认
+     */
+    const DS_PUBLIC = 0b0001;
+
+    /**
+     * 销毁PROTECTED成员变量资源
+     */
+    const DS_PROTECTED = 0b0010;
+
+    /**
+     * 销毁PRIVATE成员变量资源
+     */
+    const DS_PRIVATE = 0b0100;
+
+    /**
+     * 销毁STATIC成员变量资源
+     */
+    const DS_STATIC = 0b1000;
 }

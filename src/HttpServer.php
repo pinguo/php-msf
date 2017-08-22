@@ -159,7 +159,7 @@ abstract class HttpServer extends Server
                 /**
                  * @var \PG\MSF\Controllers\Controller $controllerInstance
                  */
-                $controllerInstance = $this->objectPool->get($controllerClassName, $controllerName, $methodName);
+                $controllerInstance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
                 $controllerInstance->__useCount++;
                 if (empty($controllerInstance->__getObjectPool())) {
                     $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
@@ -199,7 +199,7 @@ abstract class HttpServer extends Server
                 /**
                  * @var $output Output
                  */
-                $output   = $controllerInstance->context->getObjectPool()->get(Output::class, $controllerInstance);
+                $output   = $controllerInstance->context->getObjectPool()->get(Output::class, [$controllerInstance]);
                 $output->set($request, $response);
 
                 $controllerInstance->context->setInput($input);
