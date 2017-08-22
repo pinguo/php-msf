@@ -18,7 +18,7 @@ class Client extends Core
     /**
      * @var array DNS查询缓存
      */
-    public static $dnsCache;
+    public static $dnsCache = [];
 
     /**
      * @var array 请求报头

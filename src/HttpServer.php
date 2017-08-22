@@ -152,7 +152,7 @@ abstract class HttpServer extends Server
                 break;
             }
 
-            $methodPrefix = $this->config->get('http.method_prefix', '');
+            $methodPrefix = $this->config->get('http.method_prefix', 'action');
             $methodName   = $methodPrefix . $this->route->getMethodName();
 
             try {

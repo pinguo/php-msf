@@ -106,7 +106,7 @@ class NormalRoute implements IRoute
             $this->clientData->methodName     = $this->routeCache[$path][1];
             $this->controllerClassName        = $this->routeCache[$path][2];
         } else {
-            $route = explode('/', $path);
+            $route = explode('/', ltrim($path, '/'));
             $route = array_map(function ($name) {
                 if (strpos($name, '-') !== false) { // 中横线模式处理.
                     $slices = array_map('ucfirst', explode('-', $name));
@@ -119,8 +119,12 @@ class NormalRoute implements IRoute
                 }
                 return $name;
             }, $route);
-            $methodName = array_pop($route);
-            $this->clientData->controllerName = ltrim(implode("\\", $route), "\\")??null;
+            if (count($route) > 1) {
+                $methodName = array_pop($route);
+            } else {
+                $methodName = getInstance()->config->get('http.default_method', 'Index');
+            }
+            $this->clientData->controllerName = ltrim(implode("\\", $route), "\\") ?? null;
             $this->clientData->methodName     = $methodName;
             $this->controllerClassName        = '';
 
