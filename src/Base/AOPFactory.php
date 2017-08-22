@@ -13,6 +13,7 @@ use PG\AOP\Wrapper;
 use PG\MSF\Pools\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
+use PG\MSF\Pools\MysqlAsynPool;
 
 class AOPFactory extends Factory
 {
@@ -31,7 +32,7 @@ class AOPFactory extends Factory
      *
      * @param CoroutineRedisProxy $redisPoolCoroutine
      * @param Core $coreBase
-     * @return Wrapper |CoroutineRedisProxy
+     * @return Wrapper|CoroutineRedisProxy
      */
     public static function getRedisPoolCoroutine(CoroutineRedisProxy $redisPoolCoroutine, $coreBase)
     {
@@ -39,11 +40,31 @@ class AOPFactory extends Factory
         $AOPRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             $context = $coreBase->getContext();
             array_unshift($arguments, $context);
-            $data['method'] = $method;
+            $data['method']    = $method;
             $data['arguments'] = $arguments;
             return $data;
         });
         return $AOPRedisPoolCoroutine;
+    }
+
+    /**
+     * 获取协程mysql
+     *
+     * @param MysqlAsynPool $mysqlPoolCoroutine
+     * @param Core $coreBase
+     * @return Wrapper|MysqlAsynPool
+     */
+    public static function getMysqlPoolCoroutine(MysqlAsynPool $mysqlPoolCoroutine, $coreBase)
+    {
+        $AOPMysqlPoolCoroutine = new Wrapper($mysqlPoolCoroutine);
+        $AOPMysqlPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
+            $context = $coreBase->getContext();
+            array_unshift($arguments, $context);
+            $data['method']    = $method;
+            $data['arguments'] = $arguments;
+            return $data;
+        });
+        return $AOPMysqlPoolCoroutine;
     }
 
     /**
@@ -59,7 +80,7 @@ class AOPFactory extends Factory
         $redis->registerOnBefore(function ($method, $arguments) use ($redisProxy, $coreBase) {
             $context = $coreBase->getContext();
             array_unshift($arguments, $context);
-            $data['method'] = $method;
+            $data['method']    = $method;
             $data['arguments'] = $arguments;
             $data['result'] = $redisProxy->handle($method, $arguments);
             return $data;

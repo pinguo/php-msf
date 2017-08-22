@@ -8,13 +8,14 @@
 
 namespace PG\MSF\Base;
 
+use Exception;
 use Noodlehaus\Config;
 use PG\MSF\Pack\IPack;
-use PG\MSF\Pools\RedisAsynPool;
 use PG\AOP\Wrapper;
+use PG\MSF\Pools\RedisAsynPool;
+use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Pools\CoroutineRedisProxy;
-use Exception;
 
 class Core extends Child
 {
@@ -47,6 +48,11 @@ class Core extends Child
      * @var array redis连接池
      */
     protected $redisPools;
+
+    /**
+     * @var array mysql连接池
+     */
+    protected $mysqlPools;
 
     /**
      * @var array redis代理池
@@ -157,6 +163,28 @@ class Core extends Child
 
         $this->redisPools[$poolName] = AOPFactory::getRedisPoolCoroutine($pool->getCoroutine(), $this);
         return $this->redisPools[$poolName];
+    }
+
+    /**
+     * 获取MySQL连接池
+     *
+     * @param string $poolName
+     * @return bool|Wrapper
+     */
+    public function getMysqlPool(string $poolName)
+    {
+        if (isset($this->mysqlPools[$poolName])) {
+            return $this->mysqlPools[$poolName];
+        }
+
+        $pool = getInstance()->getAsynPool($poolName);
+        if (!$pool) {
+            $pool = new MysqlAsynPool($this->getConfig(), $poolName);
+            getInstance()->addAsynPool($poolName, $pool, true);
+        }
+
+        $this->mysqlPools[$poolName] = AOPFactory::getMysqlPoolCoroutine($pool, $this);;
+        return $this->mysqlPools[$poolName];
     }
 
     /**
