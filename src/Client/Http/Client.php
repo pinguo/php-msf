@@ -561,6 +561,16 @@ class Client extends Core
     }
 
     /**
+     * 清除HOST对应的DNS缓存
+     *
+     * @param $host
+     */
+    public static function clearDnsCache($host)
+    {
+        unset(self::$dnsCache[$host]);
+    }
+
+    /**
      * 获取DNS缓存
      *
      * @param $host

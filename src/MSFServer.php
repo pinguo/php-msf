@@ -14,6 +14,8 @@ use PG\MSF\Process\Inotify;
 use PG\MSF\Process\Timer;
 use PG\MSF\Pools\AsynPool;
 use PG\MSF\Pools\AsynPoolManager;
+use PG\MSF\Pools\RedisAsynPool;
+use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Proxy\IProxy;
 use PG\MSF\Tasks\Task;
@@ -158,7 +160,7 @@ abstract class MSFServer extends HttpServer
      */
     public function initAsynPools()
     {
-        $redisPools = [];
+        $asynPools = [];
 
         if ($this->config->get('redis.active')) {
             $activePools = $this->config->get('redis.active');
@@ -167,11 +169,22 @@ abstract class MSFServer extends HttpServer
             }
 
             foreach ($activePools as $poolKey) {
-                $redisPools[$poolKey] = new RedisAsynPool($this->config, $poolKey);
+                $asynPools[$poolKey] = new RedisAsynPool($this->config, $poolKey);
             }
         }
 
-        $this->asynPools = $redisPools;
+        if ($this->config->get('mysql.active')) {
+            $activePools = $this->config->get('mysql.active');
+            if (is_string($activePools)) {
+                $activePools = explode(',', $activePools);
+            }
+
+            foreach ($activePools as $poolKey) {
+                $asynPools[$poolKey] = new MysqlAsynPool($this->config, $poolKey);
+            }
+        }
+
+        $this->asynPools = $asynPools;
     }
 
     /**
@@ -386,7 +399,7 @@ abstract class MSFServer extends HttpServer
         parent::onWorkerStart($serv, $workerId);
         $this->initAsynPools();
         $this->initRedisProxies();
-        if (!$serv->taskworker && !empty($this->asynPools)) {
+        if (!$serv->taskworker) {
             //注册
             $this->asynPoolManager = new AsynPoolManager($this->poolProcess, $this);
             if (!$this->config['asyn_process_enable']) {

@@ -41,9 +41,10 @@ class MySql extends Base
         $this->mysqlAsynPool = $_mysqlAsynPool;
         $this->bindId        = $_bind_id;
         $this->sql           = $_sql;
-        $this->request       = 'mysql(' . $_sql . ')';
+        $this->request       = 'mysql(' . str_replace("\n", " ", $_sql) . ')';
         $this->requestId     = $this->getContext()->getLogId();
 
+        $this->getContext()->getLog()->profileStart($this->request);
         getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
         $keys            = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
@@ -71,7 +72,7 @@ class MySql extends Base
      */
     public function send($callback)
     {
-        $this->mysqlAsynPool->query($callback, $this->bindId, $this->sql);
+        $this->mysqlAsynPool->query($this->getContext(), $callback, $this->bindId, $this->sql);
     }
 
     /**

@@ -56,7 +56,7 @@ class Http extends Base
         $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function ($client) use ($profileName) {
+        $this->send(function (Client $client) use ($profileName) {
             if ($this->isBreak) {
                 return;
             }
@@ -66,6 +66,16 @@ class Http extends Base
             }
 
             $this->result       = (array)$client;
+            // 发现拒绝建立连接，删除DNS缓存
+            if (is_array($client) && $client['errCode'] == 111) {
+
+                Client::clearDnsCache($this->client->urlData['host']);
+            }
+
+            if (is_array($client) && $client['errCode'] != 0) {
+                $this->getContext()->getLog()->warning(dump($client, false, true));
+            }
+
             $this->responseTime = microtime(true);
             $this->getContext()->getLog()->profileEnd($profileName);
             $this->ioBack = true;

@@ -132,7 +132,7 @@ class RedisAsynPool extends AsynPool
      * @return mixed|Redis
      * @throws Exception
      */
-    public function coroutineSend($context, $name, ...$arg)
+    public function go($context, $name, ...$arg)
     {
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return $this->getSync()->$name(...$arg);
@@ -480,7 +480,7 @@ class RedisAsynPool extends AsynPool
             $this->waitConnectNum--;
 
             if (!$result) {
-                getInstance()->log->error($client->errMsg .  " with Redis {$this->connect[0]}:{$this->connect[1]}");
+                getInstance()->log->error($client->errMsg . " with Redis {$this->connect[0]}:{$this->connect[1]}");
                 return false;
             }
 
