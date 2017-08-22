@@ -109,15 +109,7 @@ class Scheduler
                 'worker_request_count' => 0,
             ],
             // 其他对象池
-            'object_poll' => [
-                // 'xxx' => 22
-            ],
-            // 控制器对象池
-            'controller_poll' => [
-                // 'xxx' => 22
-            ],
-            // Model对象池
-            'model_poll' => [
+            'object_pool' => [
                 // 'xxx' => 22
             ],
             // Http DNS Cache
@@ -201,7 +193,7 @@ class Scheduler
      */
     public function start(\Generator $routine, Context $context, Controller $controller, callable $callBack = null)
     {
-        $task = $context->getObjectPool()->get(Task::class, $routine, $context, $controller, $callBack);
+        $task = $context->getObjectPool()->get(Task::class, [$routine, $context, $controller, $callBack]);
         $this->IOCallBack[$context->getLogId()] = [];
         $this->taskMap[$context->getLogId()]    = $task;
         $this->schedule($task);

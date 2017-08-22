@@ -12,6 +12,7 @@ use PG\Exception\Errno;
 use PG\Exception\ParameterValidationExpandException;
 use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
+use PG\AOP\MI;
 use PG\MSF\Base\Core;
 use PG\MSF\Base\Child;
 use Exception;
@@ -47,7 +48,8 @@ class Controller extends Core
      */
     public function __construct($controllerName, $methodName)
     {
-        $this->__supportAutoDestroy();
+        // 支持自动销毁成员变量
+        MI::__supportAutoDestroy(static::class);
         $this->requestStartTime = microtime(true);
     }
 
@@ -159,7 +161,7 @@ class Controller extends Core
             }
             $this->objectPool->setCurrentObjParent(null);
         }
-        $this->resetProperties(Child::$reflections[static::class]);
+        $this->resetProperties();
         $this->__isContruct = false;
         getInstance()->objectPool->push($this);
         parent::destroy();
