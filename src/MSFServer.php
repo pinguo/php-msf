@@ -428,15 +428,86 @@ abstract class MSFServer extends HttpServer
 
         // Worker进程监听管理端口
         if (!$this->isTaskWorker()) {
-            $listener = stream_socket_server("tcp://127.0.0.1:" . (9081 + $workerId), $errno, $errstr);
+            $listener = stream_socket_server("tcp://127.0.0.1:" . ($this->config['http_server']['port'] + $workerId + 1), $errno, $errstr);
             swoole_event_add($listener, function ($server) {
                 $client = stream_socket_accept($server, 0);
-                swoole_event_add($client, function ($client) {
-                    echo fread($client, 8192);
-                    fwrite($client, "hello");
-                });
+                swoole_event_add($client,
+                    function ($fd) {
+                        $stat = json_encode($this->statistics());
+                        swoole_event_write($fd, 'HTTP/1.1 200 OK' . PHP_EOL);
+                        swoole_event_write($fd, 'Date: ' . date('Y-m-d H:i:s') . PHP_EOL);
+                        swoole_event_write($fd, 'Content-Type: application/json'. PHP_EOL);
+                        swoole_event_write($fd, 'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL);
+                        swoole_event_write($fd, $stat);
+                        swoole_event_del($fd);
+                    }, null, SWOOLE_EVENT_READ);
             });
         }
+    }
+
+    /**
+     * Worker进程统计信息
+     *
+     * @return array
+     */
+    public function statistics()
+    {
+        $data = [
+            // 进程ID
+            'pid' => 0,
+            // 协程统计信息
+            'coroutine' => [
+                // 当前正在处理的请求数
+                'total' => 0,
+            ],
+            // 内存使用
+            'memory' => [
+                // 峰值
+                'peak' => '',
+                // 当前使用
+                'usage' => '',
+            ],
+            // 请求信息
+            'request' => [
+                // 当前Worker进程收到的请求次数
+                'worker_request_count' => 0,
+            ],
+            // 其他对象池
+            'object_pool' => [
+                // 'xxx' => 22
+            ],
+            // Http DNS Cache
+            'dns_cache_http' => [
+                // domain => [ip, time(), times]
+            ],
+        ];
+        $routineList = $this->coroutine->taskMap;
+        $data['pid'] = $this->server->worker_pid;
+        $data['coroutine']['total']   = count($routineList);
+        $data['memory']['peak_byte']  = memory_get_peak_usage();
+        $data['memory']['usage_byte'] = memory_get_usage();
+        $data['memory']['peak']       = strval(number_format($data['memory']['peak_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['memory']['usage']      = strval(number_format($data['memory']['usage_byte'] / 1024 / 1024, 3, '.', '')) . 'M';
+        $data['request']['worker_request_count'] = $this->server->stats()['worker_request_count'];
+
+        if (!empty($this->objectPool->map)) {
+            foreach ($this->objectPool->map as $class => $objects) {
+                $data['object_pool'][$class] = $objects->count();
+            }
+
+            /**
+             * @var \PG\MSF\Coroutine\Task $task
+             */
+            foreach (getInstance()->coroutine->taskMap as $task) {
+                foreach ($task->getController()->objectPoolBuckets as $object) {
+                    $data['object_pool'][get_class($object)]++;
+                }
+                $data['object_pool'][get_class($task->getController())]++;
+            }
+        }
+
+        $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
+        return $data;
     }
 
     /**

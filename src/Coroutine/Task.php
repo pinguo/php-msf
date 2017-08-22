@@ -108,6 +108,16 @@ class Task
     }
 
     /**
+     * 获取controller
+     *
+     * @return Controller
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
      * 设置调度时产生的异常
      *
      * @param \Throwable $exception
