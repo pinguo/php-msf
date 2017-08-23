@@ -123,13 +123,15 @@ class Core extends Child
      */
     public function getRedisPool(string $poolName)
     {
+        $activePoolName = $poolName;
+        $poolName       = RedisAsynPool::ASYN_NAME . $poolName;
         if (isset($this->redisPools[$poolName])) {
             return $this->redisPools[$poolName];
         }
 
         $pool = getInstance()->getAsynPool($poolName);
         if (!$pool) {
-            $pool = new RedisAsynPool($this->getConfig(), $poolName);
+            $pool = new RedisAsynPool($this->getConfig(), $activePoolName);
             getInstance()->addAsynPool($poolName, $pool, true);
         }
 
@@ -145,13 +147,15 @@ class Core extends Child
      */
     public function getMysqlPool(string $poolName)
     {
+        $activePoolName = $poolName;
+        $poolName       = MysqlAsynPool::ASYN_NAME . $poolName;
         if (isset($this->mysqlPools[$poolName])) {
             return $this->mysqlPools[$poolName];
         }
 
         $pool = getInstance()->getAsynPool($poolName);
         if (!$pool) {
-            $pool = new MysqlAsynPool($this->getConfig(), $poolName);
+            $pool = new MysqlAsynPool($this->getConfig(), $activePoolName);
             getInstance()->addAsynPool($poolName, $pool, true);
         }
 
