@@ -55,6 +55,7 @@ class NormalRoute implements IRoute
             $this->clientData->controllerName = 'Rpc';
             $this->clientData->methodName     = 'Index';
             $this->controllerClassName        = '\PG\MSF\Controllers\Rpc';
+            $this->clientData->path           = '/Rpc/Index';
         } else {
             $this->parsePath($this->clientData->path);
         }

@@ -65,9 +65,12 @@ class Rpc extends Controller
      */
     public function actionIndex(...$arguments)
     {
-        $this->isRpc = $this->getContext()->getInput()->getHeader('x-rpc');
-        $this->parseHttpArgument($arguments);
-        yield $this->runMethod();
+        if ($this->getContext()->getInput()->getHeader('x-rpc')) {
+            $this->parseHttpArgument($arguments);
+            yield $this->runMethod();
+        } else {
+            $this->outputJson([], 'bad request', 400);
+        }
     }
 
     /**
@@ -113,6 +116,7 @@ class Rpc extends Controller
         }
 
         $response = yield $handlerInstance->{$this->method}(...$this->reqParams);
+        $this->getContext()->getLog()->pushLog('Rpc', [$handlerClass => $this->method]);
         $this->outputJson($response);
     }
 }

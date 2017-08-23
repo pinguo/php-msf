@@ -161,7 +161,7 @@ abstract class HttpServer extends Server
                  */
                 $controllerInstance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
                 $controllerInstance->__useCount++;
-                if (empty($controllerInstance->__getObjectPool())) {
+                if (empty($controllerInstance->getObjectPool())) {
                     $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
                 }
 
@@ -171,7 +171,7 @@ abstract class HttpServer extends Server
                     break;
                 }
 
-                $controllerInstance->context  = $controllerInstance->__getObjectPool()->get(Context::class);
+                $controllerInstance->context = $controllerInstance->getObjectPool()->get(Context::class);
 
                 // 初始化控制器
                 $controllerInstance->requestStartTime = microtime(true);
@@ -189,7 +189,7 @@ abstract class HttpServer extends Server
                 // 构造请求上下文成员
                 $controllerInstance->context->setLogId($PGLog->logId);
                 $controllerInstance->context->setLog($PGLog);
-                $controllerInstance->context->setObjectPool($controllerInstance->__getObjectPool());
+                $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
 
                 /**
                  * @var $input Input

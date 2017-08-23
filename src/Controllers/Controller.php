@@ -53,23 +53,13 @@ class Controller extends Core
     }
 
     /**
-     * 获取对象池（在请求上下文未初始完成时，框架内部使用）
-     *
-     * @return Wrapper|\PG\MSF\Memory\Pool
-     */
-    public function __getObjectPool()
-    {
-        return $this->objectPool;
-    }
-
-    /**
      * 获取对象池
      *
      * @return Wrapper|\PG\MSF\Memory\Pool
      */
     public function getObjectPool()
     {
-        return $this->getContext()->getObjectPool();
+        return $this->objectPool;
     }
 
     /**

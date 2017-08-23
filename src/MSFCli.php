@@ -60,7 +60,7 @@ class MSFCli extends MSFServer
              */
             $controllerInstance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
             $controllerInstance->__useCount++;
-            if (empty($controllerInstance->__getObjectPool())) {
+            if (empty($controllerInstance->getObjectPool())) {
                 $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
             }
             // 初始化控制器
@@ -71,7 +71,7 @@ class MSFCli extends MSFServer
                 break;
             }
 
-            $controllerInstance->context  = $controllerInstance->__getObjectPool()->get(Context::class);
+            $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
 
             $PGLog            = null;
             $PGLog            = clone getInstance()->log;
@@ -86,7 +86,7 @@ class MSFCli extends MSFServer
             // 构造请求上下文成员
             $controllerInstance->context->setLogId($PGLog->logId);
             $controllerInstance->context->setLog($PGLog);
-            $controllerInstance->context->setObjectPool($controllerInstance->__getObjectPool());
+            $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
 
             /**
              * @var $input Input

@@ -28,11 +28,6 @@ class Pool
     public $__currentObjParent;
 
     /**
-     * @var \stdClass 当前待创建对象的源对象的父对象
-     */
-    public $__currentObjRoot;
-
-    /**
      * Pool constructor.
      */
     private function __construct()
@@ -61,14 +56,6 @@ class Pool
      */
     public function setCurrentObjParent($obj)
     {
-        if (is_object($this->__currentObjParent)) {
-            $this->__currentObjRoot = $this->__currentObjParent;
-        }
-
-        if (is_null($obj)) {
-            $this->__currentObjRoot = null;
-        }
-
         $this->__currentObjParent = $obj;
         return $this;
     }
@@ -93,11 +80,6 @@ class Pool
     public function get($class, ...$args)
     {
         $poolName = trim($class, '\\');
-//        if (is_object($this->__currentObjRoot)
-//            && $poolName == get_class($this->__currentObjRoot)) {
-//            return $this->__currentObjRoot;
-//        }
-
         $pool     = $this->map[$poolName] ?? null;
         if ($pool == null) {
             $pool = $this->applyNewPool($poolName);

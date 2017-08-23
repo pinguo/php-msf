@@ -172,10 +172,7 @@ class AOPFactory extends Factory
                 $result->__useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
                 $result->context = &$coreBase->context;
-                if (!empty($result->context)) {
-                    $result->context->setOwner($result);
-                }
-                $result->parent = getInstance()->objectPool->__currentObjParent;
+                $result->parent = getInstance()->objectPool->getCurrentObjParent();
                 $class = get_class($result);
                 // 支持TaskProxy
                 if ($result instanceof \PG\MSF\Tasks\TaskProxy) {

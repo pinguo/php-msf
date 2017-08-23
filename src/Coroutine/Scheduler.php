@@ -66,7 +66,7 @@ class Scheduler
                         }
 
                         if ($obj instanceof Controller) {
-                            $obj->__getObjectPool()->destroy();
+                            $obj->getObjectPool()->destroy();
                             $obj->setObjectPool(null);
                         }
                         $obj = null;

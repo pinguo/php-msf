@@ -50,11 +50,6 @@ class Context extends AbstractContext
     protected $userDefined = [];
 
     /**
-     * @var \stdClass context的所有者对象
-     */
-    protected $owner;
-
-    /**
      * 获取请求输入对象
      *
      * @return Input
@@ -105,7 +100,6 @@ class Context extends AbstractContext
      */
     public function getObjectPool()
     {
-        $this->objectPool->setCurrentObjParent($this->owner);
         return $this->objectPool;
     }
 
@@ -200,28 +194,6 @@ class Context extends AbstractContext
     }
 
     /**
-     * 获取context的所有者对象
-     *
-     * @return mixed
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
-     * 设置context的所有者对象
-     *
-     * @param mixed $owner
-     * @return $this
-     */
-    public function setOwner(&$owner)
-    {
-        $this->owner = $owner;
-        return $this;
-    }
-
-    /**
      * @inheritdoc
      */
     public function __sleep()
@@ -241,6 +213,5 @@ class Context extends AbstractContext
         $this->controllerName = null;
         $this->actionName     = null;
         $this->userDefined    = [];
-        $this->owner          = null;
     }
 }
