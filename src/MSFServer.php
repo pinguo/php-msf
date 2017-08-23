@@ -416,14 +416,14 @@ abstract class MSFServer extends HttpServer
                 $client = stream_socket_accept($server, 0);
                 swoole_event_add($client,
                     function ($fd) {
-                        $stat = json_encode($this->statistics());
-                        swoole_event_write($fd, 'HTTP/1.1 200 OK' . PHP_EOL);
-                        swoole_event_write($fd, 'Date: ' . date('Y-m-d H:i:s') . PHP_EOL);
-                        swoole_event_write($fd, 'Content-Type: application/json'. PHP_EOL);
-                        swoole_event_write($fd, 'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL);
-                        swoole_event_write($fd, $stat);
+                        $stat     = json_encode($this->statistics());
+                        $response = 'HTTP/1.1 200 OK' . PHP_EOL .
+                                    'Date: ' . date('Y-m-d H:i:s') . PHP_EOL .
+                                    'Content-Type: application/json'. PHP_EOL .
+                                    'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL .
+                                    $stat;
+                        swoole_event_write($fd, $response);
                         swoole_event_del($fd);
-                        fclose($fd);
                     });
             });
         }

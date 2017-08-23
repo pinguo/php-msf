@@ -1,7 +1,6 @@
 <?php
-
 /**
- * @desc: rpc控制器类
+ * RPC控制器，为RPC请求的入口
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -11,7 +10,7 @@ namespace PG\MSF\Controllers;
 
 use Exception;
 
-class RpcController extends Controller
+class Rpc extends Controller
 {
     /**
      * @var bool
@@ -29,10 +28,7 @@ class RpcController extends Controller
      * @var null
      */
     public $version = null;
-    /**
-     * @var null
-     */
-    public $sig = null;
+
     /**
      * @var null | array
      */
@@ -48,12 +44,13 @@ class RpcController extends Controller
     public $rpcTime = null;
 
     /**
-     * 参数反射缓存
-     * @var array
+     * @var array 参数反射缓存
      */
     protected static $reflectionParameterCache = [];
 
     /**
+     * 构造方法
+     *
      * @param string $controllerName
      * @param string $methodName
      */
@@ -62,28 +59,15 @@ class RpcController extends Controller
         parent::__construct($controllerName, $methodName);
     }
 
-    public function destroy()
-    {
-        parent::destroy();
-    }
-
     /**
-     * @param $arguments
+     * RPC请求入口
+     *
+     * @param array $arguments
      * @return \Generator
      */
-    public function httpCallHandler($arguments)
+    public function actionIndex($arguments)
     {
         $this->parseHttpArgument($arguments);
-        yield $this->runMethod();
-    }
-
-    /**
-     * @param $arguments
-     * @return \Generator
-     */
-    public function tcpCallHandler($arguments)
-    {
-        $this->parseTcpArgument($arguments);
         yield $this->runMethod();
     }
 
@@ -93,11 +77,11 @@ class RpcController extends Controller
      */
     protected function parseHttpArgument(&$arguments)
     {
-        if (!is_array($arguments) || !isset($arguments['data']) || !isset($arguments['sig'])) {
+        if (!is_array($arguments) || !isset($arguments['data'])) {
             throw new Exception('Rpc argument invalid.');
         }
         if (!is_array($arguments['data'])) {
-            $arguments['data'] = $this->pack->unPack($arguments['data']);
+            $arguments['data'] = getInstance()->pack->unPack($arguments['data']);
         }
         $arguments['data'] = (array)$arguments['data'];
         if (!isset($arguments['data']['handler'])) {
@@ -114,7 +98,6 @@ class RpcController extends Controller
         $this->method = $arguments['data']['method'];
         $this->reqParams = (array)$arguments['data']['args'];
         $this->rpcTime = $arguments['data']['time'];
-        $this->sig = $arguments['sig'];
     }
 
     /**
@@ -136,7 +119,6 @@ class RpcController extends Controller
             throw new Exception('Rpc argument of args not set.');
         }
         $this->version = $arguments['version'] ?? null;
-        $this->sig = $arguments['sig'] ?? null;
         $this->handler = $arguments['handler'];
         $this->method = $arguments['method'];
         $this->reqParams = (array)$arguments['args'];
@@ -189,5 +171,10 @@ class RpcController extends Controller
         }
 
         $this->methodParams = $parameters;
+    }
+
+    public function destroy()
+    {
+        parent::destroy();
     }
 }

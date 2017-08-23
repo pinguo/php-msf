@@ -13,6 +13,7 @@ use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\Base\Child;
 use PG\MSF\Base\Core;
+use PG\MSF\Pack\IPack;
 use PG\MSF\Route\IRoute;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Coroutine\Scheduler as Coroutine;
@@ -108,6 +109,11 @@ abstract class Server extends Child
     protected $route;
 
     /**
+     * @var IPack 数据打包与解包
+     */
+    public $pack;
+
+    /**
      * @var callback 错误回调
      */
     public $onErrorHandle = null;
@@ -191,6 +197,21 @@ abstract class Server extends Child
             }
         }
         $this->route  = new $routeClassName;
+
+        // 初始化打包和解包对象
+        $packTool = $this->config->get('server.pack_tool', 'JsonPack');
+        if (class_exists($packTool)) {
+            $packClassName = $packTool;
+        } else {
+            $packClassName = "\\App\\Pack\\" . $packTool;
+            if (!class_exists($packClassName)) {
+                $packClassName = "\\PG\\MSF\\Pack\\" . $packTool;
+                if (!class_exists($packClassName)) {
+                    throw new Exception("class {$packTool} is not exist.");
+                }
+            }
+        }
+        $this->pack = new $packClassName;
     }
 
     public function getTimerContext()

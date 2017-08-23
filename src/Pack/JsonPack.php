@@ -21,7 +21,7 @@ class JsonPack implements IPack
     {
         $value = json_decode($data);
         if (empty($value)) {
-            throw new Exception('json unPack 失败');
+            throw new Exception('json unPack失败');
         }
         return $value;
     }
