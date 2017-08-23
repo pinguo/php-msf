@@ -36,11 +36,11 @@ class ConcurrentClient
         $serviceConf = $config->get('params.service', null);
         $parallelConf = $config->get('params.parallel');
 
-        $preParams = [
+        $preParams = array_filter([
             '__appVersion' => !empty($parent->getContext()->getInput()->postGet('__appVersion')) ? $parent->getContext()->getInput()->postGet('__appVersion') : $parent->getContext()->getInput()->postGet('appVersion'),
             '__locale' => !empty($parent->getContext()->getInput()->postGet('__locale')) ? $parent->getContext()->getInput()->postGet('__locale') : $parent->getContext()->getInput()->postGet('locale'),
             '__platform' => !empty($parent->getContext()->getInput()->postGet('__platform')) ? $parent->getContext()->getInput()->postGet('__platform') : $parent->getContext()->getInput()->postGet('platform')
-        ];
+        ]);
 
         $list = $result = [];
         foreach ($requests as $name => $params) {
