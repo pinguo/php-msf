@@ -57,3 +57,7 @@
  - 5.10 [小结](./doc/05.10-小结.md)
 * 6.[常见问题](./doc/06.0-常见问题.md)
 * 7.[附录](./doc/07.0-附录.md)
+
+## License
+
+Apache License Version 2.0 see [http://www.apache.org/licenses/LICENSE-2.0.html](http://www.apache.org/licenses/LICENSE-2.0.html)
