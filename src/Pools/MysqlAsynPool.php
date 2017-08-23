@@ -12,7 +12,6 @@ namespace PG\MSF\Pools;
 use Exception;
 use Noodlehaus\Config;
 use PG\MSF\Coroutine\Mysql;
-use PG\MSF\Base\Core;
 use PG\AOP\MI;
 use PG\MSF\Helpers\Context;
 
