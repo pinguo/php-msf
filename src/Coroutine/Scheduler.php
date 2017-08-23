@@ -11,7 +11,6 @@ namespace PG\MSF\Coroutine;
 use PG\MSF\Base\Core;
 use PG\MSF\Controllers\Controller;
 use PG\MSF\Helpers\Context;
-use PG\MSF\Marco;
 
 class Scheduler
 {
