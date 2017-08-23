@@ -14,7 +14,6 @@ use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
 use PG\AOP\MI;
 use PG\MSF\Base\Core;
-use PG\MSF\Base\Child;
 use Exception;
 use PG\MSF\Coroutine\CException;
 
