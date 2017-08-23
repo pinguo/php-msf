@@ -18,7 +18,7 @@ interface IAsynPool
 
     function serverInit($swooleServer, $asynManager);
 
-    function workerInit($workerid);
+    function workerInit($workerId);
 
     function pushToPool($client);
 

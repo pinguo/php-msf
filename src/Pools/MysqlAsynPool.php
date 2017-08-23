@@ -24,7 +24,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 连接池类型名称
      */
-    const AsynName = 'mysql';
+    const ASYN_NAME = 'mysql.';
 
     /**
      * @var Miner SQL Builder
@@ -228,7 +228,7 @@ class MysqlAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName . ":" . $this->active;
+        return self::ASYN_NAME . $this->active;
     }
 
     /**

@@ -110,23 +110,6 @@ abstract class MSFServer extends HttpServer
         $this->tidPidTable->column('start_time', \swoole_table::TYPE_INT, 8);
         $this->tidPidTable->create();
 
-        //创建异步连接池进程
-        if ($this->config->get('asyn_process_enable', false)) {
-            $this->poolProcess = new \swoole_process(function ($process) {
-                $process->name($this->config['server.process_title'] . '-ASYN');
-                $this->asynPoolManager = new AsynPoolManager($process, $this);
-                $this->asynPoolManager->eventAdd();
-                $this->initAsynPools();
-                foreach ($this->asynPools as $pool) {
-                    if ($pool) {
-                        $this->asynPoolManager->registerAsyn($pool);
-                    }
-                }
-                $this->initRedisProxies();
-            }, false, 2);
-            $this->server->addProcess($this->poolProcess);
-        }
-
         //reload监控进程
         if ($this->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理
             $reloadProcess = new \swoole_process(function ($process) {
@@ -169,7 +152,7 @@ abstract class MSFServer extends HttpServer
             }
 
             foreach ($activePools as $poolKey) {
-                $asynPools[$poolKey] = new RedisAsynPool($this->config, $poolKey);
+                $asynPools[RedisAsynPool::ASYN_NAME . $poolKey] = new RedisAsynPool($this->config, $poolKey);
             }
         }
 
@@ -180,7 +163,7 @@ abstract class MSFServer extends HttpServer
             }
 
             foreach ($activePools as $poolKey) {
-                $asynPools[$poolKey] = new MysqlAsynPool($this->config, $poolKey);
+                $asynPools[MysqlAsynPool::ASYN_NAME . $poolKey] = new MysqlAsynPool($this->config, $poolKey);
             }
         }
 
@@ -440,7 +423,8 @@ abstract class MSFServer extends HttpServer
                         swoole_event_write($fd, 'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL);
                         swoole_event_write($fd, $stat);
                         swoole_event_del($fd);
-                    }, null, SWOOLE_EVENT_READ);
+                        fclose($fd);
+                    });
             });
         }
     }
