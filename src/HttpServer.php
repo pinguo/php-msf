@@ -210,28 +210,29 @@ abstract class HttpServer extends Server
                 $init = $controllerInstance->__construct($controllerName, $methodName);
 
                 if ($init instanceof \Generator) {
-                    $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
-                        $isRpc = $this->route->getIsRpc();
-                        $params = $isRpc ? $this->route->getParams() : array_values($this->route->getParams());
-
-                        $generator = $isRpc ? $controllerInstance->$methodName($params) : $controllerInstance->$methodName(...$params);
-                        if ($generator instanceof \Generator) {
-                            $this->coroutine->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
-                            $this->coroutine->schedule($this->coroutine->taskMap[$controllerInstance->context->getLogId()]);
-                        }
-                    });
+                    $this->coroutine->start(
+                        $init,
+                        $controllerInstance->context,
+                        $controllerInstance,
+                        function () use ($controllerInstance, $methodName) {
+                            $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
+                            if ($generator instanceof \Generator) {
+                                $this->coroutine->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
+                                $this->coroutine->schedule($this->coroutine->taskMap[$controllerInstance->context->getLogId()]);
+                            }
+                        });
                 } else {
-                    $isRpc = $this->route->getIsRpc();
-                    $params = $isRpc ? $this->route->getParams() : array_values($this->route->getParams());
-
-                    $generator = $isRpc ? $controllerInstance->$methodName($params) : $controllerInstance->$methodName(...$params);
+                    $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
                     if ($generator instanceof \Generator) {
                         $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
                     }
                 }
 
                 if ($this->route->getEnableCache() && !$this->route->getRouteCache($this->route->getPath())) {
-                    $this->route->setRouteCache($this->route->getPath(), [$controllerName, $this->route->getMethodName(), $controllerClassName]);
+                    $this->route->setRouteCache(
+                        $this->route->getPath(),
+                        [$controllerName, $this->route->getMethodName(), $controllerClassName]
+                    );
                 }
                 break;
             } catch (\Throwable $e) {

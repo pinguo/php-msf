@@ -52,8 +52,9 @@ class NormalRoute implements IRoute
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->clientData->isRpc          = true;
             $this->clientData->params         = $request->post ?? $request->get ?? [];
-            $this->clientData->controllerName = getInstance()->config->get('rpc.default_controller');
-            $this->clientData->methodName     = getInstance()->config->get('rpc.default_method');
+            $this->clientData->controllerName = 'Rpc';
+            $this->clientData->methodName     = 'Index';
+            $this->controllerClassName        = '\PG\MSF\Controllers\Rpc';
         } else {
             $this->parsePath($this->clientData->path);
         }
