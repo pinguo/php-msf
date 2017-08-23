@@ -3,16 +3,19 @@
  * A dead simple PHP class for building SQL statements. No manual string
  * concatenation necessary.
  *
- * @author camera360_server@camera360.com
+ * @author tmtbe
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use PG\MSF\Coroutine\MySql;
+use PG\AOP\MI;
 
 class Miner
 {
+    // use property and method insert
+    use MI;
 
     /**
      * INNER JOIN type.
@@ -1851,9 +1854,9 @@ class Miner
      * 协程的方式
      * @param null $bindId
      * @param null $sql
-     * @return MySql
+     * @return mixed|MySql
      */
-    public function coroutineSend($bindId = null, $sql = null)
+    public function go($bindId = null, $sql = null)
     {
         if ($sql == null) {
             $sql = $this->getStatement(false);
@@ -1878,7 +1881,7 @@ class Miner
             return $data;
         } else {
             $this->clear();
-            return new MySql($this->mysqlPool, $bindId, $sql);
+            return $this->getContext()->getObjectPool()->get(MySql::class, [$this->mysqlPool, $bindId, $sql]);
         }
     }
 

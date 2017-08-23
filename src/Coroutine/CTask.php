@@ -1,6 +1,8 @@
 <?php
 /**
- * CTask
+ * Task协程
+ *
+ * 由worker进程投递到tasker进程的任务
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -11,16 +13,12 @@ namespace PG\MSF\Coroutine;
 class CTask extends Base
 {
     /**
-     * 任务ID
-     *
-     * @var int
+     * @var int 任务ID
      */
     public $id;
 
     /**
-     * 任务执行参数
-     *
-     * @var array
+     * @var array 任务执行参数
      */
     public $taskProxyData;
 
@@ -30,11 +28,10 @@ class CTask extends Base
      * @param array $taskProxyData
      * @param int $id
      * @param int $timeout
-     * @return $this
      */
-    public function initialization($taskProxyData, $id, $timeout)
+    public function __construct($taskProxyData, $id, $timeout)
     {
-        parent::init($timeout);
+        parent::__construct($timeout);
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];
@@ -59,17 +56,18 @@ class CTask extends Base
             $this->ioBack = true;
             $this->nextRun();
         });
-        
-        return $this;
     }
 
     /**
      * 投递异步任务给Tasker进程
+     *
      * @param callable $callback
+     * @return $this
      */
     public function send($callback)
     {
         getInstance()->server->task($this->taskProxyData, $this->id, $callback);
+        return $this;
     }
 
     /**

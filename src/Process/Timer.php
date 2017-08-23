@@ -14,15 +14,18 @@ namespace PG\MSF\Process;
 use Noodlehaus\Config as Conf;
 use PG\MSF\MSFServer;
 
-class Timer
+class Timer extends ProcessBase
 {
-    public $config;
-
-    public $MSFServer;
-
+    /**
+     * Timer constructor.
+     *
+     * @param Conf $config
+     * @param MSFServer $MSFServer
+     */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        echo 'Enable User Timer: Success', "\n";
+        parent::__construct($config, $MSFServer);
+        echo 'User      Timer: Enable', "\n";
         $MSFServer->onInitTimer();
     }
 }

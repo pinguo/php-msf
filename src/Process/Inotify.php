@@ -1,6 +1,6 @@
 <?php
 /**
- * InotifyProcess
+ * 文件监控进程
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -8,32 +8,49 @@
 
 namespace PG\MSF\Process;
 
-class Inotify
-{
-    const RELOAD_SIG = 'reload_sig';
-    public $monitorDir;
-    public $inotifyFd;
-    public $managePid;
-    public $server;
+use Noodlehaus\Config as Conf;
+use PG\MSF\MSFServer;
 
-    public function __construct($server)
+class Inotify extends ProcessBase
+{
+    /**
+     * @var bool|string 监控目录
+     */
+    public $monitorDir;
+
+    /**
+     * @var int inotify fd
+     */
+    public $inotifyFd;
+
+    /**
+     * Inotify constructor.
+     *
+     * @param Conf $config
+     * @param MSFServer $MSFServer
+     */
+    public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        $notice = 'Enable Inotify Auto Reload: ';
-        $this->server     = $server;
+        parent::__construct($config, $MSFServer);
+        $notice = 'Inotify  Reload: ';
         $this->monitorDir = realpath(ROOT_PATH . '/');
         if (!extension_loaded('inotify')) {
             $notice .= "Failed(未安装inotify扩展)\n";
         } else {
-            $this->useInotify();
-            $notice .= "Success\n";
+            $this->inotify();
+            $notice .= "Enable\n";
         }
 
         echo $notice;
     }
 
-    public function useInotify()
+    /**
+     * 监控目录
+     */
+    public function inotify()
     {
         $this->inotifyFd = inotify_init();
+
         stream_set_blocking($this->inotifyFd, 0);
         $dirIterator  = new \RecursiveDirectoryIterator($this->monitorDir);
         $iterator     = new \RecursiveIteratorIterator($dirIterator);
@@ -58,7 +75,7 @@ class Inotify
                     $wd = inotify_add_watch($inotifyFd, $file, IN_MODIFY);
                     $monitorFiles[$wd] = $file;
                 }
-                $this->server->reload();
+                $this->MSFServer->server->reload();
             }
         }, null, SWOOLE_EVENT_READ);
     }

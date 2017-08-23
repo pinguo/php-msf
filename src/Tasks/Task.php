@@ -1,8 +1,7 @@
 <?php
 /**
  * Task 异步任务
- * 在worker中的Task会被构建成TaskProxy。这个实例是单例的，
- * 所以发起task请求时每次都要使用loader给TaskProxy赋值，不能缓存重复使用，以免数据错乱。
+ * 在worker进程通过TaskProxy代理执行请求
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -10,22 +9,32 @@
 
 namespace PG\MSF\Tasks;
 
-use PG\AOP\Wrapper;
 use PG\MSF\Helpers\Context;
-use PG\MSF\Base\AOPFactory;
+use PG\AOP\Wrapper;
+use PG\MSF\Memory\Pool;
 
 class Task extends TaskProxy
 {
+    /**
+     * Task constructor.
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function initialization($taskId, $workerPid, $taskName, $methodName, $context)
+    /**
+     * Tasker进程中初始化任务
+     *
+     * @param int $taskId
+     * @param int $workerPid
+     * @param string $taskName
+     * @param string $methodName
+     * @param Context $context
+     * @param Wrapper|Pool $objectPool
+     */
+    public function __initialization($taskId, $workerPid, $taskName, $methodName, $context, $objectPool)
     {
-        /**
-         * @var Context $context
-         */
         $this->taskId = $taskId;
         getInstance()->tidPidTable->set($this->taskId,
             ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
@@ -42,37 +51,19 @@ class Task extends TaskProxy
             // 构造请求上下文成员
             $context->setLogId($PGLog->logId);
             $context->setLog($PGLog);
-            $context->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $this));
+            $context->setObjectPool($objectPool);
             $this->setContext($context);
         }
     }
 
+    /**
+     * 销毁
+     */
     public function destroy()
     {
         $this->parent == null && $this->getContext()->getLog() && $this->getContext()->getLog()->appendNoticeLog();
         $this->taskId && getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
         $this->taskId = 0;
-    }
-
-    /**
-     * 检查中断信号返回本Task是否该中断
-     * @return bool
-     */
-    protected function checkInterrupted()
-    {
-        $interrupted = pcntl_signal_dispatch();
-        if ($interrupted == false) {
-            return false;
-        }
-        //表总0获得值代表的是需要中断的id
-        $interruptedTaskId = getInstance()->tidPidTable->get(0)['pid'];
-        //读取后可以释放锁了
-        getInstance()->taskLock->unlock();
-        if ($interruptedTaskId == $this->taskId) {
-            return true;
-        }
-
-        return false;
     }
 }

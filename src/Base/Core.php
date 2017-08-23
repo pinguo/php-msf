@@ -8,31 +8,36 @@
 
 namespace PG\MSF\Base;
 
+use Exception;
 use Noodlehaus\Config;
 use PG\MSF\Pack\IPack;
-use PG\MSF\DataBase\RedisAsynPool;
 use PG\AOP\Wrapper;
+use PG\MSF\Pools\RedisAsynPool;
+use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
-use PG\MSF\DataBase\CoroutineRedisProxy;
-use Exception;
+use PG\MSF\Pools\CoroutineRedisProxy;
 
 class Core extends Child
 {
     /**
-     * @var int
+     * @var int 作用计数
      */
-    public $useCount;
+    public $__useCount;
 
     /**
-     * @var int
+     * @var int 创建时间
      */
-    public $genTime;
+    public $__genTime;
 
     /**
-     * 销毁标志
-     * @var bool
+     * @var bool 是否执行构造方法
      */
-    protected $isDestroy = false;
+    public $__isContruct = false;
+
+    /**
+     * @var bool 销毁标志
+     */
+    protected $__isDestroy = false;
 
     /**
      * @var null
@@ -40,74 +45,59 @@ class Core extends Child
     public static $stdClass = null;
 
     /**
-     * redis连接池
-     *
-     * @var array
+     * @var array redis连接池
      */
     protected $redisPools;
 
     /**
-     * redis代理池
-     *
-     * @var array
+     * @var array mysql连接池
+     */
+    protected $mysqlPools;
+
+    /**
+     * @var array redis代理池
      */
     protected $redisProxies;
 
     /**
-     * Task constructor.
+     * 构造方法
      */
     public function __construct()
     {
-        if (empty(Child::$reflections[static::class])) {
-            $reflection  = new \ReflectionClass(static::class);
-            $default     = $reflection->getDefaultProperties();
-            $ps          = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-            $ss          = $reflection->getProperties(\ReflectionProperty::IS_STATIC);
-            $autoDestroy = [];
-            foreach ($ps as $val) {
-                $autoDestroy[$val->getName()] = $default[$val->getName()];
-            }
-            foreach ($ss as $val) {
-                unset($autoDestroy[$val->getName()]);
-            }
-            unset($autoDestroy['useCount']);
-            unset($autoDestroy['genTime']);
-            unset($autoDestroy['coreName']);
-            Child::$reflections[static::class] = $autoDestroy;
-            unset($reflection);
-            unset($default);
-            unset($ps);
-            unset($ss);
-        }
+
     }
 
     /**
-     * sleep
+     * 在序列化及dump对象时使用，代表哪些属于需要导出
      *
      * @return array
      */
     public function __sleep()
     {
-        return ['useCount', 'genTime'];
+        return [];
     }
 
     /**
-     * @return Loader
+     * 和__sleep作用相反
      */
-    public function getLoader()
+    public function __unsleep()
     {
-        return getInstance()->loader;
+        return [];
     }
 
     /**
+     * 获取运行Server实例
+     *
      * @return \swoole_server
      */
-    public function getServer()
+    public function getServerInstance()
     {
         return getInstance()->server;
     }
 
     /**
+     * 获取运行server实例配置对象
+     *
      * @return Config
      */
     public function getConfig()
@@ -116,6 +106,8 @@ class Core extends Child
     }
 
     /**
+     * 获取运行server实例打包对象
+     *
      * @return IPack
      */
     public function getPack()
@@ -125,23 +117,50 @@ class Core extends Child
 
     /**
      * 获取redis连接池
+     *
      * @param string $poolName
      * @return bool|Wrapper|CoroutineRedisProxy|\Redis
      */
     public function getRedisPool(string $poolName)
     {
+        $activePoolName = $poolName;
+        $poolName       = RedisAsynPool::ASYN_NAME . $poolName;
         if (isset($this->redisPools[$poolName])) {
             return $this->redisPools[$poolName];
         }
 
         $pool = getInstance()->getAsynPool($poolName);
         if (!$pool) {
-            $pool = new RedisAsynPool($this->getConfig(), $poolName);
+            $pool = new RedisAsynPool($this->getConfig(), $activePoolName);
             getInstance()->addAsynPool($poolName, $pool, true);
         }
 
         $this->redisPools[$poolName] = AOPFactory::getRedisPoolCoroutine($pool->getCoroutine(), $this);
         return $this->redisPools[$poolName];
+    }
+
+    /**
+     * 获取MySQL连接池
+     *
+     * @param string $poolName
+     * @return bool|Wrapper
+     */
+    public function getMysqlPool(string $poolName)
+    {
+        $activePoolName = $poolName;
+        $poolName       = MysqlAsynPool::ASYN_NAME . $poolName;
+        if (isset($this->mysqlPools[$poolName])) {
+            return $this->mysqlPools[$poolName];
+        }
+
+        $pool = getInstance()->getAsynPool($poolName);
+        if (!$pool) {
+            $pool = new MysqlAsynPool($this->getConfig(), $activePoolName);
+            getInstance()->addAsynPool($poolName, $pool, true);
+        }
+
+        $this->mysqlPools[$poolName] = AOPFactory::getMysqlPoolCoroutine($pool, $this);;
+        return $this->mysqlPools[$poolName];
     }
 
     /**
@@ -214,9 +233,9 @@ class Core extends Child
      */
     public function destroy()
     {
-        if (!$this->isDestroy) {
+        if (!$this->__isDestroy) {
             parent::destroy();
-            $this->isDestroy = true;
+            $this->__isDestroy = true;
         }
     }
 
@@ -225,7 +244,7 @@ class Core extends Child
      */
     public function isUse()
     {
-        $this->isDestroy = false;
+        $this->__isDestroy = false;
     }
 
     /**
@@ -235,6 +254,6 @@ class Core extends Child
      */
     public function getIsDestroy()
     {
-        return $this->isDestroy;
+        return $this->__isDestroy;
     }
 }

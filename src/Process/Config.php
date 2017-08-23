@@ -1,8 +1,8 @@
 <?php
 /**
- * @desc: 配置管理进程
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/4/17
+ * 配置管理进程类
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -12,52 +12,45 @@ use Noodlehaus\Config as Conf;
 use PG\MSF\Marco;
 use PG\MSF\MSFServer;
 
-class Config
+class Config extends ProcessBase
 {
-    public $config;
 
-    public $MSFServer;
-
-    public $lastMinute;
-
-    protected $redisRetryTimes = [];
-
+    /**
+     * Redis探测失败次数上限
+     */
     const FAILURE_LIMIT = 2;
 
+    /**
+     * @var float 上一分钟
+     */
+    public $lastMinute;
+
+    /**
+     * @var array Redis探测retry次数
+     */
+    protected $redisRetryTimes = [];
+
+    /**
+     * Config constructor.
+     *
+     * @param Conf $config
+     * @param MSFServer $MSFServer
+     */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        echo 'Enable Config Manager: Success', "\n";
-        $this->config = $config;
-        $this->MSFServer = $MSFServer;
+        parent::__construct($config, $MSFServer);
+        echo 'Config  Manager: Enable', "\n";
         $this->lastMinute = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
     }
 
+    /**
+     * 汇总各个Worker的运行状态信息
+     */
     public function stats()
     {
         $data = [
-            'worker' => [
-                // worker进程ID
-                // 'pid' => 0,
-                // 协程统计信息
-                // 'coroutine' => [
-                // 当前正在处理的请求数
-                // 'total' => 0,
-                //],
-                // 内存使用
-                // 'memory' => [
-                // 峰值
-                // 'peak'  => '',
-                // 当前使用
-                // 'usage' => '',
-                //],
-                // 请求信息
-                //'request' => [
-                // 当前Worker进程收到的请求次数
-                //'worker_request_count' => 0,
-                //],
-            ],
             'tcp' => [
                 // 服务器启动的时间
                 'start_time' => '',
@@ -77,16 +70,6 @@ class Config
                 'task_queue_bytes' => 0,
             ],
         ];
-
-        $workerIds = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
-        foreach ($workerIds as $workerId) {
-            $workerInfo = @$this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
-            if ($workerInfo) {
-                $data['worker']['worker' . $workerId] = $workerInfo;
-            } else {
-                $data['worker']['worker' . $workerId] = [];
-            }
-        }
 
         $lastStats = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
         $data['tcp'] = $this->MSFServer->server->stats();
@@ -116,6 +99,11 @@ class Config
         $this->MSFServer->sysCache->set(Marco::SERVER_STATS, $data);
     }
 
+    /**
+     * 检测Redis Proxy状态
+     *
+     * @return bool
+     */
     public function checkRedisProxy()
     {
         $host             = gethostname();

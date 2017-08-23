@@ -17,74 +17,14 @@ class Child
     use MI;
 
     /**
-     * @var array
+     * @var array 反射类属性的默认值
      */
     protected static $reflections = [];
 
     /**
-     * 名称
-     * @var string
-     */
-    public $coreName;
-
-    /**
-     * 子集
-     *
-     * @var array
-     */
-    public $childList = [];
-
-    /**
-     * 添加树的节点
-     *
-     * @param $child Child
-     * @return $this
-     */
-    public function addChild($child)
-    {
-        $child->onAddChild($this);
-        $this->childList[$child->coreName] = $child;
-        return $this;
-    }
-
-    /**
-     * 添加节点触发的事件
-     *
-     * @param $parent
-     * @return $this
-     */
-    public function onAddChild($parent)
-    {
-        $this->parent = $parent;
-        return $this;
-    }
-
-    /**
-     * 某一个类是否在树上已经存在
-     *
-     * @param $name
-     * @return bool
-     */
-    public function hasChild($name)
-    {
-        return key_exists($name, $this->childList);
-    }
-
-    /**
-     * 获取树的节点
-     *
-     * @param $name
-     * @return mixed|null
-     */
-    public function getChild($name)
-    {
-        return $this->childList[$name] ?? null;
-    }
-
-    /**
      * 设置上下文
      *
-     * @param $context
+     * @param Context $context
      * @return $this
      */
     public function setContext($context)
@@ -98,9 +38,8 @@ class Child
      */
     public function destroy()
     {
-        foreach ($this->childList as $coreChild) {
-            $coreChild->destroy();
+        if (!empty(Child::$reflections[static::class])) {
+            $this->resetProperties(Child::$reflections[static::class]);
         }
-        $this->resetProperties(Child::$reflections[static::class]);
     }
 }

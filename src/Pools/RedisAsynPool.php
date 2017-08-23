@@ -2,38 +2,75 @@
 /**
  * redis 异步客户端连接池
  *
+ * @author tmtbe
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use Exception;
 use PG\MSF\Coroutine\Redis;
 
 class RedisAsynPool extends AsynPool
 {
-    const AsynName = 'redis';
     /**
-     * 连接
-     * @var array
+     * 连接池类型名称
+     */
+    const ASYN_NAME = 'redis.';
+
+    /**
+     * @var array 连接配置信息
      */
     public $connect;
-    protected $redisMaxCount = 0;
-    private $active;
-    private $coroutineRedisHelp;
+
     /**
-     * 不要在业务中使用
-     * @var \Redis
+     * @var int 连接峰值
+     */
+    protected $redisMaxCount = 0;
+
+    /**
+     * @var string 连接池标识
+     */
+    private $active;
+
+    /**
+     * @var CoroutineRedisProxy 连接池辅助类
+     */
+    private $coroutineRedisHelp;
+
+    /**
+     * @var \Redis 同步Redis客户端
      */
     public $redisClient;
 
+    /**
+     * @var string Redis Key前缀
+     */
     public $keyPrefix = '';
+
+    /**
+     * @var bool 是否需要hash key
+     */
     public $hashKey = false;
+
+    /**
+     * @var bool 是否启用PHP序列化
+     */
     public $phpSerialize = false;
+
+    /**
+     * @var bool 是否启用Redis序列化
+     */
     public $redisSerialize = false;
 
-
+    /**
+     * RedisAsynPool constructor.
+     *
+     * @param $config
+     * @param string $active
+     * @throws Exception
+     */
     public function __construct($config, string $active)
     {
         parent::__construct($config);
@@ -60,13 +97,17 @@ class RedisAsynPool extends AsynPool
         $this->coroutineRedisHelp = new CoroutineRedisProxy($this);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function serverInit($swooleServer, $asynManager)
     {
         parent::serverInit($swooleServer, $asynManager);
+        return $this;
     }
 
     /**
-     * 映射redis方法
+     * __call魔术方法，映射redis方法
      * @param $name
      * @param $arguments
      */
@@ -91,17 +132,18 @@ class RedisAsynPool extends AsynPool
      * @return mixed|Redis
      * @throws Exception
      */
-    public function coroutineSend($context, $name, ...$arg)
+    public function go($context, $name, ...$arg)
     {
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             return $this->getSync()->$name(...$arg);
         } else {
-            return $context->getObjectPool()->get(Redis::class)->initialization($this, $name, $arg);
+            return $context->getObjectPool()->get(Redis::class, [$this, $name, $arg]);
         }
     }
 
     /**
      * 获取同步
+     *
      * @return \Redis
      * @throws Exception
      */
@@ -130,7 +172,8 @@ class RedisAsynPool extends AsynPool
     }
 
     /**
-     * 协程模式 更加便捷
+     * 便捷协程模式
+     *
      * @return \Redis|coroutineRedisProxy
      */
     public function getCoroutine()
@@ -139,7 +182,8 @@ class RedisAsynPool extends AsynPool
     }
 
     /**
-     * 执行redis命令
+     * 执行Redis命令
+     *
      * @param $data
      */
     public function execute($data)
@@ -387,7 +431,7 @@ class RedisAsynPool extends AsynPool
                 $this->asynManager->sendMessageToWorker($this, $data);
                 //回归连接
                 if (((time() - $client->genTime) < 3600)
-                    || (($this->redisMaxCount + $this->waitConnetNum) <= 30)
+                    || (($this->redisMaxCount + $this->waitConnectNum) <= 30)
                 ) {
                     $this->pushToPool($client);
                 } else {
@@ -400,7 +444,7 @@ class RedisAsynPool extends AsynPool
     }
 
     /**
-     * 准备一个redis
+     * 创建一个Redis连接
      */
     public function prepareOne()
     {
@@ -409,11 +453,12 @@ class RedisAsynPool extends AsynPool
 
     /**
      * 重连或者连接
-     * @param null $client
+     *
+     * @param \swoole_redis|null $client
      */
     public function reconnect($client = null)
     {
-        $this->waitConnetNum++;
+        $this->waitConnectNum++;
         if ($client == null) {
             $settings = ['timeout' => 1.5];
             //存在密码
@@ -432,10 +477,10 @@ class RedisAsynPool extends AsynPool
 
         $client->on('close', [$this, 'onClose']);
         $client->connect($this->connect[0], $this->connect[1], function ($client, $result) {
-            $this->waitConnetNum--;
+            $this->waitConnectNum--;
 
             if (!$result) {
-                getInstance()->log->error($client->errMsg .  " with Redis {$this->connect[0]}:{$this->connect[1]}");
+                getInstance()->log->error($client->errMsg . " with Redis {$this->connect[0]}:{$this->connect[1]}");
                 return false;
             }
 
@@ -450,6 +495,7 @@ class RedisAsynPool extends AsynPool
 
     /**
      * 断开链接
+     *
      * @param $client
      */
     public function onClose($client)
@@ -462,6 +508,6 @@ class RedisAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName . ":" . $this->active;
+        return self::ASYN_NAME . $this->active;
     }
 }

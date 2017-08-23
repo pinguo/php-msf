@@ -11,7 +11,7 @@ namespace PG\MSF\Client;
 use PG\Exception\BusinessException;
 use PG\MSF\Base\Core;
 use PG\MSF\Client\Http\Client;
-use PG\MSF\Coroutine\GetHttpClient;
+use PG\MSF\Coroutine\Dns;
 
 class ConcurrentClient
 {
@@ -57,31 +57,30 @@ class ConcurrentClient
                 $list[$name]['parser'] = ($parallelConf[$name]['parser'] ?? 'normal') . 'Parser';
 
                 //dns请求
-                $list[$name]['dns'] = $parent->getContext()->getObjectPool()->get(Client::class)->coroutineGetHttpClient($list[$name]['host'], $list[$name]['timeout']);
+                $list[$name]['dns'] = $parent->getContext()->getObjectPool()->get(Client::class)->goDnsLookup($list[$name]['host'], $list[$name]['timeout']);
             }
         }
 
         foreach ($list as $name => $item) {
+            /**
+             * @var Client $client
+             */
             //dns结果
-            if ($item['dns'] instanceof GetHttpClient) {
-                $dnsClient = yield $item['dns'];
-            } else {
-                $dnsClient = $item['dns'];
-            }
-
-            //dns失败
-            if ($dnsClient == null) {
-                $parent->getContext()->getLog()->error('DNS lookup for ' . $item['host'] . ' Failed');
-                $result[$name] = false;
-                unset($list[$name]);
-                continue;
+            if ($item['dns'] instanceof DNS) {
+                $item['dns'] = yield $item['dns'];
+                if (!$item['dns']) {
+                    $parent->getContext()->getLog()->error('DNS lookup for ' . $item['host'] . ' Failed');
+                    $result[$name] = false;
+                    unset($list[$name]);
+                    continue;
+                }
             }
 
             //http请求
             if ($item['method'] == 'POST') {
-                $list[$name]['http'] = $dnsClient->coroutinePost($item['api'], $item['params'], $item['timeout']);
+                $list[$name]['http'] = $item['dns']->goPost($item['api'], $item['params'], $item['timeout']);
             } else {
-                $list[$name]['http'] = $dnsClient->coroutineGet($item['api'], $item['params'], $item['timeout']);
+                $list[$name]['http'] = $item['dns']->goGet($item['api'], $item['params'], $item['timeout']);
             }
         }
 

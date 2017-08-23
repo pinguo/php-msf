@@ -1,7 +1,6 @@
 <?php
 /**
- * Controller 控制器
- * 对象池模式，实例会被反复使用，成员变量缓存数据记得在销毁时清理
+ * Web Controller控制器基类
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -13,54 +12,23 @@ use PG\Exception\Errno;
 use PG\Exception\ParameterValidationExpandException;
 use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
+use PG\AOP\MI;
 use PG\MSF\Base\Core;
-use PG\MSF\Base\AOPFactory;
+use PG\MSF\Base\Child;
 use Exception;
-use PG\MSF\Marco;
-use PG\MSF\Server;
 use PG\MSF\Coroutine\CException;
 
 class Controller extends Core
 {
     /**
-     * @var Wrapper|\PG\MSF\Memory\Pool
+     * @var Wrapper|\PG\MSF\Memory\Pool 对象池
      */
     protected $objectPool;
 
     /**
-     * @var array
+     * @var array 当前请求已使用的对象列表
      */
     public $objectPoolBuckets = [];
-
-    /**
-     * 是否来自http的请求不是就是来自tcp
-     * @var string
-     */
-    public $requestType;
-
-    /**
-     * fd
-     * @var int
-     */
-    public $fd;
-
-    /**
-     * uid
-     * @var int
-     */
-    public $uid;
-
-    /**
-     * 用户数据
-     * @var
-     */
-    public $clientData;
-
-    /**
-     * 用于单元测试模拟捕获服务器发出的消息
-     * @var array
-     */
-    public $testUnitSendStack = [];
 
     /**
      * @var float 请求开始处理的时间
@@ -68,23 +36,46 @@ class Controller extends Core
     public $requestStartTime = 0.0;
 
     /**
-     * Controller constructor.
+     * @var string TCP_REQUEST|HTTP_REQUEST 请求类型
      */
-    final public function __construct()
+    public $requestType;
+
+    /**
+     * Controller constructor.
+     *
+     * @param string $controllerName controller名称
+     * @param string $methodName method名称
+     */
+    public function __construct($controllerName, $methodName)
     {
-        parent::__construct();
-        $this->objectPool = AOPFactory::getObjectPool(getInstance()->objectPool, $this);
+        // 支持自动销毁成员变量
+        MI::__supportAutoDestroy(static::class);
+        $this->requestStartTime = microtime(true);
     }
 
     /**
+     * 获取对象池（在请求上下文未初始完成时，框架内部使用）
+     *
      * @return Wrapper|\PG\MSF\Memory\Pool
      */
-    public function getObjectPool()
+    public function __getObjectPool()
     {
         return $this->objectPool;
     }
 
     /**
+     * 获取对象池
+     *
+     * @return Wrapper|\PG\MSF\Memory\Pool
+     */
+    public function getObjectPool()
+    {
+        return $this->getContext()->getObjectPool();
+    }
+
+    /**
+     * 设置对象池
+     *
      * @param Wrapper|\PG\MSF\Memory\Pool|NULL $objectPool
      * @return $this
      */
@@ -95,23 +86,9 @@ class Controller extends Core
     }
 
     /**
-     * 设置客户端协议数据
-     * @param $uid
-     * @param $fd
-     * @param $clientData
-     * @param $controllerName
-     * @param $methodName
-     */
-    public function setClientData($uid, $fd, $clientData, $controllerName, $methodName)
-    {
-        $this->uid = $uid;
-        $this->fd  = $fd;
-        $this->clientData = $clientData;
-        $this->initialization($controllerName, $methodName);
-    }
-
-    /**
-     * @param string $requestType
+     * 设置请求类型
+     *
+     * @param string $requestType TCP_REQUEST|HTTP_REQUEST
      * @return $this
      */
     public function setRequestType($requestType)
@@ -121,6 +98,8 @@ class Controller extends Core
     }
 
     /**
+     * 返回请求类型
+     *
      * @return string
      */
     public function getRequestType()
@@ -129,17 +108,8 @@ class Controller extends Core
     }
 
     /**
-     * 初始化每次执行方法之前都会执行initialization
-     * @param string $controllerName 准备执行的controller名称
-     * @param string $methodName 准备执行的method名称
-     */
-    public function initialization($controllerName, $methodName)
-    {
-        $this->requestStartTime = microtime(true);
-    }
-
-    /**
      * 异常的回调
+     *
      * @param \Throwable $e
      * @throws \Throwable
      */
@@ -177,29 +147,7 @@ class Controller extends Core
     }
 
     /**
-     * 向当前客户端发送消息
-     * @param $data
-     * @param $destroy
-     * @throws Exception
-     */
-    public function send($data, $destroy = true)
-    {
-        if ($this->isDestroy) {
-            throw new Exception('controller is destroy can not send data');
-        }
-        $data = getInstance()->encode($this->pack->pack($data));
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'send', 'fd' => $this->fd, 'data' => $data];
-        } else {
-            getInstance()->send($this->fd, $data);
-        }
-        if ($destroy) {
-            $this->destroy();
-        }
-    }
-
-    /**
-     * 销毁
+     * 请求处理完成销毁相关资源
      */
     public function destroy()
     {
@@ -211,51 +159,12 @@ class Controller extends Core
                 $this->objectPoolBuckets[$k] = null;
                 unset($this->objectPoolBuckets[$k]);
             }
+            $this->objectPool->setCurrentObjParent(null);
         }
+        $this->resetProperties();
+        $this->__isContruct = false;
+        getInstance()->objectPool->push($this);
         parent::destroy();
-        Factory::getInstance()->revertController($this);
-    }
-
-    /**
-     * 获取单元测试捕获的数据
-     * @return array
-     */
-    public function getTestUnitResult()
-    {
-        $stack = $this->testUnitSendStack;
-        $this->testUnitSendStack = [];
-        return $stack;
-    }
-
-    /**
-     * 当控制器方法不存在的时候的默认方法
-     */
-    public function defaultMethod()
-    {
-        if ($this->requestType == Marco::HTTP_REQUEST) {
-            $this->getContext()->getOutput()->setHeader('HTTP/1.1', '404 Not Found');
-            $template = $this->getLoader()->view('server::error_404');
-            $this->getContext()->getOutput()->end($template->render());
-        } else {
-            throw new Exception('method not exist');
-        }
-    }
-
-    /**
-     * 断开链接
-     * @param $fd
-     * @param bool $autoDestroy
-     */
-    protected function close($fd, $autoDestroy = true)
-    {
-        if (Server::$testUnity) {
-            $this->testUnitSendStack[] = ['action' => 'close', 'fd' => $fd];
-        } else {
-            getInstance()->close($fd);
-        }
-        if ($autoDestroy) {
-            $this->destroy();
-        }
     }
 
     /**
@@ -267,17 +176,13 @@ class Controller extends Core
      * @param null $callback
      * @return void
      */
-    public function outputJson(
-        $data = null,
-        $message = '',
-        $status = 200,
-        $callback = null
-    ) {
+    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    {
         $this->getContext()->getOutput()->outputJson($data, $message, $status, $callback);
     }
 
     /**
-     * 响应通过模板输出的HTML
+     * 通过模板引擎响应输出HTML
      *
      * @param array $data
      * @param string|null $view

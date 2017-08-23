@@ -2,50 +2,91 @@
 /**
  * mysql异步客户端连接池
  *
+ * @author tmtbe
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 use Exception;
+use Noodlehaus\Config;
 use PG\MSF\Coroutine\Mysql;
+use PG\MSF\Base\Core;
+use PG\AOP\MI;
+use PG\MSF\Helpers\Context;
 
 class MysqlAsynPool extends AsynPool
 {
-    const AsynName = 'mysql';
+    // use property and method insert
+    use MI;
+
     /**
-     * @var Miner
+     * 连接池类型名称
+     */
+    const ASYN_NAME = 'mysql.';
+
+    /**
+     * @var Miner SQL Builder
      */
     public $dbQueryBuilder;
+
     /**
      * @var array
      */
     public $bindPool;
+
+    /**
+     * @var int 连接峰值
+     */
     protected $mysqlMaxCount = 0;
+
+    /**
+     * @var string 连接池标识
+     */
     private $active;
+
+    /**
+     * @var Miner 同步MySQL客户端
+     */
     private $mysqlClient;
 
+    /**
+     * MysqlAsynPool constructor.
+     *
+     * @param Config $config
+     * @param string $active
+     */
     public function __construct($config, $active)
     {
         parent::__construct($config);
-        $this->active = $active;
-        $this->bindPool = [];
-        $this->dbQueryBuilder = new Miner();
-        $this->dbQueryBuilder->mysqlPool = $this;
+        $this->active         = $active;
+        $this->bindPool       = [];
+    }
+
+    public function getDBQueryBuilder(Context $context)
+    {
+        if (empty($this->dbQueryBuilder)) {
+            $this->dbQueryBuilder            = new Miner();
+            $this->dbQueryBuilder->mysqlPool = $this;
+        }
+        $this->dbQueryBuilder->context = $context;
+
+        return $this->dbQueryBuilder;
     }
 
     /**
      * 执行mysql命令
+     *
      * @param $data
      * @throws Exception
      */
     public function execute($data)
     {
         $client = null;
-        $bindId = $data['bind_id']??null;
+        $bindId = $data['bind_id'] ?? null;
         if ($bindId != null) {//绑定
-            $client = $this->bindPool[$bindId]['client']??null;
+            $client = $this->bindPool[$bindId]['client'] ?? null;
             $sql = strtolower($data['sql']);
             if ($sql != 'begin' && $client == null) {
                 throw new Exception('error mysql affairs not begin.');
@@ -59,7 +100,7 @@ class MysqlAsynPool extends AsynPool
                 return;
             } else {
                 $client = $this->pool->shift();
-                if ($client->isClose??false) {
+                if ($client->isClose ?? false) {
                     $this->reconnect($client);
                     $this->commands->push($data);
                     return;
@@ -100,9 +141,18 @@ class MysqlAsynPool extends AsynPool
             //给worker发消息
             $this->asynManager->sendMessageToWorker($this, $data);
 
+
             //不是绑定的连接就回归连接
             if (!isset($data['bind_id'])) {
-                $this->pushToPool($client);
+                //回归连接
+                if (((time() - $client->genTime) < 3600)
+                    || (($this->mysqlMaxCount + $this->waitConnectNum) <= 30)
+                ) {
+                    $this->pushToPool($client);
+                } else {
+                    $client->close();
+                    $this->mysqlMaxCount--;
+                }
             } else {//事务
                 $bindId = $data['bind_id'];
                 if ($sql == 'commit' || $sql == 'rollback') {//结束事务
@@ -113,13 +163,10 @@ class MysqlAsynPool extends AsynPool
     }
 
     /**
-     * 准备一个mysql
+     * 创建一个Mysql连接
      */
     public function prepareOne()
     {
-        if ($this->mysqlMaxCount + $this->waitConnetNum >= $this->config->get('database.asyn_max_count', 10)) {
-            return;
-        }
         $this->reconnect();
     }
 
@@ -129,15 +176,16 @@ class MysqlAsynPool extends AsynPool
      */
     public function reconnect($client = null)
     {
-        $this->waitConnetNum++;
+        $this->waitConnectNum++;
         if ($client == null) {
             $client = new \swoole_mysql();
+            $client->genTime = time();
         }
-        $set = $this->config['database'][$this->active];
-        $client->connect($set, function ($client, $result) {
-            $this->waitConnetNum--;
+        $set = $this->config['mysql'][$this->active];
+        $client->connect($set, function ($client, $result) use ($set) {
+            $this->waitConnectNum--;
             if (!$result) {
-                throw new Exception($client->connect_error);
+                getInstance()->log->error($client->connect_error . ' with Mysql ' . $set['host'] . ':' . $set['port']);
             } else {
                 $client->isClose = false;
                 if (!isset($client->client_id)) {
@@ -152,9 +200,11 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 释放绑定
-     * @param $bindId
+     *
+     * @param Context $context
+     * @param int $bindId
      */
-    public function freeBind($bindId)
+    public function freeBind(Context $context, $bindId)
     {
         $client = $this->bindPool[$bindId]['client'];
         if ($client != null) {
@@ -165,6 +215,7 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 断开链接
+     *
      * @param $client
      */
     public function onClose($client)
@@ -177,16 +228,18 @@ class MysqlAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName . ":" . $this->active;
+        return self::ASYN_NAME . $this->active;
     }
 
     /**
      * 开启一个事务
+     *
+     * @param Context $context
      * @param $object
      * @param $callback
      * @return string
      */
-    public function begin($object, $callback)
+    public function begin(Context $context, $object, $callback)
     {
         $id = $this->bind($object);
         $this->query($callback, $id, 'begin');
@@ -195,10 +248,12 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 获取绑定值
+     *
+     * @param Context $context
      * @param $object
      * @return string
      */
-    public function bind($object)
+    public function bind(Context $context, $object)
     {
         if (!isset($object->UBID)) {
             $object->UBID = 0;
@@ -209,12 +264,14 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 执行一个sql语句
+     *
+     * @param Context $context
      * @param $callback
      * @param null $bindId
      * @param null $sql
      * @throws Exception
      */
-    public function query($callback, $bindId = null, $sql = null)
+    public function query(Context $context, $callback, $bindId = null, $sql = null)
     {
         if ($sql == null) {
             $sql = $this->dbQueryBuilder->getStatement(false);
@@ -236,53 +293,63 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 开启一个协程事务
+     *
+     * @param Context $context
      * @param $object
      * @return MySql
      */
-    public function coroutineBegin($object)
+    public function coroutineBegin(Context $context, $object)
     {
-        $id = $this->bind($object);
-        return $this->dbQueryBuilder->coroutineSend($id, 'begin');
+        $id = $this->bind($context, $object);
+        return $this->dbQueryBuilder->go($id, 'begin');
     }
 
     /**
      * 提交一个事务
+     *
+     * @param Context $context
      * @param $callback
      * @param $id
      */
-    public function commit($callback, $id)
+    public function commit(Context $context, $callback, $id)
     {
-        $this->query($callback, $id, 'commit');
+        $this->query($context, $callback, $id, 'commit');
     }
 
     /**
      * 协程Commit
+     *
+     * @param Context $context
      * @param $id
      * @return MySql
      */
-    public function coroutineCommit($id)
+    public function coroutineCommit(Context $context, $id)
     {
-        return $this->dbQueryBuilder->coroutineSend($id, 'commit');
+        return $this->dbQueryBuilder->go($id, 'commit');
     }
 
     /**
      * 回滚
+     *
+     * @param Context $context
      * @param $callback
      * @param $id
      */
-    public function rollback($callback, $id)
+    public function rollback(Context $context, $callback, $id)
     {
-        $this->query($callback, $id, 'rollback');
+        $this->query($context, $callback, $id, 'rollback');
     }
 
     /**
      * 协程Rollback
+     *
+     * @param Context $context
      * @param $id
      * @return MySql
      */
-    public function coroutineRollback($id)
+    public function coroutineRollback(Context $context, $id)
     {
-        return $this->dbQueryBuilder->coroutineSend($id, 'rollback');
+        return $this->dbQueryBuilder->go($id, 'rollback');
     }
 
     /**
@@ -294,7 +361,7 @@ class MysqlAsynPool extends AsynPool
         if (isset($this->mysqlClient)) {
             return $this->mysqlClient;
         }
-        $activeConfig = $this->config['database'][$this->active];
+        $activeConfig = $this->config['mysql'][$this->active];
         $this->mysqlClient = new Miner();
         $this->mysqlClient->pdoConnect($activeConfig);
         return $this->mysqlClient;

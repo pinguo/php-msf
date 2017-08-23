@@ -14,26 +14,48 @@ use PG\MSF\Coroutine\CTask;
 
 class TaskProxy extends Core
 {
-    protected $taskId;
+
     /**
-     * task代理数据
-     * @var mixed
+     * @var int 任务执行超时时间
+     */
+    protected $timeout = 0;
+
+    /**
+     * @var int 任务ID
+     */
+    protected $taskId;
+
+    /**
+     * @var mixed task执行数据
      */
     private $taskProxyData;
 
     /**
-     * TaskProxy constructor.
+     * @var string 执行的Task Name
      */
-    public function __construct()
+    public $taskName;
+
+    /**
+     * @var array Task构造参数
+     */
+    public $taskConstruct;
+
+    /**
+     * TaskProxy constructor.
+     * @param array ...$args
+     */
+    public function __construct(...$args)
     {
+        $this->taskConstruct = $args;
         parent::__construct();
     }
 
     /**
-     * 代理
-     * @param $name
-     * @param $arguments
-     * @return int
+     * __call魔术方法
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return CTask
      */
     public function __call($name, $arguments)
     {
@@ -48,45 +70,49 @@ class TaskProxy extends Core
         $this->taskProxyData = [
             'type'    => Marco::SERVER_TYPE_TASK,
             'message' => [
-                'task_name'     => $this->coreName,
-                'task_fuc_name' => $name,
-                'task_fuc_data' => $arguments,
-                'task_id'       => $this->taskId,
-                'task_context'  => $this->getContext(),
+                'task_name'      => $this->taskName,
+                'task_fuc_name'  => $name,
+                'task_fuc_data'  => $arguments,
+                'task_id'        => $this->taskId,
+                'task_context'   => $this->getContext(),
+                'task_construct' => $this->taskConstruct,
             ]
         ];
 
-        return $this->taskId;
+        return $this->getContext()->getObjectPool()->get(CTask::class, [$this->taskProxyData, -1, $this->timeout]);
     }
 
     /**
-     * 开始异步任务
+     * 设置任务执行超时时间
+     *
+     * @param int $timeout
+     * @return $this
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+        return $this;
+    }
+
+    /**
+     * 获取任务执行超时时间
+     *
+     * @param int $timeout
+     * @return int
+     */
+    public function getTimeout($timeout)
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * 异步任务
+     *
      * @param null $callback
      */
     public function startTask($callback = null)
     {
         getInstance()->server->task($this->taskProxyData, -1, $callback);
-    }
-
-    /**
-     * 异步的协程模式
-     *
-     * @param int $timeout 超时时间,单位毫秒
-     * @return CTask
-     */
-    public function coroutineSend($timeout = 0)
-    {
-        return $this->getContext()->getObjectPool()->get(CTask::class)->initialization($this->taskProxyData, -1, $timeout);
-    }
-
-    /**
-     * 开始同步任务
-     * @param float $timeOut
-     * @return mixed
-     */
-    public function startTaskWait($timeOut = 0.5)
-    {
-        return getInstance()->server->taskwait($this->taskProxyData, $timeOut, -1);
     }
 
     /**

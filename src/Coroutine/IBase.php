@@ -1,6 +1,6 @@
 <?php
 /**
- * 协程任务接口
+ * 协程接口
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.

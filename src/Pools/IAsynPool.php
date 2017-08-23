@@ -2,11 +2,11 @@
 /**
  * IAsynPool
  *
- * @author camera360_server@camera360.com
+ * @author tmtbe
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\DataBase;
+namespace PG\MSF\Pools;
 
 interface IAsynPool
 {
@@ -18,7 +18,7 @@ interface IAsynPool
 
     function serverInit($swooleServer, $asynManager);
 
-    function workerInit($workerid);
+    function workerInit($workerId);
 
     function pushToPool($client);
 
