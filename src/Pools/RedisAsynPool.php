@@ -17,7 +17,7 @@ class RedisAsynPool extends AsynPool
     /**
      * 连接池类型名称
      */
-    const AsynName = 'redis';
+    const ASYN_NAME = 'redis.';
 
     /**
      * @var array 连接配置信息
@@ -508,6 +508,6 @@ class RedisAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName . ":" . $this->active;
+        return self::ASYN_NAME . $this->active;
     }
 }
