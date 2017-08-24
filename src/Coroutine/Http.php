@@ -67,11 +67,11 @@ class Http extends Base
 
             $this->result       = (array)$client;
             // 发现拒绝建立连接，删除DNS缓存
-            if (is_array($client) && $client['errCode'] == 111) {
+            if (is_object($client) && $client->errCode == 111) {
                 Client::clearDnsCache($this->client->urlData['host']);
             }
 
-            if (is_array($client) && $client['errCode'] != 0) {
+            if (is_object($client) && $client->errCode != 0) {
                 $this->getContext()->getLog()->warning(dump($client, false, true));
             }
 
