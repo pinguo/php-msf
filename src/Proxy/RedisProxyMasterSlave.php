@@ -54,7 +54,7 @@ class RedisProxyMasterSlave implements IProxy
                 throw new Exception('No slave redis server in master-slave config!');
             }
         } catch (Exception $e) {
-            writeln('Redis Proxy', $e->getMessage());
+            writeln('Redis Proxy' . $e->getMessage());
         }
     }
 
@@ -176,36 +176,36 @@ class RedisProxyMasterSlave implements IProxy
             $newSlaves = $this->goodPools['slaves'];
 
             if (empty($newMaster)) {
-                writeln('Redis Proxy', 'No master redis server in master-slave config!');
+                writeln('Redis Proxy' . 'No master redis server in master-slave config!');
                 throw new Exception('No master redis server in master-slave config!');
             }
 
             if ($this->master !== $newMaster) {
                 $this->master = $newMaster;
-                writeln('Redis Proxy', 'master node change to ' . $newMaster);
+                writeln('Redis Proxy' . 'master node change to ' . $newMaster);
             }
 
             if (empty($newSlaves)) {
-                writeln('Redis Proxy', 'No slave redis server in master-slave config!');
+                writeln('Redis Proxy' . 'No slave redis server in master-slave config!');
                 throw new Exception('No slave redis server in master-slave config!');
             }
 
             $losts = array_diff($this->slaves, $newSlaves);
             if ($losts) {
                 $this->slaves = $newSlaves;
-                writeln('Redis Proxy', 'slave nodes change to ( ' . implode(',',
+                writeln('Redis Proxy'. 'slave nodes change to ( ' . implode(',',
                         $newSlaves) . ' ), lost ( ' . implode(',', $losts) . ' )');
             }
 
             $adds = array_diff($newSlaves, $this->slaves);
             if ($adds) {
                 $this->slaves = $newSlaves;
-                writeln('Redis Proxy', 'slave nodes change to ( ' . implode(',', $newSlaves) . ' ), add ( ' . implode(',', $adds) . ' )');
+                writeln('Redis Proxy' . 'slave nodes change to ( ' . implode(',', $newSlaves) . ' ), add ( ' . implode(',', $adds) . ' )');
             }
 
             return true;
         } catch (Exception $e) {
-            writeln('Redis Proxy', $e->getMessage());
+            writeln('Redis Proxy' . $e->getMessage());
             return false;
         }
     }

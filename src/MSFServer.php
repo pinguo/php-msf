@@ -230,6 +230,11 @@ abstract class MSFServer extends HttpServer
                     $taskId        = $message['task_id'];
                     $taskContext   = $message['task_context'];
                     $taskConstruct = $message['task_construct'];
+
+                    if (empty($taskName) || empty($taskFucName)) {
+                        return $result;
+                    }
+
                     $objectPool    = AOPFactory::getObjectPool($this->objectPool, $this);
                     /**
                      * @var Task $task
@@ -418,10 +423,10 @@ abstract class MSFServer extends HttpServer
                     function ($fd) {
                         $stat     = json_encode($this->statistics());
                         $response = 'HTTP/1.1 200 OK' . PHP_EOL .
-                                    'Date: ' . date('Y-m-d H:i:s') . PHP_EOL .
-                                    'Content-Type: application/json'. PHP_EOL .
-                                    'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL .
-                                    $stat;
+                            'Date: ' . date('Y-m-d H:i:s') . PHP_EOL .
+                            'Content-Type: application/json'. PHP_EOL .
+                            'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL .
+                            $stat;
                         swoole_event_write($fd, $response);
                         swoole_event_del($fd);
                     });

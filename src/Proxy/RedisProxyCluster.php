@@ -55,7 +55,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
                 }
             }
         } catch (Exception $e) {
-            writeln('Redis Proxy', $e->getMessage());
+            writeln('Redis Proxy' . $e->getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
                     getInstance()->getAsynPool($pool)->getSync()->connect($host, $port, 0.05);
                 }
             } catch (\Exception $e) {
-                writeln('Redis Proxy', $e->getMessage() . "\t {$pool}");
+                writeln('Redis Proxy' . $e->getMessage() . "\t {$pool}");
             }
         }
     }
@@ -338,7 +338,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
             foreach ($losts as $lost) {
                 $this->removeTarget($lost);
             }
-            writeln('Redis Proxy', ' Remove ( ' . implode(',', $losts) . ' ) from Cluster');
+            writeln('Redis Proxy Remove ( ' . implode(',', $losts) . ' ) from Cluster');
         }
 
         $adds = array_diff($newPools, $nowPools);
@@ -346,7 +346,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
             foreach ($adds as $add) {
                 $this->addTarget($add, $this->pools[$add]);
             }
-            writeln('Redis Proxy', 'Add ( ' . implode(',', $adds) . ' ) into Cluster');
+            writeln('Redis Proxy Add ( ' . implode(',', $adds) . ' ) into Cluster');
         }
     }
 }

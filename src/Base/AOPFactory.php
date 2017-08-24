@@ -155,7 +155,7 @@ class AOPFactory extends Factory
                     if (!empty(getInstance()->server)
                         && property_exists(getInstance()->server, 'taskworker')
                         && !getInstance()->server->taskworker) {
-                        array_unshift($arguments, '\PG\MSF\Tasks\TaskProxy');
+                        array_unshift($arguments, \PG\MSF\Tasks\TaskProxy::class);
                     }
                 }
             }
@@ -175,7 +175,7 @@ class AOPFactory extends Factory
                 $result->parent = getInstance()->objectPool->getCurrentObjParent();
                 $class = get_class($result);
                 // 支持TaskProxy
-                if ($class == '\PG\MSF\Tasks\TaskProxy') {
+                if ($class == \PG\MSF\Tasks\TaskProxy::class) {
                     array_shift($arguments);
                     $result->taskName = $arguments[0];
                 }
