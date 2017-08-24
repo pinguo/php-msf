@@ -416,7 +416,11 @@ abstract class MSFServer extends HttpServer
 
         // Worker进程监听管理端口
         if (!$this->isTaskWorker()) {
-            $listener = stream_socket_server("tcp://127.0.0.1:" . ($this->config['http_server']['port'] + $workerId + 1), $errno, $errstr);
+            $localSocket = "tcp://127.0.0.1:" . ($this->config['http_server']['port'] + $workerId + 1);
+            $listener    = stream_socket_server($localSocket, $errno, $errstr);
+            if ($listener) {
+                writeln('worker  monitor: ' . $localSocket);
+            }
             swoole_event_add($listener, function ($server) {
                 $client = stream_socket_accept($server, 0);
                 swoole_event_add($client,
