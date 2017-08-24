@@ -420,21 +420,23 @@ abstract class MSFServer extends HttpServer
             $listener    = stream_socket_server($localSocket, $errno, $errstr);
             if ($listener) {
                 writeln('worker  monitor: ' . $localSocket);
+                swoole_event_add($listener, function ($server) {
+                    $client = stream_socket_accept($server, 0);
+                    swoole_event_add($client,
+                        function ($fd) {
+                            $stat     = json_encode($this->statistics());
+                            $response = 'HTTP/1.1 200 OK' . PHP_EOL .
+                                'Date: ' . date('Y-m-d H:i:s') . PHP_EOL .
+                                'Content-Type: application/json'. PHP_EOL .
+                                'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL .
+                                $stat;
+                            swoole_event_write($fd, $response);
+                            swoole_event_del($fd);
+                        });
+                });
+            } else {
+                writeln('Worker  Monitor: Failed Listen' . $localSocket);
             }
-            swoole_event_add($listener, function ($server) {
-                $client = stream_socket_accept($server, 0);
-                swoole_event_add($client,
-                    function ($fd) {
-                        $stat     = json_encode($this->statistics());
-                        $response = 'HTTP/1.1 200 OK' . PHP_EOL .
-                            'Date: ' . date('Y-m-d H:i:s') . PHP_EOL .
-                            'Content-Type: application/json'. PHP_EOL .
-                            'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL .
-                            $stat;
-                        swoole_event_write($fd, $response);
-                        swoole_event_del($fd);
-                    });
-            });
         }
     }
 
