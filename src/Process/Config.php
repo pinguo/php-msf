@@ -39,7 +39,7 @@ class Config extends ProcessBase
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         parent::__construct($config, $MSFServer);
-        writeln('Config Manager Process: Enabled');
+        writeln('Config   Manager: Enabled');
         $this->lastMinute = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
         swoole_timer_tick(1000, [$this, 'stats']);
