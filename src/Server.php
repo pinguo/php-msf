@@ -696,15 +696,18 @@ abstract class Server extends Child
      */
     public function checkErrors()
     {
-        // exit统计
-        $key      = Marco::SERVER_STATS . '_' . $this->server->worker_pid . '_exit';
-        $exitStat = $this->sysCache->get($key);
-        $exitStat++;
-        $this->sysCache->set($key, $exitStat);
+        if (getInstance()->server) {
+            // exit统计
+            $key = Marco::SERVER_STATS . getInstance()->server->worker_id . '_exit';
+            $exitStat = $this->sysCache->get($key);
+            $exitStat++;
+            $this->sysCache->set($key, $exitStat);
+        }
 
         // 错误信息
         $logMsg  = "WORKER EXIT UNEXPECTED ";
         $error   = error_get_last();
+
         if (isset($error['type'])) {
             switch ($error['type']) {
                 case E_ERROR:
