@@ -177,7 +177,7 @@ class MSFCli extends MSFServer
         $this->initAsynPools();
         $this->initRedisProxies();
         //注册
-        $this->asynPoolManager = new AsynPoolManager($this->poolProcess, $this);
+        $this->asynPoolManager = new AsynPoolManager(null, $this);
         $this->asynPoolManager->noEventAdd();
         foreach ($this->asynPools as $pool) {
             if ($pool) {
