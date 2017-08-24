@@ -175,7 +175,7 @@ class AOPFactory extends Factory
                 $result->parent = getInstance()->objectPool->getCurrentObjParent();
                 $class = get_class($result);
                 // 支持TaskProxy
-                if ($result instanceof \PG\MSF\Tasks\TaskProxy) {
+                if ($class == '\PG\MSF\Tasks\TaskProxy') {
                     array_shift($arguments);
                     $result->taskName = $arguments[0];
                 }
