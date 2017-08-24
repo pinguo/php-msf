@@ -502,7 +502,7 @@ abstract class MSFServer extends HttpServer
         }
 
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
-        $key  = Marco::SERVER_STATS . '_' . $this->server->worker_pid . '_exit';
+        $key  = Marco::SERVER_STATS . getInstance()->server->worker_id . '_exit';
         $data['exit'] = $this->sysCache->get($key);
 
         return $data;
