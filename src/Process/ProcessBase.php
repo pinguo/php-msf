@@ -9,6 +9,7 @@
 namespace PG\MSF\Process;
 
 use Noodlehaus\Config as Conf;
+use PG\MSF\Marco;
 use PG\MSF\MSFServer;
 
 abstract class ProcessBase
@@ -31,7 +32,8 @@ abstract class ProcessBase
      */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
-        $this->config    = $config;
-        $this->MSFServer = $MSFServer;
+        $this->config                 = $config;
+        $this->MSFServer              = $MSFServer;
+        $this->MSFServer->processType = Marco::PROCESS_USER;
     }
 }

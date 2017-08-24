@@ -34,9 +34,9 @@ abstract class MSFServer extends HttpServer
     public $objectPoolBuckets = [];
 
     /**
-     * @var \swoole_process 连接池进程
+     * @var int 进程类型，worker,tasker,user
      */
-    protected $poolProcess;
+    public $processType = Marco::PROCESS_USER;
 
     /**
      * @var array Redis代理管理器
@@ -389,20 +389,14 @@ abstract class MSFServer extends HttpServer
         $this->initRedisProxies();
         if (!$serv->taskworker) {
             //注册
-            $this->asynPoolManager = new AsynPoolManager($this->poolProcess, $this);
-            if (!$this->config['asyn_process_enable']) {
-                $this->asynPoolManager->noEventAdd();
-            }
+            $this->asynPoolManager = new AsynPoolManager(null, $this);
+            $this->asynPoolManager->noEventAdd();
             foreach ($this->asynPools as $pool) {
                 if ($pool) {
                     $pool->workerInit($workerId);
                     $this->asynPoolManager->registerAsyn($pool);
                 }
             }
-        } else {
-            //注册中断信号
-            pcntl_signal(SIGUSR1, function () {
-            });
         }
 
         if (!empty($this->redisProxyManager)) {
@@ -416,6 +410,7 @@ abstract class MSFServer extends HttpServer
 
         // Worker进程监听管理端口
         if (!$this->isTaskWorker()) {
+            $this->processType = Marco::PROCESS_WORKER;
             $localSocket = "tcp://127.0.0.1:" . ($this->config['http_server']['port'] + $workerId + 1);
             $listener    = stream_socket_server($localSocket, $errno, $errstr);
             if ($listener) {
@@ -437,6 +432,8 @@ abstract class MSFServer extends HttpServer
             } else {
                 writeln('Worker  Monitor: Failed Listen' . $localSocket);
             }
+        } else {
+            $this->processType = Marco::PROCESS_TASKER;
         }
     }
 

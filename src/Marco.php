@@ -78,4 +78,19 @@ class Marco
      * 销毁STATIC成员变量资源
      */
     const DS_STATIC = 0b1000;
+
+    /**
+     * 进程为worker
+     */
+    const PROCESS_WORKER = 1;
+
+    /**
+     * 进程为tasker
+     */
+    const PROCESS_TASKER = 2;
+
+    /**
+     * 进程为user
+     */
+    const PROCESS_USER = 3;
 }
