@@ -1,8 +1,8 @@
 <?php
 /**
- * Redis Proxy工厂类
- *
- * @author camera360_server@camera360.com
+ * @desc:
+ * @author: leandre <niulingyun@camera360.com>
+ * @date: 2017/4/12
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -12,16 +12,12 @@ use PG\MSF\Marco;
 
 class RedisProxyFactory
 {
-    /**
-     * @var array Redis协程
-     */
     public static $redisCoroutines = [];
 
     /**
      * 生成proxy对象
-     *
-     * @param string $name
-     * @param array $config
+     * @param $name
+     * @param $config
      * @return bool|RedisProxyCluster|RedisProxyMasterSlave
      */
     public static function makeProxy(string $name, array $config)
@@ -34,15 +30,5 @@ class RedisProxyFactory
         } else {
             return false;
         }
-    }
-
-    /**
-     * 返回日志前缀
-     *
-     * @return string
-     */
-    public static function getLogTitle()
-    {
-        return "\n" . 'Redis Proxy [ ' . date('Y-m-d H:i:s') . ' ] : ';
     }
 }

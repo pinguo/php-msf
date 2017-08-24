@@ -44,7 +44,7 @@ abstract class HttpServer extends Server
         parent::__construct();
         $view_dir = APP_DIR . '/Views';
         if (!is_dir($view_dir)) {
-            echo "App directory does not exist Views directory, please create.\n";
+            writeln('App', 'App directory does not exist Views directory, please create.');
             exit();
         }
     }
