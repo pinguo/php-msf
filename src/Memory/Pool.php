@@ -9,6 +9,7 @@
 namespace PG\MSF\Memory;
 
 use Exception;
+use PG\AOP\Wrapper;
 
 class Pool
 {
@@ -16,6 +17,11 @@ class Pool
      * @var Pool 对象池实现
      */
     private static $instance;
+
+    /**
+     * @var Wrapper AOP包装器
+     */
+    public $__wrapper;
 
     /**
      * @var array 所有内存中的对象，根据类名区分
@@ -52,12 +58,12 @@ class Pool
      * 设置当前待创建对象的源对象
      *
      * @param $obj
-     * @return $this
+     * @return Pool|Wrapper
      */
     public function setCurrentObjParent($obj)
     {
         $this->__currentObjParent = $obj;
-        return $this;
+        return $this->__wrapper;
     }
 
     /**
