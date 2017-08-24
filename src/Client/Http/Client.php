@@ -397,7 +397,7 @@ class Client extends Core
             /**
              * @var Client[] $go
              */
-            $go[$key]  = $this->context->getObjectPool()->get(self::class);
+            $go[$key]  = $this->getObject(self::class);
             /**
              * @var Dns[] $dns
              */
