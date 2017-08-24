@@ -1,24 +1,46 @@
 <?php
 /**
- * @desc:
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/4/12
+ * 主从结构Redis代理
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
 namespace PG\MSF\Proxy;
 
 use Exception;
-use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Pools\RedisAsynPool;
 
 class RedisProxyMasterSlave implements IProxy
 {
+    /**
+     * @var string 代理标识，它代表一个Redis集群
+     */
     private $name;
+
+    /**
+     * @var array 连接池列表，数字索引的连接池名称列表
+     */
     private $pools;
+
+    /**
+     * @var string Redis集群中主节点的连接池名称
+     */
     private $master;
+
+    /**
+     * @var array Redis集群中从节点的连接池名称列表
+     */
     private $slaves;
+
+    /**
+     * @var array 通过探活检测的连接池列表
+     */
     private $goodPools;
 
+    /**
+     * @var array 读的Redis指令列表
+     */
     private static $readOperation = [
         // Strings
         'GET', 'MGET', 'BITCOUNT', 'STRLEN', 'GETBIT', 'GETRANGE',
@@ -37,6 +59,7 @@ class RedisProxyMasterSlave implements IProxy
 
     /**
      * RedisProxyMasterSlave constructor.
+     *
      * @param string $name
      * @param array $config
      */
@@ -59,7 +82,8 @@ class RedisProxyMasterSlave implements IProxy
     }
 
     /**
-     * 前置检测
+     * 启动时检测Redis集群状态
+     *
      * @return bool
      */
     public function startCheck()
@@ -117,7 +141,8 @@ class RedisProxyMasterSlave implements IProxy
     }
 
     /**
-     * 处理入口
+     * 发送异步Redis请求
+     *
      * @param string $method
      * @param array $arguments
      * @return mixed
@@ -127,7 +152,7 @@ class RedisProxyMasterSlave implements IProxy
         $upMethod = strtoupper($method);
         //读
         if (in_array($upMethod, self::$readOperation) && !empty($this->slaves)) {
-            $rand = array_rand($this->slaves);
+            $rand          = array_rand($this->slaves);
             $redisPoolName = $this->slaves[$rand];
         } else {
             //写
@@ -137,7 +162,7 @@ class RedisProxyMasterSlave implements IProxy
         // EVALMOCK在指定了脚本仅读操作时，可以在从节点上执行
         if ($upMethod == 'EVALMOCK' && isset($arguments[4])) {
             if ($arguments[4]) {
-                $rand = array_rand($this->slaves);
+                $rand          = array_rand($this->slaves);
                 $redisPoolName = $this->slaves[$rand];
             }
 
@@ -160,7 +185,8 @@ class RedisProxyMasterSlave implements IProxy
     }
 
     /**
-     * 检测 用于定时检测
+     * 定时检测
+     *
      * @return bool
      */
     public function check()
@@ -176,36 +202,37 @@ class RedisProxyMasterSlave implements IProxy
             $newSlaves = $this->goodPools['slaves'];
 
             if (empty($newMaster)) {
-                writeln('Redis Proxy' . 'No master redis server in master-slave config!');
+                writeln('Redis Proxy No master redis server in master-slave config!');
                 throw new Exception('No master redis server in master-slave config!');
             }
 
             if ($this->master !== $newMaster) {
                 $this->master = $newMaster;
-                writeln('Redis Proxy' . 'master node change to ' . $newMaster);
+                writeln('Redis Proxy master node change to ' . $newMaster);
             }
 
             if (empty($newSlaves)) {
-                writeln('Redis Proxy' . 'No slave redis server in master-slave config!');
+                writeln('Redis Proxy No slave redis server in master-slave config!');
                 throw new Exception('No slave redis server in master-slave config!');
             }
 
-            $losts = array_diff($this->slaves, $newSlaves);
-            if ($losts) {
+            $loses = array_diff($this->slaves, $newSlaves);
+            if ($loses) {
                 $this->slaves = $newSlaves;
-                writeln('Redis Proxy'. 'slave nodes change to ( ' . implode(',',
-                        $newSlaves) . ' ), lost ( ' . implode(',', $losts) . ' )');
+                writeln('Redis Proxy slave nodes change to ( ' . implode(',',
+                        $newSlaves) . ' ), lost ( ' . implode(',', $loses) . ' )');
             }
 
             $adds = array_diff($newSlaves, $this->slaves);
             if ($adds) {
                 $this->slaves = $newSlaves;
-                writeln('Redis Proxy' . 'slave nodes change to ( ' . implode(',', $newSlaves) . ' ), add ( ' . implode(',', $adds) . ' )');
+                writeln('Redis Proxy slave nodes change to ( ' . implode(',',
+                        $newSlaves) . ' ), add ( ' . implode(',', $adds) . ' )');
             }
 
             return true;
         } catch (Exception $e) {
-            writeln('Redis Proxy' . $e->getMessage());
+            writeln('Redis Proxy ' . $e->getMessage());
             return false;
         }
     }

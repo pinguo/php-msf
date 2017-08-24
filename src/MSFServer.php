@@ -407,30 +407,12 @@ abstract class MSFServer extends HttpServer
             });
         }
 
-        // Worker进程监听管理端口
+        // Worker类型
         if (!$this->isTaskWorker()) {
             $this->processType = Marco::PROCESS_WORKER;
-            $localSocket = "tcp://127.0.0.1:" . (10000 + $this->config['http_server']['port'] + $workerId + 1);
-            $listener    = stream_socket_server($localSocket, $errno, $errstr);
-            if ($listener) {
-                writeln('worker  monitor: ' . $localSocket);
-                swoole_event_add($listener, function ($server) {
-                    $client = stream_socket_accept($server, 0);
-                    swoole_event_add($client,
-                        function ($fd) {
-                            $stat     = json_encode($this->statistics());
-                            $response = 'HTTP/1.1 200 OK' . "\r\n" .
-                                        'Date: ' . date('Y-m-d H:i:s') . "\r\n" .
-                                        'Content-Type: application/json'. "\r\n" .
-                                        'Content-Length: ' . strlen($stat) . "\r\n" . "\r\n" .
-                                        $stat;
-                            swoole_event_write($fd, $response);
-                            swoole_event_del($fd);
-                        });
-                });
-            } else {
-                writeln('Worker  Monitor: Failed Listen ' . $localSocket);
-            }
+            getInstance()->sysTimers[] = swoole_timer_tick(2000, function ($timerId) {
+                $this->statistics();
+            });
         } else {
             $this->processType = Marco::PROCESS_TASKER;
         }
@@ -502,6 +484,7 @@ abstract class MSFServer extends HttpServer
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
         $key  = Marco::SERVER_STATS . getInstance()->server->worker_id . '_exit';
         $data['exit'] = (int)$this->sysCache->get($key);
+        $this->sysCache->set(Marco::SERVER_STATS . $this->server->worker_id, $data);
 
         return $data;
     }

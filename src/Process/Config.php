@@ -51,6 +51,27 @@ class Config extends ProcessBase
     public function stats()
     {
         $data = [
+            'worker' => [
+                // worker进程ID
+                // 'pid' => 0,
+                // 协程统计信息
+                // 'coroutine' => [
+                // 当前正在处理的请求数
+                // 'total' => 0,
+                //],
+                // 内存使用
+                // 'memory' => [
+                // 峰值
+                // 'peak'  => '',
+                // 当前使用
+                // 'usage' => '',
+                //],
+                // 请求信息
+                //'request' => [
+                // 当前Worker进程收到的请求次数
+                //'worker_request_count' => 0,
+                //],
+            ],
             'tcp' => [
                 // 服务器启动的时间
                 'start_time' => '',
@@ -70,6 +91,16 @@ class Config extends ProcessBase
                 'task_queue_bytes' => 0,
             ],
         ];
+
+        $workerIds = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
+        foreach ($workerIds as $workerId) {
+            $workerInfo = @$this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
+            if ($workerInfo) {
+                $data['worker']['worker' . $workerId] = $workerInfo;
+            } else {
+                $data['worker']['worker' . $workerId] = [];
+            }
+        }
 
         $lastStats = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
         $data['tcp'] = $this->MSFServer->server->stats();
