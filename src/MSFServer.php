@@ -464,6 +464,8 @@ abstract class MSFServer extends HttpServer
             'dns_cache_http' => [
                 // domain => [ip, time(), times]
             ],
+            // exit
+            'exit' => 0,
         ];
         $routineList = $this->scheduler->taskMap;
         $data['pid'] = $this->server->worker_pid;
@@ -491,6 +493,9 @@ abstract class MSFServer extends HttpServer
         }
 
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
+        $key  = Marco::SERVER_STATS . '_' . $this->server->worker_pid . '_exit';
+        $data['exit'] = $this->sysCache->get($key);
+
         return $data;
     }
 

@@ -41,7 +41,7 @@ class Inotify extends ProcessBase
             $notice .= "Enabled";
         }
 
-        writeln('App', $notice);
+        writeln($notice);
     }
 
     /**
@@ -69,7 +69,7 @@ class Inotify extends ProcessBase
             if ($events) {
                 foreach ($events as $ev) {
                     $file = $monitorFiles[$ev['wd']];
-                    writeln('App', 'RELOAD ' . $file . ' update');
+                    writeln('RELOAD ' . $file . ' update');
                     unset($monitorFiles[$ev['wd']]);
 
                     $wd = inotify_add_watch($inotifyFd, $file, IN_MODIFY);

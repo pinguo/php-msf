@@ -51,7 +51,7 @@ class MSFCli extends MSFServer
             $methodName          = $this->route->getMethodName();
             if ($controllerClassName == '') {
                 clearTimes();
-                writeln('App', "not found controller {$controllerName}");
+                writeln("not found controller {$controllerName}");
                 break;
             }
 
@@ -66,7 +66,7 @@ class MSFCli extends MSFServer
             // 初始化控制器
             $controllerInstance->requestStartTime = microtime(true);
             if (!method_exists($controllerInstance, $methodName)) {
-                writeln('App', "not found method {$controllerName->$methodName}");
+                writeln("not found method {$controllerName->$methodName}");
                 $controllerInstance->destroy();
                 break;
             }
@@ -98,20 +98,21 @@ class MSFCli extends MSFServer
             $controllerInstance->context->setActionName($methodName);
             $init = $controllerInstance->__construct($controllerName, $methodName);
             if ($init instanceof \Generator) {
-                $this->scheduler->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
-                    $params = array_values($this->route->getParams());
-                    if (empty($this->route->getParams())) {
-                        $params = [];
-                    }
+                $this->scheduler->start($init, $controllerInstance->context, $controllerInstance,
+                    function () use ($controllerInstance, $methodName) {
+                        $params = array_values($this->route->getParams());
+                        if (empty($this->route->getParams())) {
+                            $params = [];
+                        }
 
-                    $generator = $controllerInstance->$methodName(...$params);
-                    if ($generator instanceof \Generator) {
-                        $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
-                        $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
-                    } else {
-                        $controllerInstance->destroy();
-                    }
-                });
+                        $generator = $controllerInstance->$methodName(...$params);
+                        if ($generator instanceof \Generator) {
+                            $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
+                            $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
+                        } else {
+                            $controllerInstance->destroy();
+                        }
+                    });
             } else {
                 $params = array_values($this->route->getParams());
                 if (empty($this->route->getParams())) {

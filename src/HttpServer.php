@@ -44,7 +44,7 @@ abstract class HttpServer extends Server
         parent::__construct();
         $view_dir = APP_DIR . '/Views';
         if (!is_dir($view_dir)) {
-            writeln('App', 'App directory does not exist Views directory, please create.');
+            writeln('App directory does not exist Views directory, please create.');
             exit();
         }
     }
@@ -219,12 +219,16 @@ abstract class HttpServer extends Server
                             if ($generator instanceof \Generator) {
                                 $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
                                 $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
+                            } else {
+                                $controllerInstance->destroy();
                             }
                         });
                 } else {
                     $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
                     if ($generator instanceof \Generator) {
                         $this->scheduler->start($generator, $controllerInstance->context, $controllerInstance);
+                    } else {
+                        $controllerInstance->destroy();
                     }
                 }
 
@@ -236,7 +240,7 @@ abstract class HttpServer extends Server
                 }
                 break;
             } catch (\Throwable $e) {
-                writeln('App', dump($e, true, true));
+                writeln(dump($e, true, true));
                 $controllerInstance->onExceptionHandle($e);
             }
         } while (0);

@@ -343,11 +343,11 @@ abstract class Server extends Child
         // Master is still alive?
         if ($masterIsAlive) {
             if ($command === 'start' || $command === 'test') {
-                writeln('App', "{$startFile} already running");
+                writeln("{$startFile} already running");
                 exit;
             }
         } elseif ($command !== 'start' && $command !== 'test') {
-            writeln('App', "{$startFile} not run");
+            writeln("{$startFile} not run");
             exit;
         }
 
@@ -360,7 +360,7 @@ abstract class Server extends Child
                 break;
             case 'stop':
                 @unlink(self::$pidFile);
-                writeln('App', "$startFile is stoping ...");
+                writeln("$startFile is stoping ...");
                 // Send stop signal to master process.
                 $masterPid && posix_kill($masterPid, SIGTERM);
                 // Timeout.
@@ -372,7 +372,7 @@ abstract class Server extends Child
                     if ($masterIsAlive) {
                         // Timeout?
                         if (time() - $startTime >= $timeout) {
-                            writeln('App', "{$startFile} stop fail");
+                            writeln("{$startFile} stop fail");
                             exit;
                         }
                         // Waiting amoment.
@@ -380,18 +380,18 @@ abstract class Server extends Child
                         continue;
                     }
                     // Stop success.
-                    writeln('App', "{$startFile} stop success");
+                    writeln("{$startFile} stop success");
                     break;
                 }
                 exit(0);
                 break;
             case 'reload':
                 posix_kill($managerPid, SIGUSR1);
-                writeln('App', "{$startFile} reload");
+                writeln("{$startFile} reload");
                 exit;
             case 'restart':
                 @unlink(self::$pidFile);
-                writeln('App', "{$startFile} is stoping ...");
+                writeln("{$startFile} is stoping ...");
                 // Send stop signal to master process.
                 $masterPid && posix_kill($masterPid, SIGTERM);
                 // Timeout.
@@ -403,7 +403,7 @@ abstract class Server extends Child
                     if ($masterIsAlive) {
                         // Timeout?
                         if (time() - $startTime >= $timeout) {
-                            writeln('App', "{$startFile} stop fail");
+                            writeln("{$startFile} stop fail");
                             exit;
                         }
                         // Waiting amoment.
@@ -411,7 +411,7 @@ abstract class Server extends Child
                         continue;
                     }
                     // Stop success.
-                    writeln('App', "{$startFile} stop success");
+                    writeln("{$startFile} stop success");
                     break;
                 }
                 self::$daemonize = true;
@@ -440,7 +440,7 @@ abstract class Server extends Child
             self::$_worker->user = self::getCurrentUser();
         } else {
             if (posix_getuid() !== 0 && self::$_worker->user != self::getCurrentUser()) {
-                writeln('App', 'You must have the root privileges to change uid and gid.');
+                writeln('You must have the root privileges to change uid and gid.');
             }
         }
     }
@@ -466,17 +466,14 @@ abstract class Server extends Child
         $setConfig = self::$_worker->setServerSet();
         $ascii     = file_get_contents(__DIR__ . '/../ascii.ui');
         echo $ascii, "\n";
-        echo 'MSF     Version: ', self::version, "\n";
-        echo 'Swoole  Version: ', SWOOLE_VERSION, "\n";
-        echo 'PHP     Version: ', PHP_VERSION, "\n";
-        echo 'Application ENV: ', APPLICATION_ENV, "\n";
-        echo 'Worker   Number: ', $setConfig['worker_num'], "\n";
-        echo 'Task     Number: ', $setConfig['task_worker_num'] ?? 0, "\n";
-        echo "Listen     Addr: ", self::$_worker->config->get('http_server.socket'), "\n";
-        echo "Listen     Port: ", self::$_worker->config->get('http_server.port'), "\n";
-        if (self::$daemonize) {
-            echo "Press Ctrl-C to quit. Start Success.\n";
-        }
+        writeln('MSF     Version: ' . self::version);
+        writeln('Swoole  Version: ' . SWOOLE_VERSION);
+        writeln('PHP     Version: ' . PHP_VERSION);
+        writeln('Application ENV: ' . APPLICATION_ENV);
+        writeln('Worker   Number: ' . $setConfig['worker_num']);
+        writeln('Task     Number: ' . $setConfig['task_worker_num'] ?? 0);
+        writeln("Listen     Addr: " . self::$_worker->config->get('http_server.socket'));
+        writeln("Listen     Port: " . self::$_worker->config->get('http_server.port'));
     }
 
     /**
@@ -494,17 +491,6 @@ abstract class Server extends Child
     protected static function startSwooles()
     {
         self::$_worker->start();
-    }
-
-    /**
-     * 启动服务
-     */
-    public function start()
-    {
-        if (static::mode == 'console') {
-            $this->beforeSwooleStart();
-            $this->onWorkerStart(null, null);
-        }
     }
 
     /**
@@ -710,8 +696,15 @@ abstract class Server extends Child
      */
     public function checkErrors()
     {
-        $log = "WORKER EXIT UNEXPECTED ";
-        $error = error_get_last();
+        // exit统计
+        $key      = Marco::SERVER_STATS . '_' . $this->server->worker_pid . '_exit';
+        $exitStat = $this->sysCache->get($key);
+        $exitStat++;
+        $this->sysCache->set($key, $exitStat);
+
+        // 错误信息
+        $logMsg  = "WORKER EXIT UNEXPECTED ";
+        $error   = error_get_last();
         if (isset($error['type'])) {
             switch ($error['type']) {
                 case E_ERROR:
@@ -721,7 +714,7 @@ abstract class Server extends Child
                     $message = $error['message'];
                     $file = $error['file'];
                     $line = $error['line'];
-                    $log .= "$message ($file:$line)\nStack trace:\n";
+                    $logMsg .= "$message ($file:$line)\nStack trace:\n";
                     $trace = debug_backtrace();
                     foreach ($trace as $i => $t) {
                         if (!isset($t['file'])) {
@@ -733,18 +726,18 @@ abstract class Server extends Child
                         if (!isset($t['function'])) {
                             $t['function'] = 'unknown';
                         }
-                        $log .= "#$i {$t['file']}({$t['line']}): ";
+                        $logMsg .= "#$i {$t['file']}({$t['line']}): ";
                         if (isset($t['object']) and is_object($t['object'])) {
-                            $log .= get_class($t['object']) . '->';
+                            $logMsg .= get_class($t['object']) . '->';
                         }
-                        $log .= "{$t['function']}()\n";
+                        $logMsg .= "{$t['function']}()\n";
                     }
                     if (isset($_SERVER['REQUEST_URI'])) {
-                        $log .= '[QUERY] ' . $_SERVER['REQUEST_URI'];
+                        $logMsg .= '[QUERY] ' . $_SERVER['REQUEST_URI'];
                     }
-                    $this->log->alert($log);
+                    $this->log->alert($logMsg);
                     if ($this->onErrorHandle != null) {
-                        $this->onErrorHandle('服务器发生崩溃事件', $log);
+                        $this->onErrorHandle('服务器发生崩溃', $logMsg);
                     }
                     break;
                 default:

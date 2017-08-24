@@ -25,7 +25,7 @@ class Timer extends ProcessBase
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         parent::__construct($config, $MSFServer);
-        writeln('App', 'User Timer Process: Enabled');
+        writeln('User Timer Process: Enabled');
         $MSFServer->onInitTimer();
     }
 }
