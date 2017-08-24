@@ -32,7 +32,7 @@ class Inotify extends ProcessBase
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         parent::__construct($config, $MSFServer);
-        $notice = 'Inotify Auto Reload Process: ';
+        $notice = 'Inotify  Reload: ';
         $this->monitorDir = realpath(ROOT_PATH . '/');
         if (!extension_loaded('inotify')) {
             $notice .= "Failed(未安装inotify扩展)";
