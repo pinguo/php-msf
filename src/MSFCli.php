@@ -10,7 +10,7 @@ namespace PG\MSF;
 
 use Exception;
 use PG\MSF\Pools\AsynPoolManager;
-use PG\MSF\Coroutine\Scheduler as Coroutine;
+use PG\MSF\Coroutine\Scheduler;
 use PG\MSF\Console\Request;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Base\Input;
@@ -30,7 +30,7 @@ class MSFCli extends MSFServer
     public function __construct()
     {
         parent::__construct();
-        $this->coroutine = new Coroutine();
+        $this->scheduler = new Scheduler();
     }
 
     /**
@@ -98,7 +98,7 @@ class MSFCli extends MSFServer
             $controllerInstance->context->setActionName($methodName);
             $init = $controllerInstance->__construct($controllerName, $methodName);
             if ($init instanceof \Generator) {
-                $this->coroutine->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
+                $this->scheduler->start($init, $controllerInstance->context, $controllerInstance, function () use ($controllerInstance, $methodName) {
                     $params = array_values($this->route->getParams());
                     if (empty($this->route->getParams())) {
                         $params = [];
@@ -106,8 +106,8 @@ class MSFCli extends MSFServer
 
                     $generator = $controllerInstance->$methodName(...$params);
                     if ($generator instanceof \Generator) {
-                        $this->coroutine->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
-                        $this->coroutine->schedule($this->coroutine->taskMap[$controllerInstance->context->getLogId()]);
+                        $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
+                        $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
                     } else {
                         $controllerInstance->destroy();
                     }
@@ -120,7 +120,7 @@ class MSFCli extends MSFServer
 
                 $generator = $controllerInstance->$methodName(...$params);
                 if ($generator instanceof \Generator) {
-                    $this->coroutine->start($generator, $controllerInstance->context, $controllerInstance);
+                    $this->scheduler->start($generator, $controllerInstance->context, $controllerInstance);
                 } else {
                     $controllerInstance->destroy();
                 }
