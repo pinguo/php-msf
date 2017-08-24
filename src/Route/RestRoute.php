@@ -6,13 +6,9 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Rest;
+namespace PG\MSF\Route;
 
-/**
- * Class Route
- * @package PG\MSF\Route
- */
-class Route extends \PG\MSF\Route\NormalRoute
+class RestRoute extends NormalRoute
 {
     /**
      * @var array 支持HTTP动作
@@ -71,11 +67,11 @@ class Route extends \PG\MSF\Route\NormalRoute
      */
     public function handleClientRequest($request)
     {
-        $this->clientData->path = rtrim($request->server['path_info'], '/');
-        $this->clientData->verb = $this->parseVerb($request);
+        $this->routePrams->path = rtrim($request->server['path_info'], '/');
+        $this->routePrams->verb = $this->parseVerb($request);
         $data = $this->parseRule();
         // 如果未从rest配置中解析到，则按普通模式解析
-        $path = $data[0] ?? $this->clientData->path;
+        $path = $data[0] ?? $this->routePrams->path;
         $this->parsePath($path);
         // 将 path 中含有的参数放入 get 中
         if (!empty($data[1])) {
@@ -95,9 +91,9 @@ class Route extends \PG\MSF\Route\NormalRoute
         if (empty($this->restRules)) {
             return [];
         }
-        $pathInfo = $this->trimSlashes($this->clientData->path);
+        $pathInfo = $this->trimSlashes($this->routePrams->path);
         foreach ($this->restRules as $rule) {
-            if (!in_array($this->clientData->verb, $rule[0])) {
+            if (!in_array($this->routePrams->verb, $rule[0])) {
                 continue;
             }
             if (!preg_match($rule[1][0], $pathInfo, $matches)) {
