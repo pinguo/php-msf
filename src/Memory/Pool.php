@@ -29,11 +29,6 @@ class Pool
     public $map;
 
     /**
-     * @var mixed 当前待创建对象的源对象
-     */
-    public $__currentObjParent;
-
-    /**
      * Pool constructor.
      */
     private function __construct()
@@ -52,28 +47,6 @@ class Pool
             self::$instance = new Pool();
         }
         return self::$instance;
-    }
-
-    /**
-     * 设置当前待创建对象的源对象
-     *
-     * @param $obj
-     * @return Pool|Wrapper
-     */
-    public function setCurrentObjParent($obj)
-    {
-        $this->__currentObjParent = $obj;
-        return $this->__wrapper;
-    }
-
-    /**
-     * 获取当前待创建对象的源对象
-     *
-     * @return mixed
-     */
-    public function getCurrentObjParent()
-    {
-        return $this->__currentObjParent;
     }
 
     /**

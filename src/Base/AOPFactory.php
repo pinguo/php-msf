@@ -170,7 +170,7 @@ class AOPFactory extends Factory
                 $result->__useCount++;
                 $coreBase->objectPoolBuckets[] = $result;
                 $result->context = &$coreBase->context;
-                $result->parent = getInstance()->objectPool->getCurrentObjParent();
+                $result->parent  = null;//暂时无方案
                 $class = get_class($result);
                 // 支持TaskProxy
                 if ($class == \PG\MSF\Tasks\TaskProxy::class) {

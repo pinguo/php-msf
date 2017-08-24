@@ -256,7 +256,6 @@ abstract class MSFServer extends HttpServer
                         $this->objectPoolBuckets[$k] = null;
                         unset($this->objectPoolBuckets[$k]);
                     }
-                    $objectPool->setCurrentObjParent(null);
                 } catch (\Throwable $e) {
                     if (empty($task) || !($task instanceof Task) || empty($task->getContext())) {
                         getInstance()->log->error(dump($e, false, true));

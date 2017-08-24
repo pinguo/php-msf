@@ -109,11 +109,8 @@ class Scheduler
                     break;
                 }
 
-                // 命令行下退出进程
-                if (getInstance()::mode == 'console') {
-                    $task->getController()->destroy();
-                    break;
-                }
+                // 请求释放
+                $task->getController()->destroy();
             } while (0);
         } catch (\Throwable $e) {
             $task->setException($e);

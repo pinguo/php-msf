@@ -148,7 +148,6 @@ class Controller extends Core
                 $this->objectPoolBuckets[$k] = null;
                 unset($this->objectPoolBuckets[$k]);
             }
-            $this->objectPool->setCurrentObjParent(null);
             $this->resetProperties();
             $this->__isContruct = false;
             getInstance()->objectPool->push($this);
