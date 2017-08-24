@@ -411,7 +411,7 @@ abstract class MSFServer extends HttpServer
         // Worker进程监听管理端口
         if (!$this->isTaskWorker()) {
             $this->processType = Marco::PROCESS_WORKER;
-            $localSocket = "tcp://127.0.0.1:" . ($this->config['http_server']['port'] + $workerId + 1);
+            $localSocket = "tcp://127.0.0.1:" . (10000 + $this->config['http_server']['port'] + $workerId + 1);
             $listener    = stream_socket_server($localSocket, $errno, $errstr);
             if ($listener) {
                 writeln('worker  monitor: ' . $localSocket);
@@ -420,17 +420,17 @@ abstract class MSFServer extends HttpServer
                     swoole_event_add($client,
                         function ($fd) {
                             $stat     = json_encode($this->statistics());
-                            $response = 'HTTP/1.1 200 OK' . PHP_EOL .
-                                'Date: ' . date('Y-m-d H:i:s') . PHP_EOL .
-                                'Content-Type: application/json'. PHP_EOL .
-                                'Content-Length: ' . strlen($stat) . PHP_EOL . PHP_EOL .
-                                $stat;
+                            $response = 'HTTP/1.1 200 OK' . "\r\n" .
+                                        'Date: ' . date('Y-m-d H:i:s') . "\r\n" .
+                                        'Content-Type: application/json'. "\r\n" .
+                                        'Content-Length: ' . strlen($stat) . "\r\n" . "\r\n" .
+                                        $stat;
                             swoole_event_write($fd, $response);
                             swoole_event_del($fd);
                         });
                 });
             } else {
-                writeln('Worker  Monitor: Failed Listen' . $localSocket);
+                writeln('Worker  Monitor: Failed Listen ' . $localSocket);
             }
         } else {
             $this->processType = Marco::PROCESS_TASKER;
