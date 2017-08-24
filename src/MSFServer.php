@@ -465,7 +465,7 @@ abstract class MSFServer extends HttpServer
                 // domain => [ip, time(), times]
             ],
         ];
-        $routineList = $this->coroutine->taskMap;
+        $routineList = $this->scheduler->taskMap;
         $data['pid'] = $this->server->worker_pid;
         $data['coroutine']['total']   = count($routineList);
         $data['memory']['peak_byte']  = memory_get_peak_usage();
@@ -482,7 +482,7 @@ abstract class MSFServer extends HttpServer
             /**
              * @var \PG\MSF\Coroutine\Task $task
              */
-            foreach (getInstance()->coroutine->taskMap as $task) {
+            foreach (getInstance()->scheduler->taskMap as $task) {
                 foreach ($task->getController()->objectPoolBuckets as $object) {
                     $data['object_pool'][get_class($object)]++;
                 }

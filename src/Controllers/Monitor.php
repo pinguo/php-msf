@@ -90,7 +90,7 @@ class Monitor extends Controller
             $request[$workerId] = "http://127.0.0.1:" . ($this->getConfig()['http_server']['port'] + $workerId + 1);
         }
 
-        $result = yield $this->getContext()->getObjectPool()->get(Client::class)->goConcurrent($request);
+        $result = yield $this->getObject(Client::class)->goConcurrent($request);
 
         foreach ($result as $workerId => $content) {
             $data['worker'][$workerId] = json_decode($content['body'], true);

@@ -43,7 +43,7 @@ class MSFCli extends MSFServer
         $request->resolve();
 
         $controllerInstance = null;
-        $this->route->handleClientRequest($request);
+        $this->route->handleHttpRequest($request);
 
         do {
             $controllerName      = $this->route->getControllerName();

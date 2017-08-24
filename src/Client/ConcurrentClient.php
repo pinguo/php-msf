@@ -57,7 +57,7 @@ class ConcurrentClient
                 $list[$name]['parser'] = ($parallelConf[$name]['parser'] ?? 'normal') . 'Parser';
 
                 //dns请求
-                $list[$name]['dns'] = $parent->getContext()->getObjectPool()->get(Client::class)->goDnsLookup($list[$name]['host'], $list[$name]['timeout']);
+                $list[$name]['dns'] = $parent->getObject(Client::class)->goDnsLookup($list[$name]['host'], $list[$name]['timeout']);
             }
         }
 

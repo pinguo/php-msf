@@ -132,14 +132,14 @@ abstract class Base implements IBase
      */
     public function nextRun()
     {
-        if (empty(getInstance()->coroutine->IOCallBack[$this->requestId])) {
+        if (empty(getInstance()->scheduler->IOCallBack[$this->requestId])) {
             return true;
         }
 
-        foreach (getInstance()->coroutine->IOCallBack[$this->requestId] as $k => $coroutine) {
-            if ($coroutine->ioBack && !empty(getInstance()->coroutine->taskMap[$this->requestId])) {
-                unset(getInstance()->coroutine->IOCallBack[$this->requestId][$k]);
-                getInstance()->coroutine->schedule(getInstance()->coroutine->taskMap[$this->requestId]);
+        foreach (getInstance()->scheduler->IOCallBack[$this->requestId] as $k => $coroutine) {
+            if ($coroutine->ioBack && !empty(getInstance()->scheduler->taskMap[$this->requestId])) {
+                unset(getInstance()->scheduler->IOCallBack[$this->requestId][$k]);
+                getInstance()->scheduler->schedule(getInstance()->scheduler->taskMap[$this->requestId]);
             } else {
                 break;
             }
@@ -177,7 +177,7 @@ abstract class Base implements IBase
     public function break()
     {
         if ($this->requestId && $this->ioBackKey !== null) {
-            unset(getInstance()->coroutine->IOCallBack[$this->requestId][$this->ioBackKey]);
+            unset(getInstance()->scheduler->IOCallBack[$this->requestId][$this->ioBackKey]);
             $this->isBreak = true;
         }
 

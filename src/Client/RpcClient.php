@@ -205,7 +205,7 @@ class RpcClient extends Core
         /**
          * @var Client $client
          */
-        $client = yield $this->getContext()->getObjectPool()->get(Client::class)->goDnsLookup($this->host, $this->timeout, $headers);
+        $client = yield $this->getObject(Client::class)->goDnsLookup($this->host, $this->timeout, $headers);
         if (!$client) {
             throw new Exception($this->host . ' dns query failed');
         }
@@ -272,7 +272,7 @@ class RpcClient extends Core
             return $results;
         }
 
-        $responses = yield $context->getContext()->getObjectPool()->get(Client::class)->goConcurrent($requests);
+        $responses = yield $context->getObject(Client::class)->goConcurrent($requests);
         foreach ($responses as $key => $response) {
             if ($response && !empty($response['body']) && ($jsonRes = json_decode($response['body'], true))) {
                 if ($jsonRes['status'] !== 200) {

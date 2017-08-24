@@ -86,6 +86,12 @@ class NormalRoute implements IRoute
                 $this->controllerClassName = $className;
                 break;
             }
+
+            $className = "\\App\\Console\\" . $this->clientData->controllerName;
+            if (class_exists($className)) {
+                $this->controllerClassName = $className;
+                break;
+            }
         } while (0);
 
         if ($this->controllerClassName  == '') {

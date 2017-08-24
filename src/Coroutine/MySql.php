@@ -45,8 +45,8 @@ class MySql extends Base
         $this->requestId     = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($this->request);
-        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
-        $keys            = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
+        $keys            = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
         $this->send(function ($result) {
@@ -54,7 +54,7 @@ class MySql extends Base
                 return;
             }
 
-            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
+            if (empty(getInstance()->scheduler->taskMap[$this->requestId])) {
                 return;
             }
 

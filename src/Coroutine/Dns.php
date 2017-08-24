@@ -38,9 +38,9 @@ class Dns extends Base
         $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->client->urlData['host'];
         $this->requestId = $this->getContext()->getLogId();
 
-        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
+        getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $this->getContext()->getLog()->profileStart($profileName);
-        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        $keys = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
         $this->send(function (Client $client) use ($profileName) {
@@ -48,7 +48,7 @@ class Dns extends Base
                 return;
             }
 
-            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
+            if (empty(getInstance()->scheduler->taskMap[$this->requestId])) {
                 return;
             }
 
