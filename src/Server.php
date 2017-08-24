@@ -343,11 +343,11 @@ abstract class Server extends Child
         // Master is still alive?
         if ($masterIsAlive) {
             if ($command === 'start' || $command === 'test') {
-                echo("MSF[$startFile] already running\n");
+                writeln('App', "{$startFile} already running");
                 exit;
             }
         } elseif ($command !== 'start' && $command !== 'test') {
-            echo("MSF[$startFile] not run\n");
+            writeln('App', "{$startFile} not run");
             exit;
         }
 
@@ -360,7 +360,7 @@ abstract class Server extends Child
                 break;
             case 'stop':
                 @unlink(self::$pidFile);
-                echo("MSF[$startFile] is stoping ...\n");
+                writeln('App', "$startFile is stoping ...");
                 // Send stop signal to master process.
                 $masterPid && posix_kill($masterPid, SIGTERM);
                 // Timeout.
@@ -372,7 +372,7 @@ abstract class Server extends Child
                     if ($masterIsAlive) {
                         // Timeout?
                         if (time() - $startTime >= $timeout) {
-                            echo("MSF[$startFile] stop fail\n");
+                            writeln('App', "{$startFile} stop fail");
                             exit;
                         }
                         // Waiting amoment.
@@ -380,18 +380,18 @@ abstract class Server extends Child
                         continue;
                     }
                     // Stop success.
-                    echo("MSF[$startFile] stop success\n");
+                    writeln('App', "{$startFile} stop success");
                     break;
                 }
                 exit(0);
                 break;
             case 'reload':
                 posix_kill($managerPid, SIGUSR1);
-                echo("MSF[$startFile] reload\n");
+                writeln('App', "{$startFile} reload");
                 exit;
             case 'restart':
                 @unlink(self::$pidFile);
-                echo("MSF[$startFile] is stoping ...\n");
+                writeln('App', "{$startFile} is stoping ...");
                 // Send stop signal to master process.
                 $masterPid && posix_kill($masterPid, SIGTERM);
                 // Timeout.
@@ -403,7 +403,7 @@ abstract class Server extends Child
                     if ($masterIsAlive) {
                         // Timeout?
                         if (time() - $startTime >= $timeout) {
-                            echo("MSF[$startFile] stop fail\n");
+                            writeln('App', "{$startFile} stop fail");
                             exit;
                         }
                         // Waiting amoment.
@@ -411,7 +411,7 @@ abstract class Server extends Child
                         continue;
                     }
                     // Stop success.
-                    echo("MSF[$startFile] stop success\n");
+                    writeln('App', "{$startFile} stop success");
                     break;
                 }
                 self::$daemonize = true;
@@ -440,7 +440,7 @@ abstract class Server extends Child
             self::$_worker->user = self::getCurrentUser();
         } else {
             if (posix_getuid() !== 0 && self::$_worker->user != self::getCurrentUser()) {
-                echo('Warning: You must have the root privileges to change uid and gid.');
+                writeln('App', 'You must have the root privileges to change uid and gid.');
             }
         }
     }
@@ -779,7 +779,6 @@ abstract class Server extends Child
      */
     public function onErrorHandle($msg, $log)
     {
-        print_r($msg . "\n");
-        print_r($log . "\n");
+        writeln('Error Handler', $msg, $log);
     }
 }
