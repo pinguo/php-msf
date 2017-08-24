@@ -16,7 +16,7 @@ use PG\MSF\Base\Core;
 use PG\MSF\Pack\IPack;
 use PG\MSF\Route\IRoute;
 use PG\MSF\Helpers\Context;
-use PG\MSF\Coroutine\Scheduler as Coroutine;
+use PG\MSF\Coroutine\Scheduler;
 use PG\MSF\Base\AOPFactory;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Route\NormalRoute;
@@ -69,14 +69,9 @@ abstract class Server extends Child
     protected static $_worker = null;
 
     /**
-     * @var int Maximum length of the show names.
+     * @var Scheduler 协程调度器
      */
-    protected static $_maxShowLength = 12;
-
-    /**
-     * @var Coroutine 协程调度器
-     */
-    public $coroutine;
+    public $scheduler;
 
     /**
      * @var string server name
@@ -552,7 +547,7 @@ abstract class Server extends Child
 
         file_put_contents(self::$pidFile, ',' . $serv->worker_pid, FILE_APPEND);
         if (!$serv->taskworker) {//worker进程
-            $this->coroutine = new Coroutine();
+            $this->scheduler = new Scheduler();
             self::setProcessTitle($this->config['server.process_title'] . '-Worker');
         } else {
             self::setProcessTitle($this->config['server.process_title'] . '-Tasker');
