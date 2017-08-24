@@ -152,8 +152,7 @@ class AOPFactory extends Factory
 
                 if (self::$taskClasses[$className]) {
                     // worker进程
-                    if (!empty(getInstance()->server)
-                        && property_exists(getInstance()->server, 'taskworker')
+                    if (!empty(getInstance()->server) && getInstance()->server->worker_pid
                         && !getInstance()->server->taskworker) {
                         array_unshift($arguments, \PG\MSF\Tasks\TaskProxy::class);
                     }
