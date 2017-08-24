@@ -86,6 +86,11 @@ class Pool
     public function get($class, ...$args)
     {
         $poolName = trim($class, '\\');
+
+        if (!$poolName) {
+            return null;
+        }
+
         $pool     = $this->map[$poolName] ?? null;
         if ($pool == null) {
             $pool = $this->applyNewPool($poolName);
