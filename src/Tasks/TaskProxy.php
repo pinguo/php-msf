@@ -79,7 +79,7 @@ class TaskProxy extends Core
             ]
         ];
 
-        return $this->getContext()->getObjectPool()->get(CTask::class, [$this->taskProxyData, -1, $this->timeout]);
+        return $this->getObject(CTask::class, [$this->taskProxyData, -1, $this->timeout]);
     }
 
     /**

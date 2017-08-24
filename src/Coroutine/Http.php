@@ -52,8 +52,8 @@ class Http extends Base
         $this->requestId  = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($profileName);
-        getInstance()->coroutine->IOCallBack[$this->requestId][] = $this;
-        $keys = array_keys(getInstance()->coroutine->IOCallBack[$this->requestId]);
+        getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
+        $keys = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
         $this->send(function ($client) use ($profileName) {
@@ -61,7 +61,7 @@ class Http extends Base
                 return;
             }
 
-            if (empty(getInstance()->coroutine->taskMap[$this->requestId])) {
+            if (empty(getInstance()->scheduler->taskMap[$this->requestId])) {
                 return;
             }
 

@@ -126,17 +126,17 @@ class Client extends Core
             $this->dnsLookupCallBack($ip);
         } else {
             $logId = $this->getContext()->getLogId();
-            swoole_async_dns_lookup($this->urlData['host'], function ($host, $ip) use (&$data, $logId) {
+            swoole_async_dns_lookup($this->urlData['host'], function ($host, $ip) use ($logId) {
                 if ($ip === '127.0.0.0') { // fix bug
                     $ip = '127.0.0.1';
                 }
 
-                if (empty(getInstance()->coroutine->taskMap[$logId])) {
+                if (empty(getInstance()->scheduler->taskMap[$logId])) {
                     return;
                 }
 
                 if (empty($ip)) {
-                    $this->getContext()->getLog()->warning($data['url'] . ' DNS查询失败');
+                    $this->getContext()->getLog()->warning($this->urlData['url'] . ' DNS查询失败');
                 } else {
                     self::setDnsCache($host, $ip);
                     $this->dnsLookupCallBack($ip);
@@ -169,7 +169,7 @@ class Client extends Core
 
         $ip = Client::getDnsCache($this->urlData['host']);
         if ($ip !== null) {
-            $client     = $this->getContext()->getObjectPool()->get(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
+            $client     = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
             $client->set(['timeout' => -1]);
             $this->client = $client;
             $headers = array_merge($headers, [
@@ -179,7 +179,7 @@ class Client extends Core
             $this->setHeaders($headers);
             return $this;
         } else {
-            return $this->getContext()->getObjectPool()->get(Dns::class, [$this, $this->dnsTimeout, $headers]);
+            return $this->getObject(Dns::class, [$this, $this->dnsTimeout, $headers]);
         }
     }
 
@@ -207,7 +207,7 @@ class Client extends Core
             }
         }
         $this->setHeaders($headers);
-        $sendPostReq  = $this->getContext()->getObjectPool()->get(Http::class, [$this, 'POST', $this->urlData['path'], $data, $timeout]);
+        $sendPostReq  = $this->getObject(Http::class, [$this, 'POST', $this->urlData['path'], $data, $timeout]);
 
         return $sendPostReq;
     }
@@ -237,7 +237,7 @@ class Client extends Core
         }
         $this->setHeaders($headers);
 
-        $sendGetReq  = $this->getContext()->getObjectPool()->get(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
+        $sendGetReq  = $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
 
         return $sendGetReq;
     }
@@ -265,7 +265,7 @@ class Client extends Core
         yield $this->goDnsLookup();
         $this->setHeaders($headers);
 
-        return yield $this->getContext()->getObjectPool()->get(Http::class, [$this, 'POST', $this->urlData['path'], $data, $timeout]);
+        return yield $this->getObject(Http::class, [$this, 'POST', $this->urlData['path'], $data, $timeout]);
     }
 
     /**
@@ -291,7 +291,7 @@ class Client extends Core
         yield $this->goDnsLookup();
         $this->setHeaders($headers);
 
-        return yield $this->getContext()->getObjectPool()->get(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
+        return yield $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
     }
 
     /**
@@ -424,11 +424,11 @@ class Client extends Core
             }
 
             if ($requests[$key]['method'] == 'GET') {
-                $sendHttpRequests[$key] = $this->getContext()->getObjectPool()->get(Http::class, [$client, 'GET', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
+                $sendHttpRequests[$key] = $this->getObject(Http::class, [$client, 'GET', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
             }
 
             if ($requests[$key]['method'] == 'POST') {
-                $sendHttpRequests[$key] = $this->getContext()->getObjectPool()->get(Http::class, [$client, 'POST', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
+                $sendHttpRequests[$key] = $this->getObject(Http::class, [$client, 'POST', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
             }
         }
 
@@ -452,7 +452,7 @@ class Client extends Core
             return true;
         }
 
-        $this->client = $this->getContext()->getObjectPool()->get(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
+        $this->client = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
         $this->client->set(['timeout' => -1]);
         $headers = array_merge($this->urlData['headers'], [
             'Host' => $this->urlData['host'],

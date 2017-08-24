@@ -1881,7 +1881,7 @@ class Miner
             return $data;
         } else {
             $this->clear();
-            return $this->getContext()->getObjectPool()->get(MySql::class, [$this->mysqlPool, $bindId, $sql]);
+            return $this->getObject(MySql::class, [$this->mysqlPool, $bindId, $sql]);
         }
     }
 

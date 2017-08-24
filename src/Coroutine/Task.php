@@ -298,10 +298,10 @@ class Task
     public function destroy()
     {
         if (!empty($this->id)) {
-            getInstance()->coroutine->taskMap[$this->id] = null;
-            unset(getInstance()->coroutine->taskMap[$this->id]);
-            getInstance()->coroutine->IOCallBack[$this->id] = null;
-            unset(getInstance()->coroutine->IOCallBack[$this->id]);
+            getInstance()->scheduler->taskMap[$this->id] = null;
+            unset(getInstance()->scheduler->taskMap[$this->id]);
+            getInstance()->scheduler->IOCallBack[$this->id] = null;
+            unset(getInstance()->scheduler->IOCallBack[$this->id]);
             if (getInstance()::mode == 'console') {
                 $this->controller->destroy();
             }
