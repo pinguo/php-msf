@@ -1,8 +1,8 @@
 <?php
 /**
- * @desc:
- * @author: leandre <niulingyun@camera360.com>
- * @date: 2017/4/12
+ * 分布式结构Redis代理
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -11,17 +11,34 @@ namespace PG\MSF\Proxy;
 use Exception;
 use Flexihash\Flexihash;
 use Flexihash\Hasher\Md5Hasher;
-use PG\MSF\DataBase\RedisAsynPool;
+use PG\MSF\Pools\RedisAsynPool;
+use PG\MSF\Helpers\Context;
 
 class RedisProxyCluster extends Flexihash implements IProxy
 {
+    /**
+     * @var string 代理标识，它代表一个Redis集群
+     */
     private $name;
 
+    /**
+     * @var array 连接池列表 key=连接池名称, value=权重
+     */
     private $pools;
 
+    /**
+     * @var array 通过探活检测的连接池列表
+     */
     private $goodPools = [];
 
+    /**
+     * @var mixed|string key前缀
+     */
     private $keyPrefix = '';
+
+    /**
+     * @var bool|mixed 是否将key散列后储存
+     */
     private $hashKey = false;
     /**
      * @var bool 随机选择一个redis，一般用于redis前面有twemproxy等代理，每个代理都可以处理请求，随机即可
@@ -30,20 +47,20 @@ class RedisProxyCluster extends Flexihash implements IProxy
 
     /**
      * RedisProxyCluster constructor.
-     * @param string $name
-     * @param array $config
+     *
+     * @param string $name 代理标识
+     * @param array $config 代理配置数组
      */
     public function __construct(string $name, array $config)
     {
-        $this->name = $name;
-        $this->pools = $config['pools'];
-
+        $this->name      = $name;
+        $this->pools     = $config['pools'];
         $this->keyPrefix = $config['keyPrefix'] ?? '';
-        $this->hashKey = $config['hashKey'] ?? false;
-        $this->isRandom = $config['random'] ?? false;
-        $hasher = $config['hasher'] ?? Md5Hasher::class;
+        $this->hashKey   = $config['hashKey'] ?? false;
+        $this->isRandom  = $config['random'] ?? false;
+        $hasher          = $config['hasher'] ?? Md5Hasher::class;
+        $hasher          = new $hasher;
 
-        $hasher = new $hasher;
         try {
             parent::__construct($hasher);
             $this->startCheck();
@@ -55,25 +72,30 @@ class RedisProxyCluster extends Flexihash implements IProxy
                 }
             }
         } catch (Exception $e) {
-            writeln('Redis Proxy' . $e->getMessage());
+            writeln('Redis Proxy ' . $e->getMessage());
         }
     }
 
     /**
-     * 检查可用的pools
-     * @return array
+     * 检测可用的连接池
+     *
+     * @return $this
      */
     public function startCheck()
     {
         $this->syncCheck();
+        return $this;
     }
 
     /**
-     * 同步检测 用户启动
+     * 启动时同步检测可用的连接池
+     *
+     * @return $this
      */
     private function syncCheck()
     {
         $this->goodPools = [];
+
         foreach ($this->pools as $pool => $weight) {
             try {
                 $poolInstance = getInstance()->getAsynPool($pool);
@@ -82,9 +104,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
                     getInstance()->addAsynPool($pool, $poolInstance, true);
                 }
 
-                if ($poolInstance->getSync()
-                    ->set('msf_active_cluster_check_' . gethostname(), 1, 5)
-                ) {
+                if ($poolInstance->getSync()->set('msf_active_cluster_check_' . gethostname(), 1, 5)) {
                     $this->goodPools[$pool] = $weight;
                 } else {
                     $host = getInstance()->getAsynPool($pool)->getSync()->getHost();
@@ -98,17 +118,22 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
-     * 处理查询
-     * @param string $method
+     * 发送异步Redis请求
+     *
+     * @param string $method Redis指令
      * @param array $arguments
      * @return array|bool|mixed
      */
     public function handle(string $method, array $arguments)
     {
+        /**
+         * @var Context $arguments[0]
+         */
         try {
             if ($this->isRandom) {
                 return $this->random($method, $arguments);
             }
+
             if ($method === 'evalMock') {
                 return $this->evalMock($arguments);
             } else {
@@ -116,8 +141,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
                 //单key操作
                 if (!is_array($key)) {
                     return $this->single($method, $key, $arguments);
-                } else {
                     // 批量操作
+                } else {
                     return $this->multi($method, $key, $arguments);
                 }
             }
@@ -127,17 +152,18 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
+     * 执行Redis evalMock指令
+     *
      * @param array $arguments
      * @return array
      */
     public function evalMock(array $arguments)
     {
-        $args = $arguments[2];
-        $numKeys = $arguments[3];
-        $keys = array_slice($args, 0, $numKeys);
-        $argvs = array_slice($args, $numKeys);
-
-        $arrRedis = $index2Key = array();
+        $args         = $arguments[2];
+        $numKeys      = $arguments[3];
+        $keys         = array_slice($args, 0, $numKeys);
+        $evalMockArgs = array_slice($args, $numKeys);
+        $arrRedis     = $index2Key = [];
 
         if (empty($keys)) {
             //如果没有设置缓存key，则连接所有的实例
@@ -157,7 +183,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
             }
         }
 
-        $ret = array();
+        $ret = [];
         foreach ($arrRedis as $index => $redisPoolName) {
             if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
                 if (getInstance()->getAsynPool($redisPoolName) == null) {
@@ -168,7 +194,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
             $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
 
             $arrKeys = empty($index2Key) ? $index2Key : $index2Key[$index];
-            $res = $redisPoolCoroutine->evalMock($arguments[0], $arguments[1], array_merge($arrKeys, $argvs), count($arrKeys));
+            $res     = $redisPoolCoroutine->evalMock($arguments[0], $arguments[1], array_merge($arrKeys, $evalMockArgs), count($arrKeys));
+
             if ($res instanceof \Generator) {
                 $ret[] = $res;
             }
@@ -182,8 +209,10 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
-     * @param string $key a key identifying a value to be cached
-     * @return string a key generated from the provided key which ensures the uniqueness across applications
+     * 生成唯一Redis Key
+     *
+     * @param string $key
+     * @return string
      */
     private function generateUniqueKey(string $key)
     {
@@ -192,6 +221,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
 
     /**
      * 随机策略
+     *
      * @param string $method
      * @param array $arguments
      * @return bool
@@ -199,6 +229,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
     private function random(string $method, array $arguments)
     {
         $redisPoolName = array_rand($this->goodPools);
+
         if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
             if (getInstance()->getAsynPool($redisPoolName) == null) {
                 return false;
@@ -217,7 +248,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
-     * 单key
+     * 单key指令
+     *
      * @param string $method
      * @param string $key
      * @param array $arguments
@@ -245,7 +277,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
-     * 批量处理
+     * 批量多key指令
+     *
      * @param string $method
      * @param array $key
      * @param array $arguments
@@ -293,7 +326,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
-     * 分发
+     * 请求分发
+     *
      * @param array $opArr
      * @param string $method
      * @param array $arguments
@@ -322,7 +356,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
     }
 
     /**
-     * 检测  用户定时检测
+     * 用户定时检测
+     *
+     * @return bool
      */
     public function check()
     {
@@ -333,12 +369,13 @@ class RedisProxyCluster extends Flexihash implements IProxy
 
         $nowPools = $this->getAllTargets();
         $newPools = array_keys($this->goodPools);
-        $losts = array_diff($nowPools, $newPools);
-        if (!empty($losts)) {
-            foreach ($losts as $lost) {
+        $loses    = array_diff($nowPools, $newPools);
+
+        if (!empty($loses)) {
+            foreach ($loses as $lost) {
                 $this->removeTarget($lost);
             }
-            writeln('Redis Proxy Remove ( ' . implode(',', $losts) . ' ) from Cluster');
+            writeln('Redis Proxy Remove ( ' . implode(',', $loses) . ' ) from Cluster');
         }
 
         $adds = array_diff($newPools, $nowPools);
@@ -348,5 +385,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
             }
             writeln('Redis Proxy Add ( ' . implode(',', $adds) . ' ) into Cluster');
         }
+
+        return true;
     }
 }
