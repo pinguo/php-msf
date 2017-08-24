@@ -96,6 +96,8 @@ class Scheduler
                     if (is_callable($task->getCallBack())) {
                         ($task->getCallBack())();
                         $task->resetCallBack();
+                    } else {
+                        $task->getController()->destroy();
                     }
                 } else {
                     $this->schedule($task);

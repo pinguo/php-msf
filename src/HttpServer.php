@@ -44,7 +44,7 @@ abstract class HttpServer extends Server
         parent::__construct();
         $view_dir = APP_DIR . '/Views';
         if (!is_dir($view_dir)) {
-            writeln('App', 'App directory does not exist Views directory, please create.');
+            writeln('App directory does not exist Views directory, please create.');
             exit();
         }
     }
@@ -236,7 +236,7 @@ abstract class HttpServer extends Server
                 }
                 break;
             } catch (\Throwable $e) {
-                writeln('App', dump($e, true, true));
+                writeln(dump($e, true, true));
                 $controllerInstance->onExceptionHandle($e);
             }
         } while (0);

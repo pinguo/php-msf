@@ -302,9 +302,6 @@ class Task
             unset(getInstance()->scheduler->taskMap[$this->id]);
             getInstance()->scheduler->IOCallBack[$this->id] = null;
             unset(getInstance()->scheduler->IOCallBack[$this->id]);
-            if (getInstance()::mode == 'console') {
-                $this->controller->destroy();
-            }
             $this->stack      = null;
             $this->controller = null;
             $this->id         = null;
