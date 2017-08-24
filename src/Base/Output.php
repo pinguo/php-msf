@@ -327,6 +327,7 @@ class Output extends Core
             $output = json_encode($output, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
         $this->response->end($output);
+        $this->controller->destroy();
     }
 
     /**

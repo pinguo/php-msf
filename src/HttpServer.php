@@ -219,16 +219,12 @@ abstract class HttpServer extends Server
                             if ($generator instanceof \Generator) {
                                 $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
                                 $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
-                            } else {
-                                $controllerInstance->destroy();
                             }
                         });
                 } else {
                     $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
                     if ($generator instanceof \Generator) {
                         $this->scheduler->start($generator, $controllerInstance->context, $controllerInstance);
-                    } else {
-                        $controllerInstance->destroy();
                     }
                 }
 

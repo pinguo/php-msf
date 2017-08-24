@@ -89,20 +89,32 @@ class Scheduler
         $task->run();
 
         try {
-            if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
-            } else {
-                if ($task->isFinished()) {
-                    $task->resetRoutine();
-                    if (is_callable($task->getCallBack())) {
-                        ($task->getCallBack())();
-                        $task->resetCallBack();
-                    } else {
-                        $task->getController()->destroy();
-                    }
-                } else {
-                    $this->schedule($task);
+            do {
+                // 协程异步IO
+                if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
+                    break;
                 }
-            }
+
+                // 继续调度
+                if (!$task->isFinished()) {
+                    $this->schedule($task);
+                    break;
+                }
+
+                // 请求调度结束（考虑是有否回调）
+                $task->resetRoutine();
+                if (is_callable($task->getCallBack())) {
+                    ($task->getCallBack())();
+                    $task->resetCallBack();
+                    break;
+                }
+
+                // 命令行下退出进程
+                if (getInstance()::mode == 'console') {
+                    $task->getController()->destroy();
+                    break;
+                }
+            } while (0);
         } catch (\Throwable $e) {
             $task->setException($e);
             $this->schedule($task);
