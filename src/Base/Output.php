@@ -314,9 +314,8 @@ class Output extends Core
      *
      * @param string $output
      * @param bool $gzip
-     * @param bool $destroy
      */
-    public function end($output = '', $gzip = true, $destroy = true)
+    public function end($output = '', $gzip = true)
     {
         $acceptEncoding = strtolower($this->request->header['accept-encoding'] ?? '');
         if ($gzip && strpos($acceptEncoding, 'gzip') !== false) {
@@ -328,9 +327,6 @@ class Output extends Core
             $output = json_encode($output, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
         $this->response->end($output);
-        if ($destroy) {
-            $this->controller->destroy();
-        }
     }
 
     /**
