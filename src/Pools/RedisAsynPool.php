@@ -156,23 +156,30 @@ class RedisAsynPool extends AsynPool
         //task进程内同步redis连接
         $this->redisClient = new \Redis();
         $conf              = $this->config['redis'][$this->active];
-
-        if ($this->redisClient->connect($conf['ip'], $conf['port'], 0.05) == false) {
-            $addr = $conf['ip'] . ':' . $conf['port'] . ' ';
-            throw new Exception($addr . $this->redisClient->getLastError());
-        }
-
-        if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
-            if ($this->redisClient->auth($this->config['redis'][$this->active]['password']) == false) {
-
-                $addr = $conf['ip'] . ':' . $conf['port'] . ' password validate failed ';
+        $addr              = $conf['ip'] . ':' . $conf['port'] . ' ';
+        try {
+            // 连接
+            if (!$this->redisClient->connect($conf['ip'], $conf['port'], 0.05)) {
                 throw new Exception($this->redisClient->getLastError());
             }
-        }
 
-        if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
-            $addr = $conf['ip'] . ':' . $conf['port'] . ' select db failed ';
-            $this->redisClient->select($this->config['redis'][$this->active]['select']);
+            // 验证
+            if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
+                $addr .= 'auth password failed, message ';
+                if (!$this->redisClient->auth($this->config['redis'][$this->active]['password'])) {
+                    throw new Exception($this->redisClient->getLastError());
+                }
+            }
+
+            // select
+            if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
+                $addr .= 'select failed, message ';
+                if (!$this->redisClient->select($this->config['redis'][$this->active]['select'])) {
+                    throw new Exception($this->redisClient->getLastError());
+                }
+            }
+        } catch (Exception $e) {
+            throw new Exception($addr . $e->getMessage());
         }
 
         return $this->redisClient;
