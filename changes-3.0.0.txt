@@ -1,7 +1,7 @@
 508380b - pinguo-xudianyang:   * 调整controller::destroy策略
 3b4c199 - pinguo-xudianyang:   * 修复监控端口的问题
 550757c - pinguo-xudianyang:   * 修复MSFCli模式的报错
-c125044 - pinguo-xudianyang:   + 添加Macro::PROCESS_WORKER,Macro::PROCESS_TASKER,Macro::PROCESS_TASKER进程标识宏
+c125044 - pinguo-xudianyang:   + 添加Macro::PROCESS_WORKER,Macro::PROCESS_TASKER,Macro::PROCESS_USER进程标识宏
 85eef20 - pinguo-xudianyang:   * TaskProxy兼容用户自定义进程
 2630446 - pinguo-xudianyang:   + worker exit统计
 a23c91b - pinguo-xudianyang:   + monitor writeln
