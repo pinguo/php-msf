@@ -34,11 +34,6 @@ abstract class MSFServer extends HttpServer
     public $objectPoolBuckets = [];
 
     /**
-     * @var int 进程类型，worker,tasker,user
-     */
-    public $processType = Marco::PROCESS_USER;
-
-    /**
      * @var array Redis代理管理器
      */
     protected $redisProxyManager = [];
@@ -249,19 +244,22 @@ abstract class MSFServer extends HttpServer
                     } else {
                         throw new Exception("method $taskFucName not exist in $taskName");
                     }
-
-                    //销毁对象
-                    foreach ($this->objectPoolBuckets as $k => $obj) {
-                        $objectPool->push($obj);
-                        $this->objectPoolBuckets[$k] = null;
-                        unset($this->objectPoolBuckets[$k]);
-                    }
                 } catch (\Throwable $e) {
                     if (empty($task) || !($task instanceof Task) || empty($task->getContext())) {
                         getInstance()->log->error(dump($e, false, true));
                     } else {
                         $error = dump($e, false, true);
                         $task->getContext()->getLog()->error($error);
+                    }
+                } finally {
+                    if (is_object($task) && !empty($task->getContext())) {
+                        $task->getContext()->getLog()->appendNoticeLog();
+                    }
+                    //销毁对象
+                    foreach ($this->objectPoolBuckets as $k => $obj) {
+                        $objectPool->push($obj);
+                        $this->objectPoolBuckets[$k] = null;
+                        unset($this->objectPoolBuckets[$k]);
                     }
                 }
                 return $result;
