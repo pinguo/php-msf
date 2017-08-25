@@ -784,6 +784,6 @@ abstract class Server extends Child
      */
     public function onErrorHandle($msg, $log)
     {
-        writeln('Error Handler ' . $msg . ' ' . $log);
+        writeln($msg . ' ' . $log);
     }
 }
