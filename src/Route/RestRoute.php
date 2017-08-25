@@ -63,7 +63,7 @@ class RestRoute extends NormalRoute
     /**
      * HTTP请求解析
      *
-     * @param $request
+     * @param \swoole_http_request $request 请求对象
      */
     public function handleClientRequest($request)
     {

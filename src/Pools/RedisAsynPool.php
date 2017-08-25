@@ -10,7 +10,9 @@
 namespace PG\MSF\Pools;
 
 use Exception;
+use Noodlehaus\Config;
 use PG\MSF\Coroutine\Redis;
+use PG\MSF\Helpers\Context;
 
 class RedisAsynPool extends AsynPool
 {
@@ -67,8 +69,8 @@ class RedisAsynPool extends AsynPool
     /**
      * RedisAsynPool constructor.
      *
-     * @param $config
-     * @param string $active
+     * @param Config $config 配置对象
+     * @param string $active 连接池名称
      * @throws Exception
      */
     public function __construct($config, string $active)
@@ -108,8 +110,9 @@ class RedisAsynPool extends AsynPool
 
     /**
      * __call魔术方法，映射redis方法
-     * @param $name
-     * @param $arguments
+     *
+     * @param string $name Redis指令
+     * @param array $arguments Redis指令参数
      */
     public function __call(string $name, $arguments)
     {
@@ -126,9 +129,9 @@ class RedisAsynPool extends AsynPool
     /**
      * 协程模式
      *
-     * @param $context
-     * @param $name
-     * @param array ...$arg
+     * @param Context $context 请求上下文对象
+     * @param string $name Redis指令
+     * @param array $arg Redis指令参数
      * @return mixed|Redis
      * @throws Exception
      */
@@ -198,7 +201,7 @@ class RedisAsynPool extends AsynPool
     /**
      * 执行Redis命令
      *
-     * @param $data
+     * @param array $data Redis命令相关信息
      */
     public function execute($data)
     {
@@ -468,7 +471,7 @@ class RedisAsynPool extends AsynPool
     /**
      * 重连或者连接
      *
-     * @param \swoole_redis|null $client
+     * @param \swoole_redis|null $client 连接对象
      */
     public function reconnect($client = null)
     {
@@ -510,7 +513,7 @@ class RedisAsynPool extends AsynPool
     /**
      * 断开链接
      *
-     * @param $client
+     * @param \swoole_redis $client 连接对象
      */
     public function onClose($client)
     {
@@ -518,6 +521,8 @@ class RedisAsynPool extends AsynPool
     }
 
     /**
+     * 返回唯一的连接池名称
+     *
      * @return string
      */
     public function getAsynName()

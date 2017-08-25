@@ -62,7 +62,7 @@ class Context extends AbstractContext
     /**
      * 设置请求输入对象
      *
-     * @param $input
+     * @param Input $input 请求对象
      * @return $this
      */
     public function setInput($input)
@@ -84,7 +84,7 @@ class Context extends AbstractContext
     /**
      * 设置请求输出对象
      *
-     * @param $output
+     * @param Output $output 请求输出对象
      * @return $this
      */
     public function setOutput($output)
@@ -106,7 +106,7 @@ class Context extends AbstractContext
     /**
      * 设置对象池对象
      *
-     * @param $objectPool
+     * @param Pool $objectPool 对象池实例
      * @return $this
      */
     public function setObjectPool($objectPool)
@@ -118,7 +118,7 @@ class Context extends AbstractContext
     /**
      * 设置控制器名称
      *
-     * @param $controllerName
+     * @param string $controllerName 控制器名称
      * @return $this
      */
     public function setControllerName($controllerName)
@@ -140,7 +140,7 @@ class Context extends AbstractContext
     /**
      * 设置方法名称
      *
-     * @param $actionName
+     * @param string $actionName 控制器方法名
      * @return $this
      */
     public function setActionName($actionName)
@@ -172,7 +172,7 @@ class Context extends AbstractContext
     /**
      * 获取key所对应的用户自定义的全局上下文数据
      *
-     * @param $key
+     * @param string $key 用户自定义的上下文数据Key
      * @return mixed|null
      */
     public function getUserDefined($key)
@@ -183,8 +183,8 @@ class Context extends AbstractContext
     /**
      * 设置key所对应的用户自定义的全局上下文的value
      *
-     * @param string $key
-     * @param mixed $val
+     * @param string $key 用户自定义的上下文数据Key
+     * @param mixed $val 用户自定义的上下文数据Value
      * @return $this
      */
     public function setUserDefined($key, $val)

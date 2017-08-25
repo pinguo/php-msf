@@ -104,8 +104,8 @@ abstract class HttpServer extends Server
     /**
      * Swoole Worker进程启动回调
      *
-     * @param \swoole_server $serv
-     * @param $workerId
+     * @param \swoole_server $serv server实例
+     * @param int $workerId worker id
      */
     public function onWorkerStart($serv, $workerId)
     {
@@ -127,8 +127,8 @@ abstract class HttpServer extends Server
     /**
      * HTTP请求回调
      *
-     * @param \swoole_http_request $request
-     * @param \swoole_http_response $response
+     * @param \swoole_http_request $request 请求对象
+     * @param \swoole_http_response $response 响应对象
      */
     public function onRequest($request, $response)
     {
@@ -263,7 +263,7 @@ abstract class HttpServer extends Server
     /**
      * 产生日志ID
      *
-     * @param \swoole_http_request $request
+     * @param \swoole_http_request $request 请求对象
      * @return string
      */
     public function genLogId($request)

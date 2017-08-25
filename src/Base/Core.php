@@ -116,9 +116,9 @@ class Core extends Child
     }
 
     /**
-     * 获取redis连接池
+     * 获取Redis连接池
      *
-     * @param string $poolName
+     * @param string $poolName 配置的Redis连接池名称
      * @return bool|Wrapper|CoroutineRedisProxy|\Redis
      */
     public function getRedisPool(string $poolName)
@@ -142,7 +142,7 @@ class Core extends Child
     /**
      * 获取MySQL连接池
      *
-     * @param string $poolName
+     * @param string $poolName 配置的MySQL连接池名称
      * @return bool|Wrapper
      */
     public function getMysqlPool(string $poolName)
@@ -164,9 +164,9 @@ class Core extends Child
     }
 
     /**
-     * 获取redis代理
+     * 获取Redis代理
      *
-     * @param string $proxyName
+     * @param string $proxyName 配置的Redis代理名称
      * @return bool|Wrapper|CoroutineRedisProxy|\Redis
      * @throws Exception
      */
@@ -193,7 +193,7 @@ class Core extends Child
     /**
      * 设置RedisPools
      *
-     * @param array $redisPools
+     * @param array|null $redisPools 多个Redis连接池实例，通常用于销毁Redis连接池，赋值为NULL
      * @return $this
      */
     public function setRedisPools($redisPools)
@@ -212,7 +212,7 @@ class Core extends Child
     /**
      * 设置RedisPools
      *
-     * @param array $redisProxies
+     * @param array|null $redisProxies 多个Redis代理实例，通常用于销毁Redis代理，赋值为NULL
      * @return $this
      */
     public function setRedisProxies($redisProxies)

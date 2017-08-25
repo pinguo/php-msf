@@ -1,8 +1,10 @@
 <?php
 /**
- * @desc: 并行httpClient
- * @author: leandre <niulingyun@camera360.com>
- * @date: 14/06/2017
+ * 并行的兼容Flex标准的HTTP客户端
+ *
+ * 不推荐使用将来可能废弃，建议使用\PG\MSF\Client\Http\Client::goConcurrent($requests)
+ *
+ * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
@@ -15,6 +17,9 @@ use PG\MSF\Coroutine\Dns;
 
 class ConcurrentClient
 {
+    /**
+     * @var array json errors
+     */
     protected static $jsonErrors = [
         JSON_ERROR_NONE => null,
         JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
@@ -26,8 +31,9 @@ class ConcurrentClient
 
     /**
      * 并行请求
-     * @param array $requests
-     * @param Core $parent
+     *
+     * @param array $requests 请求的数据
+     * @param Core $parent Core实例（通常为Controller实例）
      * @return array
      */
     public static function request(array $requests, Core $parent)
@@ -108,9 +114,9 @@ class ConcurrentClient
     /**
      * 结果解析器(常规)
      *
-     * @param array $request
-     * @param array $response
-     * @param Core $parent
+     * @param array $request 请求信息
+     * @param array $response 响应数据
+     * @param Core $parent Core实例（通常为Controller实例）
      * @return mixed|null
      */
     protected static function normalParser(array $request, array $response, Core $parent)
@@ -132,7 +138,7 @@ class ConcurrentClient
     /**
      * 解析返回值
      *
-     * @param $responseBody
+     * @param array $responseBody 响应正文
      * @return mixed
      * @throws BusinessException
      */
@@ -152,7 +158,8 @@ class ConcurrentClient
     }
 
     /**
-     * 拿到 json 解析最后出现的错误信息
+     * 拿到json解析最后出现的错误信息
+     *
      * @return mixed|string
      */
     private static function jsonLastErrorMsg()

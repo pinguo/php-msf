@@ -53,8 +53,8 @@ class TaskProxy extends Core
     /**
      * __call魔术方法
      *
-     * @param string $name
-     * @param array $arguments
+     * @param string $name 任务方法名
+     * @param array $arguments 执行参数
      * @return CTask
      */
     public function __call($name, $arguments)
@@ -85,7 +85,7 @@ class TaskProxy extends Core
     /**
      * 设置任务执行超时时间
      *
-     * @param int $timeout
+     * @param int $timeout 超时时间，单位毫秒
      * @return $this
      */
     public function setTimeout($timeout)
@@ -97,10 +97,9 @@ class TaskProxy extends Core
     /**
      * 获取任务执行超时时间
      *
-     * @param int $timeout
      * @return int
      */
-    public function getTimeout($timeout)
+    public function getTimeout()
     {
         return $this->timeout;
     }
@@ -108,7 +107,7 @@ class TaskProxy extends Core
     /**
      * 异步任务
      *
-     * @param null $callback
+     * @param callable|null $callback 任务执行完成的回调
      */
     public function startTask($callback = null)
     {

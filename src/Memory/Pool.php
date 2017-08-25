@@ -52,7 +52,7 @@ class Pool
     /**
      * 获取一个
      *
-     * @param string $class
+     * @param string $class 完全命名空间类名
      * @param array $args 可变参数列表
      * @return mixed
      */
@@ -87,7 +87,7 @@ class Pool
     /**
      * 创建新的栈，用于储存相应的对象
      *
-     * @param string $poolName
+     * @param string $poolName 对象池名称
      * @return mixed
      * @throws Exception
      */
@@ -104,7 +104,7 @@ class Pool
     /**
      * 返还一个对象
      *
-     * @param $classInstance
+     * @param mixed $classInstance 对象实例
      */
     public function push($classInstance)
     {

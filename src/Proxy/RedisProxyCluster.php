@@ -121,7 +121,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
      * 发送异步Redis请求
      *
      * @param string $method Redis指令
-     * @param array $arguments
+     * @param array $arguments Redis指令参数
      * @return array|bool|mixed
      */
     public function handle(string $method, array $arguments)
@@ -154,7 +154,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
     /**
      * 执行Redis evalMock指令
      *
-     * @param array $arguments
+     * @param array $arguments evalMock指令参数
      * @return array
      */
     public function evalMock(array $arguments)
@@ -211,7 +211,7 @@ class RedisProxyCluster extends Flexihash implements IProxy
     /**
      * 生成唯一Redis Key
      *
-     * @param string $key
+     * @param string $key Key
      * @return string
      */
     private function generateUniqueKey(string $key)
@@ -222,8 +222,8 @@ class RedisProxyCluster extends Flexihash implements IProxy
     /**
      * 随机策略
      *
-     * @param string $method
-     * @param array $arguments
+     * @param string $method Redis指令
+     * @param array $arguments Redis指令参数
      * @return bool
      */
     private function random(string $method, array $arguments)
@@ -250,9 +250,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
     /**
      * 单key指令
      *
-     * @param string $method
-     * @param string $key
-     * @param array $arguments
+     * @param string $method Redis指令
+     * @param string $key Redis Key
+     * @param array $arguments Redis指令参数
      * @return mixed
      */
     private function single(string $method, string $key, array $arguments)
@@ -279,9 +279,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
     /**
      * 批量多key指令
      *
-     * @param string $method
-     * @param array $key
-     * @param array $arguments
+     * @param string $method Redis指令
+     * @param array $key Redis Key列表
+     * @param array $arguments Redis指令参数
      * @return array|bool
      */
     private function multi(string $method, array $key, array $arguments)
@@ -328,9 +328,9 @@ class RedisProxyCluster extends Flexihash implements IProxy
     /**
      * 请求分发
      *
-     * @param array $opArr
-     * @param string $method
-     * @param array $arguments
+     * @param array $opArr 相应Redis连接池的所有请求
+     * @param string $method Redis指令
+     * @param array $arguments Redis指令参数
      * @return array
      */
     protected function dispatch(array $opArr, string $method, array $arguments)

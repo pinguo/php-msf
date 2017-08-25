@@ -80,7 +80,7 @@ class Scheduler
     /**
      * 调度协程任务（请求）
      *
-     * @param Task $task
+     * @param Task $task 协程实例
      * @return $this
      */
     public function schedule(Task $task)
@@ -124,10 +124,10 @@ class Scheduler
     /**
      * 开始执行调度请求
      *
-     * @param \Generator $routine
-     * @param Context $context
-     * @param Controller $controller
-     * @param callable|null $callBack
+     * @param \Generator $routine 待调度的迭代器实例
+     * @param Context $context 请求的上下文对象
+     * @param Controller $controller 当前请求控制器名称
+     * @param callable|null $callBack 迭代器执行完成后回调函数
      */
     public function start(\Generator $routine, Context $context, Controller $controller, callable $callBack = null)
     {

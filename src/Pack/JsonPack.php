@@ -12,16 +12,29 @@ use Exception;
 
 class JsonPack implements IPack
 {
+    /**
+     * JSON打包
+     *
+     * @param mixed $data 待打包数据
+     * @return string
+     */
     public function pack($data)
     {
         return json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
+    /**
+     * JSON解包
+     *
+     * @param string $data 待解包数据
+     * @return mixed
+     * @throws Exception
+     */
     public function unPack($data)
     {
         $value = json_decode($data);
         if (empty($value)) {
-            throw new Exception('json unPack失败');
+            throw new Exception('Json unPack失败');
         }
         return $value;
     }

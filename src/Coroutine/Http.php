@@ -35,10 +35,10 @@ class Http extends Base
     /**
      * 初始化Http异步请求协程对象
      *
-     * @param Client $client
-     * @param string $method
-     * @param string $path
-     * @param string|array $data
+     * @param Client $client Client实例
+     * @param string $method HTTP请求的方法
+     * @param string $path HTTP请求的URL Path
+     * @param string|array $data 发送的数据
      * @param int $timeout
      */
     public function __construct(Client $client, $method, $path, $data, $timeout)
@@ -85,7 +85,7 @@ class Http extends Base
     /**
      * 发送异步的HTTP请求
      *
-     * @param callable $callback
+     * @param callable $callback 请求响应的回调函数
      */
     public function send($callback)
     {

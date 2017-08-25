@@ -31,8 +31,8 @@ class Controller extends \PG\MSF\Controllers\Controller
     /**
      * 构造方法
      *
-     * @param string $controllerName
-     * @param string $methodName
+     * @param string $controllerName controller标识
+     * @param string $methodName method名称
      */
     public function __construct($controllerName, $methodName)
     {
@@ -113,10 +113,10 @@ class Controller extends \PG\MSF\Controllers\Controller
     /**
      * 响应json格式数据
      *
-     * @param array|null $data
-     * @param string $message
-     * @param int $status
-     * @param string|null $callback
+     * @param mixed|null $data 响应数据
+     * @param string $message 响应提示
+     * @param int $status 响应HTTP状态码
+     * @param callable|null $callback jsonp参数名
      * @throws \Exception
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
@@ -144,7 +144,7 @@ class Controller extends \PG\MSF\Controllers\Controller
     /**
      * 响应options请求
      *
-     * @param array $options
+     * @param array $options OPTIONS
      */
     public function outputOptions(array $options)
     {
@@ -163,7 +163,7 @@ class Controller extends \PG\MSF\Controllers\Controller
     /**
      * 异常的回调
      *
-     * @param \Throwable $e
+     * @param \Throwable $e 异常
      * @throws \Throwable
      */
     public function onExceptionHandle(\Throwable $e)

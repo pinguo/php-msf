@@ -37,8 +37,8 @@ class AsynPoolManager
     /**
      * AsynPoolManager constructor.
      *
-     * @param \swoole_process $process
-     * @param MSFServer $swooleServer
+     * @param \swoole_process $process 进程对象
+     * @param MSFServer $swooleServer Server运行实例
      */
     public function __construct($process, $swooleServer)
     {
@@ -74,7 +74,7 @@ class AsynPoolManager
     /**
      * 算是管道消息
      *
-     * @param $pipe
+     * @param int $pipe 管道文件描述符号
      * @return $this
      */
     public function getPipeMessage($pipe)
@@ -90,7 +90,7 @@ class AsynPoolManager
     /**
      * 分发消息
      *
-     * @param $data
+     * @param array $data 待分发数据
      * @return $this
      */
     public function distribute($data)
@@ -104,7 +104,7 @@ class AsynPoolManager
     /**
      * 注册异步连接池
      *
-     * @param $asyn
+     * @param IAsynPool $asyn 连接池对象
      * @return $this
      */
     public function registerAsyn(IAsynPool $asyn)
@@ -118,9 +118,9 @@ class AsynPoolManager
     /**
      * 写入管道
      *
-     * @param IAsynPool $asyn
-     * @param $data
-     * @param $workerId
+     * @param IAsynPool $asyn 连接池对象
+     * @param mixed $data 写入数据
+     * @param int $workerId worker进程ID
      * @return $this
      */
     public function writePipe(IAsynPool $asyn, $data, $workerId)
@@ -140,7 +140,8 @@ class AsynPoolManager
     /**
      * 分发消息给worker
      *
-     * @param $data
+     * @param IAsynPool $asyn 连接池对象
+     * @param mixed $data 待分发数据
      * @return $this
      */
     public function sendMessageToWorker(IAsynPool $asyn, $data)

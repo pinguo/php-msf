@@ -49,8 +49,8 @@ class Rpc extends Controller
     /**
      * 构造方法
      *
-     * @param string $controllerName
-     * @param string $methodName
+     * @param string $controllerName controller标识
+     * @param string $methodName method名称
      */
     public function __construct($controllerName, $methodName)
     {

@@ -24,7 +24,7 @@ class Child
     /**
      * 设置上下文
      *
-     * @param Context $context
+     * @param Context $context 请求上下文对象
      * @return $this
      */
     public function setContext($context)

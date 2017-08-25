@@ -31,9 +31,9 @@ class MySql extends Base
     /**
      * MySql constructor.
      *
-     * @param int $_mysqlAsynPool
-     * @param null $_bind_id
-     * @param null $_sql
+     * @param MysqlAsynPool $_mysqlAsynPool MySQL连接池对象
+     * @param int|null $_bind_id bind ID
+     * @param string|null $_sql 执行的SQL
      */
     public function __construct($_mysqlAsynPool, $_bind_id = null, $_sql = null)
     {
@@ -68,7 +68,7 @@ class MySql extends Base
     /**
      * 发送异步的MySQL请求
      *
-     * @param $callback
+     * @param callable $callback 执行SQL后的回调函数
      */
     public function send($callback)
     {

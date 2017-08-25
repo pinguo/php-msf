@@ -51,9 +51,9 @@ class Redis extends Base
     /**
      * 初始化Redis异步请求的协程对象
      *
-     * @param RedisAsynPool $redisAsynPool
-     * @param string $name
-     * @param array $arguments
+     * @param RedisAsynPool $redisAsynPool Redis连接池实例
+     * @param string $name Redis指令
+     * @param array $arguments Redis指令参数
      */
     public function __construct($redisAsynPool, $name, $arguments)
     {
@@ -114,7 +114,7 @@ class Redis extends Base
     /**
      * 发送异步的Redis请求
      *
-     * @param $callback
+     * @param callable $callback Redis指令执行后的回调函数
      */
     public function send($callback)
     {
@@ -125,9 +125,9 @@ class Redis extends Base
     /**
      * 反序列化
      *
-     * @param mixed $data
-     * @param array $keys
-     * @param int $len
+     * @param mixed $data Redis响应数据
+     * @param array $keys Redis操作的Key列表
+     * @param int $len 操作的数据量
      * @return array|bool|mixed
      */
     protected function unSerializeHandler($data, $keys = [], $len = 0)
@@ -182,7 +182,7 @@ class Redis extends Base
     /**
      * 是否可以反序列化
      *
-     * @param string $string
+     * @param string $string 待反序列化的原始数据
      * @return bool
      */
     private function canUnserialize(string $string)
@@ -193,7 +193,7 @@ class Redis extends Base
     /**
      * 真正反序列化
      *
-     * @param string $data
+     * @param string $data 待反序列化的原始数据
      * @return mixed|string
      */
     private function realUnserialize($data)

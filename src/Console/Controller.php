@@ -15,8 +15,8 @@ class Controller extends BController
     /**
      * Controller constructor.
      *
-     * @param string $controllerName
-     * @param string $methodName
+     * @param string $controllerName 控制器名称
+     * @param string $methodName 控制器方法名
      */
     public function __construct($controllerName, $methodName)
     {
