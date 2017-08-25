@@ -222,7 +222,8 @@ abstract class HttpServer extends Server
                             } else {
                                 $controllerInstance->destroy();
                             }
-                        });
+                        }
+                    );
                 } else {
                     $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
                     if ($generator instanceof \Generator) {

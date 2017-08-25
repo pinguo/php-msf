@@ -663,7 +663,7 @@ abstract class Server extends Child
      */
     public function registerTimer($ms, callable $callBack, $params = [])
     {
-        swoole_timer_tick($ms, function($timerId, $params) use ($callBack) {
+        swoole_timer_tick($ms, function ($timerId, $params) use ($callBack) {
             $this->getTimerContext();
             $callBack($timerId, $params);
             $this->getContext()->getLog()->appendNoticeLog();

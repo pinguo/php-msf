@@ -36,8 +36,10 @@ class Task extends TaskProxy
     public function __initialization($taskId, $workerPid, $taskName, $methodName, $context, $objectPool)
     {
         $this->taskId = $taskId;
-        getInstance()->tidPidTable->set($this->taskId,
-            ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]);
+        getInstance()->tidPidTable->set(
+            $this->taskId,
+            ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]
+        );
         if ($context) {
             $PGLog = null;
             $PGLog = clone getInstance()->log;

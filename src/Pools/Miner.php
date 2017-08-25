@@ -1229,8 +1229,10 @@ class Miner
                             $placeholderValues[] = $criterion['value'][0];
                             $placeholderValues[] = $criterion['value'][1];
                         } else {
-                            $value = $this->autoQuote($criterion['value'][0],
-                                    $autoQuote) . " " . self::LOGICAL_AND . " " .
+                            $value = $this->autoQuote(
+                                $criterion['value'][0],
+                                $autoQuote
+                            ) . " " . self::LOGICAL_AND . " " .
                                 $this->autoQuote($criterion['value'][1], $autoQuote);
                         }
 
@@ -1597,8 +1599,10 @@ class Miner
 
                 $this->setPlaceholderValues[] = $set['value'];
             } else {
-                $statement .= $set['column'] . " " . self::EQUALS . " " . $this->autoQuote($set['value'],
-                        $autoQuote) . ", ";
+                $statement .= $set['column'] . " " . self::EQUALS . " " . $this->autoQuote(
+                    $set['value'],
+                    $autoQuote
+                ) . ", ";
             }
         }
 
@@ -2054,8 +2058,13 @@ class Miner
                     $Miner->closeWhere();
                 }
             } else {
-                $Miner->where($where['column'], $where['value'], $where['operator'], $where['connector'],
-                    $where['quote']);
+                $Miner->where(
+                    $where['column'],
+                    $where['value'],
+                    $where['operator'],
+                    $where['connector'],
+                    $where['quote']
+                );
             }
         }
 
@@ -2182,8 +2191,13 @@ class Miner
                     $Miner->closeHaving();
                 }
             } else {
-                $Miner->having($having['column'], $having['value'], $having['operator'],
-                    $having['connector'], $having['quote']);
+                $Miner->having(
+                    $having['column'],
+                    $having['value'],
+                    $having['operator'],
+                    $having['connector'],
+                    $having['quote']
+                );
             }
         }
 
@@ -2567,7 +2581,8 @@ class Miner
             $activeConfig["host"] . ';port=' . $activeConfig['port']??3306;
         $pdo = new \PDO(
             $dsn,
-            $activeConfig["user"], $activeConfig["password"],
+            $activeConfig["user"],
+            $activeConfig["password"],
             [\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $activeConfig['charset']??'utf8']
         );
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -2582,9 +2597,11 @@ class Miner
      */
     public function getPlaceholderValues()
     {
-        return array_merge($this->getSetPlaceholderValues(),
+        return array_merge(
+            $this->getSetPlaceholderValues(),
             $this->getWherePlaceholderValues(),
-            $this->getHavingPlaceholderValues());
+            $this->getHavingPlaceholderValues()
+        );
     }
 
     /**
