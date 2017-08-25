@@ -43,7 +43,7 @@ class CoroutineRedisProxy
     /**
      * CoroutineRedisProxy constructor.
      *
-     * @param RedisAsynPool $redisAsynPool
+     * @param RedisAsynPool $redisAsynPool Redis连接池对象
      */
     public function __construct(RedisAsynPool $redisAsynPool)
     {
@@ -57,10 +57,10 @@ class CoroutineRedisProxy
     /**
      * redis cache 操作封装
      *
-     * @param $context
-     * @param string $key
-     * @param string $value
-     * @param int $expire
+     * @param Context $context 请求上下文对象
+     * @param string $key Redis Key
+     * @param string $value Redis Value
+     * @param int $expire 过期时间，单位秒
      * @return mixed|Redis
      */
     public function cache($context, string $key, $value = '', int $expire = 0)
@@ -141,8 +141,8 @@ class CoroutineRedisProxy
     /**
      * __call魔术方法
      *
-     * @param string $name
-     * @param array $arguments
+     * @param string $name Redis指令
+     * @param array $arguments Redis指令参数
      * @return array|bool|mixed
      */
     public function __call(string $name, array $arguments)
@@ -325,9 +325,9 @@ class CoroutineRedisProxy
     /**
      * 反序列化
      *
-     * @param $data
-     * @param array $keys
-     * @param int $len
+     * @param mixed $data 响应数据
+     * @param array $keys 操作的多个Key列表
+     * @param int $len 操作的数量
      * @return array|bool|mixed
      */
     protected function unSerializeHandler($data, $keys = [], $len = 0)
@@ -382,7 +382,7 @@ class CoroutineRedisProxy
     /**
      * 是否可以反序列化
      *
-     * @param string $string
+     * @param string $string 待反序列化数据
      * @return bool
      */
     private function canUnserialize(string $string)
@@ -393,7 +393,7 @@ class CoroutineRedisProxy
     /**
      * 真正反序列化
      *
-     * @param string $data
+     * @param string $data 待反序列化数据
      * @return mixed|string
      */
     private function realUnserialize($data)

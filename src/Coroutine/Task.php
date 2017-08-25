@@ -56,10 +56,10 @@ class Task
     /**
      * 初始化方法
      *
-     * @param \Generator $routine
-     * @param Context $context
-     * @param Controller $controller
-     * @param $callBack callable|null
+     * @param \Generator $routine 待调度的迭代器实例
+     * @param Context $context 请求的上下文对象
+     * @param Controller $controller 当前请求控制器名称
+     * @param $callBack callable|null 迭代器执行完成后回调函数
      */
     public function __construct(\Generator $routine, Context &$context, Controller &$controller, callable $callBack = null)
     {
@@ -74,7 +74,7 @@ class Task
     /**
      * 重置迭代器
      *
-     * @param \Generator $routine
+     * @param \Generator $routine 迭代器实例
      * @return $this
      */
     public function resetRoutine(\Generator $routine = null)
@@ -97,7 +97,7 @@ class Task
     /**
      * 重置callback
      *
-     * @param callable|null $callBack
+     * @param callable|null $callBack 迭代器执行完成后回调函数
      * @return $this
      */
     public function resetCallBack(callable $callBack = null)
@@ -120,7 +120,7 @@ class Task
     /**
      * 设置调度时产生的异常
      *
-     * @param \Throwable $exception
+     * @param \Throwable $exception 异常实例
      */
     public function setException(\Throwable $exception)
     {
@@ -213,8 +213,8 @@ class Task
     /**
      * 处理协程任务的超时
      *
-     * @param \Throwable $e
-     * @param $value
+     * @param \Throwable $e 异常实例
+     * @param mixed $value 当前迭代的值
      * @return \Throwable
      */
     public function handleTaskTimeout(\Throwable $e, $value)
@@ -239,8 +239,8 @@ class Task
     /**
      * 处理协程任务的异常
      *
-     * @param \Throwable $e
-     * @param $value
+     * @param \Throwable $e 异常实例
+     * @param mixed $value 当前迭代的值
      * @return bool|Exception|\Throwable
      */
     public function handleTaskException(\Throwable $e, $value)

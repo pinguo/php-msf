@@ -68,7 +68,7 @@ class Client extends Core
     /**
      * 设置请求报头
      *
-     * @param array $headers
+     * @param array $headers 键值对应数组的报头列表
      * @return $this
      */
     public function setHeaders($headers)
@@ -100,7 +100,7 @@ class Client extends Core
     /**
      * 设置请求Cookies
      *
-     * @param $cookies
+     * @param array $cookies 键值对应数组的Cookie数据
      * @return $this
      */
     public function setCookies($cookies)
@@ -112,8 +112,8 @@ class Client extends Core
     /**
      * 异步DNS查询
      *
-     * @param $callBack
-     * @param array $headers
+     * @param callable $callBack DNS查询异步回调函数
+     * @param array $headers 键值对应数组的报头列表
      * @throws \Exception
      */
     public function asyncDnsLookup($callBack, array $headers = [])
@@ -466,7 +466,7 @@ class Client extends Core
     /**
      * 标准化解析URL
      *
-     * @param string $url
+     * @param string $url 待解析URL
      * @return bool|mixed
      */
     public static function parseUrl($url)
@@ -518,8 +518,8 @@ class Client extends Core
     /**
      * 发起异步GET请求
      *
-     * @param string $path
-     * @param mixed(array|object) $query
+     * @param string $path 待请求的URL Path
+     * @param mixed(array|object) $query查询参数
      * @param $callback
      */
     public function get($path, $query, $callback)
@@ -533,8 +533,8 @@ class Client extends Core
     /**
      * 发起异步POST请求
      *
-     * @param string $path
-     * @param array $data
+     * @param string $path 待请求的URL Path
+     * @param array $data 发送的POST数据
      * @param $callback
      */
     public function post($path, $data, $callback)
@@ -549,8 +549,8 @@ class Client extends Core
     /**
      * 设置DNS缓存
      *
-     * @param $host
-     * @param $ip
+     * @param string $host HOST名称
+     * @param string $ip 已解析的IP
      */
     public static function setDnsCache($host, $ip)
     {
@@ -562,7 +562,7 @@ class Client extends Core
     /**
      * 清除HOST对应的DNS缓存
      *
-     * @param $host
+     * @param $host HOST名称
      */
     public static function clearDnsCache($host)
     {
@@ -572,7 +572,7 @@ class Client extends Core
     /**
      * 获取DNS缓存
      *
-     * @param $host
+     * @param $host HOST名称
      * @return mixed|null
      */
     public static function getDnsCache($host)

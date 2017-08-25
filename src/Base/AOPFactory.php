@@ -1,6 +1,8 @@
 <?php
 /**
- * AOP类工厂，基于AOP完善的支持请求上下文，Redis连接池及代理
+ * AOP类工厂
+ *
+ * 基于AOP完善的支持请求上下文，Redis连接池及代理，MySQL连接池等
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -8,14 +10,16 @@
 
 namespace PG\MSF\Base;
 
+use PG\MSF\Marco;
+use PG\AOP\MI;
 use PG\AOP\Factory;
 use PG\AOP\Wrapper;
-use PG\AOP\MI;
-use PG\MSF\Marco;
-use PG\MSF\Pools\CoroutineRedisProxy;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
+use PG\MSF\Proxy\RedisProxyCluster;
+use PG\MSF\Proxy\RedisProxyMasterSlave;
 use PG\MSF\Pools\MysqlAsynPool;
+use PG\MSF\Pools\CoroutineRedisProxy;
 
 class AOPFactory extends Factory
 {
@@ -32,9 +36,9 @@ class AOPFactory extends Factory
     /**
      * 获取协程redis
      *
-     * @param CoroutineRedisProxy $redisPoolCoroutine
-     * @param Core $coreBase
-     * @return Wrapper|CoroutineRedisProxy
+     * @param CoroutineRedisProxy $redisPoolCoroutine Redis协程辅助类实例
+     * @param Core $coreBase Core实例（通常为Controller实例）
+     * @return Wrapper|CoroutineRedisProxy AOP包装的CoroutineRedisProxy切片实例
      */
     public static function getRedisPoolCoroutine(CoroutineRedisProxy $redisPoolCoroutine, $coreBase)
     {
@@ -52,9 +56,9 @@ class AOPFactory extends Factory
     /**
      * 获取协程mysql
      *
-     * @param MysqlAsynPool $mysqlPoolCoroutine
-     * @param Core $coreBase
-     * @return Wrapper|MysqlAsynPool
+     * @param MysqlAsynPool $mysqlPoolCoroutine MySQL连接池实例
+     * @param Core $coreBase Core实例（通常为Controller实例）
+     * @return Wrapper|MysqlAsynPool AOP包装的MysqlAsynPool切片实例
      */
     public static function getMysqlPoolCoroutine(MysqlAsynPool $mysqlPoolCoroutine, $coreBase)
     {
@@ -72,9 +76,9 @@ class AOPFactory extends Factory
     /**
      * 获取redis proxy
      *
-     * @param $redisProxy
-     * @param Core $coreBase
-     * @return Wrapper|\Redis
+     * @param RedisProxyCluster|RedisProxyMasterSlave $redisProxy RedisProxy实例
+     * @param Core $coreBase Core实例（通常为Controller实例）
+     * @return Wrapper|\Redis AOP包装的RedisProxyCluster或者RedisProxyMasterSlave切片实例
      */
     public static function getRedisProxy(IProxy $redisProxy, $coreBase)
     {
@@ -94,9 +98,9 @@ class AOPFactory extends Factory
     /**
      * 获取对象池实例
      *
-     * @param Pool $pool
-     * @param Child $coreBase
-     * @return Wrapper|Pool
+     * @param Pool $pool Pool实例
+     * @param Child $coreBase Core实例（通常为Controller实例）
+     * @return Wrapper|Pool AOP包装的Pool切片实例
      */
     public static function getObjectPool(Pool $pool, $coreBase)
     {

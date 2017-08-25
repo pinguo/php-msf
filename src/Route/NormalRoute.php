@@ -41,7 +41,7 @@ class NormalRoute implements IRoute
     /**
      * HTTP请求解析
      *
-     * @param $request
+     * @param \swoole_http_client $request 请求对象
      */
     public function handleHttpRequest($request)
     {
@@ -104,7 +104,7 @@ class NormalRoute implements IRoute
     /**
      * 解析请求的URL PATH
      *
-     * @param $path
+     * @param string $path 待解析URL Path
      * @return bool
      */
     public function parsePath($path)
@@ -156,7 +156,7 @@ class NormalRoute implements IRoute
     /**
      * 解析请求的方法
      *
-     * @param $request
+     * @param \swoole_http_request $request 请求对象
      * @return string
      */
     public function parseVerb($request)
@@ -244,7 +244,7 @@ class NormalRoute implements IRoute
     /**
      * 设置请求的控制器标识
      *
-     * @param string $name
+     * @param string $name 控制器标识
      * @return $this
      */
     public function setControllerName($name)
@@ -256,7 +256,7 @@ class NormalRoute implements IRoute
     /**
      * 设置请求控制器的方法标识
      *
-     * @param string $name
+     * @param string $name 控制器的方法标识
      * @return $this
      */
     public function setMethodName($name)
@@ -268,7 +268,7 @@ class NormalRoute implements IRoute
     /**
      * 设置请求的参数
      *
-     * @param array $params
+     * @param array $params 请求的参数
      * @return $this
      */
     public function setParams($params)
@@ -290,8 +290,8 @@ class NormalRoute implements IRoute
     /**
      * 缓存路由
      *
-     * @param $path
-     * @param $callable
+     * @param string $path URL Path
+     * @param array $callable 路由解析结果
      * @return $this
      */
     public function setRouteCache($path, $callable)
@@ -303,7 +303,7 @@ class NormalRoute implements IRoute
     /**
      * 获取已缓存的路由信息
      *
-     * @param $path
+     * @param string $path URL Path
      * @return mixed|null
      */
     public function getRouteCache($path)

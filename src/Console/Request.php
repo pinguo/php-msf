@@ -52,11 +52,13 @@ class Request
     /**
      * 设置服务器相关变量（兼容Web模式）
      *
-     * @param $params
+     * @param array $params 参数列表
+     * @return $this
      */
     public function setServer($params)
     {
         $this->server = $params;
+        return $this;
     }
 
     /**

@@ -69,7 +69,7 @@ abstract class Base implements IBase
     /**
      * 协程对象初始化（优先执行）
      *
-     * @param int $timeout
+     * @param int $timeout 超时时间，单位毫秒
      */
     public function __construct($timeout = 0)
     {
@@ -187,7 +187,7 @@ abstract class Base implements IBase
     /**
      * 手工设置超时时间
      *
-     * @param int $timeout
+     * @param int $timeout 超时时间，单位毫秒
      * @return $this
      */
     public function setTimeout($timeout)

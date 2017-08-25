@@ -60,8 +60,8 @@ class RedisProxyMasterSlave implements IProxy
     /**
      * RedisProxyMasterSlave constructor.
      *
-     * @param string $name
-     * @param array $config
+     * @param string $name 代理标识
+     * @param array $config 配置对象
      */
     public function __construct(string $name, array $config)
     {
@@ -143,8 +143,8 @@ class RedisProxyMasterSlave implements IProxy
     /**
      * 发送异步Redis请求
      *
-     * @param string $method
-     * @param array $arguments
+     * @param string $method Redis指令
+     * @param array $arguments Redis指令参数
      * @return mixed
      */
     public function handle(string $method, array $arguments)

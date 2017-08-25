@@ -23,8 +23,8 @@ class CException extends Exception
     /**
      * Exception constructor.
      *
-     * @param string $message
-     * @param int $code
+     * @param string $message 异常信息
+     * @param int $code 异常码
      * @param \Exception|null $previous
      */
     public function __construct($message, $code = 0, \Exception $previous = null)

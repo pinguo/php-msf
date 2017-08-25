@@ -121,7 +121,7 @@ class Output extends Core
     /**
      * 构造方法
      *
-     * @param Controller $controller
+     * @param Controller $controller 控制器实例
      */
     public function __construct($controller)
     {
@@ -139,8 +139,8 @@ class Output extends Core
     /**
      * 设置HTTP请求和HTTP响应对象
      *
-     * @param \swoole_http_request $request
-     * @param \swoole_http_response|null $response
+     * @param \swoole_http_request $request HTTP请求对象
+     * @param \swoole_http_response|null $response HTTP请求响应对象
      * @return $this
      */
     public function set(&$request, &$response = null)
@@ -153,7 +153,7 @@ class Output extends Core
     /**
      * 设置HTTP响应状态码
      *
-     * @param int $code
+     * @param int $code HTTP状态码
      * @return $this
      */
     public function setStatusHeader($code = 200)
@@ -165,10 +165,10 @@ class Output extends Core
     /**
      * 响应json格式数据
      *
-     * @param mixed|null $data
-     * @param string $message
-     * @param int $status
-     * @param callable|null $callback
+     * @param mixed|null $data 响应数据
+     * @param string $message 响应提示
+     * @param int $status 响应HTTP状态码
+     * @param callable|null $callback jsonp参数名
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
@@ -196,8 +196,7 @@ class Output extends Core
                 }
                 break;
             case Marco::TCP_REQUEST:
-                $output = json_encode($result);
-                $this->controller->send($output);
+                // @todo
                 break;
         }
     }
@@ -205,8 +204,8 @@ class Output extends Core
     /**
      * 通过模板引擎响应输出HTML
      *
-     * @param array $data
-     * @param string|null $view
+     * @param array $data 待渲染KV数据
+     * @param string|null $view 文件名
      * @throws \Exception
      * @throws \Throwable
      * @throws Exception
@@ -245,7 +244,7 @@ class Output extends Core
     /**
      * 获取jsonp的callback名称
      *
-     * @param string $callback
+     * @param string $callback jsonp的callback参数名称
      * @return string
      */
     public function getCallback($callback)
@@ -268,7 +267,7 @@ class Output extends Core
     /**
      * 设置响应的Content-Type报头
      *
-     * @param string $mime_type
+     * @param string $mime_type Content-Type的值，如application/json;charset=utf-8
      * @return $this
      */
     public function setContentType($mime_type)
@@ -280,8 +279,8 @@ class Output extends Core
     /**
      * 设置响应的其他HTTP报头
      *
-     * @param string $key
-     * @param string $value
+     * @param string $key HTTP报头Key
+     * @param string $value HTTP报头Value
      * @return $this
      */
     public function setHeader($key, $value)
@@ -293,13 +292,13 @@ class Output extends Core
     /**
      * 设置HTTP响应的cookie信息，与PHP的setcookie()参数一致
      *
-     * @param string $key
-     * @param string $value
-     * @param int $expire
-     * @param string $path
-     * @param string $domain
-     * @param bool $secure
-     * @param bool $httponly
+     * @param string $key Cookie名称
+     * @param string $value Cookie值
+     * @param int $expire 有效时间
+     * @param string $path 有效路径
+     * @param string $domain 有效域名
+     * @param bool $secure Cookie是否仅仅通过安全的HTTPS连接传给客户端
+     * @param bool $httponly 设置成TRUE，Cookie仅可通过HTTP协议访问
      * @return $this
      */
     public function setCookie($key, $value = '', $expire = 0, $path = '/', $domain = '', $secure = false, $httponly = false
@@ -312,8 +311,8 @@ class Output extends Core
     /**
      * 结束HTTP请求，发送响应体
      *
-     * @param string $output
-     * @param bool $gzip
+     * @param string $output 发送的数据
+     * @param bool $gzip 是否启用gzip压缩
      */
     public function end($output = '', $gzip = true)
     {

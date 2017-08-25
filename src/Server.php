@@ -523,8 +523,8 @@ abstract class Server extends Child
     /**
      * worker进程/task进程启动回调
      *
-     * @param $serv
-     * @param $workerId
+     * @param \swoole_server $serv server实例
+     * @param int $workerId worker id
      */
     public function onWorkerStart($serv, $workerId)
     {
@@ -603,10 +603,10 @@ abstract class Server extends Child
     /**
      * 当worker/task_worker进程发生异常后会在Manager进程内回调此函数。
      *
-     * @param $serv
-     * @param $workerId
-     * @param $workerPid
-     * @param $exitCode
+     * @param \swoole_server $serv server实例
+     * @param int $workerId worker id
+     * @param int $workerPid worker pid
+     * @param int $exitCode 退出状态码
      */
     public function onWorkerError($serv, $workerId, $workerPid, $exitCode)
     {
@@ -673,11 +673,11 @@ abstract class Server extends Child
     /**
      * 全局错误监听
      *
-     * @param $error
-     * @param $errorString
-     * @param $filename
-     * @param $line
-     * @param $symbols
+     * @param int $error 错误码
+     * @param string $errorString 错误描述
+     * @param string $filename 文件名
+     * @param int $line 文件行
+     * @param array $symbols 符号表
      */
     public function displayErrorHandler($error, $errorString, $filename, $line, $symbols)
     {

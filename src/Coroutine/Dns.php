@@ -25,9 +25,9 @@ class Dns extends Base
     /**
      * Dns constructor.
      *
-     * @param Client $client
-     * @param $timeout
-     * @param array $headers
+     * @param Client $client Client实例
+     * @param int $timeout DNS解析超时时间，单位毫秒
+     * @param array $headers HTTP请求的报头列表
      */
     public function __construct(Client $client, $timeout, $headers = [])
     {
@@ -63,7 +63,7 @@ class Dns extends Base
     /**
      * 发送DNS查询请求
      *
-     * @param callable $callback
+     * @param callable $callback DNS解析完成后的回调
      * @return $this
      */
     public function send($callback)

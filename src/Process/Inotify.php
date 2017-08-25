@@ -26,8 +26,8 @@ class Inotify extends ProcessBase
     /**
      * Inotify constructor.
      *
-     * @param Conf $config
-     * @param MSFServer $MSFServer
+     * @param Conf $config 配置对象
+     * @param MSFServer $MSFServer Server运行实例
      */
     public function __construct(Conf $config, MSFServer $MSFServer)
     {

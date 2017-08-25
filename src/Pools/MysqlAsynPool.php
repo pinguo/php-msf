@@ -53,8 +53,8 @@ class MysqlAsynPool extends AsynPool
     /**
      * MysqlAsynPool constructor.
      *
-     * @param Config $config
-     * @param string $active
+     * @param Config $config 配置对象
+     * @param string $active 连接池名称
      */
     public function __construct($config, $active)
     {
@@ -63,6 +63,12 @@ class MysqlAsynPool extends AsynPool
         $this->bindPool       = [];
     }
 
+    /**
+     * 获取DB Query Builder
+     *
+     * @param Context $context 请求上下文对象
+     * @return Miner
+     */
     public function getDBQueryBuilder(Context $context)
     {
         if (empty($this->dbQueryBuilder)) {
@@ -75,9 +81,9 @@ class MysqlAsynPool extends AsynPool
     }
 
     /**
-     * 执行mysql命令
+     * 执行MySQL SQL
      *
-     * @param $data
+     * @param array $data 执行的SQL信息
      * @throws Exception
      */
     public function execute($data)
@@ -171,7 +177,8 @@ class MysqlAsynPool extends AsynPool
 
     /**
      * 重连或者连接
-     * @param null $client
+     *
+     * @param \swoole_mysql|null $client MySQL连接对象
      */
     public function reconnect($client = null)
     {
@@ -200,8 +207,8 @@ class MysqlAsynPool extends AsynPool
     /**
      * 释放绑定
      *
-     * @param Context $context
-     * @param int $bindId
+     * @param Context $context 请求上下文对象
+     * @param int $bindId bind ID
      */
     public function freeBind(Context $context, $bindId)
     {
@@ -215,7 +222,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 断开链接
      *
-     * @param $client
+     * @param \swoole_mysql $client MySQL连接对象
      */
     public function onClose($client)
     {
@@ -223,6 +230,8 @@ class MysqlAsynPool extends AsynPool
     }
 
     /**
+     * 返回唯一的连接池名称
+     *
      * @return string
      */
     public function getAsynName()
@@ -233,23 +242,23 @@ class MysqlAsynPool extends AsynPool
     /**
      * 开启一个事务
      *
-     * @param Context $context
-     * @param $object
-     * @param $callback
+     * @param Context $context 请求上下文对象
+     * @param mixed $object 绑定对象
+     * @param callable $callback 执行完成后的回调函数
      * @return string
      */
     public function begin(Context $context, $object, $callback)
     {
-        $id = $this->bind($object);
-        $this->query($callback, $id, 'begin');
+        $id = $this->bind($context, $object);
+        $this->query($context, $callback, $id, 'begin');
         return $id;
     }
 
     /**
      * 获取绑定值
      *
-     * @param Context $context
-     * @param $object
+     * @param Context $context 请求上下文对象
+     * @param mixed $object 绑定对象
      * @return string
      */
     public function bind(Context $context, $object)
@@ -264,10 +273,10 @@ class MysqlAsynPool extends AsynPool
     /**
      * 执行一个sql语句
      *
-     * @param Context $context
-     * @param $callback
-     * @param null $bindId
-     * @param null $sql
+     * @param Context $context 请求上下文对象
+     * @param callable $callback 执行完成后的回调函数
+     * @param int|null $bindId 绑定ID
+     * @param string|null $sql SQL语句
      * @throws Exception
      */
     public function query(Context $context, $callback, $bindId = null, $sql = null)
@@ -293,8 +302,8 @@ class MysqlAsynPool extends AsynPool
     /**
      * 开启一个协程事务
      *
-     * @param Context $context
-     * @param $object
+     * @param Context $context 请求上下文对象
+     * @param mixed $object 绑定对象
      * @return MySql
      */
     public function coroutineBegin(Context $context, $object)
@@ -306,9 +315,9 @@ class MysqlAsynPool extends AsynPool
     /**
      * 提交一个事务
      *
-     * @param Context $context
-     * @param $callback
-     * @param $id
+     * @param Context $context 请求上下文对象
+     * @param string $callback 执行完成后的回调函数
+     * @param int $id 绑定ID
      */
     public function commit(Context $context, $callback, $id)
     {
@@ -318,8 +327,8 @@ class MysqlAsynPool extends AsynPool
     /**
      * 协程Commit
      *
-     * @param Context $context
-     * @param $id
+     * @param Context $context 请求上下文对象
+     * @param int $id 绑定ID
      * @return MySql
      */
     public function coroutineCommit(Context $context, $id)
@@ -330,9 +339,9 @@ class MysqlAsynPool extends AsynPool
     /**
      * 回滚
      *
-     * @param Context $context
-     * @param $callback
-     * @param $id
+     * @param Context $context 请求上下文对象
+     * @param callable $callback 执行完成后的回调函数
+     * @param int $id 绑定ID
      */
     public function rollback(Context $context, $callback, $id)
     {
@@ -342,8 +351,8 @@ class MysqlAsynPool extends AsynPool
     /**
      * 协程Rollback
      *
-     * @param Context $context
-     * @param $id
+     * @param Context $context 请求上下文对象
+     * @param int $id 绑定ID
      * @return MySql
      */
     public function coroutineRollback(Context $context, $id)

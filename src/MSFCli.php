@@ -168,8 +168,8 @@ class MSFCli extends MSFServer
     /**
      * 添加异步redis,添加redisProxy
      *
-     * @param $serv
-     * @param $workerId
+     * @param \swoole_server|null $serv server实例
+     * @param int $workerId worker id
      * @throws Exception
      */
     public function onWorkerStart($serv, $workerId)

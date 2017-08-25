@@ -20,8 +20,8 @@ class RedisProxyFactory
     /**
      * 生成proxy对象
      *
-     * @param string $name
-     * @param array $config
+     * @param string $name Redis代理名称
+     * @param array $config 配置对象
      * @return bool|RedisProxyCluster|RedisProxyMasterSlave
      */
     public static function makeProxy(string $name, array $config)

@@ -200,9 +200,9 @@ abstract class MSFServer extends HttpServer
      * 异步Task任务回调
      *
      * @param \swoole_server $serv
-     * @param int $taskId
-     * @param int $fromId
-     * @param array $data
+     * @param int $taskId Task ID
+     * @param int $fromId 来自于哪个worker进程
+     * @param array $data 任务的内容
      * @return mixed|null
      * @throws Exception
      */
@@ -271,9 +271,9 @@ abstract class MSFServer extends HttpServer
     /**
      * PipeMessage
      *
-     * @param \swoole_server $serv
-     * @param int $fromWorkerId
-     * @param string $message
+     * @param \swoole_server $serv server实例
+     * @param int $fromWorkerId worker id
+     * @param string $message 消息内容
      */
     public function onPipeMessage($serv, $fromWorkerId, $message)
     {
@@ -289,9 +289,9 @@ abstract class MSFServer extends HttpServer
     /**
      * 手工添加AsynPool
      *
-     * @param string $name
-     * @param AsynPool $pool
-     * @param bool $isRegister
+     * @param string $name 连接池名称
+     * @param AsynPool $pool 连接池对象
+     * @param bool $isRegister 是否注册到asynPoolManager
      * @throws Exception
      * @return $this
      */
@@ -312,7 +312,7 @@ abstract class MSFServer extends HttpServer
     /**
      * 获取连接池
      *
-     * @param string $name
+     * @param string $name 连接池名称
      * @return AsynPool
      */
     public function getAsynPool($name)
@@ -323,8 +323,8 @@ abstract class MSFServer extends HttpServer
     /**
      * 手工添加redis代理
      *
-     * @param string $name
-     * @param IProxy $proxy
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
      * @throws Exception
      * @return $this
      */
@@ -341,7 +341,7 @@ abstract class MSFServer extends HttpServer
     /**
      * 获取redis代理
      *
-     * @param string $name
+     * @param string $name 代理名称
      * @return mixed
      */
     public function getRedisProxy($name)
@@ -352,8 +352,8 @@ abstract class MSFServer extends HttpServer
     /**
      * 设置redis代理
      *
-     * @param string $name
-     * @param IProxy $proxy
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
      * @return $this
      */
     public function setRedisProxy($name, $proxy)
@@ -375,8 +375,8 @@ abstract class MSFServer extends HttpServer
     /**
      * 添加异步redis,添加redisProxy
      *
-     * @param \swoole_server $serv
-     * @param int $workerId
+     * @param \swoole_server $serv server实例
+     * @param int $workerId worker id
      * @throws Exception
      */
     public function onWorkerStart($serv, $workerId)

@@ -72,7 +72,7 @@ abstract class AsynPool implements IAsynPool
     /**
      * AsynPool constructor.
      *
-     * @param $config
+     * @param Config $config 配置对象
      */
     public function __construct($config)
     {
@@ -85,7 +85,7 @@ abstract class AsynPool implements IAsynPool
     /**
      * 注册回调
      *
-     * @param $callback
+     * @param callable $callback 回调函数
      * @return int
      */
     public function addTokenCallback($callback)
@@ -103,7 +103,7 @@ abstract class AsynPool implements IAsynPool
     /**
      * 分发消息
      *
-     * @param $data
+     * @param array $data 待分发数据
      * @return $this
      */
     public function distribute($data)
@@ -120,8 +120,8 @@ abstract class AsynPool implements IAsynPool
     /**
      * 初始化
      *
-     * @param MSFServer $swooleServer
-     * @param $asynManager
+     * @param MSFServer $swooleServer Server实例
+     * @param AsynPoolManager $asynManager 异步连接池管理器
      * @return $this
      */
     public function serverInit($swooleServer, $asynManager)
@@ -136,7 +136,7 @@ abstract class AsynPool implements IAsynPool
     /**
      * 初始化workerId
      *
-     * @param $workerId
+     * @param int $workerId worker进程ID
      * @return $this
      */
     public function workerInit($workerId)
@@ -149,7 +149,7 @@ abstract class AsynPool implements IAsynPool
     /**
      * 归还连接
      *
-     * @param mixed $client
+     * @param mixed $client 连接对象
      * @return $this
      */
     public function pushToPool($client)

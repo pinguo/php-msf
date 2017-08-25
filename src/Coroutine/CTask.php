@@ -25,9 +25,9 @@ class CTask extends Base
     /**
      * 初始化Task协程对象
      *
-     * @param array $taskProxyData
-     * @param int $id
-     * @param int $timeout
+     * @param array $taskProxyData 待执行的Task信息
+     * @param int $id Task ID
+     * @param int $timeout 超时时间，单位秒
      */
     public function __construct($taskProxyData, $id, $timeout)
     {
@@ -61,7 +61,7 @@ class CTask extends Base
     /**
      * 投递异步任务给Tasker进程
      *
-     * @param callable $callback
+     * @param callable $callback 任务完成后的回调函数
      * @return $this
      */
     public function send($callback)

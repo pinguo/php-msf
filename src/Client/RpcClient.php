@@ -133,10 +133,10 @@ class RpcClient extends Core
     }
 
     /**
-     * 指定服务句柄，一般为控制器
+     * 指定服务句柄，一般为RPC服务导出的类名
      *
-     * @param string $handler
-     * @param array|null
+     * @param string $handler 服务句柄（类名）
+     * @param array|null 服务句柄的构造参数
      * @return RpcClient
      */
     public function handler($handler, $construct = null)
@@ -161,10 +161,10 @@ class RpcClient extends Core
     }
 
     /**
-     * 指定一个远程方法，如控制器名
+     * 指定一个远程服务句柄的方法
      *
-     * @param string $method
-     * @param mixed $args
+     * @param string $method 方法名
+     * @param mixed $args 执行的参数列表
      * @return mixed
      * @throws \Exception
      */
@@ -180,8 +180,8 @@ class RpcClient extends Core
     /**
      * Rpc模式执行远程调用
      *
-     * @param $method
-     * @param array $args
+     * @param string $method 远程服务句柄的方法名
+     * @param array $args 执行的参数列表
      * @return mixed
      * @throws Exception
      */
@@ -233,7 +233,7 @@ class RpcClient extends Core
     /**
      * 多个RPC并行请求
      *
-     * @param array $multiRpc
+     * @param array $multiRpc RpcClient实例列表
      * @return array
      */
     public static function goConcurrent(array $multiRpc)

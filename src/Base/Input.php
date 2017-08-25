@@ -47,7 +47,7 @@ class Input extends Core
     /**
      * 获取POST/GET参数，优先读取POST
      *
-     * @param string $index
+     * @param string $index 请求参数名
      * @return string
      */
     public function postGet($index)
@@ -58,7 +58,7 @@ class Input extends Core
     /**
      * 获取POST参数
      *
-     * @param string $index
+     * @param string $index POST参数名
      * @return string
      */
     public function post($index)
@@ -69,7 +69,7 @@ class Input extends Core
     /**
      * 获取GET参数
      *
-     * @param string $index
+     * @param string $index GET参数名
      * @return string
      */
     public function get($index)
@@ -80,7 +80,7 @@ class Input extends Core
     /**
      * 获取POST/GET参数，优先读取GET
      *
-     * @param string $index
+     * @param string $index 请求参数名
      * @return string
      */
     public function getPost($index)
@@ -152,8 +152,8 @@ class Input extends Core
     /**
      * 设置POST请求参数
      *
-     * @param string $key
-     * @param mixed $value
+     * @param string $key 设置参数的key
+     * @param mixed $value 设置参数的value
      * @return $this
      */
     public function setPost($key, $value)
@@ -165,8 +165,8 @@ class Input extends Core
     /**
      * 设置GET请求参数
      *
-     * @param string $key
-     * @param mixed $value
+     * @param string $key 设置参数的key
+     * @param mixed $value 设置参数的value
      * @return $this
      */
     public function setGet($key, $value)
@@ -178,7 +178,7 @@ class Input extends Core
     /**
      * 设置所有POST请求参数
      *
-     * @param $post
+     * @param array $post 所有的待设置的POST请求参数
      * @return $this
      */
     public function setAllPost(array $post)
@@ -190,7 +190,7 @@ class Input extends Core
     /**
      * 设置所有GET请求参数
      *
-     * @param $get
+     * @param array $get 所有的待设置的GET请求参数
      * @return $this
      */
     public function setAllGet(array $get)
@@ -202,7 +202,7 @@ class Input extends Core
     /**
      * 获取Cookie参数
      *
-     * @param string $index
+     * @param string $index Cookie参数名
      * @return string
      */
     public function getCookie($index)
@@ -213,17 +213,18 @@ class Input extends Core
     /**
      * 获取上传文件信息
      *
-     * @param string $index
+     * @param string $index File文件名
      * @return array
      */
-    public function getFile($index) {
+    public function getFile($index)
+    {
         return $this->request->files[$index] ?? '';
     }
 
     /**
      * 获取Server相关的数据
      *
-     * @param string $index
+     * @param string $index 获取的Server参数名
      * @return array|bool|string
      */
     public function getServer($index)
@@ -294,7 +295,7 @@ class Input extends Core
     /**
      * 获取请求报头参数
      *
-     * @param string $index
+     * @param string $index 请求报头参数名
      * @return string
      */
     public function getHeader($index)

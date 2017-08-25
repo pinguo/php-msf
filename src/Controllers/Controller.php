@@ -42,7 +42,7 @@ class Controller extends Core
     /**
      * Controller constructor.
      *
-     * @param string $controllerName controller名称
+     * @param string $controllerName controller标识
      * @param string $methodName method名称
      */
     public function __construct($controllerName, $methodName)
@@ -65,7 +65,7 @@ class Controller extends Core
     /**
      * 设置对象池
      *
-     * @param Wrapper|\PG\MSF\Memory\Pool|NULL $objectPool
+     * @param Wrapper|\PG\MSF\Memory\Pool|NULL $objectPool Pool实例
      * @return $this
      */
     public function setObjectPool($objectPool)
@@ -99,7 +99,7 @@ class Controller extends Core
     /**
      * 异常的回调
      *
-     * @param \Throwable $e
+     * @param \Throwable $e 异常实例
      * @throws \Throwable
      */
     public function onExceptionHandle(\Throwable $e)
@@ -158,10 +158,10 @@ class Controller extends Core
     /**
      * 响应json格式数据
      *
-     * @param null $data
-     * @param string $message
-     * @param int $status
-     * @param null $callback
+     * @param mixed|null $data 响应数据
+     * @param string $message 响应提示
+     * @param int $status 响应HTTP状态码
+     * @param callable|null $callback jsonp参数名
      * @return void
      */
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
@@ -172,8 +172,8 @@ class Controller extends Core
     /**
      * 通过模板引擎响应输出HTML
      *
-     * @param array $data
-     * @param string|null $view
+     * @param array $data 待渲染KV数据
+     * @param string|null $view 文件名
      * @throws \Exception
      * @throws \Throwable
      * @throws Exception
