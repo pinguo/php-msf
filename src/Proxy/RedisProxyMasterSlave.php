@@ -219,15 +219,19 @@ class RedisProxyMasterSlave implements IProxy
             $loses = array_diff($this->slaves, $newSlaves);
             if ($loses) {
                 $this->slaves = $newSlaves;
-                writeln('Redis Proxy slave nodes change to ( ' . implode(',',
-                        $newSlaves) . ' ), lost ( ' . implode(',', $loses) . ' )');
+                writeln('Redis Proxy slave nodes change to ( ' . implode(
+                    ',',
+                    $newSlaves
+                ) . ' ), lost ( ' . implode(',', $loses) . ' )');
             }
 
             $adds = array_diff($newSlaves, $this->slaves);
             if ($adds) {
                 $this->slaves = $newSlaves;
-                writeln('Redis Proxy slave nodes change to ( ' . implode(',',
-                        $newSlaves) . ' ), add ( ' . implode(',', $adds) . ' )');
+                writeln('Redis Proxy slave nodes change to ( ' . implode(
+                    ',',
+                    $newSlaves
+                ) . ' ), add ( ' . implode(',', $adds) . ' )');
             }
 
             return true;

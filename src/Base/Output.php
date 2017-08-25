@@ -301,7 +301,14 @@ class Output extends Core
      * @param bool $httponly 设置成TRUE，Cookie仅可通过HTTP协议访问
      * @return $this
      */
-    public function setCookie($key, $value = '', $expire = 0, $path = '/', $domain = '', $secure = false, $httponly = false
+    public function setCookie(
+        $key,
+        $value = '',
+        $expire = 0,
+        $path = '/',
+        $domain = '',
+        $secure = false,
+        $httponly = false
     ) {
         $this->response->cookie($key, $value, $expire, $path, $domain, $secure, $httponly);
         return $this;

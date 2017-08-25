@@ -159,7 +159,7 @@ class Core extends Child
             getInstance()->addAsynPool($poolName, $pool, true);
         }
 
-        $this->mysqlPools[$poolName] = AOPFactory::getMysqlPoolCoroutine($pool, $this);;
+        $this->mysqlPools[$poolName] = AOPFactory::getMysqlPoolCoroutine($pool, $this);
         return $this->mysqlPools[$poolName];
     }
 
