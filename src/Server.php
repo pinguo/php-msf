@@ -34,6 +34,11 @@ abstract class Server extends Child
     const mode = 'web';
 
     /**
+     * @var int 进程类型，worker,tasker,user
+     */
+    public $processType = Marco::PROCESS_USER;
+
+    /**
      * @var Server 实例
      */
     protected static $instance;
@@ -696,11 +701,15 @@ abstract class Server extends Child
      */
     public function checkErrors()
     {
-        if (getInstance()->server) {
+        if ($this->processType == Marco::PROCESS_WORKER) {
             // exit统计
             $key = Marco::SERVER_STATS . getInstance()->server->worker_id . '_exit';
             $exitStat = $this->sysCache->get($key);
-            $exitStat++;
+            if (!$exitStat) {
+                $exitStat = 1;
+            } else {
+                $exitStat++;
+            }
             $this->sysCache->set($key, $exitStat);
         }
 

@@ -152,19 +152,26 @@ class RedisAsynPool extends AsynPool
         if (isset($this->redisClient)) {
             return $this->redisClient;
         }
-        //同步redis连接，给task使用
+
+        //task进程内同步redis连接
         $this->redisClient = new \Redis();
-        if ($this->redisClient->connect($this->config['redis'][$this->active]['ip'],
-                $this->config['redis'][$this->active]['port'], 0.05) == false
-        ) {
-            throw new Exception($this->redisClient->getLastError());
+        $conf              = $this->config['redis'][$this->active];
+
+        if ($this->redisClient->connect($conf['ip'], $conf['port'], 0.05) == false) {
+            $addr = $conf['ip'] . ':' . $conf['port'] . ' ';
+            throw new Exception($addr . $this->redisClient->getLastError());
         }
+
         if ($this->config->has('redis.' . $this->active . '.password')) {//存在验证
             if ($this->redisClient->auth($this->config['redis'][$this->active]['password']) == false) {
+
+                $addr = $conf['ip'] . ':' . $conf['port'] . ' password validate failed ';
                 throw new Exception($this->redisClient->getLastError());
             }
         }
+
         if ($this->config->has('redis.' . $this->active . '.select')) {//存在验证
+            $addr = $conf['ip'] . ':' . $conf['port'] . ' select db failed ';
             $this->redisClient->select($this->config['redis'][$this->active]['select']);
         }
 

@@ -61,7 +61,6 @@ class Task extends TaskProxy
      */
     public function destroy()
     {
-        $this->parent == null && $this->getContext()->getLog() && $this->getContext()->getLog()->appendNoticeLog();
         $this->taskId && getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
         $this->taskId = 0;
