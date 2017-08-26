@@ -65,7 +65,7 @@ class Rpc extends Controller
      */
     public function actionIndex(...$arguments)
     {
-        if ($this->getContext()->getInput()->getHeader('x-rpc')) {
+        if ($this->getContext()->getInput()->getHeader('x-rpc') && isset($arguments[0])) {
             $this->parseHttpArgument($arguments);
             yield $this->runMethod();
         } else {
