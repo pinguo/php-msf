@@ -57,7 +57,7 @@ abstract class HttpServer extends Server
     public function setConfig()
     {
         parent::setConfig();
-        $this->httpEnable     = $this->config['http_server']['enable'];
+        $this->httpEnable     = $this->config->get('http_server.enable', true);
         $this->httpSocketName = $this->config['http_server']['socket'];
         $this->httpPort       = $this->config['http_server']['port'];
         return $this;
