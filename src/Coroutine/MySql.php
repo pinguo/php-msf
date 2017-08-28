@@ -18,7 +18,7 @@ use PG\MSF\Pools\MysqlAsynPool;
 class MySql extends Base
 {
     /**
-     * @var MysqlAsynPool
+     * @var MysqlAsynPool MySQL连接池对象
      */
     public $mysqlAsynPool;
 

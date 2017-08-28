@@ -48,12 +48,12 @@ class Task
     protected $id;
 
     /**
-     * @var \Throwable
+     * @var \Throwable 迭代过程中的异常
      */
     protected $exception;
 
     /**
-     * @var callable|null
+     * @var callable|null 迭代完成时执行回调函数
      */
     protected $callBack;
 

@@ -198,7 +198,9 @@ class Context extends AbstractContext
     }
 
     /**
-     * @inheritdoc
+     * 属性不用于序列化
+     *
+     * @return array
      */
     public function __sleep()
     {
