@@ -151,11 +151,11 @@ class Miner
      */
     const BRACKET_CLOSE = ")";
     /**
-     * @var MysqlAsynPool
+     * @var MysqlAsynPool MySQL连接池
      */
     public $mysqlPool;
     /**
-     * @var array
+     * @var array MySQL连接池配置
      */
     protected $activeConfig;
     /**
@@ -2436,6 +2436,9 @@ class Miner
         return $this;
     }
 
+    /**
+     * 清除Build Query相关变量数据
+     */
     public function clear()
     {
         $this->option = array();
