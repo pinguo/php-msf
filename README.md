@@ -44,7 +44,7 @@ php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleD
 
 ## 文档
 
-API Document: 
+API Document: [类文档](https://rawgit.com/PGWireless/php-msf/master/api/index.html)
 
 框架手册: [目录](./doc/preface-目录.md)
 
