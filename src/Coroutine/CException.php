@@ -17,7 +17,9 @@ use Exception;
 class CException extends Exception
 {
     /**
-     * @return string 获取前一个异常Message
+     * 获取前一个异常Message
+     *
+     * @return string
      */
     public function getPreviousMessage()
     {

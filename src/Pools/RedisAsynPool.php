@@ -13,6 +13,7 @@ use Exception;
 use Noodlehaus\Config;
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
+use PG\MSF\MSFServer;
 
 /**
  * Class RedisAsynPool
@@ -104,7 +105,11 @@ class RedisAsynPool extends AsynPool
     }
 
     /**
-     * @inheritdoc
+     * 初始化
+     *
+     * @param MSFServer $swooleServer Server实例
+     * @param AsynPoolManager $asynManager 异步连接池管理器
+     * @return $this
      */
     public function serverInit($swooleServer, $asynManager)
     {

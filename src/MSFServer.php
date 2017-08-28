@@ -73,7 +73,9 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * @inheritdoc
+     * 启动服务
+     *
+     * @return $this|void
      */
     public function start()
     {
@@ -82,7 +84,9 @@ abstract class MSFServer extends HttpServer
 
 
     /**
-     * @inheritdoc
+     * 设置并解析配置
+     *
+     * @return $this
      */
     public function setConfig()
     {

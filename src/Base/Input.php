@@ -20,7 +20,9 @@ class Input extends Core
     public $request;
 
     /**
-     * @inheritdoc
+     * 属性不用于序列化
+     *
+     * @return array
      */
     public function __sleep()
     {
