@@ -11,6 +11,10 @@ namespace PG\MSF\Process;
 use Noodlehaus\Config as Conf;
 use PG\MSF\MSFServer;
 
+/**
+ * Class Inotify
+ * @package PG\MSF\Process
+ */
 class Inotify extends ProcessBase
 {
     /**

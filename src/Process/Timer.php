@@ -14,6 +14,10 @@ namespace PG\MSF\Process;
 use Noodlehaus\Config as Conf;
 use PG\MSF\MSFServer;
 
+/**
+ * Class Timer
+ * @package PG\MSF\Process
+ */
 class Timer extends ProcessBase
 {
     /**

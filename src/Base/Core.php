@@ -17,6 +17,10 @@ use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Pools\CoroutineRedisProxy;
 
+/**
+ * Class Core
+ * @package PG\MSF\Base
+ */
 class Core extends Child
 {
     /**

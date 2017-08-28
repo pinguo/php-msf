@@ -13,6 +13,10 @@ use PG\MSF\Base\Core;
 use PG\MSF\Coroutine\Dns;
 use PG\MSF\Coroutine\Http;
 
+/**
+ * Class Client
+ * @package PG\MSF\Client\Http
+ */
 class Client extends Core
 {
     /**

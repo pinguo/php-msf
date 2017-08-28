@@ -11,6 +11,10 @@ namespace PG\MSF\Proxy;
 use Exception;
 use PG\MSF\Pools\RedisAsynPool;
 
+/**
+ * Class RedisProxyMasterSlave
+ * @package PG\MSF\Proxy
+ */
 class RedisProxyMasterSlave implements IProxy
 {
     /**

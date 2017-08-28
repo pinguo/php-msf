@@ -14,6 +14,10 @@ use Noodlehaus\Config;
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
 
+/**
+ * Class RedisAsynPool
+ * @package PG\MSF\Pools
+ */
 class RedisAsynPool extends AsynPool
 {
     /**

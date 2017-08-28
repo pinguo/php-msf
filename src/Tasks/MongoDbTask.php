@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Tasks;
 
+/**
+ * Class MongoDbTask
+ * @package PG\MSF\Tasks
+ */
 class MongoDbTask extends Task
 {
     /**

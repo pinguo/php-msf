@@ -14,6 +14,10 @@ use PG\MSF\Base\Input;
 use PG\MSF\Base\Output;
 use PG\MSF\Base\AOPFactory;
 
+/**
+ * Class HttpServer
+ * @package PG\MSF
+ */
 abstract class HttpServer extends Server
 {
     /**

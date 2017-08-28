@@ -11,6 +11,10 @@ namespace PG\MSF\Coroutine;
 use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Marco;
 
+/**
+ * Class Redis
+ * @package PG\MSF\Coroutine
+ */
 class Redis extends Base
 {
     /**

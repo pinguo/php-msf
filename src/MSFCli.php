@@ -17,6 +17,10 @@ use PG\MSF\Base\Input;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Base\AOPFactory;
 
+/**
+ * Class MSFCli
+ * @package PG\MSF
+ */
 class MSFCli extends MSFServer
 {
     /**

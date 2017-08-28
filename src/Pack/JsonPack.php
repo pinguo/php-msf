@@ -10,6 +10,10 @@ namespace PG\MSF\Pack;
 
 use Exception;
 
+/**
+ * Class JsonPack
+ * @package PG\MSF\Pack
+ */
 class JsonPack implements IPack
 {
     /**

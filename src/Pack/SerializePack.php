@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Pack;
 
+/**
+ * Class SerializePack
+ * @package PG\MSF\Pack
+ */
 class SerializePack implements IPack
 {
     /**

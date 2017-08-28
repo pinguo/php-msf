@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Console;
 
+/**
+ * Class Request
+ * @package PG\MSF\Console
+ */
 class Request
 {
     /**

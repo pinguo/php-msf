@@ -10,6 +10,10 @@ namespace PG\MSF\Coroutine;
 
 use Exception;
 
+/**
+ * Class CException
+ * @package PG\MSF\Coroutine
+ */
 class CException extends Exception
 {
     /**

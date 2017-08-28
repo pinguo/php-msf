@@ -12,6 +12,10 @@ namespace PG\MSF\Pools;
 use PG\MSF\Marco;
 use PG\MSF\MSFServer;
 
+/**
+ * Class AsynPoolManager
+ * @package PG\MSF\Pools
+ */
 class AsynPoolManager
 {
     /**
@@ -30,7 +34,7 @@ class AsynPoolManager
     protected $registerDir = [];
 
     /**
-     * @var bool
+     * @var bool 采用进程通讯，默认每个进程都启用进程池
      */
     protected $notEventAdd = false;
 

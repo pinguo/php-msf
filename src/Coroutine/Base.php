@@ -11,6 +11,10 @@ namespace PG\MSF\Coroutine;
 use Exception;
 use PG\AOP\MI;
 
+/**
+ * Class Base
+ * @package PG\MSF\Coroutine
+ */
 abstract class Base implements IBase
 {
     // use property and method insert

@@ -21,6 +21,10 @@ use PG\MSF\Proxy\RedisProxyMasterSlave;
 use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Pools\CoroutineRedisProxy;
 
+/**
+ * Class AOPFactory
+ * @package PG\MSF\Base
+ */
 class AOPFactory extends Factory
 {
     /**

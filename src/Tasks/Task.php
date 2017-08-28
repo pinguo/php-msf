@@ -13,6 +13,10 @@ use PG\MSF\Helpers\Context;
 use PG\AOP\Wrapper;
 use PG\MSF\Memory\Pool;
 
+/**
+ * Class Task
+ * @package PG\MSF\Tasks
+ */
 class Task extends TaskProxy
 {
     /**

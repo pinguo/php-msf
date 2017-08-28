@@ -14,6 +14,10 @@ use Flexihash\Hasher\Md5Hasher;
 use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Helpers\Context;
 
+/**
+ * Class RedisProxyCluster
+ * @package PG\MSF\Proxy
+ */
 class RedisProxyCluster extends Flexihash implements IProxy
 {
     /**

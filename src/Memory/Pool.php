@@ -11,6 +11,10 @@ namespace PG\MSF\Memory;
 use Exception;
 use PG\AOP\Wrapper;
 
+/**
+ * Class Pool
+ * @package PG\MSF\Memory
+ */
 class Pool
 {
     /**

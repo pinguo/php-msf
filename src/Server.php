@@ -21,6 +21,10 @@ use PG\MSF\Base\AOPFactory;
 use PG\MSF\Memory\Pool;
 use PG\MSF\Route\NormalRoute;
 
+/**
+ * Class Server
+ * @package PG\MSF
+ */
 abstract class Server extends Child
 {
     /**

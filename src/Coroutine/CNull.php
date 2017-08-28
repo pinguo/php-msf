@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Coroutine;
 
+/**
+ * Class CNull
+ * @package PG\MSF\Coroutine
+ */
 class CNull
 {
     private static $instance;

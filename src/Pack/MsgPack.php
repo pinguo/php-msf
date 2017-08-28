@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Pack;
 
+/**
+ * Class MsgPack
+ * @package PG\MSF\Pack
+ */
 class MsgPack implements IPack
 {
     /**

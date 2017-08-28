@@ -13,6 +13,10 @@ use PG\MSF\Helpers\Context;
 use PG\MSF\Controllers\Controller;
 use PG\AOP\MI;
 
+/**
+ * Class Task
+ * @package PG\MSF\Coroutine
+ */
 class Task
 {
     // use property and method insert

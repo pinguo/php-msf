@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Route;
 
+/**
+ * Class RestRoute
+ * @package PG\MSF\Route
+ */
 class RestRoute extends NormalRoute
 {
     /**

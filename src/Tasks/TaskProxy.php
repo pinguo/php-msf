@@ -12,6 +12,10 @@ use PG\MSF\Marco;
 use PG\MSF\Base\Core;
 use PG\MSF\Coroutine\CTask;
 
+/**
+ * Class TaskProxy
+ * @package PG\MSF\Tasks
+ */
 class TaskProxy extends Core
 {
 

@@ -12,6 +12,10 @@ namespace PG\MSF\Pools;
 use Noodlehaus\Config;
 use PG\MSF\MSFServer;
 
+/**
+ * Class AsynPool
+ * @package PG\MSF\Pools
+ */
 abstract class AsynPool implements IAsynPool
 {
     /**

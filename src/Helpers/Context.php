@@ -15,6 +15,10 @@ use PG\MSF\Base\Output;
 use PG\MSF\Memory\Pool;
 use PG\AOP\MI;
 
+/**
+ * Class Context
+ * @package PG\MSF\Helpers
+ */
 class Context extends AbstractContext
 {
     use MI;

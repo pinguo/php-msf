@@ -12,6 +12,10 @@ use Exception;
 use PG\MSF\Marco;
 use PG\MSF\Controllers\Controller;
 
+/**
+ * Class Output
+ * @package PG\MSF\Base
+ */
 class Output extends Core
 {
     /**
