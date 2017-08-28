@@ -30,7 +30,9 @@ class Input extends Core
     }
 
     /**
-     * @param \swoole_http_request|\PG\MSF\Console\Request $request 设置请求参数对象
+     * 设置请求参数对象
+     *
+     * @param \swoole_http_request|\PG\MSF\Console\Request $request 请求参数对象
      * @return $this
      */
     public function set($request)

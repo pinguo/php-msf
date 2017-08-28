@@ -44,7 +44,7 @@ class Core extends Child
     protected $__isDestroy = false;
 
     /**
-     * @var null
+     * @var \stdClass|null 对象模板
      */
     public static $stdClass = null;
 

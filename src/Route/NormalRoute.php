@@ -25,7 +25,7 @@ class NormalRoute implements IRoute
     public $routeCache;
 
     /**
-     * @var \stdClass
+     * @var \stdClass 请求的路由相关信息
      */
     protected $routePrams;
 

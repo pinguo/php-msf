@@ -123,7 +123,7 @@ abstract class Server extends Child
     public $onErrorHandle = null;
 
     /**
-     * @var \swoole_server
+     * @var \swoole_server Server运行实例
      */
     public $server;
 
@@ -138,12 +138,12 @@ abstract class Server extends Child
     public $log;
 
     /**
-     * @var null
+     * @var \stdClass|null 对象模板
      */
     protected static $stdClass = null;
 
     /**
-     * @var \Yac
+     * @var \Yac 系统共享对象操作句柄
      */
     public $sysCache;
 
@@ -218,6 +218,11 @@ abstract class Server extends Child
         $this->pack = new $packClassName;
     }
 
+    /**
+     * 创建用户自定义定时进程的上下文对象
+     *
+     * @return NULL|Context
+     */
     public function getTimerContext()
     {
         $context = new Context();
@@ -664,6 +669,7 @@ abstract class Server extends Child
      *
      * @param int $ms 定时器间隔毫秒
      * @param callable $callBack 定时器执行的回调
+     * @param array $params 定时器其他参数
      */
     public function registerTimer($ms, callable $callBack, $params = [])
     {

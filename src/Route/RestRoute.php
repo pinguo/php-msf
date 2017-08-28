@@ -38,7 +38,7 @@ class RestRoute extends NormalRoute
     public $restRules = [];
 
     /**
-     * @var string
+     * @var string HTTP请求方法
      */
     public $verb;
 
