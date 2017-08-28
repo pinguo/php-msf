@@ -10,6 +10,10 @@
 
 namespace PG\MSF\Coroutine;
 
+/**
+ * Class CTask
+ * @package PG\MSF\Coroutine
+ */
 class CTask extends Base
 {
     /**
