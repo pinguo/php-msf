@@ -108,7 +108,7 @@ class Scheduler
                 // 请求调度结束（考虑是有否回调）
                 $task->resetRoutine();
                 if (is_callable($task->getCallBack())) {
-                    ($task->getCallBack())();
+                    $task->getCallBack()();
                     $task->resetCallBack();
                     break;
                 }

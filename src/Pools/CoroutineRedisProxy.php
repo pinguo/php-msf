@@ -292,7 +292,8 @@ class CoroutineRedisProxy
     /**
      * 序列化
      *
-     * @param $data
+     * @param mixed $data 待序列化数据
+     * @param bool $phpSerialize 是否启动PHP序列化
      * @return string
      */
     protected function serializeHandler($data, $phpSerialize = false)
