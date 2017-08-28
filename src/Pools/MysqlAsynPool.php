@@ -35,7 +35,7 @@ class MysqlAsynPool extends AsynPool
     public $dbQueryBuilder;
 
     /**
-     * @var array
+     * @var array 绑定的连接映射表
      */
     public $bindPool;
 
