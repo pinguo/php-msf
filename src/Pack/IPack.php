@@ -14,7 +14,19 @@ namespace PG\MSF\Pack;
  */
 interface IPack
 {
+    /**
+     * 打包
+     *
+     * @param $data
+     * @return string
+     */
     function pack($data);
 
+    /**
+     * 解包
+     *
+     * @param $data
+     * @return mixed
+     */
     function unPack($data);
 }

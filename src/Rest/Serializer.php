@@ -104,6 +104,8 @@ class Serializer
     }
 
     /**
+     * Requested fields
+     *
      * @return array the names of the requested fields. The first element is an array
      * representing the list of default fields requested, while the second element is
      * an array of the extra fields requested in addition to the default fields.
