@@ -13,6 +13,10 @@ use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Marco;
 
+/**
+ * Class CoroutineRedisProxy
+ * @package PG\MSF\Pools
+ */
 class CoroutineRedisProxy
 {
     /**

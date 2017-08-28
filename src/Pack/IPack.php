@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Pack;
 
+/**
+ * Interface IPack
+ * @package PG\MSF\Pack
+ */
 interface IPack
 {
     function pack($data);

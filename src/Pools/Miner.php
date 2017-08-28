@@ -12,6 +12,10 @@ namespace PG\MSF\Pools;
 use PG\MSF\Coroutine\MySql;
 use PG\AOP\MI;
 
+/**
+ * Class Miner
+ * @package PG\MSF\Pools
+ */
 class Miner
 {
     // use property and method insert

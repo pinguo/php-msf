@@ -10,6 +10,10 @@ namespace PG\MSF\Controllers;
 
 use Exception;
 
+/**
+ * Class Rpc
+ * @package PG\MSF\Controllers
+ */
 class Rpc extends Controller
 {
     /**

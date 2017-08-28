@@ -12,6 +12,10 @@ use Noodlehaus\Config as Conf;
 use PG\MSF\Marco;
 use PG\MSF\MSFServer;
 
+/**
+ * Class ProcessBase
+ * @package PG\MSF\Process
+ */
 abstract class ProcessBase
 {
     /**

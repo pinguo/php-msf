@@ -10,6 +10,10 @@ namespace PG\MSF\Proxy;
 
 use PG\MSF\Marco;
 
+/**
+ * Class RedisProxyFactory
+ * @package PG\MSF\Proxy
+ */
 class RedisProxyFactory
 {
     /**

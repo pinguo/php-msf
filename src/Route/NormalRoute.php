@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Route;
 
+/**
+ * Class NormalRoute
+ * @package PG\MSF\Route
+ */
 class NormalRoute implements IRoute
 {
     /**

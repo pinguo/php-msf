@@ -2,16 +2,6 @@
 /**
  * RestTestController
  *
- * @author camera360_server@camera360.com
- * @copyright Chengdu pinguo Technology Co.,Ltd.
- */
-
-namespace PG\MSF\Controllers;
-
-use PG\MSF\Rest\Controller;
-use PG\MSF\Base\Output;
-
-/**
  * Restful 测试
  * 选择路由器：
  * $config['server']['route_tool'] = '\\PG\\MSF\\Rest\\Route';
@@ -35,6 +25,18 @@ use PG\MSF\Base\Output;
  *     options -> 查看资源所支持的HTTP动词，如：/users/<id> | /users
  *     create -> 新建资源，如：/users
  * ]
+ *
+ * @author camera360_server@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+
+namespace PG\MSF\Controllers;
+
+use PG\MSF\Rest\Controller;
+use PG\MSF\Base\Output;
+
+/**
+ *
  * Class RestController
  * @package PG\MSF\Controllers
  */

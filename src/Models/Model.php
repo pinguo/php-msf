@@ -10,6 +10,10 @@ namespace PG\MSF\Models;
 
 use PG\MSF\Base\Core;
 
+/**
+ * Class Model
+ * @package PG\MSF\Models
+ */
 class Model extends Core
 {
 }

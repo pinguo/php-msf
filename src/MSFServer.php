@@ -21,6 +21,10 @@ use PG\MSF\Proxy\IProxy;
 use PG\MSF\Tasks\Task;
 use PG\MSF\Base\AOPFactory;
 
+/**
+ * Class MSFServer
+ * @package PG\MSF
+ */
 abstract class MSFServer extends HttpServer
 {
     /**

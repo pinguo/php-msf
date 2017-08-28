@@ -11,6 +11,10 @@ namespace PG\MSF\Base;
 use PG\MSF\Helpers\Context;
 use PG\AOP\MI;
 
+/**
+ * Class Child
+ * @package PG\MSF\Base
+ */
 class Child
 {
     // use property and method insert

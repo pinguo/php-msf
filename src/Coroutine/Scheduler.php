@@ -12,6 +12,10 @@ use PG\MSF\Base\Core;
 use PG\MSF\Controllers\Controller;
 use PG\MSF\Helpers\Context;
 
+/**
+ * Class Scheduler
+ * @package PG\MSF\Coroutine
+ */
 class Scheduler
 {
     /**

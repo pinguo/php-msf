@@ -11,6 +11,10 @@ namespace PG\MSF\Coroutine;
 use Exception;
 use PG\MSF\Pools\MysqlAsynPool;
 
+/**
+ * Class MySql
+ * @package PG\MSF\Coroutine
+ */
 class MySql extends Base
 {
     /**

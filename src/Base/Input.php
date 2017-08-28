@@ -8,6 +8,10 @@
 
 namespace PG\MSF\Base;
 
+/**
+ * Class Input
+ * @package PG\MSF\Base
+ */
 class Input extends Core
 {
     /**

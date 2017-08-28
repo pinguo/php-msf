@@ -17,6 +17,10 @@ use PG\MSF\Base\Core;
 use Exception;
 use PG\MSF\Coroutine\CException;
 
+/**
+ * Class Controller
+ * @package PG\MSF\Controllers
+ */
 class Controller extends Core
 {
     /**

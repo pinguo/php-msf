@@ -11,6 +11,10 @@ namespace PG\MSF\Controllers;
 use PG\MSF\Marco;
 use PG\MSF\Client\Http\Client;
 
+/**
+ * Class Monitor
+ * @package PG\MSF\Controllers
+ */
 class Monitor extends Controller
 {
     /**

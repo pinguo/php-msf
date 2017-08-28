@@ -13,6 +13,10 @@ use PG\Exception\PrivilegeException;
 use PG\MSF\Base\Output;
 use PG\MSF\Coroutine\CException;
 
+/**
+ * Class Controller
+ * @package PG\MSF\Rest
+ */
 class Controller extends \PG\MSF\Controllers\Controller
 {
     /**

@@ -10,6 +10,10 @@ namespace PG\MSF\Coroutine;
 
 use PG\MSF\Client\Http\Client;
 
+/**
+ * Class Dns
+ * @package PG\MSF\Coroutine
+ */
 class Dns extends Base
 {
     /**

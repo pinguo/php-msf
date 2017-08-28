@@ -10,6 +10,10 @@ namespace PG\MSF\Console;
 
 use PG\MSF\Controllers\Controller as BController;
 
+/**
+ * Class Controller
+ * @package PG\MSF\Console
+ */
 class Controller extends BController
 {
     /**

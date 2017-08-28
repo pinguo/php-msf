@@ -2,6 +2,8 @@
 /**
  * Rest Serializer
  *
+ * 暂未实现，后面如果在 Restful 返回值中需要有 _links 或在 header 中加入分页信息可用...
+ *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
@@ -9,7 +11,6 @@
 namespace PG\MSF\Rest;
 
 /**
- * 暂未实现，后面如果在 Restful 返回值中需要有 _links 或在 header 中加入分页信息可用...
  * Class Serializer
  * @package PG\MSF\Rest
  */

@@ -20,6 +20,10 @@ use Exception;
 use PG\MSF\Client\Http\Client;
 use PG\MSF\Base\Core;
 
+/**
+ * Class RpcClient
+ * @package PG\MSF\Client
+ */
 class RpcClient extends Core
 {
     /**

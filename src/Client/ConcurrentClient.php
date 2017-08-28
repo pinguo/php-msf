@@ -15,6 +15,10 @@ use PG\MSF\Base\Core;
 use PG\MSF\Client\Http\Client;
 use PG\MSF\Coroutine\Dns;
 
+/**
+ * Class ConcurrentClient
+ * @package PG\MSF\Client
+ */
 class ConcurrentClient
 {
     /**

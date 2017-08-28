@@ -10,6 +10,10 @@ namespace PG\MSF\Coroutine;
 
 use PG\MSF\Client\Http\Client;
 
+/**
+ * Class Http
+ * @package PG\MSF\Coroutine
+ */
 class Http extends Base
 {
     /**
@@ -67,7 +71,7 @@ class Http extends Base
 
             $this->result       = (array)$client;
             // 发现拒绝建立连接，删除DNS缓存
-            if (is_object($client) && $client->errCode == 111) {
+            if (is_object($client) && ($client->errCode == 111 || $client->statusCode == 404)) {
                 Client::clearDnsCache($this->client->urlData['host']);
             }
 
