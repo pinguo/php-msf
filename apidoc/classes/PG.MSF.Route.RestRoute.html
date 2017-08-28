@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/PG.html">\PG</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">4</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-421408408"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-421408408" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1859174894"></a>
+                                <a href="../namespaces/PG.html" style="margin-left: 30px; padding-left: 0">PG</a>
+            </div>
+            <div id="namespace-1859174894" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1026659398"></a>
+                                <a href="../namespaces/PG.MSF.html" style="margin-left: 30px; padding-left: 0">MSF</a>
+            </div>
+            <div id="namespace-1026659398" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1458737421"></a>
+                                <a href="../namespaces/PG.MSF.Base.html" style="margin-left: 30px; padding-left: 0">Base</a>
+            </div>
+            <div id="namespace-1458737421" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Base.AOPFactory.html">AOPFactory</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Child.html">Child</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Core.html">Core</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Input.html">Input</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Output.html">Output</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-852738643"></a>
+                                <a href="../namespaces/PG.MSF.Client.html" style="margin-left: 30px; padding-left: 0">Client</a>
+            </div>
+            <div id="namespace-852738643" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-509857671"></a>
+                                <a href="../namespaces/PG.MSF.Client.Http.html" style="margin-left: 30px; padding-left: 0">Http</a>
+            </div>
+            <div id="namespace-509857671" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Client.Http.Client.html">Client</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Client.ConcurrentClient.html">ConcurrentClient</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Client.RpcClient.html">RpcClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-577776700"></a>
+                                <a href="../namespaces/PG.MSF.Console.html" style="margin-left: 30px; padding-left: 0">Console</a>
+            </div>
+            <div id="namespace-577776700" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Console.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Console.Request.html">Request</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-299184994"></a>
+                                <a href="../namespaces/PG.MSF.Controllers.html" style="margin-left: 30px; padding-left: 0">Controllers</a>
+            </div>
+            <div id="namespace-299184994" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Monitor.html">Monitor</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Rest.html">Rest</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Rpc.html">Rpc</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-264862827"></a>
+                                <a href="../namespaces/PG.MSF.Coroutine.html" style="margin-left: 30px; padding-left: 0">Coroutine</a>
+            </div>
+            <div id="namespace-264862827" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Coroutine.IBase.html">IBase</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Base.html">Base</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CException.html">CException</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CNull.html">CNull</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CTask.html">CTask</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Dns.html">Dns</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.MySql.html">MySql</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Redis.html">Redis</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Scheduler.html">Scheduler</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Task.html">Task</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-656251997"></a>
+                                <a href="../namespaces/PG.MSF.Helpers.html" style="margin-left: 30px; padding-left: 0">Helpers</a>
+            </div>
+            <div id="namespace-656251997" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Helpers.Context.html">Context</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1392844705"></a>
+                                <a href="../namespaces/PG.MSF.Memory.html" style="margin-left: 30px; padding-left: 0">Memory</a>
+            </div>
+            <div id="namespace-1392844705" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Memory.Pool.html">Pool</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-767916670"></a>
+                                <a href="../namespaces/PG.MSF.Models.html" style="margin-left: 30px; padding-left: 0">Models</a>
+            </div>
+            <div id="namespace-767916670" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Models.Model.html">Model</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2086684918"></a>
+                                <a href="../namespaces/PG.MSF.Pack.html" style="margin-left: 30px; padding-left: 0">Pack</a>
+            </div>
+            <div id="namespace-2086684918" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Pack.IPack.html">IPack</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Pack.JsonPack.html">JsonPack</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pack.MsgPack.html">MsgPack</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pack.SerializePack.html">SerializePack</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-614921849"></a>
+                                <a href="../namespaces/PG.MSF.Pools.html" style="margin-left: 30px; padding-left: 0">Pools</a>
+            </div>
+            <div id="namespace-614921849" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Pools.IAsynPool.html">IAsynPool</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Pools.AsynPool.html">AsynPool</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.AsynPoolManager.html">AsynPoolManager</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html">CoroutineRedisProxy</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.Miner.html">Miner</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.MysqlAsynPool.html">MysqlAsynPool</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.RedisAsynPool.html">RedisAsynPool</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2073777149"></a>
+                                <a href="../namespaces/PG.MSF.Process.html" style="margin-left: 30px; padding-left: 0">Process</a>
+            </div>
+            <div id="namespace-2073777149" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Process.Config.html">Config</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.Inotify.html">Inotify</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.ProcessBase.html">ProcessBase</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.Timer.html">Timer</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-29034010"></a>
+                                <a href="../namespaces/PG.MSF.Proxy.html" style="margin-left: 30px; padding-left: 0">Proxy</a>
+            </div>
+            <div id="namespace-29034010" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Proxy.IProxy.html">IProxy</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyCluster.html">RedisProxyCluster</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyFactory.html">RedisProxyFactory</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyMasterSlave.html">RedisProxyMasterSlave</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1012956325"></a>
+                                <a href="../namespaces/PG.MSF.Rest.html" style="margin-left: 30px; padding-left: 0">Rest</a>
+            </div>
+            <div id="namespace-1012956325" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Rest.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Rest.Serializer.html">Serializer</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-893143197"></a>
+                                <a href="../namespaces/PG.MSF.Route.html" style="margin-left: 30px; padding-left: 0">Route</a>
+            </div>
+            <div id="namespace-893143197" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Route.IRoute.html">IRoute</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Route.NormalRoute.html">NormalRoute</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Route.RestRoute.html">RestRoute</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-152648809"></a>
+                                <a href="../namespaces/PG.MSF.Tasks.html" style="margin-left: 30px; padding-left: 0">Tasks</a>
+            </div>
+            <div id="namespace-152648809" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.MongoDbTask.html">MongoDbTask</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.Task.html">Task</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.TaskProxy.html">TaskProxy</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.HttpServer.html">HttpServer</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Marco.html">Marco</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.MSFCli.html">MSFCli</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.MSFServer.html">MSFServer</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Server.html">Server</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/PG.MSF.Route.html">\PG\MSF\Route</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\PG\MSF\Route</small>RestRoute</h1>
+                    <p><em>Class RestRoute</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_handleHttpRequest" class="">handleHttpRequest()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_findControllerClassName" class="">findControllerClassName()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_parsePath" class="">parsePath()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_parseVerb" class="">parseVerb()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getControllerName" class="">getControllerName()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getControllerClassName" class="">getControllerClassName()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getMethodName" class="">getMethodName()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getPath" class="">getPath()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getIsRpc" class="">getIsRpc()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getVerb" class="">getVerb()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getParams" class="">getParams()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_setControllerName" class="">setControllerName()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_setMethodName" class="">setMethodName()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_setParams" class="">setParams()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getEnableCache" class="">getEnableCache()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_setRouteCache" class="">setRouteCache()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#method_getRouteCache" class="">getRouteCache()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#method_handleClientRequest" class="">handleClientRequest()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#method_parseRule" class="">parseRule()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#property_enableCache" class="">$enableCache</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#property_routeCache" class="">$routeCache</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#property_controllerClassName" class="">$controllerClassName</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#property_verbs" class="">$verbs</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#property_restRules" class="">$restRules</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#property_verb" class="">$verb</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#method_initRules" class="">initRules()</a><br />
+                                                                    <a href="../classes/PG.MSF.Route.RestRoute.html#method_trimSlashes" class="">trimSlashes()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Route.NormalRoute.html#property_routePrams" class="">$routePrams</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Route.RestRoute.html"><div class="path-wrapper">Route/RestRoute.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">MSF\Route</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper"><a href="../classes/PG.MSF.Route.NormalRoute.html">\PG\MSF\Route\NormalRoute</a></div>
+                                                                                                    <div class="namespace-wrapper">\PG\MSF\Route\RestRoute</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_enableCache" name="property_enableCache" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$enableCache</h3>
+                <pre class="signature">$enableCache : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; 路径cache                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_routeCache" name="property_routeCache" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$routeCache</h3>
+                <pre class="signature">$routeCache : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; 路由缓存                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_controllerClassName" name="property_controllerClassName" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$controllerClassName</h3>
+                <pre class="signature">$controllerClassName : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; 控制器完全命名空间类名                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_verbs" name="property_verbs" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$verbs</h3>
+                <pre class="signature">$verbs : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; 支持HTTP动作                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_restRules" name="property_restRules" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$restRules</h3>
+                <pre class="signature">$restRules : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; 路径规则                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_verb" name="property_verb" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$verb</h3>
+                <pre class="signature">$verb : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; HTTP请求方法                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_routePrams" name="property_routePrams" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$routePrams</h3>
+                <pre class="signature">$routePrams : \stdClass</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \stdClass
+                &mdash; 请求的路由相关信息                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct() </pre>
+                <p><em>Route constructor.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_handleHttpRequest" name="method_handleHttpRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">handleHttpRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">handleHttpRequest(\swoole_http_client  <span class="argument">$request</span>) </pre>
+                <p><em>HTTP请求解析</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_http_client</td>
+                                <td>$request </td>
+                                <td><p>请求对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_findControllerClassName" name="method_findControllerClassName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">findControllerClassName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">findControllerClassName() : boolean</pre>
+                <p><em>计算Controller Class Name</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parsePath" name="method_parsePath" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parsePath()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parsePath(string  <span class="argument">$path</span>) : boolean</pre>
+                <p><em>解析请求的URL PATH</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$path </td>
+                                <td><p>待解析URL Path</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parseVerb" name="method_parseVerb" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parseVerb()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parseVerb(\swoole_http_request  <span class="argument">$request</span>) : string</pre>
+                <p><em>解析请求的方法</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_http_request</td>
+                                <td>$request </td>
+                                <td><p>请求对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getControllerName" name="method_getControllerName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getControllerName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getControllerName() : string</pre>
+                <p><em>获取控制器名称</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getControllerClassName" name="method_getControllerClassName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getControllerClassName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getControllerClassName() : string</pre>
+                <p><em>获取请求对应的控制器完全命名空间类名</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getMethodName" name="method_getMethodName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getMethodName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getMethodName() : string</pre>
+                <p><em>获取方法名称</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getPath" name="method_getPath" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getPath()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getPath() : string</pre>
+                <p><em>获取请求的PATH</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getIsRpc" name="method_getIsRpc" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getIsRpc()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getIsRpc() : boolean</pre>
+                <p><em>判断请求是否为RPC请求</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getVerb" name="method_getVerb" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getVerb()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getVerb() : string|null</pre>
+                <p><em>获取请求的方法</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string|null
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getParams" name="method_getParams" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getParams()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getParams() : array</pre>
+                <p><em>获取请求的参数</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setControllerName" name="method_setControllerName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setControllerName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setControllerName(string  <span class="argument">$name</span>) : $this</pre>
+                <p><em>设置请求的控制器标识</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$name </td>
+                                <td><p>控制器标识</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setMethodName" name="method_setMethodName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setMethodName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setMethodName(string  <span class="argument">$name</span>) : $this</pre>
+                <p><em>设置请求控制器的方法标识</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$name </td>
+                                <td><p>控制器的方法标识</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setParams" name="method_setParams" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setParams()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setParams(array  <span class="argument">$params</span>) : $this</pre>
+                <p><em>设置请求的参数</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$params </td>
+                                <td><p>请求的参数</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getEnableCache" name="method_getEnableCache" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getEnableCache()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getEnableCache() : boolean</pre>
+                <p><em>获取是否支持路由Cache</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setRouteCache" name="method_setRouteCache" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setRouteCache()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setRouteCache(string  <span class="argument">$path</span>, array  <span class="argument">$callable</span>) : $this</pre>
+                <p><em>缓存路由</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$path </td>
+                                <td><p>URL Path</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$callable </td>
+                                <td><p>路由解析结果</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getRouteCache" name="method_getRouteCache" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getRouteCache()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getRouteCache(string  <span class="argument">$path</span>) : mixed|null</pre>
+                <p><em>获取已缓存的路由信息</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$path </td>
+                                <td><p>URL Path</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed|null
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Route.NormalRoute.html"><div class="path-wrapper">\PG\MSF\Route\NormalRoute</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_handleClientRequest" name="method_handleClientRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">handleClientRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">handleClientRequest(\swoole_http_request  <span class="argument">$request</span>) </pre>
+                <p><em>HTTP请求解析</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_http_request</td>
+                                <td>$request </td>
+                                <td><p>请求对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parseRule" name="method_parseRule" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parseRule()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parseRule() : array</pre>
+                <p><em>解析路由规则</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_initRules" name="method_initRules" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">initRules()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">initRules() : array|mixed</pre>
+                <p><em>初始化Rules</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array|mixed
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_trimSlashes" name="method_trimSlashes" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">trimSlashes()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">trimSlashes(string  <span class="argument">$string</span>) : string</pre>
+                <p><em>去掉下划线</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$string </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">RestRoute.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Route/RestRoute.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/PG.html">\PG</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on August 28th, 2017 at 15:23.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

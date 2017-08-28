@@ -1,0 +1,2903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/PG.html">\PG</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">4</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-198296662"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-198296662" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-555036880"></a>
+                                <a href="../namespaces/PG.html" style="margin-left: 30px; padding-left: 0">PG</a>
+            </div>
+            <div id="namespace-555036880" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1830184437"></a>
+                                <a href="../namespaces/PG.MSF.html" style="margin-left: 30px; padding-left: 0">MSF</a>
+            </div>
+            <div id="namespace-1830184437" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-526455248"></a>
+                                <a href="../namespaces/PG.MSF.Base.html" style="margin-left: 30px; padding-left: 0">Base</a>
+            </div>
+            <div id="namespace-526455248" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Base.AOPFactory.html">AOPFactory</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Child.html">Child</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Core.html">Core</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Input.html">Input</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Output.html">Output</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-879503458"></a>
+                                <a href="../namespaces/PG.MSF.Client.html" style="margin-left: 30px; padding-left: 0">Client</a>
+            </div>
+            <div id="namespace-879503458" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1466260549"></a>
+                                <a href="../namespaces/PG.MSF.Client.Http.html" style="margin-left: 30px; padding-left: 0">Http</a>
+            </div>
+            <div id="namespace-1466260549" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Client.Http.Client.html">Client</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Client.ConcurrentClient.html">ConcurrentClient</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Client.RpcClient.html">RpcClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-372824112"></a>
+                                <a href="../namespaces/PG.MSF.Console.html" style="margin-left: 30px; padding-left: 0">Console</a>
+            </div>
+            <div id="namespace-372824112" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Console.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Console.Request.html">Request</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-23385604"></a>
+                                <a href="../namespaces/PG.MSF.Controllers.html" style="margin-left: 30px; padding-left: 0">Controllers</a>
+            </div>
+            <div id="namespace-23385604" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Monitor.html">Monitor</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Rest.html">Rest</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Rpc.html">Rpc</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2031266903"></a>
+                                <a href="../namespaces/PG.MSF.Coroutine.html" style="margin-left: 30px; padding-left: 0">Coroutine</a>
+            </div>
+            <div id="namespace-2031266903" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Coroutine.IBase.html">IBase</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Base.html">Base</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CException.html">CException</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CNull.html">CNull</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CTask.html">CTask</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Dns.html">Dns</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.MySql.html">MySql</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Redis.html">Redis</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Scheduler.html">Scheduler</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Task.html">Task</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1920566941"></a>
+                                <a href="../namespaces/PG.MSF.Helpers.html" style="margin-left: 30px; padding-left: 0">Helpers</a>
+            </div>
+            <div id="namespace-1920566941" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Helpers.Context.html">Context</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1338497230"></a>
+                                <a href="../namespaces/PG.MSF.Memory.html" style="margin-left: 30px; padding-left: 0">Memory</a>
+            </div>
+            <div id="namespace-1338497230" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Memory.Pool.html">Pool</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-238232410"></a>
+                                <a href="../namespaces/PG.MSF.Models.html" style="margin-left: 30px; padding-left: 0">Models</a>
+            </div>
+            <div id="namespace-238232410" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Models.Model.html">Model</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2048105085"></a>
+                                <a href="../namespaces/PG.MSF.Pack.html" style="margin-left: 30px; padding-left: 0">Pack</a>
+            </div>
+            <div id="namespace-2048105085" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Pack.IPack.html">IPack</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Pack.JsonPack.html">JsonPack</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pack.MsgPack.html">MsgPack</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pack.SerializePack.html">SerializePack</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-62370058"></a>
+                                <a href="../namespaces/PG.MSF.Pools.html" style="margin-left: 30px; padding-left: 0">Pools</a>
+            </div>
+            <div id="namespace-62370058" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Pools.IAsynPool.html">IAsynPool</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Pools.AsynPool.html">AsynPool</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.AsynPoolManager.html">AsynPoolManager</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html">CoroutineRedisProxy</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.Miner.html">Miner</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.MysqlAsynPool.html">MysqlAsynPool</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.RedisAsynPool.html">RedisAsynPool</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-192293795"></a>
+                                <a href="../namespaces/PG.MSF.Process.html" style="margin-left: 30px; padding-left: 0">Process</a>
+            </div>
+            <div id="namespace-192293795" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Process.Config.html">Config</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.Inotify.html">Inotify</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.ProcessBase.html">ProcessBase</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.Timer.html">Timer</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-111472022"></a>
+                                <a href="../namespaces/PG.MSF.Proxy.html" style="margin-left: 30px; padding-left: 0">Proxy</a>
+            </div>
+            <div id="namespace-111472022" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Proxy.IProxy.html">IProxy</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyCluster.html">RedisProxyCluster</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyFactory.html">RedisProxyFactory</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyMasterSlave.html">RedisProxyMasterSlave</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1560497210"></a>
+                                <a href="../namespaces/PG.MSF.Rest.html" style="margin-left: 30px; padding-left: 0">Rest</a>
+            </div>
+            <div id="namespace-1560497210" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Rest.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Rest.Serializer.html">Serializer</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-797506831"></a>
+                                <a href="../namespaces/PG.MSF.Route.html" style="margin-left: 30px; padding-left: 0">Route</a>
+            </div>
+            <div id="namespace-797506831" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Route.IRoute.html">IRoute</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Route.NormalRoute.html">NormalRoute</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Route.RestRoute.html">RestRoute</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1897986440"></a>
+                                <a href="../namespaces/PG.MSF.Tasks.html" style="margin-left: 30px; padding-left: 0">Tasks</a>
+            </div>
+            <div id="namespace-1897986440" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.MongoDbTask.html">MongoDbTask</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.Task.html">Task</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.TaskProxy.html">TaskProxy</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.HttpServer.html">HttpServer</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Marco.html">Marco</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.MSFCli.html">MSFCli</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.MSFServer.html">MSFServer</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Server.html">Server</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/PG.MSF.html">\PG\MSF</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\PG\MSF</small>HttpServer</h1>
+                    <p><em>Class HttpServer</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_getTimerContext" class="">getTimerContext()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_getInstance" class="">getInstance()</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method_setConfig" class="">setConfig()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_run" class="">run()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_setProcessTitle" class="">setProcessTitle()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_setServerSet" class="">setServerSet()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_beforeSwooleStart" class="">beforeSwooleStart()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onStart" class="">onStart()</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method_onWorkerStart" class="">onWorkerStart()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onClose" class="">onClose()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onWorkerStop" class="">onWorkerStop()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onTask" class="">onTask()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onFinish" class="">onFinish()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onPipeMessage" class="">onPipeMessage()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onWorkerError" class="">onWorkerError()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onManagerStart" class="">onManagerStart()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onManagerStop" class="">onManagerStop()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method___call" class="">__call()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_registerTimer" class="">registerTimer()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_displayErrorHandler" class="">displayErrorHandler()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_checkErrors" class="">checkErrors()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_isTaskWorker" class="">isTaskWorker()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_close" class="">close()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_onErrorHandle" class="">onErrorHandle()</a><br />
+                                                                    <a href="../classes/PG.MSF.Base.Child.html#method_setContext" class="">setContext()</a><br />
+                                                                    <a href="../classes/PG.MSF.Base.Child.html#method_destroy" class="">destroy()</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method_start" class="">start()</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method_setTemplateEngine" class="">setTemplateEngine()</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method_onRequest" class="">onRequest()</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#method_genLogId" class="">genLogId()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Server.html#property_processType" class="">$processType</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_daemonize" class="">$daemonize</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_pidFile" class="">$pidFile</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_scheduler" class="">$scheduler</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_name" class="">$name</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_user" class="">$user</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_workerNum" class="">$workerNum</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_taskNum" class="">$taskNum</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_tickTime" class="">$tickTime</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_pack" class="">$pack</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_onErrorHandle" class="">$onErrorHandle</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_server" class="">$server</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_config" class="">$config</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_log" class="">$log</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_sysCache" class="">$sysCache</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_sysTimers" class="">$sysTimers</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_MSFSrcDir" class="">$MSFSrcDir</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_objectPool" class="">$objectPool</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#property_httpSocketName" class="">$httpSocketName</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#property_httpPort" class="">$httpPort</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#property_httpEnable" class="">$httpEnable</a><br />
+                                                                    <a href="../classes/PG.MSF.HttpServer.html#property_templateEngine" class="">$templateEngine</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Server.html#constant_version" class="">version</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#constant_mode" class="">mode</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Server.html#method_init" class="">init()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_parseCommand" class="">parseCommand()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_initWorkers" class="">initWorkers()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_getCurrentUser" class="">getCurrentUser()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_displayUI" class="">displayUI()</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#method_startSwooles" class="">startSwooles()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Server.html#property_instance" class="">$instance</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property__masterPid" class="">$_masterPid</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_logFile" class="">$logFile</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property__startFile" class="">$_startFile</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property__worker" class="">$_worker</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_route" class="">$route</a><br />
+                                                                    <a href="../classes/PG.MSF.Server.html#property_stdClass" class="">$stdClass</a><br />
+                                                                    <a href="../classes/PG.MSF.Base.Child.html#property_reflections" class="">$reflections</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                            <span class="label label-info">abstract</span>
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/HttpServer.html"><div class="path-wrapper">HttpServer.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">PG\MSF</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                        <div class="namespace-wrapper"><a href="../classes/PG.MSF.Base.Child.html">\PG\MSF\Base\Child</a></div>
+                                                                    
+                                        <div class="namespace-wrapper"><a href="../classes/PG.MSF.Server.html">\PG\MSF\Server</a></div>
+                                                                                                    <div class="namespace-wrapper">\PG\MSF\HttpServer</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_version" name="constant_version" class="anchor"></a>
+            <article id="constant_version" class="constant">
+                <h3 class="">version</h3>
+                <pre class="signature">version</pre>
+                <p><em>版本</em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_mode" name="constant_mode" class="anchor"></a>
+            <article id="constant_mode" class="constant">
+                <h3 class="">mode</h3>
+                <pre class="signature">mode</pre>
+                <p><em>运行方式（web/console）</em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_processType" name="property_processType" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$processType</h3>
+                <pre class="signature">$processType : integer</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer
+                &mdash; 进程类型，worker,tasker,user                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_daemonize" name="property_daemonize" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$daemonize</h3>
+                <pre class="signature">$daemonize : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; Daemonize.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_pidFile" name="property_pidFile" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$pidFile</h3>
+                <pre class="signature">$pidFile : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; pid文件                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_scheduler" name="property_scheduler" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$scheduler</h3>
+                <pre class="signature">$scheduler : \PG\MSF\Coroutine\Scheduler</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Coroutine.Scheduler.html">\PG\MSF\Coroutine\Scheduler</a>
+                &mdash; 协程调度器                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_name" name="property_name" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$name</h3>
+                <pre class="signature">$name : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; server name                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_user" name="property_user" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$user</h3>
+                <pre class="signature">$user : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; server user                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_workerNum" name="property_workerNum" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$workerNum</h3>
+                <pre class="signature">$workerNum : integer</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer
+                &mdash; Worker数量                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_taskNum" name="property_taskNum" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$taskNum</h3>
+                <pre class="signature">$taskNum : integer</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer
+                &mdash; Tasker数量                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_tickTime" name="property_tickTime" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$tickTime</h3>
+                <pre class="signature">$tickTime : integer</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer
+                &mdash; 服务器到现在的毫秒数                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_pack" name="property_pack" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$pack</h3>
+                <pre class="signature">$pack : \PG\MSF\Pack\IPack</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Pack.IPack.html">\PG\MSF\Pack\IPack</a>
+                &mdash; 数据打包与解包                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_onErrorHandle" name="property_onErrorHandle" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$onErrorHandle</h3>
+                <pre class="signature">$onErrorHandle : callback</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                callback
+                &mdash; 错误回调                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_server" name="property_server" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$server</h3>
+                <pre class="signature">$server : \swoole_server</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \swoole_server
+                &mdash; Server运行实例                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_config" name="property_config" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$config</h3>
+                <pre class="signature">$config : \Noodlehaus\Config</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \Noodlehaus\Config
+                &mdash; 配置对象                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_log" name="property_log" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$log</h3>
+                <pre class="signature">$log : \PG\Log\PGLog</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \PG\Log\PGLog
+                &mdash; 日志对象                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_sysCache" name="property_sysCache" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$sysCache</h3>
+                <pre class="signature">$sysCache : \Yac</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \Yac
+                &mdash; 系统共享对象操作句柄                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_sysTimers" name="property_sysTimers" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$sysTimers</h3>
+                <pre class="signature">$sysTimers : array</pre>
+                <p><em>系统注册的定时器列表</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_MSFSrcDir" name="property_MSFSrcDir" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$MSFSrcDir</h3>
+                <pre class="signature">$MSFSrcDir : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; 框架目录                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_objectPool" name="property_objectPool" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$objectPool</h3>
+                <pre class="signature">$objectPool : \PG\MSF\Memory\Pool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Memory.Pool.html">\PG\MSF\Memory\Pool</a>
+                &mdash; 对象池                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_httpSocketName" name="property_httpSocketName" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$httpSocketName</h3>
+                <pre class="signature">$httpSocketName : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; HTTP服务监听地址如: 0.0.0.0                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_httpPort" name="property_httpPort" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$httpPort</h3>
+                <pre class="signature">$httpPort : integer</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer
+                &mdash; HTTP服务监听商品                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_httpEnable" name="property_httpEnable" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$httpEnable</h3>
+                <pre class="signature">$httpEnable : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; 是否启用HTTP服务                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_templateEngine" name="property_templateEngine" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$templateEngine</h3>
+                <pre class="signature">$templateEngine : \League\Plates\Engine</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \League\Plates\Engine
+                &mdash; 内置模板引擎                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_instance" name="property_instance" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$instance</h3>
+                <pre class="signature">$instance : \PG\MSF\Server</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Server.html">\PG\MSF\Server</a>
+                &mdash; 实例                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__masterPid" name="property__masterPid" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_masterPid</h3>
+                <pre class="signature">$_masterPid : integer</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                integer
+                &mdash; Master进程ID                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_logFile" name="property_logFile" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$logFile</h3>
+                <pre class="signature">$logFile : mixed</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                mixed
+                &mdash; 日志文件                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__startFile" name="property__startFile" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_startFile</h3>
+                <pre class="signature">$_startFile : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; Start file.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__worker" name="property__worker" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_worker</h3>
+                <pre class="signature">$_worker : \PG\MSF\Server</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Server.html">\PG\MSF\Server</a>
+                &mdash; worker instance.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_route" name="property_route" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$route</h3>
+                <pre class="signature">$route : \PG\MSF\Route\IRoute|\PG\MSF\Route\NormalRoute</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Route.IRoute.html">\PG\MSF\Route\IRoute</a>|<a href="../classes/PG.MSF.Route.NormalRoute.html">\PG\MSF\Route\NormalRoute</a>
+                &mdash; 路由器                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_stdClass" name="property_stdClass" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$stdClass</h3>
+                <pre class="signature">$stdClass : \stdClass|null</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \stdClass|null
+                &mdash; 对象模板                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_reflections" name="property_reflections" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$reflections</h3>
+                <pre class="signature">$reflections : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; 反射类属性的默认值                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Base.Child.html"><div class="path-wrapper">\PG\MSF\Base\Child</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct() </pre>
+                <p><em>HttpServer constructor.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getTimerContext" name="method_getTimerContext" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getTimerContext()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getTimerContext() : NULL|\PG\MSF\Helpers\Context</pre>
+                <p><em>创建用户自定义定时进程的上下文对象</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    NULL|<a href="../classes/PG.MSF.Helpers.Context.html">\PG\MSF\Helpers\Context</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getInstance" name="method_getInstance" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getInstance()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getInstance() : \PG\MSF\Server|\PG\MSF\MSFServer</pre>
+                <p><em>获取运行的Server实例</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/PG.MSF.Server.html">\PG\MSF\Server</a>|<a href="../classes/PG.MSF.MSFServer.html">\PG\MSF\MSFServer</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setConfig" name="method_setConfig" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setConfig()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setConfig() : $this</pre>
+                <p><em>设置并解析配置</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_run" name="method_run" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">run()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">run() : void</pre>
+                <p><em>运行所有的服务进程</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setProcessTitle" name="method_setProcessTitle" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setProcessTitle()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setProcessTitle(string  <span class="argument">$title</span>) : void</pre>
+                <p><em>设置服务进程名称</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$title </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setServerSet" name="method_setServerSet" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setServerSet()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setServerSet() : mixed</pre>
+                <p><em>设置服务器配置参数</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                        <span class="label label-info">abstract</span>
+                                                <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_beforeSwooleStart" name="method_beforeSwooleStart" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">beforeSwooleStart()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">beforeSwooleStart() </pre>
+                <p><em>start前的操作</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onStart" name="method_onStart" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onStart()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onStart(  <span class="argument">$serv</span>) </pre>
+                <p><em>Server启动在主进程的主线程回调此函数</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onWorkerStart" name="method_onWorkerStart" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onWorkerStart()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onWorkerStart(\swoole_server  <span class="argument">$serv</span>, integer  <span class="argument">$workerId</span>) </pre>
+                <p><em>Swoole Worker进程启动回调</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_server</td>
+                                <td>$serv </td>
+                                <td><p>server实例</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$workerId </td>
+                                <td><p>worker id</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onClose" name="method_onClose" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onClose()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onClose(  <span class="argument">$serv</span>,   <span class="argument">$fd</span>) </pre>
+                <p><em>TCP客户端连接关闭后，在worker进程中回调此函数</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$fd </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onWorkerStop" name="method_onWorkerStop" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onWorkerStop()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onWorkerStop(  <span class="argument">$serv</span>,   <span class="argument">$fd</span>) </pre>
+                <p><em>此事件在worker进程终止时发生</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$fd </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onTask" name="method_onTask" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onTask()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onTask(  <span class="argument">$serv</span>,   <span class="argument">$taskId</span>,   <span class="argument">$fromId</span>,   <span class="argument">$data</span>) : mixed</pre>
+                <p><em>在task_worker进程内被调用</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$taskId </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$fromId </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onFinish" name="method_onFinish" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onFinish()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onFinish(  <span class="argument">$serv</span>,   <span class="argument">$taskId</span>,   <span class="argument">$data</span>) </pre>
+                <p><em>当worker进程投递的任务在task_worker中完成时调用</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$taskId </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onPipeMessage" name="method_onPipeMessage" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onPipeMessage()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onPipeMessage(  <span class="argument">$serv</span>,   <span class="argument">$fromWorkerId</span>,   <span class="argument">$message</span>) </pre>
+                <p><em>当工作进程收到由sendMessage发送的管道消息时会触发onPipeMessage事件</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$fromWorkerId </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$message </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onWorkerError" name="method_onWorkerError" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onWorkerError()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onWorkerError(\swoole_server  <span class="argument">$serv</span>, integer  <span class="argument">$workerId</span>, integer  <span class="argument">$workerPid</span>, integer  <span class="argument">$exitCode</span>) </pre>
+                <p><em>当worker/task_worker进程发生异常后会在Manager进程内回调此函数。</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_server</td>
+                                <td>$serv </td>
+                                <td><p>server实例</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$workerId </td>
+                                <td><p>worker id</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$workerPid </td>
+                                <td><p>worker pid</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$exitCode </td>
+                                <td><p>退出状态码</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onManagerStart" name="method_onManagerStart" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onManagerStart()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onManagerStart(  <span class="argument">$serv</span>) </pre>
+                <p><em>当管理进程启动时调用</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onManagerStop" name="method_onManagerStop" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onManagerStop()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onManagerStop(  <span class="argument">$serv</span>) </pre>
+                <p><em>当管理进程结束时调</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$serv </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___call" name="method___call" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__call()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__call(  <span class="argument">$name</span>,   <span class="argument">$arguments</span>) : mixed</pre>
+                <p><em>__call魔术方法</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$arguments </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_registerTimer" name="method_registerTimer" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">registerTimer()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">registerTimer(integer  <span class="argument">$ms</span>, callable  <span class="argument">$callBack</span>, array  <span class="argument">$params = array()</span>) </pre>
+                <p><em>定时器包装（用于业务Timer进程）</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$ms </td>
+                                <td><p>定时器间隔毫秒</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>callable</td>
+                                <td>$callBack </td>
+                                <td><p>定时器执行的回调</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$params </td>
+                                <td><p>定时器其他参数</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_displayErrorHandler" name="method_displayErrorHandler" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">displayErrorHandler()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">displayErrorHandler(integer  <span class="argument">$error</span>, string  <span class="argument">$errorString</span>, string  <span class="argument">$filename</span>, integer  <span class="argument">$line</span>, array  <span class="argument">$symbols</span>) </pre>
+                <p><em>全局错误监听</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$error </td>
+                                <td><p>错误码</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$errorString </td>
+                                <td><p>错误描述</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$filename </td>
+                                <td><p>文件名</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$line </td>
+                                <td><p>文件行</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$symbols </td>
+                                <td><p>符号表</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_checkErrors" name="method_checkErrors" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">checkErrors()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">checkErrors() : void</pre>
+                <p><em>致命错误回调</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_isTaskWorker" name="method_isTaskWorker" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">isTaskWorker()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">isTaskWorker() : boolean</pre>
+                <p><em>是否是task进程</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_close" name="method_close" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">close()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">close(integer  <span class="argument">$fd</span>) </pre>
+                <p><em>服务器主动关闭链接</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$fd </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onErrorHandle" name="method_onErrorHandle" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onErrorHandle()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onErrorHandle(  <span class="argument">$msg</span>,   <span class="argument">$log</span>) </pre>
+                <p><em>错误处理函数</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$msg </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$log </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setContext" name="method_setContext" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setContext()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setContext(\PG\MSF\Helpers\Context  <span class="argument">$context</span>) : $this</pre>
+                <p><em>设置上下文</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/PG.MSF.Helpers.Context.html">\PG\MSF\Helpers\Context</a></td>
+                                <td>$context </td>
+                                <td><p>请求上下文对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Base.Child.html"><div class="path-wrapper">\PG\MSF\Base\Child</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_destroy" name="method_destroy" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">destroy()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">destroy() </pre>
+                <p><em>销毁,解除引用</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Base.Child.html"><div class="path-wrapper">\PG\MSF\Base\Child</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_start" name="method_start" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">start()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">start() : $this|void</pre>
+                <p><em>启动服务</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    $this|void
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setTemplateEngine" name="method_setTemplateEngine" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setTemplateEngine()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setTemplateEngine() : $this</pre>
+                <p><em>设置模板引擎</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    $this
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onRequest" name="method_onRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onRequest(\swoole_http_request  <span class="argument">$request</span>, \swoole_http_response  <span class="argument">$response</span>) </pre>
+                <p><em>HTTP请求回调</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_http_request</td>
+                                <td>$request </td>
+                                <td><p>请求对象</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>\swoole_http_response</td>
+                                <td>$response </td>
+                                <td><p>响应对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_genLogId" name="method_genLogId" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">genLogId()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">genLogId(\swoole_http_request  <span class="argument">$request</span>) : string</pre>
+                <p><em>产生日志ID</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\swoole_http_request</td>
+                                <td>$request </td>
+                                <td><p>请求对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_init" name="method_init" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">init()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">init() : void</pre>
+                <p><em>服务初始化</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parseCommand" name="method_parseCommand" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">parseCommand()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parseCommand() : void</pre>
+                <p><em>解析命令行参数</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_initWorkers" name="method_initWorkers" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">initWorkers()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">initWorkers() : void</pre>
+                <p><em>初始化worker进程</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getCurrentUser" name="method_getCurrentUser" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">getCurrentUser()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getCurrentUser() : string</pre>
+                <p><em>获取当前进程用户</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_displayUI" name="method_displayUI" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">displayUI()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">displayUI() : void</pre>
+                <p><em>显示命令行控制台信息</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_startSwooles" name="method_startSwooles" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">startSwooles()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">startSwooles() : void</pre>
+                <p><em>Fork some worker processes.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/PG.MSF.Server.html"><div class="path-wrapper">\PG\MSF\Server</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">HttpServer.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/HttpServer.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/PG.html">\PG</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on August 28th, 2017 at 15:23.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

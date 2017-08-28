@@ -200,5 +200,11 @@ abstract class Base implements IBase
         return $this;
     }
 
+    /**
+     * 发送异步请求
+     *
+     * @param $callback
+     * @return mixed
+     */
     abstract public function send($callback);
 }

@@ -142,6 +142,7 @@ class ConcurrentClient
     /**
      * 解析返回值
      *
+     * @param array $request 请求参数
      * @param array $responseBody 响应正文
      * @return mixed
      * @throws BusinessException

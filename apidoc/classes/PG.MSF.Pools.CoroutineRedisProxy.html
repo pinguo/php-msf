@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/PG.html">\PG</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">4</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-239803266"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-239803266" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1138542275"></a>
+                                <a href="../namespaces/PG.html" style="margin-left: 30px; padding-left: 0">PG</a>
+            </div>
+            <div id="namespace-1138542275" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-150606512"></a>
+                                <a href="../namespaces/PG.MSF.html" style="margin-left: 30px; padding-left: 0">MSF</a>
+            </div>
+            <div id="namespace-150606512" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-146262494"></a>
+                                <a href="../namespaces/PG.MSF.Base.html" style="margin-left: 30px; padding-left: 0">Base</a>
+            </div>
+            <div id="namespace-146262494" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Base.AOPFactory.html">AOPFactory</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Child.html">Child</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Core.html">Core</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Input.html">Input</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Base.Output.html">Output</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-139819252"></a>
+                                <a href="../namespaces/PG.MSF.Client.html" style="margin-left: 30px; padding-left: 0">Client</a>
+            </div>
+            <div id="namespace-139819252" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1817683008"></a>
+                                <a href="../namespaces/PG.MSF.Client.Http.html" style="margin-left: 30px; padding-left: 0">Http</a>
+            </div>
+            <div id="namespace-1817683008" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Client.Http.Client.html">Client</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Client.ConcurrentClient.html">ConcurrentClient</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Client.RpcClient.html">RpcClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1502596717"></a>
+                                <a href="../namespaces/PG.MSF.Console.html" style="margin-left: 30px; padding-left: 0">Console</a>
+            </div>
+            <div id="namespace-1502596717" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Console.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Console.Request.html">Request</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1806373394"></a>
+                                <a href="../namespaces/PG.MSF.Controllers.html" style="margin-left: 30px; padding-left: 0">Controllers</a>
+            </div>
+            <div id="namespace-1806373394" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Monitor.html">Monitor</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Rest.html">Rest</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Controllers.Rpc.html">Rpc</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-172725669"></a>
+                                <a href="../namespaces/PG.MSF.Coroutine.html" style="margin-left: 30px; padding-left: 0">Coroutine</a>
+            </div>
+            <div id="namespace-172725669" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Coroutine.IBase.html">IBase</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Base.html">Base</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CException.html">CException</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CNull.html">CNull</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.CTask.html">CTask</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Dns.html">Dns</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.MySql.html">MySql</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Redis.html">Redis</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Scheduler.html">Scheduler</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Coroutine.Task.html">Task</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-395246775"></a>
+                                <a href="../namespaces/PG.MSF.Helpers.html" style="margin-left: 30px; padding-left: 0">Helpers</a>
+            </div>
+            <div id="namespace-395246775" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Helpers.Context.html">Context</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-305989708"></a>
+                                <a href="../namespaces/PG.MSF.Memory.html" style="margin-left: 30px; padding-left: 0">Memory</a>
+            </div>
+            <div id="namespace-305989708" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Memory.Pool.html">Pool</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-473675058"></a>
+                                <a href="../namespaces/PG.MSF.Models.html" style="margin-left: 30px; padding-left: 0">Models</a>
+            </div>
+            <div id="namespace-473675058" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Models.Model.html">Model</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1297912419"></a>
+                                <a href="../namespaces/PG.MSF.Pack.html" style="margin-left: 30px; padding-left: 0">Pack</a>
+            </div>
+            <div id="namespace-1297912419" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Pack.IPack.html">IPack</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Pack.JsonPack.html">JsonPack</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pack.MsgPack.html">MsgPack</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pack.SerializePack.html">SerializePack</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-786531021"></a>
+                                <a href="../namespaces/PG.MSF.Pools.html" style="margin-left: 30px; padding-left: 0">Pools</a>
+            </div>
+            <div id="namespace-786531021" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Pools.IAsynPool.html">IAsynPool</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Pools.AsynPool.html">AsynPool</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.AsynPoolManager.html">AsynPoolManager</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html">CoroutineRedisProxy</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.Miner.html">Miner</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.MysqlAsynPool.html">MysqlAsynPool</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Pools.RedisAsynPool.html">RedisAsynPool</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1474290899"></a>
+                                <a href="../namespaces/PG.MSF.Process.html" style="margin-left: 30px; padding-left: 0">Process</a>
+            </div>
+            <div id="namespace-1474290899" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Process.Config.html">Config</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.Inotify.html">Inotify</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.ProcessBase.html">ProcessBase</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Process.Timer.html">Timer</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1385128153"></a>
+                                <a href="../namespaces/PG.MSF.Proxy.html" style="margin-left: 30px; padding-left: 0">Proxy</a>
+            </div>
+            <div id="namespace-1385128153" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Proxy.IProxy.html">IProxy</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyCluster.html">RedisProxyCluster</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyFactory.html">RedisProxyFactory</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Proxy.RedisProxyMasterSlave.html">RedisProxyMasterSlave</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-85178775"></a>
+                                <a href="../namespaces/PG.MSF.Rest.html" style="margin-left: 30px; padding-left: 0">Rest</a>
+            </div>
+            <div id="namespace-85178775" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Rest.Controller.html">Controller</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Rest.Serializer.html">Serializer</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-53755179"></a>
+                                <a href="../namespaces/PG.MSF.Route.html" style="margin-left: 30px; padding-left: 0">Route</a>
+            </div>
+            <div id="namespace-53755179" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/PG.MSF.Route.IRoute.html">IRoute</a></li>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Route.NormalRoute.html">NormalRoute</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Route.RestRoute.html">RestRoute</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1757968191"></a>
+                                <a href="../namespaces/PG.MSF.Tasks.html" style="margin-left: 30px; padding-left: 0">Tasks</a>
+            </div>
+            <div id="namespace-1757968191" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.MongoDbTask.html">MongoDbTask</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.Task.html">Task</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Tasks.TaskProxy.html">TaskProxy</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/PG.MSF.HttpServer.html">HttpServer</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Marco.html">Marco</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.MSFCli.html">MSFCli</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.MSFServer.html">MSFServer</a></li>
+                                                    <li class="class"><a href="../classes/PG.MSF.Server.html">Server</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/PG.MSF.Pools.html">\PG\MSF\Pools</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\PG\MSF\Pools</small>CoroutineRedisProxy</h1>
+                    <p><em>Class CoroutineRedisProxy</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_cache" class="">cache()</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_evalMock" class="">evalMock()</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method___call" class="">__call()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#property_keyPrefix" class="">$keyPrefix</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#property_hashKey" class="">$hashKey</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#property_phpSerialize" class="">$phpSerialize</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#property_redisSerialize" class="">$redisSerialize</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_generateUniqueKey" class="">generateUniqueKey()</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_serializeHandler" class="">serializeHandler()</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_unSerializeHandler" class="">unSerializeHandler()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_canUnserialize" class="">canUnserialize()</a><br />
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#method_realUnserialize" class="">realUnserialize()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/PG.MSF.Pools.CoroutineRedisProxy.html#property_redisAsynPool" class="">$redisAsynPool</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Pools.CoroutineRedisProxy.html"><div class="path-wrapper">Pools/CoroutineRedisProxy.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">MSF\Pools</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\PG\MSF\Pools\CoroutineRedisProxy</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_keyPrefix" name="property_keyPrefix" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$keyPrefix</h3>
+                <pre class="signature">$keyPrefix : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; Redis key前缀                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_hashKey" name="property_hashKey" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$hashKey</h3>
+                <pre class="signature">$hashKey : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; 是否需要hash key                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_phpSerialize" name="property_phpSerialize" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$phpSerialize</h3>
+                <pre class="signature">$phpSerialize : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; 是否启用PHP序列化                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_redisSerialize" name="property_redisSerialize" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$redisSerialize</h3>
+                <pre class="signature">$redisSerialize : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; 是否启用Redis序列化                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_redisAsynPool" name="property_redisAsynPool" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$redisAsynPool</h3>
+                <pre class="signature">$redisAsynPool : \PG\MSF\Pools\RedisAsynPool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/PG.MSF.Pools.RedisAsynPool.html">\PG\MSF\Pools\RedisAsynPool</a>
+                &mdash; Redis连接池                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(\PG\MSF\Pools\RedisAsynPool  <span class="argument">$redisAsynPool</span>) </pre>
+                <p><em>CoroutineRedisProxy constructor.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/PG.MSF.Pools.RedisAsynPool.html">\PG\MSF\Pools\RedisAsynPool</a></td>
+                                <td>$redisAsynPool </td>
+                                <td><p>Redis连接池对象</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_cache" name="method_cache" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">cache()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">cache(\PG\MSF\Helpers\Context  <span class="argument">$context</span>, string  <span class="argument">$key</span>, string  <span class="argument">$value = &#039;&#039;</span>, integer  <span class="argument">$expire</span>) : mixed|\PG\MSF\Coroutine\Redis</pre>
+                <p><em>redis cache 操作封装</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/PG.MSF.Helpers.Context.html">\PG\MSF\Helpers\Context</a></td>
+                                <td>$context </td>
+                                <td><p>请求上下文对象</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$key </td>
+                                <td><p>Redis Key</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$value </td>
+                                <td><p>Redis Value</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$expire </td>
+                                <td><p>过期时间，单位秒</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed|<a href="../classes/PG.MSF.Coroutine.Redis.html">\PG\MSF\Coroutine\Redis</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_evalMock" name="method_evalMock" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">evalMock()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">evalMock(\PG\MSF\Helpers\Context  <span class="argument">$context</span>, string  <span class="argument">$script</span>, array  <span class="argument">$args = array()</span>, integer  <span class="argument">$numKeys</span>) : array</pre>
+                <p><em>在redis执行lua脚本，因为redis原生方法eval是php的保留关键字，所以用该方法名代替
+会根据$args参数中的缓存key进行redis实例选择</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/PG.MSF.Helpers.Context.html">\PG\MSF\Helpers\Context</a></td>
+                                <td>$context </td>
+                                <td><p>上下文</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$script </td>
+                                <td><p>Lua脚本代码</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$args </td>
+                                <td><p>参数</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$numKeys </td>
+                                <td><p>脚本用到的redis的key的数量</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt></dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>redis中执行的Lua脚本，不支持直接返回多维数组，需要将多维数组转成json返回
+本方法的返回值会对Lua脚本的返回值进行封装：</p>
+<ol>
+<li>如果脚本中需要返回多个key的操作结果，Lua脚本的返回值格式请如下，需要是json：</li>
+</ol>
+                                    				
+                                                            <h4>Examples</h4>
+                                                                <h5>key1 : &#039;&#039; or array(),
+             key2 : &#039;&#039; or array(),
+             ...
+         }
+本方法会将各个实例的返回值按照缓存key进行合并，然后返作为数组返回</h5>
+                        <pre class="pre-scrollable">** File not found : { **</pre>
+                                            <h5>key1 =&gt; &#039;&#039; or array(),
+             key2 =&gt; &#039;&#039; or array(),
+             ...
+         ]
+
+2. 如果只有一个key的操作结果，Lua脚本的返回值就无需按照key封装成数组，比如：</h5>
+                        <pre class="pre-scrollable">** File not found : [ **</pre>
+                                            <h5>或者 array(value1, value2, ...)
+本方法会将这些值直接返回
+
+3. 如果redis中本身存的就是未做序列化的json，该方法会自己将json解析成数组返回：</h5>
+                        <pre class="pre-scrollable">** File not found : true **</pre>
+                                            <h5>value2, ...)</h5>
+                        <pre class="pre-scrollable">** File not found : array(value1, **</pre>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            author
+                        </th>
+                        <td>
+                                                                                            <p>niulingyun</p>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___call" name="method___call" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__call()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__call(string  <span class="argument">$name</span>, array  <span class="argument">$arguments</span>) : array|boolean|mixed</pre>
+                <p><em>__call魔术方法</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$name </td>
+                                <td><p>Redis指令</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$arguments </td>
+                                <td><p>Redis指令参数</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array|boolean|mixed
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_generateUniqueKey" name="method_generateUniqueKey" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">generateUniqueKey()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">generateUniqueKey(string  <span class="argument">$key</span>) : string</pre>
+                <p><em>生成唯一Redis Key</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$key </td>
+                                <td><p>a key identifying a value to be cached</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>a key generated from the provided key which ensures the uniqueness across applications</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_serializeHandler" name="method_serializeHandler" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">serializeHandler()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">serializeHandler(mixed  <span class="argument">$data</span>, boolean  <span class="argument">$phpSerialize = false</span>) : string</pre>
+                <p><em>序列化</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$data </td>
+                                <td><p>待序列化数据</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$phpSerialize </td>
+                                <td><p>是否启动PHP序列化</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_unSerializeHandler" name="method_unSerializeHandler" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">unSerializeHandler()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">unSerializeHandler(mixed  <span class="argument">$data</span>, array  <span class="argument">$keys = array()</span>, integer  <span class="argument">$len</span>) : array|boolean|mixed</pre>
+                <p><em>反序列化</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$data </td>
+                                <td><p>响应数据</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$keys </td>
+                                <td><p>操作的多个Key列表</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$len </td>
+                                <td><p>操作的数量</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array|boolean|mixed
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_canUnserialize" name="method_canUnserialize" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">canUnserialize()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">canUnserialize(string  <span class="argument">$string</span>) : boolean</pre>
+                <p><em>是否可以反序列化</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$string </td>
+                                <td><p>待反序列化数据</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_realUnserialize" name="method_realUnserialize" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">realUnserialize()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">realUnserialize(string  <span class="argument">$data</span>) : mixed|string</pre>
+                <p><em>真正反序列化</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$data </td>
+                                <td><p>待反序列化数据</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed|string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">CoroutineRedisProxy.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Pools/CoroutineRedisProxy.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/PG.html">\PG</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on August 28th, 2017 at 15:23.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

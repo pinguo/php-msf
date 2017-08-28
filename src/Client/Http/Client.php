@@ -523,7 +523,7 @@ class Client extends Core
      * 发起异步GET请求
      *
      * @param string $path 待请求的URL Path
-     * @param mixed(array|object) $query查询参数
+     * @param array $query 查询参数
      * @param $callback
      */
     public function get($path, $query, $callback)
