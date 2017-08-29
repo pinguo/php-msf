@@ -174,6 +174,11 @@ class RpcClient extends Core
      */
     public function __call($method, $args)
     {
+        $this->method = $method;
+        $this->args   = $args;
+        $response     = yield $this->remoteHttpCall($method, $args);
+
+        return $response;
     }
 
     /**
@@ -186,6 +191,47 @@ class RpcClient extends Core
      */
     public function remoteHttpCall($method, array $args)
     {
+        $reqParams = [
+            'version'   => static::$version,
+            'args'      => array_values($args),
+            'time'      => microtime(true),
+            'handler'   => $this->handler,
+            'construct' => $this->construct,
+            'method'    => $method
+        ];
+        $sendData = [
+            'data' => getInstance()->pack->pack($reqParams),
+        ];
+        $headers = [
+            'X-RPC' => 1,
+        ];
+
+        /**
+         * @var Client $client
+         */
+        $client = yield $this->getObject(Client::class)->goDnsLookup($this->host, $this->timeout, $headers);
+        if (!$client) {
+            throw new Exception($this->host . ' dns query failed');
+        }
+
+        $urlPath = '/' .$this->urlPath . '/' . $this->service . '/' . $this->handler . '/' . $this->method;
+        if ($this->verb == 'POST') {
+            $response = yield $client->goPost($urlPath, $sendData, $this->timeout);
+        } else {
+            $response = yield $client->goGet($urlPath, $sendData, $this->timeout);
+        }
+
+        if ($response && !empty($response['body']) && ($jsonRes = json_decode($response['body'], true))) {
+            if ($jsonRes['status'] !== 200) {
+                $this->getContext()->getLog()->warning(dump($response, false, true));
+                return false;
+            } else {
+                return $jsonRes['data'];
+            }
+        } else {
+            $this->getContext()->getLog()->warning(dump($response, false, true));
+            return false;
+        }
     }
 
     /**
@@ -196,6 +242,55 @@ class RpcClient extends Core
      */
     public static function goConcurrent(array $multiRpc)
     {
+        $results  = [];
+        $requests = [];
+        $context  = null;
+
+        foreach ($multiRpc as $key => $rpc) {
+            if (!($rpc instanceof RpcClient)) {
+                $results[$key] = false;
+            }
+
+            $reqParams = [
+                'version'   => static::$version,
+                'args'      => array_values($rpc->args),
+                'time'      => microtime(true),
+                'handler'   => $rpc->handler,
+                'construct' => $rpc->construct,
+                'method'    => $rpc->method,
+            ];
+            $sendData = [
+                'data' => getInstance()->pack->pack($reqParams),
+            ];
+
+            $requests[$key]['url']         = $rpc->host . '/' . $rpc->urlPath . '/' . $rpc->service . '/' . $rpc->handler . '/' . $rpc->method;
+            $requests[$key]['method']      = $rpc->verb;
+            $requests[$key]['dns_timeout'] = 2000;
+            $requests[$key]['timeout']     = $rpc->timeout;
+            $requests[$key]['headers']     = ['X-RPC' => 1];
+            $requests[$key]['data']        = $sendData;
+            $context                       = $context ?? $rpc->getContext();
+        }
+
+        if (empty($requests)) {
+            return $results;
+        }
+
+        $responses = yield $context->getObject(Client::class)->goConcurrent($requests);
+        foreach ($responses as $key => $response) {
+            if ($response && !empty($response['body']) && ($jsonRes = json_decode($response['body'], true))) {
+                if ($jsonRes['status'] !== 200) {
+                    $results[$key] = false;
+                    $context->getContext()->getLog()->warning(dump($response, false, true));
+                } else {
+                    $results[$key] = $jsonRes['data'];
+                }
+            } else {
+                $results[$key] = false;
+                $context->getContext()->getLog()->warning(dump($response, false, true));
+            }
+        }
+
+        return $results;
     }
 }
-

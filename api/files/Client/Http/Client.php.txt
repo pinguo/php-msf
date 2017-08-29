@@ -258,6 +258,18 @@ class Client extends Core
      */
     public function goSinglePost($url = '', $data = [], $timeout = 30000, $headers = [])
     {
+        if (empty($this->urlData)) {
+            $this->urlData = self::parseUrl($url);
+        } else {
+            if (!empty($url)) {
+                $this->urlData['path'] = $url;
+            }
+        }
+
+        yield $this->goDnsLookup();
+        $this->setHeaders($headers);
+
+        return yield $this->getObject(Http::class, [$this, 'POST', $this->urlData['path'], $data, $timeout]);
     }
 
     /**
@@ -272,6 +284,18 @@ class Client extends Core
      */
     public function goSingleGet($url = '', $query = null, $timeout = 30000, $headers = [])
     {
+        if (empty($this->urlData)) {
+            $this->urlData = self::parseUrl($url);
+        } else {
+            if (!empty($url)) {
+                $this->urlData['path'] = $url;
+            }
+        }
+
+        yield $this->goDnsLookup();
+        $this->setHeaders($headers);
+
+        return yield $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
     }
 
     /**
@@ -308,6 +332,116 @@ class Client extends Core
      */
     public function goConcurrent(array $requests)
     {
+        if (empty($requests)) {
+            throw new Exception('$requests is empty');
+        }
+
+        $go               = [];
+        $dns              = [];
+        $result           = [];
+        $sendHttpRequests = [];
+        // 格式化请求参数，并运行DNS查询协程
+        foreach ($requests as $key => $request) {
+            if (is_array($request)) {
+                if (empty($request['url'])) {
+                    unset($requests[$key]);
+                    $this->getContext()->getLog()->error('$requests[' . $key . '] has not url field');
+                    continue;
+                }
+
+                $url = $request['url'];
+                if (isset($request['dns_timeout'])) {
+                    $dnsTimeout = $request['dns_timeout'];
+                } else {
+                    $dnsTimeout = $this->dnsTimeout;
+                }
+
+                if (isset($request['headers'])) {
+                    $headers = $request['headers'];
+                } else {
+                    $headers    = [];
+                }
+
+                if (!isset($request['method'])) {
+                    $requests[$key]['method'] = 'GET';
+                } else {
+                    $method = strtoupper($request['method']);
+                    if ($method != 'GET' && $method != 'POST') {
+                        unset($requests[$key]);
+                        $this->getContext()->getLog()->error('$requests[' . $key . '] method field not valid, must be GET or POST, And Case Sensitive');
+                        continue;
+                    }
+                }
+
+                if (!isset($request['timeout'])) {
+                    $requests[$key]['timeout'] = 0;
+                }
+
+                if (!isset($request['data'])) {
+                    $requests[$key]['data'] = [];
+                }
+
+                $requests[$key]['dns_timeout'] = $dnsTimeout;
+                $requests[$key]['headers']     = $headers;
+            } else {
+                $url              = $request;
+                $dnsTimeout       = $this->dnsTimeout;
+                $headers          = [];
+                $requests[$key]   = [
+                    'url'         => $url,
+                    'method'      => 'GET',
+                    'dns_timeout' => $dnsTimeout,
+                    'headers'     => $headers,
+                    'timeout'     => 0,
+                    'data'        => [],
+
+                ];
+            }
+
+            /**
+             * @var Client[] $go
+             */
+            $go[$key]  = $this->getObject(self::class);
+            /**
+             * @var Dns[] $dns
+             */
+            $dns[$key] = $go[$key]->goDnsLookup($url, $dnsTimeout, $headers);
+        }
+
+        // 获取DNS查询结果
+        foreach ($dns as $key => $goDns) {
+            if ($goDns instanceof Client) {
+                continue;
+            }
+
+            if (!yield $goDns) {
+                $this->getContext()->getLog()->error('DNS lookup for ' . $requests[$key]['url'] . ' Failed');
+                $result[$key] = false;
+                continue;
+            }
+        }
+
+        // 运行HTTP请求协程
+        foreach ($go as $key => $client) {
+            if (isset($result[$key])) {
+                continue;
+            }
+
+            if ($requests[$key]['method'] == 'GET') {
+                $sendHttpRequests[$key] = $this->getObject(Http::class, [$client, 'GET', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
+            }
+
+            if ($requests[$key]['method'] == 'POST') {
+                $sendHttpRequests[$key] = $this->getObject(Http::class, [$client, 'POST', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
+            }
+        }
+
+        // 获取HTTP请求结果
+        foreach ($sendHttpRequests as $key => $httpRequest) {
+            $result[$key] = yield $httpRequest;
+        }
+
+        return $result;
     }
 
     /**
@@ -330,7 +464,7 @@ class Client extends Core
         ]);
 
         $this->setHeaders($headers);
-        $this->urlData['callBack']($this);
+        ($this->urlData['callBack'])($this);
     }
 
     /**
@@ -463,4 +597,3 @@ class Client extends Core
         }
     }
 }
-

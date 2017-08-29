@@ -40,7 +40,7 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 ## 感谢
 
-php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleDistributed/)开发，而此次开源版本中，连接池主要采用了SD的实现。由于我们框架定位、解决的业务场景、稳定性的要求、代码风格等差异太大，故我们自主研发微服务框架，我们不评判各个框架的好坏，用户自主决定，选择合适业务场景的技术框架，同时在此也感谢[白猫](https://github.com/tmtbe)；另外，在研发php-msf框架及生产环境应用过程中，遇到很多低层问题，不过都一一解决，而这些问题能够解决最重要就是[韩天峰-Rango](https://github.com/matyhtf)的大力支持，在此深表感谢。
+php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleDistributed/)开发，而此次开源版本中，连接池主要采用了SD的实现。由于我们框架定位、解决的业务场景、稳定性的要求、代码风格等差异太大，故我们自主研发微服务框架，每个框架都有自己的特色和优点，选择合适自己公司和业务场景的框架最重要。同时在此也感谢[白猫](https://github.com/tmtbe)；另外，在研发php-msf框架及生产环境应用过程中，遇到很多低层问题，不过都一一解决，而这些问题能够解决最重要就是[韩天峰-Rango](https://github.com/matyhtf)的大力支持，在此深表感谢。
 
 ## 文档
 

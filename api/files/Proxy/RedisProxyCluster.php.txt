@@ -163,6 +163,53 @@ class RedisProxyCluster extends Flexihash implements IProxy
      */
     public function evalMock(array $arguments)
     {
+        $args         = $arguments[2];
+        $numKeys      = $arguments[3];
+        $keys         = array_slice($args, 0, $numKeys);
+        $evalMockArgs = array_slice($args, $numKeys);
+        $arrRedis     = $index2Key = [];
+
+        if (empty($keys)) {
+            //如果没有设置缓存key，则连接所有的实例
+            $arrRedis = $this->getAllTargets();
+        } else {
+            //根据脚本中用到的key计算出需要连接哪些实例
+            foreach ($keys as $key) {
+                $key = $this->generateUniqueKey($key);
+                $redisPoolName = $this->lookup($key);
+
+                $index = array_search($redisPoolName, $arrRedis, true);
+                if ($index === false) {
+                    $index = count($arrRedis);
+                    $arrRedis[] = $redisPoolName;
+                }
+                $index2Key[$index][] = $key;
+            }
+        }
+
+        $ret = [];
+        foreach ($arrRedis as $index => $redisPoolName) {
+            if (!isset(RedisProxyFactory::$redisCoroutines[$redisPoolName])) {
+                if (getInstance()->getAsynPool($redisPoolName) == null) {
+                    return [];
+                }
+                RedisProxyFactory::$redisCoroutines[$redisPoolName] = getInstance()->getAsynPool($redisPoolName)->getCoroutine();
+            }
+            $redisPoolCoroutine = RedisProxyFactory::$redisCoroutines[$redisPoolName];
+
+            $arrKeys = empty($index2Key) ? $index2Key : $index2Key[$index];
+            $res     = $redisPoolCoroutine->evalMock($arguments[0], $arguments[1], array_merge($arrKeys, $evalMockArgs), count($arrKeys));
+
+            if ($res instanceof \Generator) {
+                $ret[] = $res;
+            }
+        }
+
+        foreach ($ret as $k => $item) {
+            $ret[$k] = yield $item;
+        }
+
+        return $ret;
     }
 
     /**
@@ -243,6 +290,43 @@ class RedisProxyCluster extends Flexihash implements IProxy
      */
     private function multi(string $method, array $key, array $arguments)
     {
+        $opArr = [];
+
+        if (in_array(strtolower($method), ['mset', 'msetnx'])) {
+            foreach ($key as $k => $v) {
+                $redisPoolName = $this->lookup($this->generateUniqueKey($k));
+                $opArr[$redisPoolName][$k] = $v;
+            }
+
+            $opData = $this->dispatch($opArr, $method, $arguments);
+
+            foreach ($opData as $op) {
+                $result = yield $op;
+                if ($result !== 'OK') {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            $retData = [];
+            foreach ($key as $k) {
+                $redisPoolName = $this->lookup($this->generateUniqueKey($k));
+                $opArr[$redisPoolName][] = $k;
+            }
+
+            $opData = $this->dispatch($opArr, $method, $arguments);
+
+            foreach ($opData as $redisPoolName => $op) {
+                $keys = $opArr[$redisPoolName];
+                $values = yield $op;
+                if (is_array($values)) { //$values有可能超时返回false
+                    $retData = array_merge($retData, array_combine($keys, $values));
+                }
+            }
+
+            return $retData;
+        }
     }
 
     /**
@@ -309,4 +393,3 @@ class RedisProxyCluster extends Flexihash implements IProxy
         return true;
     }
 }
-
