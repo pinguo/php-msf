@@ -52,7 +52,8 @@ class MSFCli extends MSFServer
         do {
             $controllerName      = $this->route->getControllerName();
             $controllerClassName = $this->route->getControllerClassName();
-            $methodName          = $this->route->getMethodName();
+            $methodPrefix        = $this->config->get('http.method_prefix', 'action');
+            $methodName          = $methodPrefix . $this->route->getMethodName();
             if ($controllerClassName == '') {
                 clearTimes();
                 writeln("not found controller {$controllerName}");
@@ -70,7 +71,7 @@ class MSFCli extends MSFServer
             // 初始化控制器
             $controllerInstance->requestStartTime = microtime(true);
             if (!method_exists($controllerInstance, $methodName)) {
-                writeln("not found method {$controllerName->$methodName}");
+                writeln("not found method $controllerName" . "->" . "$methodName");
                 $controllerInstance->destroy();
                 break;
             }

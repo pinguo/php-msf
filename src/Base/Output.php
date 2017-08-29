@@ -225,7 +225,7 @@ class Output extends Core
         $this->setContentType('text/html; charset=UTF-8');
         if (empty($view)) {
             $view = str_replace('\\', '/', $this->getContext()->getControllerName()) . '/' .
-                str_replace($this->getConfig()->get('http.method_prefix', ''), '', $this->getContext()->getActionName());
+                str_replace($this->getConfig()->get('http.method_prefix', 'action'), '', $this->getContext()->getActionName());
         }
 
         try {

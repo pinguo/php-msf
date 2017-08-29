@@ -262,7 +262,7 @@ abstract class MSFServer extends HttpServer
                         $task->getContext()->getLog()->error($error);
                     }
                 } finally {
-                    if (is_object($task) && !empty($task->getContext())) {
+                    if (!empty($task) && !empty($task->getContext())) {
                         $task->getContext()->getLog()->appendNoticeLog();
                     }
                     //销毁对象
