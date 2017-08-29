@@ -12,7 +12,7 @@ use PG\Context\AbstractContext;
 use PG\Log\PGLog;
 use PG\MSF\Base\Input;
 use PG\MSF\Base\Output;
-use PG\MSF\Memory\Pool;
+use PG\MSF\Base\Pool;
 use PG\AOP\MI;
 
 /**
