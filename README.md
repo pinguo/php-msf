@@ -38,6 +38,12 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 目前社区有几个PHP开源项目支持协程，它们大多采用Generator+Yield来实现，但是实现的细微差别会导致性能相差甚远，我们应该认识到协程能够以同步的代码书写方式而运行异步逻辑，故协程调度器的性能一定要足够的高，php-msf的协程调度性能是原生异步回调方式的80%，也就是说某个API采用原生异步回调写法QPS为10000，通过php-msf协程调度器调度QPS为8000。
 
+## 为什么是微服务框架？
+
+目前php-msf还在起步阶段，我们花了大量的时间和精力解决稳定性、高性能、内存问题，因为我们认为“基石”是“万丈高楼”的最基本的保障，只有基础打得牢，才能将“大楼“建设得“更高”。3.0版本是我们开源的起始版本，是我们迈出的重要一步，接下来我们重点会是分布式微服务框架的打磨。
+
+另外，由于基于PHP长驻进程，并直接解析HTTP或者TCP请求，这是服务化最重要的特性，基于此我们可以做到很多原来不敢去实现想法，总之想像空间很大。
+
 ## 感谢
 
 php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleDistributed/)开发，而此次开源版本中，连接池主要采用了SD的实现。由于我们框架定位、解决的业务场景、稳定性的要求、代码风格等差异太大，故我们自主研发微服务框架，每个框架都有自己的特色和优点，选择合适自己公司和业务场景的框架最重要。同时在此也感谢[白猫](https://github.com/tmtbe)；另外，在研发php-msf框架及生产环境应用过程中，遇到很多低层问题，不过都一一解决，而这些问题能够解决最重要就是[韩天峰-Rango](https://github.com/matyhtf)的大力支持，在此深表感谢。
@@ -47,6 +53,8 @@ php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleD
 API Document: [类文档](https://rawgit.com/PGWireless/php-msf/master/api/index.html)
 
 框架手册: [目录](./doc/preface-目录.md)
+
+示例项目: [demo](https://github.com/PGWireless/php-msf/tree/demo)
 
 ## License
 
