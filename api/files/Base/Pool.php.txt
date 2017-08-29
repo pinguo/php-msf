@@ -6,14 +6,14 @@
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
 
-namespace PG\MSF\Memory;
+namespace PG\MSF\Base;
 
 use Exception;
 use PG\AOP\Wrapper;
 
 /**
  * Class Pool
- * @package PG\MSF\Memory
+ * @package PG\MSF\Base
  */
 class Pool
 {
@@ -120,3 +120,4 @@ class Pool
         $pool->push($classInstance);
     }
 }
+

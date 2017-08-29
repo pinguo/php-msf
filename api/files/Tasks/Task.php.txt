@@ -11,7 +11,7 @@ namespace PG\MSF\Tasks;
 
 use PG\MSF\Helpers\Context;
 use PG\AOP\Wrapper;
-use PG\MSF\Memory\Pool;
+use PG\MSF\Base\Pool;
 
 /**
  * Class Task

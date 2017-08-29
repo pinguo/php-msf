@@ -14,7 +14,6 @@ use PG\MSF\Marco;
 use PG\AOP\MI;
 use PG\AOP\Factory;
 use PG\AOP\Wrapper;
-use PG\MSF\Memory\Pool;
 use PG\MSF\Proxy\IProxy;
 use PG\MSF\Proxy\RedisProxyCluster;
 use PG\MSF\Proxy\RedisProxyMasterSlave;
