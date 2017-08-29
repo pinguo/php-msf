@@ -183,7 +183,7 @@ class Output extends Core
         $result = [
             'data'       => $data,
             'status'     => $status,
-            'message'    => $message,
+            'message'    => empty($message) ? 'success' : $message,
             'serverTime' => microtime(true),
         ];
 

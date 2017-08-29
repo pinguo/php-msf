@@ -74,11 +74,6 @@ class NormalRoute implements IRoute
     {
         $this->controllerClassName = '';
         do {
-            if (class_exists($this->routePrams->controllerName)) {
-                $this->controllerClassName = $this->routePrams->controllerName;
-                break;
-            }
-
             $className = "\\App\\Controllers\\" . $this->routePrams->controllerName;
             if (class_exists($className)) {
                 $this->controllerClassName = $className;
