@@ -69,6 +69,12 @@ class Rpc extends Controller
      */
     public function actionIndex(...$arguments)
     {
+        if ($this->getContext()->getInput()->getHeader('x-rpc') && isset($arguments[0])) {
+            $this->parseHttpArgument($arguments);
+            yield $this->runMethod();
+        } else {
+            $this->outputJson([], 'bad request', 400);
+        }
     }
 
     /**
@@ -106,6 +112,15 @@ class Rpc extends Controller
      */
     protected function runMethod()
     {
+        $handlerClass    = '\\App\\Models\\Handlers\\' . $this->handler;
+        $handlerInstance = $this->getObject($handlerClass, ...$this->construct);
+
+        if (!method_exists($handlerInstance, $this->method)) {
+            throw new Exception('Rpc method not found.');
+        }
+
+        $response = yield $handlerInstance->{$this->method}(...$this->reqParams);
+        $this->getContext()->getLog()->pushLog('Rpc', [$handlerClass => $this->method]);
+        $this->outputJson($response);
     }
 }
-
