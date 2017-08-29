@@ -20,6 +20,16 @@ use PG\MSF\Coroutine\Http;
 class Client extends Core
 {
     /**
+     * @var int DNS缓存有效时间（秒）
+     */
+    protected static $dnsExpire = 60;
+
+    /**
+     * @var int DNS缓存有效次数
+     */
+    protected static $dnsTimes = 10000;
+
+    /**
      * @var array DNS查询缓存
      */
     public static $dnsCache = [];
@@ -65,6 +75,9 @@ class Client extends Core
         if ($timeout) {
             $this->dnsTimeout = $timeout;
         }
+
+        self::$dnsExpire = $this->getConfig()->get('http.dns.expire', 60);
+        self::$dnsTimes  = $this->getConfig()->get('http.dns.times', 10000);
 
         return $this;
     }
@@ -582,11 +595,11 @@ class Client extends Core
     public static function getDnsCache($host)
     {
         if (!empty(self::$dnsCache[$host])) {
-            if (time() - self::$dnsCache[$host][1] > 60) {
+            if (time() - self::$dnsCache[$host][1] > self::$dnsExpire) {
                 return null;
             }
 
-            if (self::$dnsCache[$host][2] > 10000) {
+            if (self::$dnsCache[$host][2] > self::$dnsTimes) {
                 return null;
             }
 
