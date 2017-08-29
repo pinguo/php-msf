@@ -80,7 +80,7 @@ class AOPFactory extends Factory
     /**
      * 获取redis proxy
      *
-     * @param RedisProxyCluster|RedisProxyMasterSlave $redisProxy RedisProxy实例
+     * @param IProxy|RedisProxyCluster|RedisProxyMasterSlave $redisProxy RedisProxy实例
      * @param Core $coreBase Core实例（通常为Controller实例）
      * @return Wrapper|\Redis AOP包装的RedisProxyCluster或者RedisProxyMasterSlave切片实例
      */

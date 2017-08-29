@@ -73,7 +73,7 @@ class MysqlAsynPool extends AsynPool
      * @param Context $context 请求上下文对象
      * @return Miner
      */
-    public function getDBQueryBuilder(Context $context)
+    public function getDBQueryBuilder(Context $context = null)
     {
         if (empty($this->dbQueryBuilder)) {
             $this->dbQueryBuilder            = new Miner();
