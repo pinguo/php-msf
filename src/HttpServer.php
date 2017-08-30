@@ -70,13 +70,13 @@ abstract class HttpServer extends Server
     /**
      * 启动服务
      *
-     * @return $this|void
+     * @return $this
      */
     public function start()
     {
         if (!$this->httpEnable) {
             parent::start();
-            return;
+            return $this;
         }
 
         if (static::mode == 'console') {
