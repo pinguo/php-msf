@@ -49,4 +49,21 @@ class Bench extends Controller
             });
         }
     }
+
+    public function actionHttpCallBack()
+    {
+        $cli = new \swoole_http_client('127.0.0.1', 80);
+        $cli->setHeaders([
+            'Host' => 'localhost',
+        ]);
+        $cli->get('/', function($client) {
+            $this->getContext()->getOutput()->end($client->body);
+        });
+    }
+
+    public function actionHttpCoroutine()
+    {
+        $data = yield $this->getObject(Client::class)->goSingleGet('http://127.0.0.1/');
+        $this->getContext()->getOutput()->end($data['body']);
+    }
 }

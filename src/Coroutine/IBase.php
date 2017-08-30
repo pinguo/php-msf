@@ -25,7 +25,6 @@ interface IBase
      * 发送异步请求
      *
      * @param $callback
-     * @return mixed
      */
     function send($callback);
 

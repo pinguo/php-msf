@@ -170,7 +170,7 @@ class Task
                             $result = $this->routine->getReturn();
                         } catch (\Throwable $e) {
                             // not todo
-                            $result = null;
+                            $result = false;
                         }
                         $this->routine = null;
                         $this->routine = $this->stack->pop();
@@ -185,7 +185,7 @@ class Task
                         $result = $this->routine->getReturn();
                     } catch (\Throwable $e) {
                         // not todo
-                        $result = null;
+                        $result = false;
                     }
 
                     if (!empty($this->stack) && !$this->stack->isEmpty()) {
