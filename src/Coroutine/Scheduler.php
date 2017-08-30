@@ -112,9 +112,6 @@ class Scheduler
                     $task->resetCallBack();
                     break;
                 }
-
-                // 请求释放
-                $task->getController()->destroy();
             } while (0);
         } catch (\Throwable $e) {
             $task->setException($e);
