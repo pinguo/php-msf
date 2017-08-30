@@ -25,7 +25,6 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 - Linux内核版本2.3.32以上(支持epool)
 - PHP-7.0及以上版本（推荐使用PHP-7.1）
 - gcc-4.4以上版本
-- cmake-2.4+，编译为libswoole.so作为C/C++库时需要使用cmake
 - [swoole-1.9.15](https://github.com/swoole/swoole-src/archive/v1.9.15.tar.gz)及以上版本（暂不支持Swoole-2.0）
 - [hiredis-0.13.3](https://github.com/redis/hiredis/archive/v0.13.3.tar.gz)
 - composer
