@@ -162,7 +162,7 @@ class Input extends Core
      */
     public function getRawContent()
     {
-        return $this->requestArr['rawContent'];
+        return $this->request->rawContent();
     }
 
     /**
