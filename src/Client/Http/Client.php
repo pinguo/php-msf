@@ -589,7 +589,7 @@ class Client extends Core
     /**
      * 获取DNS缓存
      *
-     * @param $host HOST名称
+     * @param string $host HOST名称
      * @return mixed|null
      */
     public static function getDnsCache($host)

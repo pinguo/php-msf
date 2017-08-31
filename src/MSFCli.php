@@ -12,7 +12,7 @@ use Exception;
 use PG\MSF\Pools\AsynPoolManager;
 use PG\MSF\Coroutine\Scheduler;
 use PG\MSF\Console\Request;
-use PG\MSF\Memory\Pool;
+use PG\MSF\Base\Pool;
 use PG\MSF\Base\Input;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Base\AOPFactory;
@@ -116,9 +116,12 @@ class MSFCli extends MSFServer
                         $generator = $controllerInstance->$methodName(...$params);
                         if ($generator instanceof \Generator) {
                             $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
+                            $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetCallBack(
+                                function () use ($controllerInstance) {
+                                    $controllerInstance->destroy();
+                                }
+                            );
                             $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
-                        } else {
-                            $controllerInstance->destroy();
                         }
                     }
                 );
@@ -130,7 +133,14 @@ class MSFCli extends MSFServer
 
                 $generator = $controllerInstance->$methodName(...$params);
                 if ($generator instanceof \Generator) {
-                    $this->scheduler->start($generator, $controllerInstance->context, $controllerInstance);
+                    $this->scheduler->start(
+                        $generator,
+                        $controllerInstance->context,
+                        $controllerInstance,
+                        function () use ($controllerInstance) {
+                            $controllerInstance->destroy();
+                        }
+                    );
                 } else {
                     $controllerInstance->destroy();
                 }

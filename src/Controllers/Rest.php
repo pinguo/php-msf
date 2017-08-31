@@ -51,7 +51,7 @@ class Rest extends Controller
      *     'p2' => 'Hello',
      * ]
      */
-    public function httpCreate()
+    public function actionCreate()
     {
         var_dump($this->verb);
         $data = [
@@ -67,7 +67,7 @@ class Rest extends Controller
      * GET
      * /rests?p1=1&p2=Hello
      */
-    public function httpIndex()
+    public function actionIndex()
     {
         var_dump($this->verb);
         $data = [
@@ -88,7 +88,7 @@ class Rest extends Controller
      * GET
      * /rests/1?p1=1&p2=Hello
      */
-    public function httpView()
+    public function actionView()
     {
         var_dump($this->verb);
         $data = [
@@ -103,7 +103,7 @@ class Rest extends Controller
      * OPTIONS
      * /rests | /rests/1
      */
-    public function httpOptions()
+    public function actionOptions()
     {
         var_dump($this->verb);
         if ($this->getContext()->getInput()->get('id')) {
@@ -123,7 +123,7 @@ class Rest extends Controller
      *     'p2' => 'Hello',
      * ]
      */
-    public function httpUpdate()
+    public function actionUpdate()
     {
         var_dump($this->verb);
         $data = [
@@ -139,7 +139,7 @@ class Rest extends Controller
      * DELETE
      * /rests/1
      */
-    public function httpDelete()
+    public function actionDelete()
     {
         var_dump($this->verb);
         var_dump($this->getContext()->getInput()->get('id'));

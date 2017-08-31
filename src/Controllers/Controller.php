@@ -24,7 +24,7 @@ use PG\MSF\Coroutine\CException;
 class Controller extends Core
 {
     /**
-     * @var Wrapper|\PG\MSF\Memory\Pool 对象池
+     * @var Wrapper|\PG\MSF\Base\Pool 对象池
      */
     protected $objectPool;
 
@@ -59,7 +59,7 @@ class Controller extends Core
     /**
      * 获取对象池
      *
-     * @return Wrapper|\PG\MSF\Memory\Pool
+     * @return Wrapper|\PG\MSF\Base\Pool
      */
     public function getObjectPool()
     {
@@ -69,7 +69,7 @@ class Controller extends Core
     /**
      * 设置对象池
      *
-     * @param Wrapper|\PG\MSF\Memory\Pool|NULL $objectPool Pool实例
+     * @param Wrapper|\PG\MSF\Base\Pool|NULL $objectPool Pool实例
      * @return $this
      */
     public function setObjectPool($objectPool)
