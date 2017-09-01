@@ -609,4 +609,15 @@ class Client extends Core
             return null;
         }
     }
+
+    /**
+     * 销毁
+     */
+    public function destroy()
+    {
+        parent::destroy();
+        if ($this->client instanceof \swoole_http_client) {
+            $this->client->close();
+        }
+    }
 }
