@@ -42,8 +42,5 @@ class Child
      */
     public function destroy()
     {
-        if (!empty(Child::$reflections[static::class])) {
-            $this->resetProperties(Child::$reflections[static::class]);
-        }
     }
 }
