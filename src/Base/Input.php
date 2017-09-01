@@ -20,13 +20,34 @@ class Input extends Core
     public $request;
 
     /**
-     * 属性不用于序列化
+     * @var \swoole_http_request 用于自动序列化（解决序列化资源被析构的问题）
+     */
+    public $__serializeRequest;
+
+    /**
+     * 属性用于序列化
      *
      * @return array
      */
     public function __sleep()
     {
-        return ['request'];
+        $this->__serializeRequest          = new \swoole_http_request();
+        $this->__serializeRequest->get     = $this->request->get  ?? [];
+        $this->__serializeRequest->post    = $this->request->post ?? [];
+        $this->__serializeRequest->files   = $this->request->files ?? [];
+        $this->__serializeRequest->cookie  = $this->request->cookie ?? [];
+        $this->__serializeRequest->header  = $this->request->header ?? [];
+        $this->__serializeRequest->server  = $this->request->server ?? [];
+
+        return ['__serializeRequest'];
+    }
+
+    /**
+     * 反序列化后的初始化操作
+     */
+    public function __wakeup()
+    {
+        $this->request = $this->__serializeRequest;
     }
 
     /**
