@@ -133,13 +133,13 @@ class Output extends Core
     }
 
     /**
-     * 属性不用于序列化
+     * 属性用于序列化
      *
      * @return array
      */
     public function __sleep()
     {
-        return ['response', 'request'];
+        return [];
     }
 
     /**

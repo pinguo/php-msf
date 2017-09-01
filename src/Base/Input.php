@@ -18,19 +18,36 @@ class Input extends Core
      * @var \swoole_http_request|\PG\MSF\Console\Request 请求参数对象
      */
     public $request;
-    /**
-     * @var request序列化数组 防止往Task投递时被序列化导致上传文件被删除等资源释放操作
-     */
-    public $requestArr;
 
     /**
-     * 属性不用于序列化
+     * @var \swoole_http_request 用于自动序列化（解决序列化资源被析构的问题）
+     */
+    public $__serializeRequest;
+
+    /**
+     * 属性用于序列化
      *
      * @return array
      */
     public function __sleep()
     {
-        return ['requestArr'];
+        $this->__serializeRequest          = new \swoole_http_request();
+        $this->__serializeRequest->get     = $this->request->get  ?? [];
+        $this->__serializeRequest->post    = $this->request->post ?? [];
+        $this->__serializeRequest->files   = $this->request->files ?? [];
+        $this->__serializeRequest->cookie  = $this->request->cookie ?? [];
+        $this->__serializeRequest->header  = $this->request->header ?? [];
+        $this->__serializeRequest->server  = $this->request->server ?? [];
+
+        return ['__serializeRequest'];
+    }
+
+    /**
+     * 反序列化后的初始化操作
+     */
+    public function __wakeup()
+    {
+        $this->request = $this->__serializeRequest;
     }
 
     /**
@@ -42,7 +59,6 @@ class Input extends Core
     public function set($request)
     {
         $this->request = $request;
-        $this->requestArr = json_decode(json_encode($request), true);
         return $this;
     }
 
@@ -54,7 +70,6 @@ class Input extends Core
     public function reset()
     {
         unset($this->request);
-        unset($this->requestArr);
         return $this;
     }
 
@@ -66,7 +81,7 @@ class Input extends Core
      */
     public function postGet($index)
     {
-        return $this->requestArr['post'][$index] ?? $this->get($index);
+        return $this->request->post[$index] ?? $this->get($index);
     }
 
     /**
@@ -77,7 +92,7 @@ class Input extends Core
      */
     public function post($index)
     {
-        return $this->requestArr['post'][$index] ?? '';
+        return $this->request->post[$index] ?? '';
     }
 
     /**
@@ -88,7 +103,7 @@ class Input extends Core
      */
     public function get($index)
     {
-        return $this->requestArr['get'][$index] ?? '';
+        return $this->request->get[$index] ?? '';
     }
 
     /**
@@ -99,19 +114,17 @@ class Input extends Core
      */
     public function getPost($index)
     {
-        return $this->requestArr['get'][$index] ?? $this->post($index);
+        return $this->request->get[$index] ?? $this->post($index);
     }
 
     /**
-     * 获取所有的post和get
+     * 先获取所有的POST参数，如果POST为空则获取所有的Get参数
      *
      * @return array
      */
     public function getAllPostGet()
     {
-        $post = $this->requestArr['post'] ?? [];
-        $get = $this->requestArr['get'] ?? [];
-        return array_merge($post, $get);
+        return $this->request->post ?? $this->request->get ?? [];
     }
 
     /**
@@ -121,7 +134,7 @@ class Input extends Core
      */
     public function getAllPost()
     {
-        return $this->requestArr['post'] ?? [];
+        return $this->request->post ?? [];
     }
 
     /**
@@ -131,7 +144,7 @@ class Input extends Core
      */
     public function getAllGet()
     {
-        return $this->requestArr['get'] ?? [];
+        return $this->request->get ?? [];
     }
 
 
@@ -142,7 +155,7 @@ class Input extends Core
      */
     public function getAllHeader()
     {
-        return $this->requestArr['header'] ?? [];
+        return $this->request->header ?? [];
     }
 
     /**
@@ -152,7 +165,7 @@ class Input extends Core
      */
     public function getAllServer()
     {
-        return $this->requestArr['server'] ?? [];
+        return $this->request->server ?? [];
     }
 
     /**
@@ -174,7 +187,7 @@ class Input extends Core
      */
     public function setPost($key, $value)
     {
-        $this->requestArr['post'][$key] = $value;
+        $this->request->post[$key] = $value;
         return $this;
     }
 
@@ -187,7 +200,7 @@ class Input extends Core
      */
     public function setGet($key, $value)
     {
-        $this->requestArr['get'][$key] = $value;
+        $this->request->get[$key] = $value;
         return $this;
     }
 
@@ -199,7 +212,7 @@ class Input extends Core
      */
     public function setAllPost(array $post)
     {
-        $this->requestArr['post'] = $post;
+        $this->request->post = $post;
         return $this;
     }
 
@@ -211,7 +224,7 @@ class Input extends Core
      */
     public function setAllGet(array $get)
     {
-        $this->requestArr['get'] = $get;
+        $this->request->get = $get;
         return $this;
     }
 
@@ -223,7 +236,7 @@ class Input extends Core
      */
     public function getCookie($index)
     {
-        return $this->requestArr['cookie'][$index] ?? '';
+        return $this->request->cookie[$index] ?? '';
     }
 
     /**
@@ -234,7 +247,7 @@ class Input extends Core
      */
     public function getFile($index)
     {
-        return $this->requestArr['files'][$index] ?? '';
+        return $this->request->files[$index] ?? '';
     }
 
     /**
@@ -245,7 +258,7 @@ class Input extends Core
      */
     public function getServer($index)
     {
-        return $this->requestArr['server'][$index] ?? '';
+        return $this->request->server[$index] ?? '';
     }
 
     /**
@@ -255,11 +268,11 @@ class Input extends Core
      */
     public function getRequestMethod()
     {
-        if (isset($this->requestArr['server']['http_x_http_method_override'])) {
-            return strtoupper($this->requestArr['server']['http_x_http_method_override']);
+        if (isset($this->request->server['http_x_http_method_override'])) {
+            return strtoupper($this->request->server['http_x_http_method_override']);
         }
-        if (isset($this->requestArr['server']['request_method'])) {
-            return strtoupper($this->requestArr['server']['request_method']);
+        if (isset($this->request->server['request_method'])) {
+            return strtoupper($this->request->server['request_method']);
         }
 
         return 'GET';
@@ -272,7 +285,7 @@ class Input extends Core
      */
     public function getRequestUri()
     {
-        return $this->requestArr['server']['request_uri'];
+        return $this->request->server['request_uri'];
     }
 
     /**
@@ -282,7 +295,7 @@ class Input extends Core
      */
     public function getPathInfo()
     {
-        return $this->requestArr['server']['path_info'];
+        return $this->request->server['path_info'];
     }
 
     /**
@@ -301,7 +314,7 @@ class Input extends Core
         } elseif ($ip = $this->getHeader('http_client_ip')) {
         } elseif ($ip = $this->getHeader('x-real-ip')) {
         } elseif ($ip = $this->getHeader('remote_addr')) {
-        } elseif ($ip = $this->requestArr['server']['remote_addr']) {
+        } elseif ($ip = $this->request->server['remote_addr']) {
             // todo
         }
 
@@ -316,7 +329,7 @@ class Input extends Core
      */
     public function getHeader($index)
     {
-        return $this->requestArr['header'][$index] ?? '';
+        return $this->request->header[$index] ?? '';
     }
 
     /**
