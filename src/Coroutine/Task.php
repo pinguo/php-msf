@@ -249,14 +249,6 @@ class Task
      */
     public function handleTaskException(\Throwable $e, $value)
     {
-        if ($value != '') {
-            $logValue = '';
-            dumpInternal($logValue, $value, 0, false);
-            $message = 'Yield ' . $logValue . ' message: ' . $e->getMessage();
-        } else {
-            $message = $e->getMessage();
-        }
-
         while (!empty($this->stack) && !$this->stack->isEmpty()) {
             $this->routine = $this->stack->pop();
             try {

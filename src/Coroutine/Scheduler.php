@@ -57,9 +57,9 @@ class Scheduler
         });
 
         /**
-         * 每隔300s清理对象池中的对象
+         * 每隔3600s清理对象池中的对象
          */
-        swoole_timer_tick(300000, function ($timerId) {
+        swoole_timer_tick(3600000, function ($timerId) {
             if (!empty(getInstance()->objectPool->map)) {
                 foreach (getInstance()->objectPool->map as $class => &$objectsMap) {
                     while ($objectsMap->count()) {
@@ -94,6 +94,11 @@ class Scheduler
 
         try {
             do {
+                // 迭代器检查
+                if (!$task->getRoutine() instanceof \Generator) {
+                    break;
+                }
+
                 // 协程异步IO
                 if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
                     break;
@@ -108,8 +113,9 @@ class Scheduler
                 // 请求调度结束（考虑是否回调）
                 $task->resetRoutine();
                 if (is_callable($task->getCallBack())) {
-                    $task->getCallBack()();
+                    $func = $task->getCallBack();
                     $task->resetCallBack();
+                    $func();
                     break;
                 }
             } while (0);
