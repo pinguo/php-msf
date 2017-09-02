@@ -113,6 +113,8 @@ class AOPFactory extends Factory
             if ($method === 'push') {
                 // 手工处理释放资源
                 method_exists($arguments[0], 'destroy') && $arguments[0]->destroy();
+                // 自动调用析构方法
+                method_exists($arguments[0], '__destruct') && $arguments[0]->__destruct();
                 // 自动处理释放资源
                 $class = get_class($arguments[0]);
                 if (!empty(MI::$__reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
