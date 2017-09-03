@@ -241,7 +241,6 @@ abstract class HttpServer extends Server
                 }
                 break;
             } catch (\Throwable $e) {
-                writeln(dump($e, true, true));
                 $controllerInstance->onExceptionHandle($e);
             }
         } while (0);
