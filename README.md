@@ -71,11 +71,11 @@ php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleD
 
 ## 文档
 
-API Document: [类文档](https://rawgit.com/PGWireless/php-msf/master/api/index.html)
+API Document: [类文档](https://rawgit.com/pinguo/php-msf/master/api/index.html)
 
 框架手册: [目录](./doc/preface-目录.md)
 
-示例项目: [demo](https://github.com/PGWireless/php-msf/tree/demo)
+示例项目: [demo](https://github.com/pinguo/php-msf/tree/demo)
 
 ## License
 
