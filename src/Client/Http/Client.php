@@ -186,7 +186,9 @@ class Client extends Core
 
         $ip = Client::getDnsCache($this->urlData['host']);
         if ($ip !== null) {
-            $client     = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
+            // swoole_http_client手工析构有Segmentation fault，暂时直接new
+            //$client     = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
+            $client     = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
             $client->set(['timeout' => -1]);
             $this->client = $client;
             $headers = array_merge($headers, [
@@ -469,7 +471,9 @@ class Client extends Core
             return true;
         }
 
-        $this->client = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
+        // swoole_http_client手工析构有Segmentation fault，暂时直接new
+        //$this->client = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
+        $this->client = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
         $this->client->set(['timeout' => -1]);
         $headers = array_merge($this->urlData['headers'], [
             'Host' => $this->urlData['host'],
