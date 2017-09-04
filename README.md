@@ -103,7 +103,11 @@ API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e
 
 示例DEMO项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
 
-帮助完善文档：[https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
+帮助完善文档: [https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
+
+## 交流与反馈
+
+PHP-MSF#1群(QQ): 614054288
 
 ## License
 
