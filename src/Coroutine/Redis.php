@@ -150,9 +150,11 @@ class Redis extends Base
             if (!empty($keys) && is_array($data)) {
                 $ret = [];
                 array_walk($data, function ($val, $k) use ($keys, $len, &$ret) {
-                    $key = substr($keys[$k], $len);
-                    $val = $this->realUnserialize($val);
-                    $ret[$key] = $val;
+                    if (!is_null($val)) {
+                        $key = substr($keys[$k], $len);
+                        $val = $this->realUnserialize($val);
+                        $ret[$key] = $val;
+                    }
                 });
 
                 $data = $ret;
