@@ -97,11 +97,11 @@ php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleD
 
 ## 文档
 
-框架手册: [PHP-MSF开发手册](https://www.gitbook.com/book/pinguo/php-msf-docs/details)
+框架手册(Gitbook): [PHP-MSF开发手册](https://www.gitbook.com/book/pinguo/php-msf-docs/details)
 
-API Document: [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
+API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
 
-示例项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
+示例DEMO项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
 
 帮助完善文档：[https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
 
