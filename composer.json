@@ -1,7 +1,7 @@
 {
   "name": "pinguo/php-msf",
-  "description": "pinguo Micro Service Framework For PHP",
-  "license": "BSD-3-Clause",
+  "description": "Pinguo Micro Service Framework For PHP",
+  "license": "GPL",
   "type": "library",
   "homepage": "https://github.com/pinguo/php-msf",
   "require": {
