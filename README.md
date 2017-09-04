@@ -1,5 +1,5 @@
 <p align="center">
-![](./php-msf.svg)
+<img src="./php-msf.png"/>
 </p>
 
 # Micro Service Framework For PHP
