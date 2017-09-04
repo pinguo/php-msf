@@ -79,6 +79,4 @@ API Document: [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/ap
 
 ## License
 
-## License
-
 GNU General Public License, version 2 see [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)
