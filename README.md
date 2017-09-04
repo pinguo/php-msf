@@ -71,12 +71,14 @@ php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleD
 
 ## 文档
 
-API Document: [类文档](https://rawgit.com/pinguo/php-msf/master/api/index.html)
+API Document: [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
 
-框架手册: [目录](./doc/preface-目录.md)
+框架手册: [PHP-MSF开发手册](https://github.com/pinguo/php-msf-docs/)
 
-示例项目: [demo](https://github.com/pinguo/php-msf/tree/demo)
+示例项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
 
 ## License
 
-GNU General Public License, version 2 see [http://www.apache.org/licenses/LICENSE-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)
+## License
+
+GNU General Public License, version 2 see [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)
