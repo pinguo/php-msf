@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./php-msf.png" height="120px"/>
+<img src="./php-msf.png"/>
 </p>
 
 # Micro Service Framework For PHP
