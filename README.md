@@ -19,6 +19,26 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 * 支持独立进程的定时器
 * 支持独立配置进程
 
+## 安装
+
+推荐安装方式，编辑项目的composer.json，加入依赖`pinguo/php-msf`
+
+```json
+{
+  "require": {
+    "pinguo/php-msf": "dev-master"
+  }
+}
+```
+
+或者
+
+```bash
+$composer require pinguo/php-msf
+```
+
+更多参考[DEMO](https://github.com/pinguo/php-msf-demo)
+
 ## 环境要求
 
 - Linux，FreeBSD，MacOS(有兼容问题)
@@ -55,6 +75,8 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 由于Swoole复杂的进程模型，并且有同步阻塞和异步非阻塞之分，所以在运行相同代码逻辑时，可能在调用方式、传递参数都不一致，从而直线拉高了学习成本，我们为了屏蔽低层的差异，做了大量的工作，实现和传统MVC框架的唯一区别在于添加“yield”关键字。我们参考了Yii2框架的部分代码实践，我们期望无缝的从Yii2开发切换过来。
 
+上述三大原则，我们新增特性、功能实现的投票、合并代码依据，任何影响这些原则的PR也将会被拒绝。
+
 ## 协程
 
 目前社区有几个PHP开源项目支持协程，它们大多采用Generator+Yield来实现，但是实现的细微差别会导致性能相差甚远，我们应该认识到协程能够以同步的代码书写方式而运行异步逻辑，故协程调度器的性能一定要足够的高，php-msf的协程调度性能是原生异步回调方式的80%，也就是说某个API采用原生异步回调写法QPS为10000，通过php-msf协程调度器调度QPS为8000。
@@ -71,11 +93,13 @@ php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleD
 
 ## 文档
 
+框架手册: [PHP-MSF开发手册](https://www.gitbook.com/book/pinguo/php-msf-docs/details)
+
 API Document: [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
 
-框架手册: [PHP-MSF开发手册](https://github.com/pinguo/php-msf-docs/)
-
 示例项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
+
+帮助完善文档：[https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
 
 ## License
 
