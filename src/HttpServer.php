@@ -250,7 +250,7 @@ abstract class HttpServer extends Server
                 $controllerInstance->destroy();
             }
 
-            $response->status(500);
+            $response->status($code);
             $response->end($error);
         }
     }
