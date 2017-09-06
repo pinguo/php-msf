@@ -222,11 +222,11 @@ class RpcClient extends Core
         }
 
         if ($response && !empty($response['body']) && ($jsonRes = json_decode($response['body'], true))) {
-            if ($jsonRes['status'] !== 200) {
+            if ($response['statusCode'] !== 200) {
                 $this->getContext()->getLog()->warning(dump($response, false, true));
                 return false;
             } else {
-                return $jsonRes['data'];
+                return $jsonRes;
             }
         } else {
             $this->getContext()->getLog()->warning(dump($response, false, true));
@@ -279,11 +279,11 @@ class RpcClient extends Core
         $responses = yield $context->getObject(Client::class)->goConcurrent($requests);
         foreach ($responses as $key => $response) {
             if ($response && !empty($response['body']) && ($jsonRes = json_decode($response['body'], true))) {
-                if ($jsonRes['status'] !== 200) {
+                if ($response['statusCode'] !== 200) {
                     $results[$key] = false;
                     $context->getContext()->getLog()->warning(dump($response, false, true));
                 } else {
-                    $results[$key] = $jsonRes['data'];
+                    $results[$key] = $jsonRes;
                 }
             } else {
                 $results[$key] = false;

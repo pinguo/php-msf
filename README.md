@@ -23,26 +23,6 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 * 支持独立进程的定时器
 * 支持独立配置进程
 
-## 安装
-
-推荐安装方式，编辑项目的composer.json，加入依赖`pinguo/php-msf`
-
-```json
-{
-  "require": {
-    "pinguo/php-msf": "dev-master"
-  }
-}
-```
-
-或者
-
-```bash
-$composer require pinguo/php-msf
-```
-
-更多参考[DEMO](https://github.com/pinguo/php-msf-demo)
-
 ## 环境要求
 
 - Linux，FreeBSD，MacOS(有兼容问题)
@@ -52,6 +32,13 @@ $composer require pinguo/php-msf
 - [swoole-1.9.15](https://github.com/swoole/swoole-src/archive/v1.9.15.tar.gz)及以上版本（暂不支持Swoole-2.0）
 - [hiredis-0.13.3](https://github.com/redis/hiredis/archive/v0.13.3.tar.gz)
 - composer
+
+
+## 快速运行示例
+
+```bash
+$>curl -sS https://getcomposer.org/installer | php
+```
 
 ## 定位
 

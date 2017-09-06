@@ -32,11 +32,11 @@ class Monitor extends Controller
             }
             $data['running']['concurrency'] = $concurrency;
             $data['sys_cache']              = getInstance()->sysCache->info();
-            $this->outputJson($data, 'Server Information');
+            $this->outputJson($data);
         } else {
             $data                           = [];
             $data['sys_cache']              = getInstance()->sysCache->info();
-            $this->outputJson($data, 'Server Information Not OK');
+            $this->outputJson($data);
         }
     }
 }

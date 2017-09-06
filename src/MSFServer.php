@@ -114,12 +114,16 @@ abstract class MSFServer extends HttpServer
         $this->tidPidTable->create();
 
         //reload监控进程
-        if ($this->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理
-            $reloadProcess = new \swoole_process(function ($process) {
-                $process->name($this->config['server.process_title'] . '-RELOAD');
-                new Inotify($this->config, $this);
-            }, false, 2);
-            $this->server->addProcess($reloadProcess);
+        if ($this->config->get('auto_reload_enable', false)) {
+            if (!extension_loaded('inotify')) {
+                writeln("Inotify  Reload: Failed(未安装inotify扩展)");
+            } else {
+                $reloadProcess = new \swoole_process(function ($process) {
+                    $process->name($this->config['server.process_title'] . '-RELOAD');
+                    new Inotify($this->config, $this);
+                }, false, 2);
+                $this->server->addProcess($reloadProcess);
+            }
         }
 
         //配置管理进程
