@@ -36,7 +36,7 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 - composer
 
 
-## 快速运行起步
+## 快速起步
    
 ```bash
 $>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/ee580877/installer.php | php
