@@ -101,7 +101,7 @@ hello world!
 ├── test // 单元测试目录
 ```
 
-上述为基于php-msf的标准应用结构，一键安装程序install.php会自动生成目录，用户可以根据需求创建一些自定义目录，只要符合psr4标准即可自动加载。
+上述为基于php-msf的标准应用结构，一键安装程序installer.php会自动生成目录，用户可以根据需求创建一些自定义目录，只要符合psr4标准即可自动加载。
 
 ## 服务启动
 
@@ -132,7 +132,7 @@ $>./server.php restart
 
 ## Docker
 
-我们制作了Docker镜像，方便Docker用户快速的安装环境，运行[PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)工程。另外在开发环境修改代码后可实时预览效果，建议使用Docker for [Mac](https://download.docker.com/mac/stable/Docker.dmg)/[Windows](https://download.docker.com/win/stable/InstallDocker.msi)桌面版。
+我们制作了Docker镜像，方便Docker用户快速的安装环境，运行[PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)工程。另外期望在开发环境修改代码实时预览效果，建议使用Docker for [Mac](https://download.docker.com/mac/stable/Docker.dmg)/[Windows](https://download.docker.com/win/stable/InstallDocker.msi)桌面版。
 
 如果是升级Docker，它会自动迁移原有的镜像和容器，请耐心等待，千万不能中途kill掉Docker进程，否则再想迁移就难了。
 
