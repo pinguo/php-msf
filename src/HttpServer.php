@@ -279,22 +279,4 @@ abstract class HttpServer extends Server
 
         return $logId;
     }
-
-
-    function generateIdHex()
-    {
-        static $i = 0;
-        $i OR $i = mt_rand(1, 0x7FFFFF);
-
-        return sprintf("%08x%06x%04x%06x",
-            time() & 0xFFFFFFFF,
-
-            crc32(substr((string)gethostname(), 0, 256)) >> 8 & 0xFFFFFF,
-
-            getmypid() & 0xFFFF,
-
-            $i = $i > 0xFFFFFE ? 1 : $i + 1
-        );
-    }
-
 }
