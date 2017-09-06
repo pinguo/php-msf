@@ -150,18 +150,6 @@ class MSFCli extends MSFServer
     }
 
     /**
-     * gen a logId
-     *
-     * @param Request $request
-     * @return string
-     */
-    public function genLogId($request)
-    {
-        $logId = strval(new \MongoId());
-        return $logId;
-    }
-
-    /**
      * 服务启动前的初始化
      */
     public function beforeSwooleStart()
