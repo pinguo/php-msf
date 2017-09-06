@@ -214,6 +214,10 @@ class Client extends Core
      */
     public function goPost($url = '', $data = [], $timeout = 30000, $headers = [])
     {
+        if (empty($data)) {
+            throw new Exception('post data is empty');
+        }
+
         if (!($this->client instanceof \swoole_http_client)) {
             throw new Exception('You must complete the DNS query first, Such as $client->goDnsLookup()');
         }
@@ -273,6 +277,10 @@ class Client extends Core
      */
     public function goSinglePost($url = '', $data = [], $timeout = 30000, $headers = [])
     {
+        if (empty($data)) {
+            throw new Exception('post data is empty');
+        }
+
         if (empty($this->urlData)) {
             $this->urlData = self::parseUrl($url);
         } else {
@@ -384,6 +392,11 @@ class Client extends Core
                     if ($method != 'GET' && $method != 'POST') {
                         unset($requests[$key]);
                         $this->getContext()->getLog()->error('$requests[' . $key . '] method field not valid, must be GET or POST, And Case Sensitive');
+                        continue;
+                    }
+
+                    if ($method == 'POST' && empty($request['data'])) {
+                        $this->getContext()->getLog()->error('$requests[' . $key . '] post data is empty');
                         continue;
                     }
                 }

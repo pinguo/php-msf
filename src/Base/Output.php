@@ -164,110 +164,15 @@ class Output extends Core
      */
     public function setStatusHeader($code = 200)
     {
-        $this->response->status($code);
+        if (empty(self::$codes[$code])) {
+            $code = 500;
+        }
+
+        if (!empty($this->response)) {
+            $this->response->status($code);
+        }
+
         return $this;
-    }
-
-    /**
-     * 响应json格式数据
-     *
-     * @param mixed|null $data 响应数据
-     * @param string $message 响应提示
-     * @param int $status 响应HTTP状态码
-     * @param callable|null $callback jsonp参数名
-     */
-    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
-    {
-        $this->getContext()->getLog()->pushLog('status', $status);
-
-        $result = [
-            'data'       => $data,
-            'status'     => $status,
-            'message'    => empty($message) ? 'success' : $message,
-            'serverTime' => microtime(true),
-        ];
-
-        switch ($this->controller->requestType) {
-            case Marco::HTTP_REQUEST:
-                $callback = $this->getCallback($callback);
-                if (!is_null($callback)) {
-                    $output = $callback . '(' . json_encode($result) . ');';
-                } else {
-                    $output = json_encode($result);
-                }
-
-                if (!empty($this->response)) {
-                    $this->setContentType('application/json; charset=UTF-8');
-                    $this->end($output);
-                }
-                break;
-            case Marco::TCP_REQUEST:
-                // @todo
-                break;
-        }
-    }
-
-    /**
-     * 通过模板引擎响应输出HTML
-     *
-     * @param array $data 待渲染KV数据
-     * @param string|null $view 文件名
-     * @throws \Exception
-     * @throws \Throwable
-     * @throws Exception
-     */
-    public function outputView(array $data, $view = null)
-    {
-        if ($this->controller->requestType !== Marco::HTTP_REQUEST) {
-            throw new Exception('$this->outputView not support '. $this->controller->requestType);
-        }
-
-        $this->setContentType('text/html; charset=UTF-8');
-        if (empty($view)) {
-            $view = str_replace('\\', '/', $this->getContext()->getControllerName()) . '/' .
-                str_replace($this->getConfig()->get('http.method_prefix', 'action'), '', $this->getContext()->getActionName());
-        }
-
-        try {
-            $viewFile = ROOT_PATH . '/app/Views/' . $view;
-            $template = getInstance()->templateEngine->make($viewFile);
-            $response = $template->render($data);
-        } catch (\Throwable $e) {
-            $template = null;
-            $viewFile = getInstance()->MSFSrcDir . '/Views/' . $view;
-            try {
-                $template = getInstance()->templateEngine->make($viewFile);
-                $response = $template->render($data);
-            } catch (\Throwable $e) {
-                throw new Exception('app view and server view both not exist, please check again', 500);
-            }
-        }
-
-        $template = null;
-        $this->end($response);
-    }
-
-    /**
-     * 获取jsonp的callback名称
-     *
-     * @param string $callback jsonp的callback参数名称
-     * @return string
-     */
-    public function getCallback($callback)
-    {
-        $input = $this->getContext()->getInput();
-        if (is_null($callback) && (!empty($input->postGet('callback')) ||
-                !empty($input->postGet('cb')) ||
-                !empty($input->postGet('jsonpCallback')))
-        ) {
-            $callback = !empty($input->postGet('callback'))
-                ? $input->postGet('callback')
-                : !empty($input->postGet('cb'))
-                    ? $input->postGet('cb')
-                    : $input->postGet('jsonpCallback');
-        }
-
-        return $callback;
     }
 
     /**
@@ -320,6 +225,81 @@ class Output extends Core
         return $this;
     }
 
+    /**
+     * 响应原始数据
+     *
+     * @param mixed|null $data 响应数据
+     * @param int $status 响应HTTP状态码
+     */
+    public function output($data = null, $status = 200)
+    {
+        $this->getContext()->getLog()->pushLog('status', $status);
+
+        switch ($this->controller->requestType) {
+            case Marco::HTTP_REQUEST:
+                if (!empty($this->response)) {
+                    $this->setStatusHeader($status);
+                    $this->end($data);
+                }
+                break;
+            case Marco::TCP_REQUEST:
+                // @todo
+                break;
+        }
+    }
+
+    /**
+     * 响应json格式数据
+     *
+     * @param mixed|null $data 响应数据
+     * @param int $status 响应HTTP状态码
+     */
+    public function outputJson($data = null, $status = 200)
+    {
+        $this->setContentType('application/json; charset=UTF-8');
+        $data = json_encode($data);
+        $this->output($data, $status);
+    }
+
+    /**
+     * 通过模板引擎响应输出HTML
+     *
+     * @param array $data 待渲染KV数据
+     * @param string|null $view 文件名
+     * @throws \Exception
+     * @throws \Throwable
+     * @throws Exception
+     */
+    public function outputView(array $data, $view = null)
+    {
+        if ($this->controller->requestType !== Marco::HTTP_REQUEST) {
+            throw new Exception('$this->outputView not support '. $this->controller->requestType);
+        }
+
+        $this->setContentType('text/html; charset=UTF-8');
+        if (empty($view)) {
+            $view = str_replace('\\', '/', $this->getContext()->getControllerName()) . '/' .
+                str_replace($this->getConfig()->get('http.method_prefix', 'action'), '', $this->getContext()->getActionName());
+        }
+
+        try {
+            $viewFile = ROOT_PATH . '/app/Views/' . $view;
+            $template = getInstance()->templateEngine->make($viewFile);
+            $response = $template->render($data);
+        } catch (\Throwable $e) {
+            $template = null;
+            $viewFile = getInstance()->MSFSrcDir . '/Views/' . $view;
+            try {
+                $template = getInstance()->templateEngine->make($viewFile);
+                $response = $template->render($data);
+            } catch (\Throwable $e) {
+                throw new Exception('app view and server view both not exist, please check again', 500);
+            }
+        }
+
+        $template = null;
+        $this->end($response);
+    }
 
     /**
      * 结束HTTP请求，发送响应体

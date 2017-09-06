@@ -73,7 +73,7 @@ class Rpc extends Controller
             $this->parseHttpArgument($arguments);
             yield $this->runMethod();
         } else {
-            $this->outputJson([], 'bad request', 400);
+            $this->outputJson([], 400);
         }
     }
 

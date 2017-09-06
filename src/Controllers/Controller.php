@@ -119,19 +119,19 @@ class Controller extends Core
 
             if ($ce instanceof ParameterValidationExpandException) {
                 $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), Errno::PARAMETER_VALIDATION_FAILED);
+                $this->output('Server internal error', Errno::PARAMETER_VALIDATION_FAILED);
             } elseif ($ce instanceof PrivilegeException) {
                 $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), Errno::PRIVILEGE_NOT_PASS);
+                $this->output('Server internal error', Errno::PRIVILEGE_NOT_PASS);
             } elseif ($ce instanceof \MongoException) {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, 'Network Error.', Errno::FATAL);
+                $this->output('Server internal error', Errno::FATAL);
             } elseif ($ce instanceof CException) {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
+                $this->output(parent::$stdClass, $ce->getCode());
             } else {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
+                $this->output('Server internal error', $ce->getCode());
             }
         } catch (\Throwable $ne) {
             getInstance()->log->error('previous exception ' . dump($ce, false, true));
@@ -160,17 +160,27 @@ class Controller extends Core
     }
 
     /**
+     * 响应原始数据
+     *
+     * @param mixed|null $data 响应数据
+     * @param int $status 响应HTTP状态码
+     * @return void
+     */
+    public function output($data = null, $status = 200)
+    {
+        $this->getContext()->getOutput()->output($data, $status);
+    }
+
+    /**
      * 响应json格式数据
      *
      * @param mixed|null $data 响应数据
-     * @param string $message 响应提示
      * @param int $status 响应HTTP状态码
-     * @param callable|null $callback jsonp参数名
      * @return void
      */
-    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    public function outputJson($data = null, $status = 200)
     {
-        $this->getContext()->getOutput()->outputJson($data, $message, $status, $callback);
+        $this->getContext()->getOutput()->outputJson($data, $status);
     }
 
     /**
