@@ -4,7 +4,7 @@
 
 # Micro Service Framework For PHP
 
-PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区服务器端团队基于Swoole自主研发的现代化的PHP服务框架，简称msf或者php-msf，它的核心设计思想是采用协程、异步、并行的创新技术手段提高系统的单机吞吐能力，降低整体服务器成本。
+PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区服务器端团队基于[Swoole](http://www.swoole.com)自主研发现代化的PHP协程服务框架，简称msf或者php-msf，是[Swoole](http://www.swoole.com)的工程级企业应用框架，经受了Camera360自拍相机亿级用户高并发大流量的考验。php-msf由Camera360服务器团队主导研发，会持续更新与维护，也希望有更多优秀的[Swoole](http://www.swoole.com)应用实践开发者加入。php-msf核心设计思想是采用协程、异步、并行的创新技术手段提高系统的单机吞吐能力，降低整体服务器成本。
 
 ## 主要特性
 
@@ -35,6 +35,15 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 - [phpredis](http://pecl.php.net/get/redis-3.1.2.tgz)
 - composer
 
+## 文档
+
+框架手册(Gitbook): [PHP-MSF开发手册](https://pinguo.gitbooks.io/php-msf-docs/)
+
+API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
+
+示例DEMO项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
+
+帮助完善文档: [https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
 
 ## 快速起步
    
@@ -72,6 +81,29 @@ hello world!
 
 注意端口，如果你不是8990，你需要修改，然后访问测试。
 
+## 标准应用结构
+
+```
+├── app // PHP业务代码
+│   ├── AppServer.php // 应用server类，可根据需求自定义
+│   ├── Controllers // 控制器类目录
+│   ├── Lib // 特殊逻辑处理类目录
+│   ├── Models // Model类目录
+│   ├── Route // 特殊路由规则类目录
+│   ├── Tasks // Task类目录
+│   └── Views // 视图文件目录
+├── build.sh // 构建脚本（拉取docker镜像，启动容器）
+├── checkstyle.sh // 代码检查脚本
+├── composer.json // composer包依赖配置文件
+├── config // 配置目录
+├── server.php // server启动脚本
+├── console.php // 命令行脚本
+├── test // 单元测试目录
+```
+
+上述为基于php-msf的标准应用结构，一键安装程序install.php会自动生成目录，用户可以根据需求创建一些自定义目录，只要符合psr4标准即可自动加载。
+
+## 服务启动
 
 调试模式
 
@@ -98,7 +130,19 @@ $>./server.php stop
 $>./server.php restart
 ```
 
-## 定位
+## Docker
+
+我们制作了Docker镜像，方便Docker用户快速的安装环境，运行[PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)工程。另外在开发环境修改代码后可实时预览效果，建议使用Docker for [Mac](https://download.docker.com/mac/stable/Docker.dmg)/[Windows](https://download.docker.com/win/stable/InstallDocker.msi)桌面版。
+
+如果是升级Docker，它会自动迁移原有的镜像和容器，请耐心等待，千万不能中途kill掉Docker进程，否则再想迁移就难了。
+
+Docker Registry(阿里云):
+
+- 公网地址: `docker pull registry.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
+- 经典内网: `docker pull registry-internal.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
+- VPC网络: `docker pull registry-vpc.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
+
+## 框架定位
 
 我们专注打造稳定高性能纯异步基于HTTP的微服务框架，作为nginx+php-fpm的替代技术栈实现架构的微服务化;而Tcp/WebSocket Server将作为插件的形势支持，或者作为其他独立的开源项目。
 
@@ -110,7 +154,7 @@ $>./server.php restart
 
 对于聚合服务，比如大型的网站首页，想要通过服务器端聚合内容整合数据，php-msf是可选方案之一。
 
-## 原则
+## 项目原则
 
 ### 稳定
 
@@ -126,7 +170,7 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 上述三大原则，是我们在新增特性、功能实现时，投票或者合并代码的依据，任何影响这些原则的PR也将会被拒绝。
 
-## 协程
+## 关于协程
 
 目前社区有几个PHP开源项目支持协程，它们大多采用Generator+Yield来实现，但是实现的细微差别会导致性能相差甚远，我们应该认识到协程能够以同步的代码书写方式而运行异步逻辑，故协程调度器的性能一定要足够的高，php-msf的协程调度性能是原生异步回调方式的80%，也就是说某个API采用原生异步回调写法QPS为10000，通过php-msf协程调度器调度QPS为8000。
 
@@ -138,17 +182,7 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 ## 感谢
 
-php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleDistributed/)开发，而此次开源版本中，连接池主要采用了SD的实现。由于我们框架定位、解决的业务场景、稳定性的要求、代码风格等差异太大，故我们自主研发微服务框架，每个框架都有自己的特色和优点，选择合适自己公司和业务场景的框架最重要。同时在此也感谢[白猫](https://github.com/tmtbe)；另外，在研发php-msf框架及生产环境应用过程中，遇到很多底层问题，不过都一一解决，而这些问题能够解决最重要就是[Swoole](https://github.com/swoole/swoole-src)开源项目创始人[韩天峰-Rango](https://github.com/matyhtf)的大力支持，在此深表感谢。
-
-## 文档
-
-框架手册(Gitbook): [PHP-MSF开发手册](https://pinguo.gitbooks.io/php-msf-docs/)
-
-API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
-
-示例DEMO项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
-
-帮助完善文档: [https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
+php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleDistributed/)开发，而此次开源版本中，连接池主要采用了SD的实现。由于我们框架定位、解决的业务场景、稳定性的要求、代码风格等差异太大，因此我们决定自主研发微服务框架，每个框架都有自己的特色和优点，选择合适自己公司和业务场景的框架最重要，同时在此也感谢[白猫](https://github.com/tmtbe)；另外，在研发php-msf框架及生产环境应用过程中，遇到很多底层问题，不过都一一解决，而这些问题能够解决最重要就是[Swoole](http://www.swoole.com)开源项目创始人[韩天峰-Rango](https://github.com/matyhtf)的大力支持，在此深表感谢。
 
 ## 交流与反馈
 
