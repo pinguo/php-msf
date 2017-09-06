@@ -27,17 +27,75 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 
 - Linux，FreeBSD，MacOS(有兼容问题)
 - Linux内核版本2.3.32以上(支持epoll)
-- PHP-7.0及以上版本（推荐使用PHP-7.1）
+- PHP-7.0及以上版本（生产环境建议使用PHP-7.1）
 - gcc-4.4以上版本
 - [swoole-1.9.15](https://github.com/swoole/swoole-src/archive/v1.9.15.tar.gz)及以上版本（暂不支持Swoole-2.0）
 - [hiredis-0.13.3](https://github.com/redis/hiredis/archive/v0.13.3.tar.gz)
+- [yac](https://github.com/laruence/yac/archive/yac-2.0.2.tar.gz)
+- [phpredis](http://pecl.php.net/get/redis-3.1.2.tgz)
 - composer
 
 
-## 快速运行示例
+## 快速运行起步
+   
+```bash
+$>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/ee580877/installer.php | php
+```
+
+`installer.php`会检查运行环境，根据你的自定义配置，自动创建项目模板，composer安装依赖，启动服务。
+
+如果一切顺利，运行到最后你将看到如下的输出：
 
 ```bash
-$>curl -sS https://getcomposer.org/installer | php
+[2017-09-06 16:08:34] Run composer install success
+[2017-09-06 16:08:34] Congratulations, all are installed successfully!
+[2017-09-06 16:08:34] You can, visit http://127.0.0.1:8990/Welcome for test
+      _______                               ____
+________  / /_  ____        ____ ___  _____/ __/
+___/ __ \/ __ \/ __ \______/ __ `__ \/ ___/ /_
+__/ /_/ / / / / /_/ /_____/ / / / / (__  ) __/
+_/ .___/_/ /_/ .___/     /_/ /_/ /_/____/_/
+/_/         /_/         Camera360 Open Source TM
+[2017-09-06 16:08:34] Swoole  Version: 1.9.18
+[2017-09-06 16:08:34] PHP     Version: 7.1.8
+[2017-09-06 16:08:34] Application ENV: docker
+[2017-09-06 16:08:34] Listen     Addr: 0.0.0.0
+[2017-09-06 16:08:34] Listen     Port: 8990
+```
+
+访问测试：
+
+```bash
+$>curl http://127.0.0.1:8990/Welcome
+hello world!
+```
+
+注意端口，如果你不是8990，你需要修改，然后访问测试。
+
+
+调试模式
+
+```bash
+$>./server.php start
+```
+
+Daemon模式
+
+```bash
+$>./server.php start -d
+```
+
+
+停止服务
+
+```bash
+$>./server.php stop
+```
+
+重启服务
+
+```bash
+$>./server.php restart
 ```
 
 ## 定位

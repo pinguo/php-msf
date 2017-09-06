@@ -164,24 +164,12 @@ class Output extends Core
      */
     public function setStatusHeader($code = 200)
     {
-        $this->response->status($code);
-        return $this;
-    }
-
-    /**
-     * 设置HTTP响应状态码
-     *
-     * @param $status
-     * @return $this
-     */
-    public function setStatus($status)
-    {
-        if (!in_array($status, self::$codes)) {
-            $status = 500;
+        if (empty(self::$codes[$code])) {
+            $code = 500;
         }
 
         if (!empty($this->response)) {
-            $this->response->status($status);
+            $this->response->status($code);
         }
 
         return $this;
@@ -250,8 +238,8 @@ class Output extends Core
         switch ($this->controller->requestType) {
             case Marco::HTTP_REQUEST:
                 if (!empty($this->response)) {
-                    $this->setStatus($status);
-                    $this->end($output);
+                    $this->setStatusHeader($status);
+                    $this->end($data);
                 }
                 break;
             case Marco::TCP_REQUEST:

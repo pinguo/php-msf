@@ -119,19 +119,19 @@ class Controller extends Core
 
             if ($ce instanceof ParameterValidationExpandException) {
                 $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
-                $this->outputJson(parent::$stdClass, Errno::PARAMETER_VALIDATION_FAILED);
+                $this->output('Server internal error', Errno::PARAMETER_VALIDATION_FAILED);
             } elseif ($ce instanceof PrivilegeException) {
                 $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-                $this->outputJson(parent::$stdClass, Errno::PRIVILEGE_NOT_PASS);
+                $this->output('Server internal error', Errno::PRIVILEGE_NOT_PASS);
             } elseif ($ce instanceof \MongoException) {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, Errno::FATAL);
+                $this->output('Server internal error', Errno::FATAL);
             } elseif ($ce instanceof CException) {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, $ce->getCode());
+                $this->output(parent::$stdClass, $ce->getCode());
             } else {
                 $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->outputJson(parent::$stdClass, $ce->getCode());
+                $this->output('Server internal error', $ce->getCode());
             }
         } catch (\Throwable $ne) {
             getInstance()->log->error('previous exception ' . dump($ce, false, true));

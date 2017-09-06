@@ -250,13 +250,8 @@ abstract class HttpServer extends Server
                 $controllerInstance->destroy();
             }
 
-            $res = json_encode([
-                'data'       => parent::$stdClass,
-                'message'    => $error,
-                'status'     => $code,
-                'serverTime' => microtime(true)
-            ]);
-            $response->end($res);
+            $response->status(500);
+            $response->end($error);
         }
     }
 
