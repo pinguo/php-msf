@@ -55,7 +55,7 @@ PHP-MSF#1群(QQ): 614054288
 $>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/214fe1e2/installer.php | php
 ```
 
-`installer.php`会检查运行环境，根据你的自定义配置，自动创建项目模板，composer安装依赖，启动服务。
+`installer.php`会检查运行环境，根据你的自定义配置，自动创建项目模板，composer安装依赖，启动服务。如果`cdn.rawgit.com`无法访问，可以直接克隆或者下载[php-msf-docker](https://github.com/pinguo/php-msf-docker)，提取`installer.php`，然后直接运行`php installer.php`
 
 如果一切顺利，运行到最后你将看到如下的输出：
 
