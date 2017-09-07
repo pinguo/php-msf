@@ -7,11 +7,11 @@
   "require": {
     "php": ">=7.0",
     "ext-swoole": ">=1.9.15",
-    "pinguo/php-log": "dev-master",
-    "pinguo/php-context": "dev-master",
-    "pinguo/php-aop": "dev-master",
-    "pinguo/php-exception": "dev-master",
-    "pinguo/plates": "dev-master",
+    "pinguo/php-log": "1.0.0",
+    "pinguo/php-context": "1.0.0",
+    "pinguo/php-aop": "1.0.0",
+    "pinguo/php-exception": "1.0.0",
+    "pinguo/plates": "3.3.1",
     "hassankhan/config": "~0.10",
     "flexihash/flexihash": "^2.0.0"
   },
@@ -26,7 +26,6 @@
       "src/Helpers/Common.php"
     ]
   },
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "extra": {
   },
