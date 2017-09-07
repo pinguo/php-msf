@@ -39,7 +39,7 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 
 框架手册(Gitbook): [PHP-MSF开发手册](https://pinguo.gitbooks.io/php-msf-docs/)
 
-API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
+API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/4e0ed09d/api-document/index.html)
 
 示例DEMO项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
 
@@ -48,7 +48,7 @@ API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e
 ## 快速起步
 
 ```bash
-$>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/ee580877/installer.php | php
+$>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/214fe1e2/installer.php | php
 ```
 
 `installer.php`会检查运行环境，根据你的自定义配置，自动创建项目模板，composer安装依赖，启动服务。
