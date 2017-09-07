@@ -155,6 +155,24 @@ Docker Registry(阿里云):
 
 对于聚合服务，比如大型的网站首页，想要通过服务器端聚合内容整合数据，php-msf是可选方案之一。
 
+## 手工安装
+
+推荐安装方式，通过编辑项目`composer.json`加入依赖`pinguo/php-msf`
+
+```json
+{
+    "require": {
+        "pinguo/php-msf": ">=3.0.0"
+    }
+}
+```
+
+进入project目录，执行:
+
+```bash
+$>composer require "pinguo/php-msf:>=3.0.0" -vvv
+```
+
 ## 项目原则
 
 ### 稳定
