@@ -46,7 +46,7 @@ API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e
 帮助完善文档: [https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
 
 ## 快速起步
-   
+
 ```bash
 $>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/ee580877/installer.php | php
 ```
@@ -141,6 +141,7 @@ Docker Registry(阿里云):
 - 公网地址: `docker pull registry.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
 - 经典内网: `docker pull registry-internal.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
 - VPC网络: `docker pull registry-vpc.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
+- DockerHub(国外): `docker pull pinguoops/php-msf-docker`
 
 ## 框架定位
 
