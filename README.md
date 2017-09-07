@@ -163,15 +163,12 @@ Docker Registry(阿里云):
 {
     "require": {
         "pinguo/php-msf": ">=3.0.0"
-    }
+    },
+    "minimum-stability": "dev"
 }
 ```
 
-进入project目录，执行:
-
-```bash
-$>composer require "pinguo/php-msf:>=3.0.0" -vvv
-```
+`"minimum-stability": "dev"`这个配置选项必须加上，因为日志组件依赖`"monolog/monolog": "2.0.x-dev"`，并且`monolog/monolog`无2.0的release包，不过我们在生产环境已经验证其稳定性。
 
 ## 项目原则
 
