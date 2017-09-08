@@ -4,13 +4,13 @@
 
 # Micro Service Framework For PHP
 
-PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区服务器端团队基于[Swoole](http://www.swoole.com)自主研发现代化的PHP协程服务框架，简称msf或者php-msf，是[Swoole](http://www.swoole.com)的工程级企业应用框架，经受了Camera360自拍相机亿级用户高并发大流量的考验。php-msf由Camera360服务器团队主导研发，会持续更新与维护，也希望有更多优秀的[Swoole](http://www.swoole.com)应用实践开发者加入。php-msf核心设计思想是采用协程、异步、并行的创新技术手段提高系统的单机吞吐能力，降低整体服务器成本。
+PHP微服务框架即“Micro Service Framework For PHP”，是[Camera360](https://www.camera360.com)社区服务器端团队基于[Swoole](http://www.swoole.com)自主研发现代化的PHP协程服务框架，简称msf或者php-msf，是[Swoole](http://www.swoole.com)的工程级企业应用框架，经受了Camera360亿级用户高并发大流量的考验。php-msf由[Camera360](https://www.camera360.com)服务器团队主导研发，会持续更新与维护，也希望有更多优秀的[Swoole](http://www.swoole.com)应用实践开发者加入。php-msf核心设计思想是采用协程、异步、并行的创新技术手段提高系统的单机吞吐能力，降低整体服务器成本。
 
 ## 主要特性
 
 * 精简版的MVC框架
 * IO密集性业务的单机处理能力提升5-10倍
-* 代码长驻内存
+* 代码常驻内存
 * 支持对象池
 * 支持Redis连接池、MySQL连接池
 * 支持Redis分布式、master-slave部署结构的集群
@@ -180,7 +180,7 @@ Docker Registry(阿里云):
 
 ### 稳定
 
-php-msf经受了Camera360社区服务大流量、高并发的洗礼，稳定性得到充分验证。稳定性是我们花了大量时间、精力去解决的最重要问题，是三大原则的最重要原则。
+php-msf经受了[Camera360](https://www.camera360.com)社区服务大流量、高并发的洗礼，稳定性得到充分验证。稳定性是我们花了大量时间、精力去解决的最重要问题，是三大原则的最重要原则。
 
 ### 高性能
 
@@ -200,7 +200,7 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 目前php-msf还在起步阶段，我们花了大量的时间和精力解决稳定性、高性能、内存问题，因为我们认为“基石”是“万丈高楼”的最基本的保障，只有基础打得牢，才能将“大楼”建设得“更高”。3.0版本是我们开源的起始版本，是我们迈出的重要一步，接下来我们重点会是分布式微服务框架的打磨。
 
-另外，由于基于PHP长驻进程，并直接解析HTTP或者TCP请求，这是服务化最重要的支撑，基于此我们可以做很多原来不敢去实现的想法，总之想像空间很大。
+另外，由于基于PHP常驻进程，并直接解析HTTP或者TCP请求，这是服务化最重要的支撑，基于此我们可以做很多原来不敢去实现的想法，总之想像空间很大。
 
 ## 感谢
 
