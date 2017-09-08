@@ -4,13 +4,13 @@
 
 # Micro Service Framework For PHP
 
-PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区服务器端团队基于[Swoole](http://www.swoole.com)自主研发现代化的PHP协程服务框架，简称msf或者php-msf，是[Swoole](http://www.swoole.com)的工程级企业应用框架，经受了Camera360自拍相机亿级用户高并发大流量的考验。php-msf由Camera360服务器团队主导研发，会持续更新与维护，也希望有更多优秀的[Swoole](http://www.swoole.com)应用实践开发者加入。php-msf核心设计思想是采用协程、异步、并行的创新技术手段提高系统的单机吞吐能力，降低整体服务器成本。
+PHP微服务框架即“Micro Service Framework For PHP”，是[Camera360](https://www.camera360.com)社区服务器端团队基于[Swoole](http://www.swoole.com)自主研发现代化的PHP协程服务框架，简称msf或者php-msf，是[Swoole](http://www.swoole.com)的工程级企业应用框架，经受了Camera360亿级用户高并发大流量的考验。php-msf由[Camera360](https://www.camera360.com)服务器团队主导研发，会持续更新与维护，也希望有更多优秀的[Swoole](http://www.swoole.com)应用实践开发者加入。php-msf核心设计思想是采用协程、异步、并行的创新技术手段提高系统的单机吞吐能力，降低整体服务器成本。
 
 ## 主要特性
 
 * 精简版的MVC框架
 * IO密集性业务的单机处理能力提升5-10倍
-* 代码长驻内存
+* 代码常驻内存
 * 支持对象池
 * 支持Redis连接池、MySQL连接池
 * 支持Redis分布式、master-slave部署结构的集群
@@ -39,19 +39,23 @@ PHP微服务框架即“Micro Service Framework For PHP”，是Camera360社区�
 
 框架手册(Gitbook): [PHP-MSF开发手册](https://pinguo.gitbooks.io/php-msf-docs/)
 
-API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/73e7c4f2/api-document/index.html)
+API Document(Rawgit): [类文档](https://cdn.rawgit.com/pinguo/php-msf-docs/4e0ed09d/api-document/index.html)
 
 示例DEMO项目: [PHP-MSF DEMO](https://github.com/pinguo/php-msf-demo)
 
 帮助完善文档: [https://github.com/pinguo/php-msf-docs](https://github.com/pinguo/php-msf-docs)，请提交PR。
 
+## 交流与反馈
+
+PHP-MSF#1群(QQ): 614054288
+
 ## 快速起步
 
 ```bash
-$>curl -sS https://cdn.rawgit.com/pinguo/php-msf-docker/ee580877/installer.php | php
+$>php -r "copy('https://raw.githubusercontent.com/pinguo/php-msf-docker/master/installer.php', 'installer.php');include('installer.php');" && source ~/.bashrc
 ```
 
-`installer.php`会检查运行环境，根据你的自定义配置，自动创建项目模板，composer安装依赖，启动服务。
+`installer.php`会检查运行环境，根据你的自定义配置，自动创建项目模板，composer安装依赖，启动服务。如果`cdn.rawgit.com`无法访问，可以直接克隆或者下载[php-msf-docker](https://github.com/pinguo/php-msf-docker)，提取`installer.php`，然后直接运行`php installer.php`
 
 如果一切顺利，运行到最后你将看到如下的输出：
 
@@ -143,6 +147,8 @@ Docker Registry(阿里云):
 - VPC网络: `docker pull registry-vpc.cn-hangzhou.aliyuncs.com/pinguo-ops/php-msf-docker:latest`
 - DockerHub(国外): `docker pull pinguoops/php-msf-docker`
 
+
+
 ## 框架定位
 
 我们专注打造稳定高性能纯异步基于HTTP的微服务框架，作为nginx+php-fpm的替代技术栈实现架构的微服务化;而Tcp/WebSocket Server将作为插件的形势支持，或者作为其他独立的开源项目。
@@ -163,21 +169,18 @@ Docker Registry(阿里云):
 {
     "require": {
         "pinguo/php-msf": ">=3.0.0"
-    }
+    },
+    "minimum-stability": "dev"
 }
 ```
 
-进入project目录，执行:
-
-```bash
-$>composer require "pinguo/php-msf:>=3.0.0" -vvv
-```
+`"minimum-stability": "dev"`这个配置选项必须加上，因为日志组件依赖`"monolog/monolog": "2.0.x-dev"`，并且`monolog/monolog`无2.0的release包，不过我们在生产环境已经验证其稳定性。
 
 ## 项目原则
 
 ### 稳定
 
-php-msf经受了Camera360社区服务大流量、高并发的洗礼，稳定性得到充分验证。稳定性是我们花了大量时间、精力去解决的最重要问题，是三大原则的最重要原则。
+php-msf经受了[Camera360](https://www.camera360.com)社区服务大流量、高并发的洗礼，稳定性得到充分验证。稳定性是我们花了大量时间、精力去解决的最重要问题，是三大原则的最重要原则。
 
 ### 高性能
 
@@ -197,15 +200,11 @@ IO密集性业务的单机处理能力提升5-10倍，这是生产环境中得�
 
 目前php-msf还在起步阶段，我们花了大量的时间和精力解决稳定性、高性能、内存问题，因为我们认为“基石”是“万丈高楼”的最基本的保障，只有基础打得牢，才能将“大楼”建设得“更高”。3.0版本是我们开源的起始版本，是我们迈出的重要一步，接下来我们重点会是分布式微服务框架的打磨。
 
-另外，由于基于PHP长驻进程，并直接解析HTTP或者TCP请求，这是服务化最重要的支撑，基于此我们可以做很多原来不敢去实现的想法，总之想像空间很大。
+另外，由于基于PHP常驻进程，并直接解析HTTP或者TCP请求，这是服务化最重要的支撑，基于此我们可以做很多原来不敢去实现的想法，总之想像空间很大。
 
 ## 感谢
 
 php-msf最开始基于[SwooleDistributed-1.7.x](https://github.com/tmtbe/SwooleDistributed/)开发，而此次开源版本中，连接池主要采用了SD的实现。由于我们框架定位、解决的业务场景、稳定性的要求、代码风格等差异太大，因此我们决定自主研发微服务框架，每个框架都有自己的特色和优点，选择合适自己公司和业务场景的框架最重要，同时在此也感谢[白猫](https://github.com/tmtbe)；另外，在研发php-msf框架及生产环境应用过程中，遇到很多底层问题，不过都一一解决，而这些问题能够解决最重要就是[Swoole](http://www.swoole.com)开源项目创始人[韩天峰-Rango](https://github.com/matyhtf)的大力支持，在此深表感谢。
-
-## 交流与反馈
-
-PHP-MSF#1群(QQ): 614054288
 
 ## License
 

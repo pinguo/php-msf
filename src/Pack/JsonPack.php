@@ -17,28 +17,39 @@ use Exception;
 class JsonPack implements IPack
 {
     /**
-     * JSON打包
+     * pack JSON
      *
-     * @param mixed $data 待打包数据
-     * @return string
+     * This adapter uses the json_encode PHP's functions.
+     * For further details, please refer to the manual.
+     * Manual : http://php.net/manual/en/function.json-encode.php
+     *
+     * @param  mixed  $data
+     * @param  int  $options
+     * @param  int  $depth
+     * @return mixed
      */
-    public function pack($data)
+    public function pack($data, $options = JSON_UNESCAPED_UNICODE, $depth = 512)
     {
-        return json_encode($data, JSON_UNESCAPED_UNICODE);
+        return json_encode($data, $options, $depth);
     }
 
     /**
-     * JSON解包
+     * unpack JSON
      *
-     * @param string $data 待解包数据
-     * @return mixed
+     * This adapter uses the json_decode PHP's functions.
+     * For further details, please refer to the manual.
+     * Manual : http://php.net/manual/en/function.json-decode.php
+     *
+     * @param  string  $data
+     * @param  ...  $params
      * @throws Exception
+     * @return mixed
      */
-    public function unPack($data)
+    public function unPack($data, ...$params)
     {
-        $value = json_decode($data);
-        if (empty($value)) {
-            throw new Exception('Json unPack失败');
+        $value = json_decode($data, ...$params);
+        if ($value === null && json_last_error() !== 0) {
+            throw new Exception('Json unPack faild. Error message : ' .  json_last_error_msg());
         }
         return $value;
     }
