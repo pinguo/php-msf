@@ -10,6 +10,7 @@ namespace PG\MSF\Base;
 
 use Exception;
 use PG\AOP\Wrapper;
+use PG\MSF\Marco;
 
 /**
  * Class Pool
@@ -83,6 +84,7 @@ class Pool
             $obj->__useCount   = 0;
             $obj->__genTime    = time();
             $obj->__isContruct = false;
+            $obj->__DSLevel    = Marco::DS_PUBLIC;
             unset($reflector);
             return $obj;
         }
