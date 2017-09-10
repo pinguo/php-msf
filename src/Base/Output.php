@@ -309,6 +309,7 @@ class Output extends Core
      */
     public function end($output = '', $gzip = true)
     {
+        $this->setHeader('X-Ngx-LogId', $this->getContext()->getLogId());
         $acceptEncoding = strtolower($this->request->header['accept-encoding'] ?? '');
         if ($gzip && strpos($acceptEncoding, 'gzip') !== false) {
             $this->response->gzip(1);
