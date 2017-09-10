@@ -305,20 +305,7 @@ class Input extends Core
      */
     public function getRemoteAddr()
     {
-        if (($ip = $this->getHeader('x-forwarded-for')) || ($ip = $this->getHeader('http_x_forwarded_for'))
-            || ($ip = $this->getHeader('http_forwarded')) || ($ip = $this->getHeader('http_forwarded_for'))
-            || ($ip = $this->getHeader('http_forwarded'))
-        ) {
-            $ip = explode(',', $ip);
-            $ip = trim($ip[0]);
-        } elseif ($ip = $this->getHeader('http_client_ip')) {
-        } elseif ($ip = $this->getHeader('x-real-ip')) {
-        } elseif ($ip = $this->getHeader('remote_addr')) {
-        } elseif ($ip = $this->request->server['remote_addr']) {
-            // todo
-        }
-
-        return $ip;
+        return getInstance()::getRemoteAddr($this->request);
     }
 
     /**

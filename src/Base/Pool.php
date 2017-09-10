@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Base;
 
-use Exception;
 use PG\AOP\Wrapper;
 use PG\MSF\Marco;
 

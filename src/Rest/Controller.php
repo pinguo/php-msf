@@ -8,10 +8,7 @@
 
 namespace PG\MSF\Rest;
 
-use PG\Exception\ParameterValidationExpandException;
-use PG\Exception\PrivilegeException;
 use PG\MSF\Base\Output;
-use PG\MSF\Coroutine\CException;
 
 /**
  * Class Controller
@@ -190,7 +187,7 @@ class Controller extends \PG\MSF\Controllers\Controller
             } elseif ($ce instanceof \MongoException) {
                 $this->getContext()->getLog()->error($errMsg . ' with code 500');
                 $this->outputJson(parent::$stdClass, Output::$codes[500], 500);
-            } elseif ($ce instanceof CException) {
+            } elseif ($ce instanceof Exception) {
                 $this->getContext()->getLog()->error($errMsg . ' with code 500');
                 $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
             } else {

@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Proxy;
 
-use Exception;
 use PG\MSF\Pools\RedisAsynPool;
 
 /**

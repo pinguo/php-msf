@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Coroutine;
 
-use Exception;
 use PG\AOP\MI;
 
 /**

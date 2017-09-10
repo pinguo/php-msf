@@ -137,22 +137,34 @@ abstract class HttpServer extends Server
     public function onRequest($request, $response)
     {
         $error              = '';
-        $code               = 500;
-        $controllerInstance = null;
+        $httpCode           = 500;
+        $logId              = $this->genLogId($request);
+        $instance           = null;
         $this->route->handleHttpRequest($request);
+
+        // 构造请求日志对象
+        $PGLog            = clone getInstance()->log;
+        $PGLog->accessRecord['beginTime'] = microtime(true);
+        $PGLog->accessRecord['uri']       = $this->route->getPath();
+        $PGLog->logId     = $logId;
+        defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+        $PGLog->init();
+        $PGLog->pushLog('verb', $this->route->getVerb());
+        $PGLog->pushLog('user-agent', $request->header['user-agent'] ?? 'unknown');
+        $PGLog->pushLog('remote-addr', self::getRemoteAddr($request));
 
         do {
             if ($this->route->getPath() == '') {
-                $error = 'Index not found';
-                $code  = 404;
+                $error    = 'Index not found';
+                $httpCode = 404;
                 break;
             }
 
             $controllerName      = $this->route->getControllerName();
             $controllerClassName = $this->route->getControllerClassName();
             if ($controllerClassName == '') {
-                $error = 'Api not found controller(' . $controllerName . ')';
-                $code  = 404;
+                $error    = 'Api not found controller(' . $controllerName . ')';
+                $httpCode = 404;
                 break;
             }
 
@@ -161,75 +173,89 @@ abstract class HttpServer extends Server
 
             try {
                 /**
-                 * @var \PG\MSF\Controllers\Controller $controllerInstance
+                 * @var \PG\MSF\Controllers\Controller $instance
                  */
-                $controllerInstance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
-                $controllerInstance->__useCount++;
-                if (empty($controllerInstance->getObjectPool())) {
-                    $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
+                $instance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
+                $instance->__useCount++;
+                if (empty($instance->getObjectPool())) {
+                    $instance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $instance));
                 }
 
-                if (!method_exists($controllerInstance, $methodName)) {
-                    $error = 'Api not found method(' . $methodName . ')';
-                    $code  = 404;
+                if (!method_exists($instance, $methodName)) {
+                    $error    = 'Api not found method(' . $methodName . ')';
+                    $httpCode = 404;
                     break;
                 }
 
-                $controllerInstance->context = $controllerInstance->getObjectPool()->get(Context::class);
-
+                $instance->context = $instance->getObjectPool()->get(Context::class);
                 // 初始化控制器
-                $controllerInstance->requestStartTime = microtime(true);
-                $PGLog            = null;
-                $PGLog            = clone getInstance()->log;
-                $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
-                $PGLog->accessRecord['uri']       = $this->route->getPath();
-                $PGLog->logId = $this->genLogId($request);
-                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
-                $PGLog->init();
-                $PGLog->pushLog('controller', $controllerName);
-                $PGLog->pushLog('method', $methodName);
-                $PGLog->pushLog('verb', $this->route->getVerb());
+                $instance->requestStartTime = microtime(true);
 
                 // 构造请求上下文成员
-                $controllerInstance->context->setLogId($PGLog->logId);
-                $controllerInstance->context->setLog($PGLog);
-                $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
+                $instance->context->setLogId($PGLog->logId);
+                $instance->context->setLog($PGLog);
+                $instance->context->setObjectPool($instance->getObjectPool());
 
                 /**
                  * @var $input Input
                  */
-                $input    = $controllerInstance->context->getObjectPool()->get(Input::class);
+                $input    = $instance->context->getObjectPool()->get(Input::class);
                 $input->set($request);
                 /**
                  * @var $output Output
                  */
-                $output   = $controllerInstance->context->getObjectPool()->get(Output::class, [$controllerInstance]);
+                $output   = $instance->context->getObjectPool()->get(Output::class, [$instance]);
                 $output->set($request, $response);
 
-                $controllerInstance->context->setInput($input);
-                $controllerInstance->context->setOutput($output);
-                $controllerInstance->context->setControllerName($controllerName);
-                $controllerInstance->context->setActionName($methodName);
-                $controllerInstance->setRequestType(Marco::HTTP_REQUEST);
-                $init = $controllerInstance->__construct($controllerName, $methodName);
+                $instance->context->setInput($input);
+                $instance->context->setOutput($output);
+                $instance->context->setControllerName($controllerName);
+                $instance->context->setActionName($methodName);
+                $instance->setRequestType(Marco::HTTP_REQUEST);
+                $init = $instance->__construct($controllerName, $methodName);
 
                 if ($init instanceof \Generator) {
                     $this->scheduler->start(
                         $init,
-                        $controllerInstance->context,
-                        $controllerInstance,
-                        function () use ($controllerInstance, $methodName) {
-                            $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
+                        $instance,
+                        function () use ($instance, $methodName) {
+                            $generator = $instance->$methodName(...array_values($this->route->getParams()));
                             if ($generator instanceof \Generator) {
-                                $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
-                                $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
+                                $this->scheduler->taskMap[$instance->context->getLogId()]->resetRoutine($generator);
+                                $this->scheduler->schedule(
+                                    $this->scheduler->taskMap[$instance->context->getLogId()],
+                                    function () use ($instance) {
+                                        if (!$instance->getContext()->getOutput()->__isEnd) {
+                                            $instance->getContext()->getOutput()->output('Not Implemented', 501);
+                                        }
+                                        $instance->destroy();
+                                    }
+                                );
+                            } else {
+                                if (!$instance->getContext()->getOutput()->__isEnd) {
+                                    $instance->getContext()->getOutput()->output('Not Implemented', 501);
+                                }
+                                $instance->destroy();
                             }
                         }
                     );
                 } else {
-                    $generator = $controllerInstance->$methodName(...array_values($this->route->getParams()));
+                    $generator = $instance->$methodName(...array_values($this->route->getParams()));
                     if ($generator instanceof \Generator) {
-                        $this->scheduler->start($generator, $controllerInstance->context, $controllerInstance);
+                        $this->scheduler->start(
+                            $generator, $instance,
+                            function () use ($instance) {
+                                if (!$instance->getContext()->getOutput()->__isEnd) {
+                                    $instance->getContext()->getOutput()->output('Not Implemented', 501);
+                                }
+                                $instance->destroy();
+                            }
+                        );
+                    } else {
+                        if (!$instance->getContext()->getOutput()->__isEnd) {
+                            $instance->getContext()->getOutput()->output('Not Implemented', 501);
+                        }
+                        $instance->destroy();
                     }
                 }
 
@@ -241,18 +267,52 @@ abstract class HttpServer extends Server
                 }
                 break;
             } catch (\Throwable $e) {
-                $controllerInstance->onExceptionHandle($e);
+                $instance->onExceptionHandle($e);
             }
         } while (0);
 
         if ($error !== '') {
-            if ($controllerInstance != null) {
-                $controllerInstance->destroy();
+            if ($instance != null) {
+                $instance->destroy();
             }
 
-            $response->status($code);
+            $PGLog->pushLog('http-code', $httpCode);
+            $PGLog->appendNoticeLog();
+            $response->status($httpCode);
             $response->end($error);
         }
+    }
+
+    /**
+     * 获取远程客户端IP
+     *
+     * @param \swoole_http_request $request 请求对象
+     * @return string
+     */
+    public static function getRemoteAddr($request)
+    {
+        $ip = $request->header['http_client_ip']       ??
+              $request->header['x-real-ip']            ??
+              $request->header['remote_addr']          ??
+              $request->server['remote_addr']          ??
+              "";
+
+        if ($ip) {
+            return $ip;
+        }
+
+        $ip = $request->header['x-forwarded-for']      ??
+              $request->header['http_x_forwarded_for'] ??
+              $request->header['http_forwarded']       ??
+              $request->header['http_forwarded_for']   ??
+              "";
+
+        if ($ip) {
+            $ip = explode(',', $ip);
+            $ip = trim($ip[0]);
+        }
+
+        return $ip;
     }
 
     /**

@@ -8,7 +8,7 @@
 
 namespace PG\MSF;
 
-use Exception;
+use PG\MSF\Base\Exception;
 use Noodlehaus\Config;
 use PG\Log\PGLog;
 use PG\MSF\Base\Child;
