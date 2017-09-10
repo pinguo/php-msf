@@ -85,7 +85,7 @@ class Scheduler
      * 调度协程任务（请求）
      *
      * @param Task $task 协程实例
-     * @param callable|null $callback
+     * @param callable|null $callback 特殊场景回调，如清理资源
      * @return $this
      */
     public function schedule(Task $task, callable $callback = null)
