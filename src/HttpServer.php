@@ -268,6 +268,7 @@ abstract class HttpServer extends Server
                 break;
             } catch (\Throwable $e) {
                 $instance->onExceptionHandle($e);
+                $instance->destroy();
             }
         } while (0);
 

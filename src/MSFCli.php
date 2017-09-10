@@ -45,9 +45,14 @@ class MSFCli extends MSFServer
         parent::run();
         $request = new Request();
         $request->resolve();
-
-        $controllerInstance = null;
         $this->route->handleHttpRequest($request);
+
+        $PGLog            = clone getInstance()->log;
+        $PGLog->accessRecord['beginTime'] = microtime(true);
+        $PGLog->accessRecord['uri']       = $this->route->getPath();
+        $PGLog->logId = $this->genLogId($request);
+        defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+        $PGLog->init();
 
         do {
             $controllerName      = $this->route->getControllerName();
@@ -61,67 +66,58 @@ class MSFCli extends MSFServer
             }
 
             /**
-             * @var \PG\MSF\Controllers\Controller $controllerInstance
+             * @var \PG\MSF\Controllers\Controller $instance
              */
-            $controllerInstance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
-            $controllerInstance->__useCount++;
-            if (empty($controllerInstance->getObjectPool())) {
-                $controllerInstance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $controllerInstance));
+            $instance = $this->objectPool->get($controllerClassName, [$controllerName, $methodName]);
+            $instance->__useCount++;
+            if (empty($instance->getObjectPool())) {
+                $instance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $instance));
             }
             // 初始化控制器
-            $controllerInstance->requestStartTime = microtime(true);
-            if (!method_exists($controllerInstance, $methodName)) {
+            $instance->requestStartTime = microtime(true);
+            if (!method_exists($instance, $methodName)) {
                 writeln("not found method $controllerName" . "->" . "$methodName");
-                $controllerInstance->destroy();
+                $instance->destroy();
                 break;
             }
 
-            $controllerInstance->context  = $controllerInstance->getObjectPool()->get(Context::class);
-
-            $PGLog            = null;
-            $PGLog            = clone getInstance()->log;
-            $PGLog->accessRecord['beginTime'] = $controllerInstance->requestStartTime;
-            $PGLog->accessRecord['uri']       = $this->route->getPath();
-            $PGLog->logId = $this->genLogId($request);
-            defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
-            $PGLog->init();
-            $PGLog->pushLog('controller', $controllerName);
-            $PGLog->pushLog('method', $methodName);
+            $instance->context  = $instance->getObjectPool()->get(Context::class);
 
             // 构造请求上下文成员
-            $controllerInstance->context->setLogId($PGLog->logId);
-            $controllerInstance->context->setLog($PGLog);
-            $controllerInstance->context->setObjectPool($controllerInstance->getObjectPool());
+            $instance->context->setLogId($PGLog->logId);
+            $instance->context->setLog($PGLog);
+            $instance->context->setObjectPool($instance->getObjectPool());
 
             /**
              * @var $input Input
              */
-            $input    = $controllerInstance->getObjectPool()->get(Input::class);
+            $input    = $instance->getObjectPool()->get(Input::class);
             $input->set($request);
-            $controllerInstance->context->setInput($input);
-            $controllerInstance->context->setControllerName($controllerName);
-            $controllerInstance->context->setActionName($methodName);
-            $init = $controllerInstance->__construct($controllerName, $methodName);
+            $instance->context->setInput($input);
+            $instance->context->setControllerName($controllerName);
+            $instance->context->setActionName($methodName);
+            $init = $instance->__construct($controllerName, $methodName);
             if ($init instanceof \Generator) {
                 $this->scheduler->start(
                     $init,
-                    $controllerInstance->context,
-                    $controllerInstance,
-                    function () use ($controllerInstance, $methodName) {
+                    $instance,
+                    function () use ($instance, $methodName) {
                         $params = array_values($this->route->getParams());
                         if (empty($this->route->getParams())) {
                             $params = [];
                         }
 
-                        $generator = $controllerInstance->$methodName(...$params);
+                        $generator = $instance->$methodName(...$params);
                         if ($generator instanceof \Generator) {
-                            $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetRoutine($generator);
-                            $this->scheduler->taskMap[$controllerInstance->context->getLogId()]->resetCallBack(
-                                function () use ($controllerInstance) {
-                                    $controllerInstance->destroy();
+                            $this->scheduler->taskMap[$instance->context->getLogId()]->resetRoutine($generator);
+                            $this->scheduler->schedule(
+                                $this->scheduler->taskMap[$instance->context->getLogId()],
+                                function () use ($instance) {
+                                    $instance->destroy();
                                 }
                             );
-                            $this->scheduler->schedule($this->scheduler->taskMap[$controllerInstance->context->getLogId()]);
+                        } else {
+                            $instance->destroy();
                         }
                     }
                 );
@@ -131,18 +127,17 @@ class MSFCli extends MSFServer
                     $params = [];
                 }
 
-                $generator = $controllerInstance->$methodName(...$params);
+                $generator = $instance->$methodName(...$params);
                 if ($generator instanceof \Generator) {
                     $this->scheduler->start(
                         $generator,
-                        $controllerInstance->context,
-                        $controllerInstance,
-                        function () use ($controllerInstance) {
-                            $controllerInstance->destroy();
+                        $instance,
+                        function () use ($instance) {
+                            $instance->destroy();
                         }
                     );
                 } else {
-                    $controllerInstance->destroy();
+                    $instance->destroy();
                 }
             }
             break;
