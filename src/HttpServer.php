@@ -266,7 +266,7 @@ abstract class HttpServer extends Server
         static $i = 0;
         $i || $i = mt_rand(1, 0x7FFFFF);
 
-        $logId = $request->header['log_id'] ?? '' ;
+        $logId = $request->header['x-ngx-logid'] ?? $request->header['log_id'] ?? '' ;
 
         if (!$logId) {
             $logId = sprintf("%08x%06x%04x%06x",
