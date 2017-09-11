@@ -69,7 +69,7 @@ class RestRoute extends NormalRoute
      *
      * @param \swoole_http_request $request 请求对象
      */
-    public function handleClientRequest($request)
+    public function handleHttpRequest($request)
     {
         $this->routePrams->path = rtrim($request->server['path_info'], '/');
         $this->routePrams->verb = $this->parseVerb($request);
