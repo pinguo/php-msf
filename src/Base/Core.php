@@ -23,7 +23,7 @@ use PG\MSF\Pools\CoroutineRedisProxy;
 class Core extends Child
 {
     /**
-     * @var int 作用计数
+     * @var int 使用计数
      */
     public $__useCount;
 
