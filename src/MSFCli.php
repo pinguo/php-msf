@@ -53,6 +53,7 @@ class MSFCli extends MSFServer
         $PGLog->logId = $this->genLogId($request);
         defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
         $PGLog->init();
+        $PGLog->pushLog('verb', 'cli');
 
         do {
             $controllerName      = $this->route->getControllerName();
