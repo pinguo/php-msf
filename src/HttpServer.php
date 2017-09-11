@@ -26,7 +26,7 @@ abstract class HttpServer extends Server
     public $httpSocketName;
 
     /**
-     * @var integer HTTP服务监听商品
+     * @var integer HTTP服务监听端口
      */
     public $httpPort;
 
