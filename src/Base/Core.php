@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Base;
 
-use Exception;
 use Noodlehaus\Config;
 use PG\MSF\Pack\IPack;
 use PG\AOP\Wrapper;

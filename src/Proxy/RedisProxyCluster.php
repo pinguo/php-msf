@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Proxy;
 
-use Exception;
 use Flexihash\Flexihash;
 use Flexihash\Hasher\Md5Hasher;
 use PG\MSF\Pools\RedisAsynPool;

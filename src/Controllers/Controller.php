@@ -8,14 +8,10 @@
 
 namespace PG\MSF\Controllers;
 
-use PG\Exception\Errno;
-use PG\Exception\ParameterValidationExpandException;
-use PG\Exception\PrivilegeException;
 use PG\AOP\Wrapper;
 use PG\AOP\MI;
 use PG\MSF\Base\Core;
 use Exception;
-use PG\MSF\Coroutine\CException;
 
 /**
  * Class Controller
@@ -116,23 +112,8 @@ class Controller extends Core
                 $errMsg = dump($e, false, true);
                 $ce     = $e;
             }
-
-            if ($ce instanceof ParameterValidationExpandException) {
-                $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PARAMETER_VALIDATION_FAILED);
-                $this->output('Server internal error', Errno::PARAMETER_VALIDATION_FAILED);
-            } elseif ($ce instanceof PrivilegeException) {
-                $this->getContext()->getLog()->warning($errMsg . ' with code ' . Errno::PRIVILEGE_NOT_PASS);
-                $this->output('Server internal error', Errno::PRIVILEGE_NOT_PASS);
-            } elseif ($ce instanceof \MongoException) {
-                $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->output('Server internal error', Errno::FATAL);
-            } elseif ($ce instanceof CException) {
-                $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->output(parent::$stdClass, $ce->getCode());
-            } else {
-                $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                $this->output('Server internal error', $ce->getCode());
-            }
+            $this->getContext()->getLog()->error($errMsg);
+            $this->output('Internal Server Error', 500);
         } catch (\Throwable $ne) {
             getInstance()->log->error('previous exception ' . dump($ce, false, true));
             getInstance()->log->error('handle exception ' . dump($ne, false, true));

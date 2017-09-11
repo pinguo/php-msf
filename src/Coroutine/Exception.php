@@ -1,6 +1,6 @@
 <?php
 /**
- * Exception
+ * 协程异常
  *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
@@ -8,13 +8,13 @@
 
 namespace PG\MSF\Coroutine;
 
-use Exception;
+use PG\MSF\Base\Exception as BaseException;
 
 /**
- * Class CException
+ * Class Exception
  * @package PG\MSF\Coroutine
  */
-class CException extends Exception
+class Exception extends BaseException
 {
     /**
      * 获取前一个异常Message

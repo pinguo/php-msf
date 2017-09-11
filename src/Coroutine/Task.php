@@ -9,7 +9,6 @@
 namespace PG\MSF\Coroutine;
 
 use Exception;
-use PG\MSF\Helpers\Context;
 use PG\MSF\Controllers\Controller;
 use PG\AOP\MI;
 
@@ -61,17 +60,15 @@ class Task
      * 初始化方法
      *
      * @param \Generator $routine 待调度的迭代器实例
-     * @param Context $context 请求的上下文对象
      * @param Controller $controller 当前请求控制器名称
      * @param $callBack callable|null 迭代器执行完成后回调函数
      */
-    public function __construct(\Generator $routine, Context &$context, Controller &$controller, callable $callBack = null)
+    public function __construct(\Generator $routine, Controller &$controller, callable $callBack = null)
     {
         $this->routine    = $routine;
-        $this->context    = $context;
         $this->controller = $controller;
         $this->stack      = new \SplStack();
-        $this->id         = $context->getLogId();
+        $this->id         = $this->getContext()->getLogId();
         $this->callBack   = $callBack;
     }
 
@@ -233,10 +230,6 @@ class Task
 
         $this->getContext()->getLog()->warning($message);
 
-        if (!empty($value) && $value instanceof IBase && method_exists($value, 'destroy')) {
-            $value->destroy();
-        }
-
         return $e;
     }
 
@@ -256,10 +249,6 @@ class Task
                 break;
             } catch (\Exception $e) {
             }
-        }
-
-        if (!empty($value) && $value instanceof IBase && method_exists($value, 'destroy')) {
-            $value->destroy();
         }
 
         if (!empty($this->stack) && $this->stack->isEmpty()) {

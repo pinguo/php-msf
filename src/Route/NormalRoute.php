@@ -45,7 +45,7 @@ class NormalRoute implements IRoute
     /**
      * HTTP请求解析
      *
-     * @param \swoole_http_client $request 请求对象
+     * @param \swoole_http_request $request 请求对象
      */
     public function handleHttpRequest($request)
     {

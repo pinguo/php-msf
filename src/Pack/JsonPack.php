@@ -8,8 +8,6 @@
 
 namespace PG\MSF\Pack;
 
-use Exception;
-
 /**
  * Class JsonPack
  * @package PG\MSF\Pack

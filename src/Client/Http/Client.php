@@ -8,10 +8,10 @@
 
 namespace PG\MSF\Client\Http;
 
-use Exception;
 use PG\MSF\Base\Core;
 use PG\MSF\Coroutine\Dns;
 use PG\MSF\Coroutine\Http;
+use PG\MSF\Client\Exception;
 
 /**
  * Class Client

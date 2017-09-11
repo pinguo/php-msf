@@ -8,7 +8,6 @@
 
 namespace PG\MSF\Base;
 
-use Exception;
 use PG\MSF\Marco;
 use PG\MSF\Controllers\Controller;
 
@@ -118,6 +117,11 @@ class Output extends Core
     public $request;
 
     /**
+     * @var bool 是否响应
+     */
+    public $__isEnd = false;
+
+    /**
      * @var Controller 当前处理请求的控制器
      */
     protected $controller;
@@ -153,25 +157,6 @@ class Output extends Core
     {
         $this->request  = $request;
         $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * 设置HTTP响应状态码
-     *
-     * @param int $code HTTP状态码
-     * @return $this
-     */
-    public function setStatusHeader($code = 200)
-    {
-        if (empty(self::$codes[$code])) {
-            $code = 500;
-        }
-
-        if (!empty($this->response)) {
-            $this->response->status($code);
-        }
-
         return $this;
     }
 
@@ -229,22 +214,12 @@ class Output extends Core
      * 响应原始数据
      *
      * @param mixed|null $data 响应数据
-     * @param int $status 响应HTTP状态码
+     * @param int $httpCode 响应HTTP状态码
      */
-    public function output($data = null, $status = 200)
+    public function output($data = null, $httpCode = 200)
     {
-        $this->getContext()->getLog()->pushLog('status', $status);
-
-        switch ($this->controller->requestType) {
-            case Marco::HTTP_REQUEST:
-                if (!empty($this->response)) {
-                    $this->setStatusHeader($status);
-                    $this->end($data);
-                }
-                break;
-            case Marco::TCP_REQUEST:
-                // @todo
-                break;
+        if (!empty($this->response)) {
+            $this->end($data, $httpCode);
         }
     }
 
@@ -252,13 +227,16 @@ class Output extends Core
      * 响应json格式数据
      *
      * @param mixed|null $data 响应数据
-     * @param int $status 响应HTTP状态码
+     * @param int $httpCode 响应HTTP状态码
      */
-    public function outputJson($data = null, $status = 200)
+    public function outputJson($data = null, $httpCode = 200)
     {
         $this->setContentType('application/json; charset=UTF-8');
         $data = json_encode($data);
-        $this->output($data, $status);
+
+        if (!empty($this->response)) {
+            $this->end($data, $httpCode);
+        }
     }
 
     /**
@@ -293,7 +271,7 @@ class Output extends Core
                 $template = getInstance()->templateEngine->make($viewFile);
                 $response = $template->render($data);
             } catch (\Throwable $e) {
-                throw new Exception('app view and server view both not exist, please check again', 500);
+                throw new Exception('app view and server view both not exist, please check again');
             }
         }
 
@@ -305,11 +283,13 @@ class Output extends Core
      * 结束HTTP请求，发送响应体
      *
      * @param string $output 发送的数据
+     * @param int $httpCode 响应的HTTP状态码
      * @param bool $gzip 是否启用gzip压缩
      */
-    public function end($output = '', $gzip = true)
+    public function end($output = '', $httpCode = 200, $gzip = true)
     {
         $this->setHeader('X-Ngx-LogId', $this->getContext()->getLogId());
+        $this->getContext()->getLog()->pushLog('http-code', $httpCode);
         $acceptEncoding = strtolower($this->request->header['accept-encoding'] ?? '');
         if ($gzip && strpos($acceptEncoding, 'gzip') !== false) {
             $this->response->gzip(1);
@@ -319,8 +299,29 @@ class Output extends Core
             $this->setHeader('Content-Type', 'application/json');
             $output = json_encode($output, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }
+        $this->getContext()->getLog()->pushLog('content-length', strlen($output));
+        $this->setStatusHeader($httpCode);
         $this->response->end($output);
-        $this->controller->destroy();
+        $this->__isEnd = true;
+    }
+
+    /**
+     * 设置HTTP响应状态码
+     *
+     * @param int $code HTTP状态码
+     * @return $this
+     */
+    private function setStatusHeader($code = 200)
+    {
+        if (empty(self::$codes[$code])) {
+            $code = 200;
+        }
+
+        if (!empty($this->response)) {
+            $this->response->status($code);
+        }
+
+        return $this;
     }
 
     /**

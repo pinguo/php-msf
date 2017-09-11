@@ -9,7 +9,6 @@
 
 namespace PG\MSF\Pools;
 
-use Exception;
 use Noodlehaus\Config;
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;

@@ -8,10 +8,7 @@
 
 namespace PG\MSF\Rest;
 
-use PG\Exception\ParameterValidationExpandException;
-use PG\Exception\PrivilegeException;
 use PG\MSF\Base\Output;
-use PG\MSF\Coroutine\CException;
 
 /**
  * Class Controller
@@ -181,27 +178,8 @@ class Controller extends \PG\MSF\Controllers\Controller
                 $ce = $e;
             }
 
-            if ($ce instanceof ParameterValidationExpandException) {
-                $this->getContext()->getLog()->warning($errMsg . ' with code 401');
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), 401);
-            } elseif ($ce instanceof PrivilegeException) {
-                $this->getContext()->getLog()->warning($errMsg . ' with code 403');
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), 403);
-            } elseif ($ce instanceof \MongoException) {
-                $this->getContext()->getLog()->error($errMsg . ' with code 500');
-                $this->outputJson(parent::$stdClass, Output::$codes[500], 500);
-            } elseif ($ce instanceof CException) {
-                $this->getContext()->getLog()->error($errMsg . ' with code 500');
-                $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
-            } else {
-                $this->getContext()->getLog()->error($errMsg . ' with code ' . $ce->getCode());
-                // set status in header
-                if (isset(Output::$codes[$ce->getCode()])) {
-                    $this->outputJson(parent::$stdClass, $ce->getMessage(), $ce->getCode());
-                } else {
-                    $this->outputJson(parent::$stdClass, $ce->getMessage(), 500);
-                }
-            }
+            $this->getContext()->getLog()->error($errMsg);
+            $this->outputJson(parent::$stdClass, 500);
         } catch (\Throwable $ne) {
             getInstance()->log->error('previous exception ' . dump($ce, false, true));
             getInstance()->log->error('handle exception ' . dump($ne, false, true));

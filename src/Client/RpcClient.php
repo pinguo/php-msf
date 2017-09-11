@@ -16,7 +16,6 @@
  */
 namespace PG\MSF\Client;
 
-use Exception;
 use PG\MSF\Client\Http\Client;
 use PG\MSF\Base\Core;
 
