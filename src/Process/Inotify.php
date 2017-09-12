@@ -68,7 +68,7 @@ class Inotify extends ProcessBase
             $monitorFiles[$wd] = $file;
         }
 
-        swoole_event_add($this->inotifyFd, function ($inotifyFd) use ($monitorFiles) {
+        swoole_event_add($this->inotifyFd, function ($inotifyFd) use (&$monitorFiles) {
             $events = inotify_read($inotifyFd);
             if ($events) {
                 foreach ($events as $ev) {
