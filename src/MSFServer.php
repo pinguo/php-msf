@@ -9,6 +9,7 @@
 namespace PG\MSF;
 
 use Exception;
+use PG\MSF\Helpers\Context;
 use PG\MSF\Process\Config;
 use PG\MSF\Process\Inotify;
 use PG\MSF\Process\Timer;
@@ -230,6 +231,7 @@ abstract class MSFServer extends HttpServer
         $type    = $unserializeData['type'] ?? '';
         $message = $unserializeData['message'] ?? '';
         $result  = false;
+        $status  = 200;
         switch ($type) {
             case Marco::SERVER_TYPE_TASK:
                 try {
@@ -237,10 +239,29 @@ abstract class MSFServer extends HttpServer
                     $taskFucName   = $message['task_fuc_name'];
                     $taskData      = $message['task_fuc_data'];
                     $taskId        = $message['task_id'];
+                    /**
+                     * @var Context $taskContext
+                     */
                     $taskContext   = $message['task_context'];
                     $taskConstruct = $message['task_construct'];
 
+                    // 构造请求日志对象
+                    $PGLog                            = clone getInstance()->log;
+                    $PGLog->logId                     = $taskContext->getLogId();
+                    $PGLog->accessRecord['beginTime'] = microtime(true);
+                    $PGLog->accessRecord['uri']       = $taskContext->getInput()->getPathInfo();
+                    $PGLog->pushLog('task', $taskName);
+                    $PGLog->pushLog('method', $taskFucName);
+                    defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME . '-task';
+                    $PGLog->init();
+                    $taskContext->setLogId($PGLog->logId);
+                    $taskContext->setLog($PGLog);
+
                     if (empty($taskName) || empty($taskFucName)) {
+                        $status = 500;
+                        $PGLog->error('Task Not Found');
+                        $PGLog->pushLog('status', $status);
+                        $PGLog->appendNoticeLog();
                         return $result;
                     }
 
@@ -259,16 +280,11 @@ abstract class MSFServer extends HttpServer
                         throw new Exception("method $taskFucName not exist in $taskName");
                     }
                 } catch (\Throwable $e) {
-                    if (empty($task) || !($task instanceof Task) || empty($task->getContext())) {
-                        getInstance()->log->error(dump($e, false, true));
-                    } else {
-                        $error = dump($e, false, true);
-                        $task->getContext()->getLog()->error($error);
-                    }
+                    $status = 500;
+                    $PGLog->error(dump($e, false, true));
                 } finally {
-                    if (!empty($task) && !empty($task->getContext())) {
-                        $task->getContext()->getLog()->appendNoticeLog();
-                    }
+                    $PGLog->pushLog('status', $status);
+                    $PGLog->appendNoticeLog();
                     //销毁对象
                     foreach ($this->objectPoolBuckets as $k => $obj) {
                         $objectPool->push($obj);
