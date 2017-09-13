@@ -58,7 +58,7 @@ class NormalRoute implements IRoute
             $this->routeParams->params         = $request->post ?? $request->get ?? [];
             $this->routeParams->controllerName = 'Rpc';
             $this->routeParams->methodName     = 'Index';
-            $this->controllerClassName        = '\PG\MSF\Controllers\Rpc';
+            $this->controllerClassName         = '\PG\MSF\Controllers\Rpc';
             $this->routeParams->path           = '/Rpc/Index';
         } else {
             $this->parsePath($this->routeParams->path);
@@ -111,7 +111,7 @@ class NormalRoute implements IRoute
         if ($this->getEnableCache() && isset($this->routeCache[$path])) {
             $this->routeParams->controllerName = $this->routeCache[$path][0];
             $this->routeParams->methodName     = $this->routeCache[$path][1];
-            $this->controllerClassName        = $this->routeCache[$path][2];
+            $this->controllerClassName         = $this->routeCache[$path][2];
         } else {
             $route = explode('/', ltrim($path, '/'));
             $route = array_map(function ($name) {
@@ -133,7 +133,7 @@ class NormalRoute implements IRoute
             }
             $this->routeParams->controllerName = ltrim(implode("\\", $route), "\\") ?? null;
             $this->routeParams->methodName     = $methodName;
-            $this->controllerClassName        = '';
+            $this->controllerClassName         = '';
 
             if ($this->findControllerClassName()) {
                 return true;
