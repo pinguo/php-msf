@@ -4,7 +4,7 @@
  *
  * Restful 测试
  * 选择路由器：
- * $config['server']['route_tool'] = '\\PG\\MSF\\Route\\RestRout';
+ * $config['server']['route_tool'] = '\\PG\\MSF\\Route\\RestRoute';
  * 路由相关配置 eg：
  * $config['rest']['route']['rules'] = [
  *     'POST rests' => 'rest/create',
