@@ -59,6 +59,7 @@ class Inotify extends ProcessBase
         $dirIterator  = new \RecursiveDirectoryIterator($this->monitorDir);
         $iterator     = new \RecursiveIteratorIterator($dirIterator);
         $monitorFiles = [];
+        $tempFiles    = [];
 
         foreach ($iterator as $file) {
             $fileInfo = pathinfo($file);
@@ -69,22 +70,31 @@ class Inotify extends ProcessBase
 
             //改为监听目录
             $dirPath = $fileInfo['dirname'];
-            if (!isset($monitorFiles[$dirPath])) {
+            if (!isset($tempFiles[$dirPath])) {
                 $wd = inotify_add_watch($this->inotifyFd, $fileInfo['dirname'], IN_MODIFY | IN_CREATE | IN_IGNORED);
-                $monitorFiles[$dirPath] = $wd;
+                $tempFiles[$dirPath] = $wd;
+                $monitorFiles[$wd] = $dirPath;
             }
         }
 
-        swoole_event_add($this->inotifyFd, function ($inotifyFd) use ($monitorFiles) {
+        $tempFiles = NULL;
+
+        swoole_event_add($this->inotifyFd, function ($inotifyFd) use (&$monitorFiles) {
             $events = inotify_read($inotifyFd);
             $flag = true;
             foreach ($events as $ev) {
                 if (pathinfo($ev['name'] , PATHINFO_EXTENSION) != 'php') {
+                    //创建目录添加监听
+                    if ($ev['mask'] == 1073742080 || $ev['mask'] == IN_CREATE) {
+                        $path = $monitorFiles[$ev['wd']] .'/'. $ev['name'];
+
+                        $wd = inotify_add_watch($inotifyFd, $path, IN_MODIFY | IN_CREATE | IN_IGNORED);
+                        $monitorFiles[$wd] = $path;
+                    }
                     $flag = false;
                     continue;
                 }
-                $path = array_search($ev['mask'], $monitorFiles);
-                writeln('RELOAD ' . $path . $ev['name'] . ' update');
+                writeln('RELOAD ' . $monitorFiles[$ev['wd']] .'/'. $ev['name'] . ' update');
             }
             if ($flag == true) {
                 $this->MSFServer->server->reload();
