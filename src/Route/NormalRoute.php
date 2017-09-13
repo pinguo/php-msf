@@ -39,7 +39,7 @@ class NormalRoute implements IRoute
      */
     public function __construct()
     {
-        $this->routePrams = new \stdClass();
+        $this->routeParams = new \stdClass();
     }
 
     /**
@@ -49,19 +49,19 @@ class NormalRoute implements IRoute
      */
     public function handleHttpRequest($request)
     {
-        $this->routePrams->path = rtrim($request->server['path_info'], '/');
-        $this->routePrams->verb = $this->parseVerb($request);
+        $this->routeParams->path = rtrim($request->server['path_info'], '/');
+        $this->routeParams->verb = $this->parseVerb($request);
         $this->setParams($request->get ?? []);
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
-            $this->routePrams->isRpc          = true;
-            $this->routePrams->params         = $request->post ?? $request->get ?? [];
-            $this->routePrams->controllerName = 'Rpc';
-            $this->routePrams->methodName     = 'Index';
+            $this->routeParams->isRpc          = true;
+            $this->routeParams->params         = $request->post ?? $request->get ?? [];
+            $this->routeParams->controllerName = 'Rpc';
+            $this->routeParams->methodName     = 'Index';
             $this->controllerClassName        = '\PG\MSF\Controllers\Rpc';
-            $this->routePrams->path           = '/Rpc/Index';
+            $this->routeParams->path           = '/Rpc/Index';
         } else {
-            $this->parsePath($this->routePrams->path);
+            $this->parsePath($this->routeParams->path);
         }
     }
 
@@ -74,19 +74,19 @@ class NormalRoute implements IRoute
     {
         $this->controllerClassName = '';
         do {
-            $className = "\\App\\Controllers\\" . $this->routePrams->controllerName;
+            $className = "\\App\\Controllers\\" . $this->routeParams->controllerName;
             if (class_exists($className)) {
                 $this->controllerClassName = $className;
                 break;
             }
 
-            $className = "\\PG\\MSF\\Controllers\\" . $this->routePrams->controllerName;
+            $className = "\\PG\\MSF\\Controllers\\" . $this->routeParams->controllerName;
             if (class_exists($className)) {
                 $this->controllerClassName = $className;
                 break;
             }
 
-            $className = "\\App\\Console\\" . $this->routePrams->controllerName;
+            $className = "\\App\\Console\\" . $this->routeParams->controllerName;
             if (class_exists($className)) {
                 $this->controllerClassName = $className;
                 break;
@@ -109,8 +109,8 @@ class NormalRoute implements IRoute
     public function parsePath($path)
     {
         if ($this->getEnableCache() && isset($this->routeCache[$path])) {
-            $this->routePrams->controllerName = $this->routeCache[$path][0];
-            $this->routePrams->methodName     = $this->routeCache[$path][1];
+            $this->routeParams->controllerName = $this->routeCache[$path][0];
+            $this->routeParams->methodName     = $this->routeCache[$path][1];
             $this->controllerClassName        = $this->routeCache[$path][2];
         } else {
             $route = explode('/', ltrim($path, '/'));
@@ -131,8 +131,8 @@ class NormalRoute implements IRoute
             } else {
                 $methodName = getInstance()->config->get('http.default_method', 'Index');
             }
-            $this->routePrams->controllerName = ltrim(implode("\\", $route), "\\") ?? null;
-            $this->routePrams->methodName     = $methodName;
+            $this->routeParams->controllerName = ltrim(implode("\\", $route), "\\") ?? null;
+            $this->routeParams->methodName     = $methodName;
             $this->controllerClassName        = '';
 
             if ($this->findControllerClassName()) {
@@ -140,7 +140,7 @@ class NormalRoute implements IRoute
             }
 
             $methodDefault  = getInstance()->config->get('http.default_method', 'Index');
-            $controllerName = $this->routePrams->controllerName  . "\\" . $this->getMethodName();
+            $controllerName = $this->routeParams->controllerName  . "\\" . $this->getMethodName();
             $this->setControllerName($controllerName);
             $this->setMethodName($methodDefault);
 
@@ -177,7 +177,7 @@ class NormalRoute implements IRoute
      */
     public function getControllerName()
     {
-        return $this->routePrams->controllerName;
+        return $this->routeParams->controllerName;
     }
 
     /**
@@ -197,7 +197,7 @@ class NormalRoute implements IRoute
      */
     public function getMethodName()
     {
-        return $this->routePrams->methodName;
+        return $this->routeParams->methodName;
     }
 
     /**
@@ -207,7 +207,7 @@ class NormalRoute implements IRoute
      */
     public function getPath()
     {
-        return $this->routePrams->path;
+        return $this->routeParams->path;
     }
 
     /**
@@ -217,7 +217,7 @@ class NormalRoute implements IRoute
      */
     public function getIsRpc()
     {
-        return $this->routePrams->isRpc ?? false;
+        return $this->routeParams->isRpc ?? false;
     }
 
     /**
@@ -227,7 +227,7 @@ class NormalRoute implements IRoute
      */
     public function getVerb()
     {
-        return $this->routePrams->verb ?? null;
+        return $this->routeParams->verb ?? null;
     }
 
     /**
@@ -237,7 +237,7 @@ class NormalRoute implements IRoute
      */
     public function getParams()
     {
-        return $this->routePrams->params ?? [];
+        return $this->routeParams->params ?? [];
     }
 
     /**
@@ -248,7 +248,7 @@ class NormalRoute implements IRoute
      */
     public function setControllerName($name)
     {
-        $this->routePrams->controllerName = $name;
+        $this->routeParams->controllerName = $name;
         return $this;
     }
 
@@ -260,7 +260,7 @@ class NormalRoute implements IRoute
      */
     public function setMethodName($name)
     {
-        $this->routePrams->methodName = $name;
+        $this->routeParams->methodName = $name;
         return $this;
     }
 
@@ -272,7 +272,7 @@ class NormalRoute implements IRoute
      */
     public function setParams($params)
     {
-        $this->routePrams->params = $params;
+        $this->routeParams->params = $params;
         return $this;
     }
 
