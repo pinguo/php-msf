@@ -71,11 +71,11 @@ class RestRoute extends NormalRoute
      */
     public function handleHttpRequest($request)
     {
-        $this->routePrams->path = rtrim($request->server['path_info'], '/');
-        $this->routePrams->verb = $this->parseVerb($request);
+        $this->routeParams->path = rtrim($request->server['path_info'], '/');
+        $this->routeParams->verb = $this->parseVerb($request);
         $data = $this->parseRule();
         // 如果未从rest配置中解析到，则按普通模式解析
-        $path = $data[0] ?? $this->routePrams->path;
+        $path = $data[0] ?? $this->routeParams->path;
         $this->parsePath($path);
         // 将 path 中含有的参数放入 get 中
         if (!empty($data[1])) {
@@ -95,9 +95,9 @@ class RestRoute extends NormalRoute
         if (empty($this->restRules)) {
             return [];
         }
-        $pathInfo = $this->trimSlashes($this->routePrams->path);
+        $pathInfo = $this->trimSlashes($this->routeParams->path);
         foreach ($this->restRules as $rule) {
-            if (!in_array($this->routePrams->verb, $rule[0])) {
+            if (!in_array($this->routeParams->verb, $rule[0])) {
                 continue;
             }
             if (!preg_match($rule[1][0], $pathInfo, $matches)) {
