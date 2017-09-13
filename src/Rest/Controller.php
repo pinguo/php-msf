@@ -117,29 +117,21 @@ class Controller extends \PG\MSF\Controllers\Controller
      * @param mixed|null $data 响应数据
      * @param string $message 响应提示
      * @param int $status 响应HTTP状态码
-     * @param callable|null $callback jsonp参数名
      * @throws \Exception
      */
-    public function outputJson($data = null, $message = '', $status = 200, $callback = null)
+    public function outputJson($data = null, $message = '', $status = 200)
     {
-        /* @var $output Output */
-        $output = $this->getContext()->getOutput();
         // set status in header
         if (!isset(Output::$codes[$status])) {
             throw new \Exception('Http code invalid', 500);
         }
-        $output->setStatusHeader($status);
         // 错误信息返回格式可参考：[https://developer.github.com/v3/]
         if ($status != 200 && $message !== '') {
             $data = [
                 'message' => $message
             ];
         }
-        $result = json_encode($data);
-        if (!empty($output->response)) {
-            $output->setContentType('application/json; charset=UTF-8');
-            $output->end($result);
-        }
+        parent::outputJson($data, $status);
     }
 
     /**
@@ -151,13 +143,14 @@ class Controller extends \PG\MSF\Controllers\Controller
     {
         /* @var $output Output */
         $output = $this->getContext()->getOutput();
+        $status = 200;
         if ($this->verb !== 'OPTIONS') {
-            $output->setStatusHeader(405);
+            $status = 405;
         }
         $output->setHeader('Allow', implode(', ', $options));
         if (!empty($output->response)) {
             $output->setContentType('application/json; charset=UTF-8');
-            $output->end();
+            $output->end('', $status);
         }
     }
 

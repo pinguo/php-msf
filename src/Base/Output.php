@@ -311,7 +311,7 @@ class Output extends Core
      * @param int $code HTTP状态码
      * @return $this
      */
-    public function setStatusHeader($code = 200)
+    private function setStatusHeader($code = 200)
     {
         if (empty(self::$codes[$code])) {
             $code = 200;
