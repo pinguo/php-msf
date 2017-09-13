@@ -59,26 +59,44 @@ class Inotify extends ProcessBase
         $dirIterator  = new \RecursiveDirectoryIterator($this->monitorDir);
         $iterator     = new \RecursiveIteratorIterator($dirIterator);
         $monitorFiles = [];
+        $tempFiles    = [];
 
         foreach ($iterator as $file) {
-            if (pathinfo($file, PATHINFO_EXTENSION) != 'php') {
+            $fileInfo = pathinfo($file);
+
+            if (!isset($fileInfo['extension']) || $fileInfo['extension'] != 'php') {
                 continue;
             }
-            $wd = inotify_add_watch($this->inotifyFd, $file, IN_MODIFY);
-            $monitorFiles[$wd] = $file;
+
+            //改为监听目录
+            $dirPath = $fileInfo['dirname'];
+            if (!isset($tempFiles[$dirPath])) {
+                $wd = inotify_add_watch($this->inotifyFd, $fileInfo['dirname'], IN_MODIFY | IN_CREATE | IN_IGNORED | IN_DELETE);
+                $tempFiles[$dirPath] = $wd;
+                $monitorFiles[$wd] = $dirPath;
+            }
         }
+
+        $tempFiles = NULL;
 
         swoole_event_add($this->inotifyFd, function ($inotifyFd) use (&$monitorFiles) {
             $events = inotify_read($inotifyFd);
-            if ($events) {
-                foreach ($events as $ev) {
-                    $file = $monitorFiles[$ev['wd']];
-                    writeln('RELOAD ' . $file . ' update');
-                    unset($monitorFiles[$ev['wd']]);
+            $flag = true;
+            foreach ($events as $ev) {
+                if (pathinfo($ev['name'] , PATHINFO_EXTENSION) != 'php') {
+                    //创建目录添加监听
+                    if ($ev['mask'] == 1073742080) {
+                        $path = $monitorFiles[$ev['wd']] .'/'. $ev['name'];
 
-                    $wd = inotify_add_watch($inotifyFd, $file, IN_MODIFY);
-                    $monitorFiles[$wd] = $file;
+                        $wd = inotify_add_watch($inotifyFd, $path, IN_MODIFY | IN_CREATE | IN_IGNORED | IN_DELETE);
+                        $monitorFiles[$wd] = $path;
+                    }
+                    $flag = false;
+                    continue;
                 }
+                writeln('RELOAD ' . $monitorFiles[$ev['wd']] .'/'. $ev['name'] . ' update');
+            }
+            if ($flag == true) {
                 $this->MSFServer->server->reload();
             }
         }, null, SWOOLE_EVENT_READ);
