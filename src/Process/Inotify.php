@@ -61,24 +61,32 @@ class Inotify extends ProcessBase
         $monitorFiles = [];
 
         foreach ($iterator as $file) {
-            if (pathinfo($file, PATHINFO_EXTENSION) != 'php') {
+            $fileInfo = pathinfo($file);
+
+            if (!isset($fileInfo['extension']) || $fileInfo['extension'] != 'php') {
                 continue;
             }
-            $wd = inotify_add_watch($this->inotifyFd, $file, IN_MODIFY);
-            $monitorFiles[$wd] = $file;
+
+            //改为监听目录
+            $dirPath = $fileInfo['dirname'];
+            if (!isset($monitorFiles[$dirPath])) {
+                $wd = inotify_add_watch($this->inotifyFd, $fileInfo['dirname'], IN_MODIFY | IN_CREATE | IN_IGNORED);
+                $monitorFiles[$dirPath] = $wd;
+            }
         }
 
-        swoole_event_add($this->inotifyFd, function ($inotifyFd) use (&$monitorFiles) {
+        swoole_event_add($this->inotifyFd, function ($inotifyFd) use ($monitorFiles) {
             $events = inotify_read($inotifyFd);
-            if ($events) {
-                foreach ($events as $ev) {
-                    $file = $monitorFiles[$ev['wd']];
-                    writeln('RELOAD ' . $file . ' update');
-                    unset($monitorFiles[$ev['wd']]);
-
-                    $wd = inotify_add_watch($inotifyFd, $file, IN_MODIFY);
-                    $monitorFiles[$wd] = $file;
+            $flag = true;
+            foreach ($events as $ev) {
+                if (pathinfo($ev['name'] , PATHINFO_EXTENSION) != 'php') {
+                    $flag = false;
+                    continue;
                 }
+                $path = array_search($ev['mask'], $monitorFiles);
+                writeln('RELOAD ' . $path . $ev['name'] . ' update');
+            }
+            if ($flag == true) {
                 $this->MSFServer->server->reload();
             }
         }, null, SWOOLE_EVENT_READ);
