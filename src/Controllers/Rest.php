@@ -1,10 +1,10 @@
 <?php
 /**
- * RestTestController
+ * Rest
  *
  * Restful 测试
  * 选择路由器：
- * $config['server']['route_tool'] = '\\PG\\MSF\\Rest\\Route';
+ * $config['server']['route_tool'] = '\\PG\\MSF\\Route\\RestRout';
  * 路由相关配置 eg：
  * $config['rest']['route']['rules'] = [
  *     'POST rests' => 'rest/create',
@@ -37,7 +37,7 @@ use PG\MSF\Base\Output;
 
 /**
  *
- * Class RestController
+ * Class Rest
  * @package PG\MSF\Controllers
  */
 class Rest extends Controller
@@ -53,7 +53,6 @@ class Rest extends Controller
      */
     public function actionCreate()
     {
-        var_dump($this->verb);
         $data = [
             'f1' => $this->getContext()->getInput()->post('p1'),
             'f2' => $this->getContext()->getInput()->post('p2'),
@@ -69,7 +68,6 @@ class Rest extends Controller
      */
     public function actionIndex()
     {
-        var_dump($this->verb);
         $data = [
             [
                 'f1' => $this->getContext()->getInput()->get('p1'),
@@ -90,7 +88,6 @@ class Rest extends Controller
      */
     public function actionView()
     {
-        var_dump($this->verb);
         $data = [
             'f1' => $this->getContext()->getInput()->get('p1'),
             'f2' => $this->getContext()->getInput()->get('p2'),
@@ -105,7 +102,6 @@ class Rest extends Controller
      */
     public function actionOptions()
     {
-        var_dump($this->verb);
         if ($this->getContext()->getInput()->get('id')) {
             $options = $this->resourceOptions;
         } else {
@@ -125,7 +121,6 @@ class Rest extends Controller
      */
     public function actionUpdate()
     {
-        var_dump($this->verb);
         $data = [
             'f1' => $this->getContext()->getInput()->post('p1'),
             'f2' => $this->getContext()->getInput()->post('p2'),
@@ -141,8 +136,6 @@ class Rest extends Controller
      */
     public function actionDelete()
     {
-        var_dump($this->verb);
-        var_dump($this->getContext()->getInput()->get('id'));
         $this->outputJson(null, Output::$codes[204], 204);
     }
 }
