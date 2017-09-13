@@ -85,7 +85,7 @@ class Inotify extends ProcessBase
             foreach ($events as $ev) {
                 if (pathinfo($ev['name'] , PATHINFO_EXTENSION) != 'php') {
                     //创建目录添加监听
-                    if ($ev['mask'] == 1073742080 || $ev['mask'] == IN_CREATE) {
+                    if ($ev['mask'] == 1073742080) {
                         $path = $monitorFiles[$ev['wd']] .'/'. $ev['name'];
 
                         $wd = inotify_add_watch($inotifyFd, $path, IN_MODIFY | IN_CREATE | IN_IGNORED);
