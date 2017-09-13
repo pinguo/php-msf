@@ -71,7 +71,7 @@ class Inotify extends ProcessBase
             //改为监听目录
             $dirPath = $fileInfo['dirname'];
             if (!isset($tempFiles[$dirPath])) {
-                $wd = inotify_add_watch($this->inotifyFd, $fileInfo['dirname'], IN_MODIFY | IN_CREATE | IN_IGNORED);
+                $wd = inotify_add_watch($this->inotifyFd, $fileInfo['dirname'], IN_MODIFY | IN_CREATE | IN_IGNORED | IN_DELETE);
                 $tempFiles[$dirPath] = $wd;
                 $monitorFiles[$wd] = $dirPath;
             }
@@ -88,7 +88,7 @@ class Inotify extends ProcessBase
                     if ($ev['mask'] == 1073742080) {
                         $path = $monitorFiles[$ev['wd']] .'/'. $ev['name'];
 
-                        $wd = inotify_add_watch($inotifyFd, $path, IN_MODIFY | IN_CREATE | IN_IGNORED);
+                        $wd = inotify_add_watch($inotifyFd, $path, IN_MODIFY | IN_CREATE | IN_IGNORED | IN_DELETE);
                         $monitorFiles[$wd] = $path;
                     }
                     $flag = false;
