@@ -1860,6 +1860,7 @@ class Miner
 
     /**
      * 协程的方式
+     *
      * @param null $bindId
      * @param null $sql
      * @return mixed|MySql

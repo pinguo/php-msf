@@ -75,7 +75,7 @@ class MySql extends Base
      */
     public function send($callback)
     {
-        $this->mysqlAsynPool->query($this->getContext(), $callback, $this->bindId, $this->sql);
+        $this->mysqlAsynPool->query($callback, $this->bindId, $this->sql, $this->getContext());
     }
 
     /**

@@ -67,6 +67,22 @@ class MysqlAsynPool extends AsynPool
     }
 
     /**
+     * 魔术方法
+     *
+     * @param $name
+     * @param $arguments
+     */
+    public function __call($name, $arguments)
+    {
+        $context = array_pop($arguments);
+        if ($this->dbQueryBuilder == null) {
+            $this->getDBQueryBuilder($context);
+        }
+
+        return $this->dbQueryBuilder->{$name}(...$arguments);
+    }
+
+    /**
      * 获取DB Query Builder
      *
      * @param Context $context 请求上下文对象
@@ -74,7 +90,7 @@ class MysqlAsynPool extends AsynPool
      */
     public function getDBQueryBuilder(Context $context = null)
     {
-        if (empty($this->dbQueryBuilder)) {
+        if ($this->dbQueryBuilder == null) {
             $this->dbQueryBuilder            = new Miner();
             $this->dbQueryBuilder->mysqlPool = $this;
         }
@@ -98,7 +114,6 @@ class MysqlAsynPool extends AsynPool
             $sql = strtolower($data['sql']);
             if ($sql != 'begin' && $client == null) {
                 throw new Exception('error mysql affairs not begin.');
-                return;
             }
         }
         if ($client == null) {
@@ -113,6 +128,7 @@ class MysqlAsynPool extends AsynPool
                     $this->commands->push($data);
                     return;
                 }
+
                 if ($bindId != null) {//添加绑定
                     $this->bindPool[$bindId]['client'] = $client;
                 }
@@ -210,15 +226,16 @@ class MysqlAsynPool extends AsynPool
     /**
      * 释放绑定
      *
-     * @param Context $context 请求上下文对象
      * @param int $bindId bind ID
+     * @param Context $context 请求上下文对象
      */
-    public function freeBind(Context $context, $bindId)
+    public function freeBind($bindId, Context $context = null)
     {
         $client = $this->bindPool[$bindId]['client'];
         if ($client != null) {
             $this->pushToPool($client);
         }
+        $this->bindPool[$bindId] = null;
         unset($this->bindPool[$bindId]);
     }
 
@@ -245,15 +262,14 @@ class MysqlAsynPool extends AsynPool
     /**
      * 开启一个事务
      *
-     * @param Context $context 请求上下文对象
-     * @param mixed $object 绑定对象
      * @param callable $callback 执行完成后的回调函数
+     * @param Context $context 请求上下文对象
      * @return string
      */
-    public function begin(Context $context, $object, $callback)
+    public function begin($callback, Context $context = null)
     {
-        $id = $this->bind($context, $object);
-        $this->query($context, $callback, $id, 'begin');
+        $id = $this->bind($context);
+        $this->query($callback, $id, 'begin', $context);
         return $id;
     }
 
@@ -261,16 +277,16 @@ class MysqlAsynPool extends AsynPool
      * 获取绑定值
      *
      * @param Context $context 请求上下文对象
-     * @param mixed $object 绑定对象
      * @return string
      */
-    public function bind(Context $context, $object)
+    public function bind(Context $context)
     {
-        if (!isset($object->UBID)) {
-            $object->UBID = 0;
+        if (!isset($context->__UBID)) {
+            $context->__UBID = 0;
         }
-        $object->UBID++;
-        return spl_object_hash($object) . $object->UBID;
+        $context->__UBID++;
+
+        return spl_object_hash($context) . $context->__UBID;
     }
 
     /**
@@ -282,7 +298,7 @@ class MysqlAsynPool extends AsynPool
      * @param string|null $sql SQL语句
      * @throws Exception
      */
-    public function query(Context $context, $callback, $bindId = null, $sql = null)
+    public function query($callback, $bindId = null, $sql = null, Context $context = null)
     {
         if ($sql == null) {
             $sql = $this->dbQueryBuilder->getStatement(false);
@@ -306,12 +322,14 @@ class MysqlAsynPool extends AsynPool
      * 开启一个协程事务
      *
      * @param Context $context 请求上下文对象
-     * @param mixed $object 绑定对象
      * @return MySql
      */
-    public function coroutineBegin(Context $context, $object)
+    public function coroutineBegin(Context $context = null)
     {
-        $id = $this->bind($context, $object);
+        if ($this->dbQueryBuilder == null) {
+            $this->getDBQueryBuilder($context);
+        }
+        $id = $this->bind($context);
         return $this->dbQueryBuilder->go($id, 'begin');
     }
 
@@ -322,9 +340,9 @@ class MysqlAsynPool extends AsynPool
      * @param string $callback 执行完成后的回调函数
      * @param int $id 绑定ID
      */
-    public function commit(Context $context, $callback, $id)
+    public function commit($callback, $id, Context $context = null)
     {
-        $this->query($context, $callback, $id, 'commit');
+        $this->query($callback, $id, 'commit', $context);
     }
 
     /**
@@ -334,8 +352,11 @@ class MysqlAsynPool extends AsynPool
      * @param int $id 绑定ID
      * @return MySql
      */
-    public function coroutineCommit(Context $context, $id)
+    public function coroutineCommit($id, Context $context = null)
     {
+        if ($this->dbQueryBuilder == null) {
+            $this->getDBQueryBuilder($context);
+        }
         return $this->dbQueryBuilder->go($id, 'commit');
     }
 
@@ -346,9 +367,9 @@ class MysqlAsynPool extends AsynPool
      * @param callable $callback 执行完成后的回调函数
      * @param int $id 绑定ID
      */
-    public function rollback(Context $context, $callback, $id)
+    public function rollback($callback, $id, Context $context = null)
     {
-        $this->query($context, $callback, $id, 'rollback');
+        $this->query($callback, $id, 'rollback', $context);
     }
 
     /**
@@ -358,8 +379,11 @@ class MysqlAsynPool extends AsynPool
      * @param int $id 绑定ID
      * @return MySql
      */
-    public function coroutineRollback(Context $context, $id)
+    public function coroutineRollback($id, Context $context = null)
     {
+        if ($this->dbQueryBuilder == null) {
+            $this->getDBQueryBuilder($context);
+        }
         return $this->dbQueryBuilder->go($id, 'rollback');
     }
 
