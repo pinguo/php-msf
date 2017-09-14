@@ -11,6 +11,7 @@ namespace PG\MSF\Base;
 use Noodlehaus\Config;
 use PG\MSF\Pack\IPack;
 use PG\AOP\Wrapper;
+use PG\MSF\Pools\Miner;
 use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
@@ -146,7 +147,7 @@ class Core extends Child
      * 获取MySQL连接池
      *
      * @param string $poolName 配置的MySQL连接池名称
-     * @return bool|Wrapper
+     * @return MysqlAsynPool|Miner|Wrapper
      */
     public function getMysqlPool(string $poolName)
     {

@@ -68,7 +68,7 @@ class AOPFactory extends Factory
         $AOPMysqlPoolCoroutine = new Wrapper($mysqlPoolCoroutine);
         $AOPMysqlPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
             $context = $coreBase->getContext();
-            array_unshift($arguments, $context);
+            array_push($arguments, $context);
             $data['method']    = $method;
             $data['arguments'] = $arguments;
             return $data;
