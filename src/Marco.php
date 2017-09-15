@@ -15,12 +15,12 @@ namespace PG\MSF;
 class Marco
 {
     /**
-     * Redis分布式模式
+     * 分布式模式
      */
     const CLUSTER                                   = 0;
 
     /**
-     * Redis主从模式
+     * 主从模式
      */
     const MASTER_SLAVE                              = 1;
 

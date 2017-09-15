@@ -17,6 +17,7 @@ use PG\AOP\Wrapper;
 use PG\MSF\Proxy\IProxy;
 use PG\MSF\Proxy\RedisProxyCluster;
 use PG\MSF\Proxy\RedisProxyMasterSlave;
+use PG\MSF\Proxy\MysqlProxyMasterSlave;
 use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Pools\CoroutineRedisProxy;
 
@@ -74,6 +75,28 @@ class AOPFactory extends Factory
             return $data;
         });
         return $AOPMysqlPoolCoroutine;
+    }
+
+    /**
+     * 获取mysql proxy
+     *
+     * @param IProxy|MysqlProxyMasterSlave $mysqlProxy MysqlProxy实例
+     * @param Core $coreBase Core实例（通常为Controller实例）
+     * @return Wrapper|MysqlAsynPool AOP包装的MysqlProxyMasterSlave切片实例
+     */
+    public static function getMysqlProxy(IProxy $mysqlProxy, $coreBase)
+    {
+        $mysql = new Wrapper($mysqlProxy);
+        $mysql->registerOnBefore(function ($method, $arguments) use ($mysqlProxy, $coreBase) {
+            $context = $coreBase->getContext();
+            array_unshift($arguments, $context);
+            $data['method']    = $method;
+            $data['arguments'] = $arguments;
+            $data['result'] = $mysqlProxy->handle($method, $arguments);
+            return $data;
+        });
+
+        return $mysql;
     }
 
     /**

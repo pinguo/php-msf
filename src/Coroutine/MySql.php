@@ -44,7 +44,7 @@ class MySql extends Base
         $this->mysqlAsynPool = $_mysqlAsynPool;
         $this->bindId        = $_bind_id;
         $this->sql           = $_sql;
-        $this->request       = 'mysql(' . str_replace("\n", " ", $_sql) . ')';
+        $this->request       = $this->mysqlAsynPool->getAsynName() . '(' . str_replace("\n", " ", $_sql) . ')';
         $this->requestId     = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($this->request);
