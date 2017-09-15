@@ -145,7 +145,7 @@ abstract class HttpServer extends Server
         // 构造请求日志对象
         $PGLog            = clone getInstance()->log;
         $PGLog->accessRecord['beginTime'] = microtime(true);
-        $PGLog->accessRecord['uri']       = $this->route->getPath();
+        $PGLog->accessRecord['uri']       = $this->route->getPath() ?: '/';
         $PGLog->logId     = $logId;
         defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
         $PGLog->init();
@@ -155,9 +155,20 @@ abstract class HttpServer extends Server
 
         do {
             if ($this->route->getPath() == '') {
-                $error    = 'Index not found';
-                $httpCode = 404;
-                break;
+                $indexFile = $this->config['http']['domain'][$this->route->getHost()]['index'] ?? __DIR__ . '/Views/index.html';
+                $response->header('X-Ngx-LogId', $PGLog->logId);
+                $httpCode  = $this->sendFile($indexFile, $request, $response);
+                $PGLog->pushLog('http-code', $httpCode);
+                $PGLog->appendNoticeLog();
+                return;
+            }
+
+            if ($this->route->getFile()) {
+                $response->header('X-Ngx-LogId', $PGLog->logId);
+                $httpCode  = $this->sendFile($this->route->getFile(), $request, $response);
+                $PGLog->pushLog('http-code', $httpCode);
+                $PGLog->appendNoticeLog();
+                return;
             }
 
             $controllerName      = $this->route->getControllerName();
@@ -339,5 +350,61 @@ abstract class HttpServer extends Server
         }
 
         return $logId;
+    }
+
+    /**
+     * 直接响应静态文件
+     *
+     * @param string $path
+     * @param \swoole_http_request $request 请求对象
+     * @param \swoole_http_response $response 响应对象
+     * @return int
+     */
+    public function sendFile($path, $request, $response)
+    {
+        $path = realpath(urldecode($path));
+        $root = $this->config['http']['domain'][$this->route->getHost()]['root'] ?? null;
+
+        // 判断文件是否存在
+        if (!file_exists($path)) {
+            $response->status(404);
+            $response->end('');
+            return Marco::SEND_FILE_404;
+        }
+
+        // 判断文件是否有权限（非root目录不能访问）
+        if (empty($root) || strpos($path, $root) === false) {
+            $response->status(403);
+            $response->end('');
+            return Marco::SEND_FILE_403;
+        }
+
+        $info      = pathinfo($path);
+        $extension = strtolower($info['extension'] ?? '');
+
+        // 判断缓存
+        $lastModified = gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT';
+        if (isset($request->header['if-modified-since']) && $request->header['if-modified-since'] == $lastModified) {
+            $response->status(304);
+            $response->end('');
+            return Marco::SEND_FILE_304;
+        }
+
+        $normalHeaders = getInstance()->config->get("fileHeader.normal", ['Content-Type: application/octet-stream']);
+        $headers       = getInstance()->config->get("fileHeader.$extension", $normalHeaders);
+
+        foreach ($headers as $value) {
+            list($hk, $hv) = explode(': ', $value);
+            $response->header($hk, $hv);
+        }
+
+        $response->header('Last-Modified', $lastModified);
+        if (!$response->sendfile($path)) {
+            swoole_async_readfile($path, function ($filename, $content) use ($response) {
+                $response->end($content);
+            });
+        }
+
+        return Marco::SEND_FILE_200;
     }
 }

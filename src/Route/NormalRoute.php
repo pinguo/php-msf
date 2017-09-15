@@ -27,7 +27,7 @@ class NormalRoute implements IRoute
     /**
      * @var \stdClass 请求的路由相关信息
      */
-    protected $routePrams;
+    protected $routeParams;
 
     /**
      * @var string 控制器完全命名空间类名
@@ -49,6 +49,11 @@ class NormalRoute implements IRoute
      */
     public function handleHttpRequest($request)
     {
+        $host = $request->header['host'] ?? '';
+        if ($host) {
+            $host = explode(':', $host)[0] ?? '';
+        }
+        $this->routeParams->host = $host;
         $this->routeParams->path = rtrim($request->server['path_info'], '/');
         $this->routeParams->verb = $this->parseVerb($request);
         $this->setParams($request->get ?? []);
@@ -61,7 +66,9 @@ class NormalRoute implements IRoute
             $this->controllerClassName         = '\PG\MSF\Controllers\Rpc';
             $this->routeParams->path           = '/Rpc/Index';
         } else {
-            $this->parsePath($this->routeParams->path);
+            if ($this->routeParams->path) {
+                $this->parsePath($this->routeParams->path);
+            }
         }
     }
 
@@ -113,6 +120,14 @@ class NormalRoute implements IRoute
             $this->routeParams->methodName     = $this->routeCache[$path][1];
             $this->controllerClassName         = $this->routeCache[$path][2];
         } else {
+            if (stristr($path, '.')) {
+                $root = getInstance()->config['http']['domain'][$this->getHost()]['root'] ?? ROOT_PATH . '/www/';
+                $this->routeParams->file = $root . $path;
+                return true;
+            } else {
+                $this->routeParams->file  = '';
+            }
+
             $route = explode('/', ltrim($path, '/'));
             $route = array_map(function ($name) {
                 if (strpos($name, '-') !== false) { // 中横线模式处理.
@@ -209,6 +224,39 @@ class NormalRoute implements IRoute
     {
         return $this->routeParams->path;
     }
+
+    /**
+     * 获取静态文件路径
+     *
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->routeParams->file;
+    }
+
+    /**
+     * 设置静态文件路径
+     *
+     * @param string $file 静态文件路径
+     * @return $this
+     */
+    public function setFile($file)
+    {
+        $this->routeParams->file = $file;
+        return $this;
+    }
+
+    /**
+     * 获取请求报头的Host
+     *
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->routeParams->host;
+    }
+
 
     /**
      * 判断请求是否为RPC请求
