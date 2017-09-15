@@ -22,10 +22,10 @@ interface IProxy
     public function check();
 
     /**
-     * 发送异步Redis请求
+     * 发送异步请求
      *
-     * @param string $method Redis指令
-     * @param array $arguments Redis指令参数
+     * @param string $method 指令
+     * @param array $arguments 指令参数
      * @return array|bool|mixed
      */
     public function handle(string $method, array $arguments);

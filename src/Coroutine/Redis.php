@@ -70,7 +70,7 @@ class Redis extends Base
         $this->redisSerialize = $redisAsynPool->redisSerialize;
         $this->name           = $name;
         $this->arguments      = $arguments;
-        $this->request        = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . "#redis.$name";
+        $this->request        = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) .  '#' . $this->redisAsynPool->getAsynName()  . '.' . $name;
         $this->requestId      = $this->getContext()->getLogId();
 
         $this->getContext()->getLog()->profileStart($this->request);

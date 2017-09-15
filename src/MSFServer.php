@@ -18,6 +18,7 @@ use PG\MSF\Pools\AsynPoolManager;
 use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
+use PG\MSF\Proxy\MysqlProxyFactory;
 use PG\MSF\Proxy\IProxy;
 use PG\MSF\Tasks\Task;
 use PG\MSF\Base\AOPFactory;
@@ -42,6 +43,11 @@ abstract class MSFServer extends HttpServer
      * @var array Redis代理管理器
      */
     protected $redisProxyManager = [];
+
+    /**
+     * @var array Mysql代理管理器
+     */
+    protected $mysqlProxyManager = [];
 
     /**
      * @var \swoole_atomic task_id的原子
@@ -193,6 +199,26 @@ abstract class MSFServer extends HttpServer
                 $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy(
                     $activeProxy,
                     $this->config['redis_proxy'][$activeProxy]
+                );
+            }
+        }
+    }
+
+    /**
+     * 初始化mysql代理客户端
+     */
+    public function initMysqlProxies()
+    {
+        if ($this->config->get('mysql_proxy.active')) {
+            $activeProxies = $this->config->get('mysql_proxy.active');
+            if (is_string($activeProxies)) {
+                $activeProxies = explode(',', $activeProxies);
+            }
+
+            foreach ($activeProxies as $activeProxy) {
+                $this->mysqlProxyManager[$activeProxy] = MysqlProxyFactory::makeProxy(
+                    $activeProxy,
+                    $this->config['mysql_proxy'][$activeProxy]
                 );
             }
         }
@@ -393,6 +419,48 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
+     * 手工添加mysql代理
+     *
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
+     * @throws Exception
+     * @return $this
+     */
+    public function addMysqlProxy($name, $proxy)
+    {
+        if (key_exists($name, $this->mysqlProxyManager)) {
+            throw new Exception('proxy key is exists!');
+        }
+        $this->mysqlProxyManager[$name] = $proxy;
+
+        return $this;
+    }
+
+    /**
+     * 获取mysql代理
+     *
+     * @param string $name 代理名称
+     * @return mixed
+     */
+    public function getMysqlProxy($name)
+    {
+        return $this->mysqlProxyManager[$name] ?? null;
+    }
+
+    /**
+     * 设置mysql代理
+     *
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
+     * @return $this
+     */
+    public function setMysqlProxy($name, $proxy)
+    {
+        $this->mysqlProxyManager[$name] = $proxy;
+        return $this;
+    }
+
+    /**
      * 获取所有的redisProxy
      *
      * @return array
@@ -414,6 +482,7 @@ abstract class MSFServer extends HttpServer
         parent::onWorkerStart($serv, $workerId);
         $this->initAsynPools();
         $this->initRedisProxies();
+        $this->initMysqlProxies();
         if (!$serv->taskworker) {
             //注册
             $this->asynPoolManager = new AsynPoolManager(null, $this);
@@ -430,6 +499,13 @@ abstract class MSFServer extends HttpServer
             //redis proxy监测
             getInstance()->sysTimers[] = $this->server->tick(5000, function () {
                 foreach ($this->redisProxyManager as $proxy) {
+                    $proxy->check();
+                }
+            });
+
+            // mysql proxy监测
+            getInstance()->sysTimers[] = $this->server->tick(5000, function () {
+                foreach ($this->mysqlProxyManager as $proxy) {
                     $proxy->check();
                 }
             });

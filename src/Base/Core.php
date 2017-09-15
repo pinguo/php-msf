@@ -15,6 +15,7 @@ use PG\MSF\Pools\Miner;
 use PG\MSF\Pools\RedisAsynPool;
 use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
+use PG\MSF\Proxy\MysqlProxyFactory;
 use PG\MSF\Pools\CoroutineRedisProxy;
 
 /**
@@ -54,14 +55,19 @@ class Core extends Child
     protected $redisPools;
 
     /**
+     * @var array redis代理池
+     */
+    protected $redisProxies;
+
+    /**
      * @var array mysql连接池
      */
     protected $mysqlPools;
 
     /**
-     * @var array redis代理池
+     * @var array mysql代理池
      */
-    protected $redisProxies;
+    protected $mysqlProxies;
 
     /**
      * 构造方法
@@ -144,30 +150,6 @@ class Core extends Child
     }
 
     /**
-     * 获取MySQL连接池
-     *
-     * @param string $poolName 配置的MySQL连接池名称
-     * @return MysqlAsynPool|Miner|Wrapper
-     */
-    public function getMysqlPool(string $poolName)
-    {
-        $activePoolName = $poolName;
-        $poolName       = MysqlAsynPool::ASYN_NAME . $poolName;
-        if (isset($this->mysqlPools[$poolName])) {
-            return $this->mysqlPools[$poolName];
-        }
-
-        $pool = getInstance()->getAsynPool($poolName);
-        if (!$pool) {
-            $pool = new MysqlAsynPool($this->getConfig(), $activePoolName);
-            getInstance()->addAsynPool($poolName, $pool, true);
-        }
-
-        $this->mysqlPools[$poolName] = AOPFactory::getMysqlPoolCoroutine($pool, $this);
-        return $this->mysqlPools[$poolName];
-    }
-
-    /**
      * 获取Redis代理
      *
      * @param string $proxyName 配置的Redis代理名称
@@ -192,6 +174,57 @@ class Core extends Child
 
         $this->redisProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
         return $this->redisProxies[$proxyName];
+    }
+
+    /**
+     * 获取MySQL连接池
+     *
+     * @param string $poolName 配置的MySQL连接池名称
+     * @return MysqlAsynPool|Miner|Wrapper
+     */
+    public function getMysqlPool(string $poolName)
+    {
+        $activePoolName = $poolName;
+        $poolName       = MysqlAsynPool::ASYN_NAME . $poolName;
+        if (isset($this->mysqlPools[$poolName])) {
+            return $this->mysqlPools[$poolName];
+        }
+
+        $pool = getInstance()->getAsynPool($poolName);
+        if (!$pool) {
+            $pool = new MysqlAsynPool($this->getConfig(), $activePoolName);
+            getInstance()->addAsynPool($poolName, $pool, true);
+        }
+
+        $this->mysqlPools[$poolName] = AOPFactory::getMysqlPoolCoroutine($pool, $this);
+        return $this->mysqlPools[$poolName];
+    }
+
+    /**
+     * 获取Mysql代理
+     *
+     * @param string $proxyName 配置的Redis代理名称
+     * @return bool|Wrapper|CoroutineRedisProxy|\Redis
+     * @throws Exception
+     */
+    public function getMysqlProxy(string $proxyName)
+    {
+        if (isset($this->mysqlProxies[$proxyName])) {
+            return $this->mysqlProxies[$proxyName];
+        }
+
+        $proxy = getInstance()->getMysqlProxy($proxyName);
+        if (!$proxy) {
+            $config = $this->getConfig()->get('mysql_proxy.' . $proxyName, null);
+            if (!$config) {
+                throw new Exception("config mysql_proxy.$proxyName not exits");
+            }
+            $proxy = MysqlProxyFactory::makeProxy($proxyName, $config);
+            getInstance()->addMysqlProxy($proxyName, $proxy);
+        }
+
+        $this->mysqlProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
+        return $this->mysqlProxies[$proxyName];
     }
 
     /**
