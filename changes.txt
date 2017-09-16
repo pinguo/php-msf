@@ -1,3 +1,14 @@
+3.0.2 ==================================================================================================================
+9d6e003 - xudianyang           * 修复请求链log_id的问题
+5614caa - xudianyang           + 异常规范、HTTP Access日志
+8b3d8c6 - syyongx              * Fix Restful bug
+28ca9b2 - xudianyang           * 规范Task异常时的日志
+e5793aa - 闫帅兵                * 优化inotify，完美支持文件或者目录的修改、删除、新增
+430c4fa - xudianyang           * 优化MySQL连接池，更简单，更容易使用
+76cc105 - xudianyang           * MySQL Proxy（主从结构、读写分离、支持事务）
+0aa72ec - xudianyang           * HTTP SEND FILE 静态文件（支持域名绑定）
+445e2bb - xudianyang           * 完善和优化MySQL同步模式，和异步模式接口一致
+
 3.0.1 ==================================================================================================================
 cfdb0b4 - niulingyun           * 修复controller自动重置public属性
 
