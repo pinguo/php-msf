@@ -1874,21 +1874,21 @@ class Miner
             $profileName = $this->mysqlPool->getAsynName() . '(' . str_replace("\n", " ", $sql) . ')';
             $this->getContext()->getLog()->profileStart($profileName);
 
-            $this->mergeInto($this->mysqlPool->getSync());
+            $this->mergeInto($this->mysqlPool->getSync($this->getContext()));
             $this->clear();
             $data = array();
             switch ($sql) {
                 case 'commit':
-                    $this->mysqlPool->getSync()->pdoCommitTrans();
+                    $this->mysqlPool->getSync($this->getContext())->pdoCommitTrans();
                     break;
                 case 'begin':
-                    $this->mysqlPool->getSync()->pdoBeginTrans();
+                    $this->mysqlPool->getSync($this->getContext())->pdoBeginTrans();
                     break;
                 case 'rollback':
-                    $this->mysqlPool->getSync()->pdoRollBackTrans();
+                    $this->mysqlPool->getSync($this->getContext())->pdoRollBackTrans();
                     break;
                 default:
-                    $data = $this->mysqlPool->getSync()->pdoQuery($sql);
+                    $data = $this->mysqlPool->getSync($this->getContext())->pdoQuery($sql);
             }
             $this->getContext()->getLog()->profileEnd($profileName);
             return $data;
@@ -2559,7 +2559,7 @@ class Miner
                 }
                 $PdoStatement->execute($palceholderValues);
             } catch (\PDOException $e) {
-                $logWarn = dump($e, false, true) . ', ' . $this->mysqlPool->getAsynName() . ' retry sync connection';
+                $logWarn = dump($e, false, true) . $this->mysqlPool->getAsynName() . ' reconnect';
                 $this->getContext()->getLog()->warning($logWarn);
                 // 服务端断开时重连一次
                 if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
@@ -2586,7 +2586,9 @@ class Miner
 
     /**
      * PDO连接
-     * @param $activeConfig
+     *
+     * @param array $activeConfig
+     * @return $this
      */
     public function pdoConnect($activeConfig)
     {
@@ -2602,6 +2604,8 @@ class Miner
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         $this->setPdoConnection($pdo);
+
+        return $this;
     }
 
     /**

@@ -49,11 +49,6 @@ class MysqlAsynPool extends AsynPool
     private $active;
 
     /**
-     * @var Miner 同步MySQL客户端
-     */
-    private $mysqlClient;
-
-    /**
      * MysqlAsynPool constructor.
      *
      * @param Config $config 配置对象
@@ -376,17 +371,17 @@ class MysqlAsynPool extends AsynPool
     /**
      * 获取同步
      *
+     * @param Context $context 请求上下文对象
      * @return Miner
      */
-    public function getSync()
+    public function getSync(Context $context = null)
     {
-        if (isset($this->mysqlClient)) {
-            return $this->mysqlClient;
-        }
         $activeConfig = $this->config['mysql'][$this->active];
-        $this->mysqlClient = new Miner();
-        $this->mysqlClient->pdoConnect($activeConfig);
-
-        return $this->mysqlClient;
+        $client = $this->getDBQueryBuilder($context);
+        if ($client->getPdoConnection() === null) {
+            return $client->pdoConnect($activeConfig);
+        } else {
+            return $client;
+        }
     }
 }
