@@ -10,6 +10,10 @@ namespace PG\MSF\Coroutine;
 
 class Sleep extends Base
 {
+    /**
+     * sleep的时间
+     * @var int
+     */
     public $__sleepTime;
 
     /**
