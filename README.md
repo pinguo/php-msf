@@ -31,6 +31,7 @@ PHP微服务框架即“Micro Service Framework For PHP”，是[Camera360](http
 * 支持命令行模式
 * 支持独立进程的定时器
 * 支持独立配置进程
+* 支持sendfile静态文件(需配置root目录)
 
 ## 环境要求
 
