@@ -17,6 +17,7 @@ use PG\MSF\Pools\MysqlAsynPool;
 use PG\MSF\Proxy\RedisProxyFactory;
 use PG\MSF\Proxy\MysqlProxyFactory;
 use PG\MSF\Pools\CoroutineRedisProxy;
+use PG\MSF\Proxy\MysqlProxyMasterSlave;
 
 /**
  * Class Core
@@ -203,8 +204,8 @@ class Core extends Child
     /**
      * 获取Mysql代理
      *
-     * @param string $proxyName 配置的Redis代理名称
-     * @return bool|Wrapper|CoroutineRedisProxy|\Redis
+     * @param string $proxyName 配置的MySQL代理名称
+     * @return Wrapper|mysqlProxyMasterSlave|Miner|MysqlAsynPool
      * @throws Exception
      */
     public function getMysqlProxy(string $proxyName)

@@ -27,7 +27,7 @@ class MysqlProxyFactory
     {
         $mode = $config['mode'];
         if ($mode == Marco::MASTER_SLAVE) {
-            return new mysqlProxyMasterSlave($name, $config);
+            return new MysqlProxyMasterSlave($name, $config);
         } else {
             return false;
         }

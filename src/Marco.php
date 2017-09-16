@@ -98,4 +98,24 @@ class Marco
      * 进程为user
      */
     const PROCESS_USER                              = 3;
+
+    /**
+     * 发送静态文件404
+     */
+    const SEND_FILE_404                             = 404;
+
+    /**
+     * 发送静态文件200
+     */
+    const SEND_FILE_200                             = 200;
+
+    /**
+     * 发送静态文件304
+     */
+    const SEND_FILE_304                             = 304;
+
+    /**
+     * 发送静态文件403
+     */
+    const SEND_FILE_403                             = 403;
 }

@@ -1871,22 +1871,26 @@ class Miner
             $sql = $this->getStatement(false);
         }
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
-            $this->mergeInto($this->mysqlPool->getSync());
+            $profileName = $this->mysqlPool->getAsynName() . '(' . str_replace("\n", " ", $sql) . ')';
+            $this->getContext()->getLog()->profileStart($profileName);
+
+            $this->mergeInto($this->mysqlPool->getSync($this->getContext()));
             $this->clear();
             $data = array();
             switch ($sql) {
                 case 'commit':
-                    $this->mysqlPool->getSync()->pdoCommitTrans();
+                    $this->mysqlPool->getSync($this->getContext())->pdoCommitTrans();
                     break;
                 case 'begin':
-                    $this->mysqlPool->getSync()->pdoBeginTrans();
+                    $this->mysqlPool->getSync($this->getContext())->pdoBeginTrans();
                     break;
                 case 'rollback':
-                    $this->mysqlPool->getSync()->pdoRollBackTrans();
+                    $this->mysqlPool->getSync($this->getContext())->pdoRollBackTrans();
                     break;
                 default:
-                    $data = $this->mysqlPool->getSync()->pdoQuery($sql);
+                    $data = $this->mysqlPool->getSync($this->getContext())->pdoQuery($sql);
             }
+            $this->getContext()->getLog()->profileEnd($profileName);
             return $data;
         } else {
             $this->clear();
@@ -2549,12 +2553,14 @@ class Miner
         // Only execute if a statement is set.
         if ($statement) {
             try {
-                $PdoStatement = $PdoConnection->prepare($statement);
+                $PdoStatement = @$PdoConnection->prepare($statement);
                 if (empty($palceholderValues)) {
                     $palceholderValues = $this->getPlaceholderValues();
                 }
                 $PdoStatement->execute($palceholderValues);
             } catch (\PDOException $e) {
+                $logWarn = dump($e, false, true) . $this->mysqlPool->getAsynName() . ' reconnect';
+                $this->getContext()->getLog()->warning($logWarn);
                 // 服务端断开时重连一次
                 if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
                     $this->setPdoConnection(null);
@@ -2580,7 +2586,9 @@ class Miner
 
     /**
      * PDO连接
-     * @param $activeConfig
+     *
+     * @param array $activeConfig
+     * @return $this
      */
     public function pdoConnect($activeConfig)
     {
@@ -2596,6 +2604,8 @@ class Miner
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         $this->setPdoConnection($pdo);
+
+        return $this;
     }
 
     /**

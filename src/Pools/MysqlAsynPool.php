@@ -49,11 +49,6 @@ class MysqlAsynPool extends AsynPool
     private $active;
 
     /**
-     * @var Miner 同步MySQL客户端
-     */
-    private $mysqlClient;
-
-    /**
      * MysqlAsynPool constructor.
      *
      * @param Config $config 配置对象
@@ -75,11 +70,7 @@ class MysqlAsynPool extends AsynPool
     public function __call($name, $arguments)
     {
         $context = array_pop($arguments);
-        if ($this->dbQueryBuilder == null) {
-            $this->getDBQueryBuilder($context);
-        }
-
-        return $this->dbQueryBuilder->{$name}(...$arguments);
+        return $this->getDBQueryBuilder($context)->{$name}(...$arguments);
     }
 
     /**
@@ -260,17 +251,16 @@ class MysqlAsynPool extends AsynPool
     }
 
     /**
-     * 开启一个事务
+     * 开启一个同步事务
      *
-     * @param callable $callback 执行完成后的回调函数
      * @param Context $context 请求上下文对象
-     * @return string
+     * @return $this
      */
-    public function begin($callback, Context $context = null)
+    public function begin(Context $context = null)
     {
-        $id = $this->bind($context);
-        $this->query($callback, $id, 'begin', $context);
-        return $id;
+        $this->getDBQueryBuilder($context)->go(null, 'begin');
+
+        return $this;
     }
 
     /**
@@ -324,25 +314,22 @@ class MysqlAsynPool extends AsynPool
      * @param Context $context 请求上下文对象
      * @return MySql
      */
-    public function coroutineBegin(Context $context = null)
+    public function goBegin(Context $context = null)
     {
-        if ($this->dbQueryBuilder == null) {
-            $this->getDBQueryBuilder($context);
-        }
         $id = $this->bind($context);
-        return $this->dbQueryBuilder->go($id, 'begin');
+        return $this->getDBQueryBuilder($context)->go($id, 'begin');
     }
 
     /**
-     * 提交一个事务
+     * 提交一个同步事务
      *
      * @param Context $context 请求上下文对象
-     * @param string $callback 执行完成后的回调函数
-     * @param int $id 绑定ID
+     * @return $this
      */
-    public function commit($callback, $id, Context $context = null)
+    public function commit(Context $context = null)
     {
-        $this->query($callback, $id, 'commit', $context);
+        $this->getDBQueryBuilder($context)->go(null, 'commit');
+        return $this;
     }
 
     /**
@@ -352,24 +339,21 @@ class MysqlAsynPool extends AsynPool
      * @param int $id 绑定ID
      * @return MySql
      */
-    public function coroutineCommit($id, Context $context = null)
+    public function goCommit($id, Context $context = null)
     {
-        if ($this->dbQueryBuilder == null) {
-            $this->getDBQueryBuilder($context);
-        }
-        return $this->dbQueryBuilder->go($id, 'commit');
+        return $this->getDBQueryBuilder($context)->go($id, 'commit');
     }
 
     /**
      * 回滚
      *
      * @param Context $context 请求上下文对象
-     * @param callable $callback 执行完成后的回调函数
-     * @param int $id 绑定ID
+     * @return $this
      */
-    public function rollback($callback, $id, Context $context = null)
+    public function rollback(Context $context = null)
     {
-        $this->query($callback, $id, 'rollback', $context);
+        $this->getDBQueryBuilder($context)->go(null, 'rollback');
+        return $this;
     }
 
     /**
@@ -379,26 +363,25 @@ class MysqlAsynPool extends AsynPool
      * @param int $id 绑定ID
      * @return MySql
      */
-    public function coroutineRollback($id, Context $context = null)
+    public function goRollback($id, Context $context = null)
     {
-        if ($this->dbQueryBuilder == null) {
-            $this->getDBQueryBuilder($context);
-        }
-        return $this->dbQueryBuilder->go($id, 'rollback');
+        return $this->getDBQueryBuilder($context)->go($id, 'rollback');
     }
 
     /**
      * 获取同步
+     *
+     * @param Context $context 请求上下文对象
      * @return Miner
      */
-    public function getSync()
+    public function getSync(Context $context = null)
     {
-        if (isset($this->mysqlClient)) {
-            return $this->mysqlClient;
-        }
         $activeConfig = $this->config['mysql'][$this->active];
-        $this->mysqlClient = new Miner();
-        $this->mysqlClient->pdoConnect($activeConfig);
-        return $this->mysqlClient;
+        $client = $this->getDBQueryBuilder($context);
+        if ($client->getPdoConnection() === null) {
+            return $client->pdoConnect($activeConfig);
+        } else {
+            return $client;
+        }
     }
 }

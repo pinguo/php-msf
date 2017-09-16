@@ -31,7 +31,7 @@ class Input extends Core
      */
     public function __sleep()
     {
-        $this->__serializeRequest          = new \swoole_http_request();
+        $this->__serializeRequest          = new \stdClass();
         $this->__serializeRequest->get     = $this->request->get  ?? [];
         $this->__serializeRequest->post    = $this->request->post ?? [];
         $this->__serializeRequest->files   = $this->request->files ?? [];

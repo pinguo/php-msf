@@ -39,11 +39,10 @@ class MysqlProxyMasterSlave implements IProxy
     private $dbQueryBuilder;
 
     /**
-     * @var array 读的Redis指令列表
+     * @var array 指令列表
      */
     private static $asynCommand = [
-        // Strings
-        'GO', 'COROUTINEBEGIN', 'BEGIN', 'COROUTINECOMMIT', 'COMMIT', 'COROUTINEROLLBACK', 'ROLLBACK'
+        'GO', 'GOBEGIN', 'BEGIN', 'GOCOMMIT', 'COMMIT', 'GOROLLBACK', 'ROLLBACK'
     ];
 
     /**
