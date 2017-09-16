@@ -12,7 +12,10 @@ class Sleep extends Base
 {
     public $__sleepTime;
 
-    public function __construct($sleepTime = 1000)
+    /**
+     * @param int $sleepTime 时间，单位为毫秒
+     */
+    public function __construct($sleepTime)
     {
         $this->__sleepTime = $sleepTime;
         parent::__construct(0);
