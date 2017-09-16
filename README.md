@@ -21,8 +21,8 @@ PHP微服务框架即“Micro Service Framework For PHP”，是[Camera360](http
 * 代码常驻内存
 * 支持对象池
 * 支持Redis连接池、MySQL连接池（异步与同步）
-* 支持Redis Proxy分布式、master-slave部署结构的集群
-* 支持MySQL Proxy master-slave部署结构的集群（读写分离、事务）
+* 内置Redis Proxy，支持分布式、master-slave集群（故障自动failover与recovery）
+* 内置MySQL Proxy，master-slave集群（读写分离、事务）
 * 支持异步、并行
 * 基于PHP Yield实现协程
 * 内建http/redis/mysql/mongodb/task等协程客户端
