@@ -36,6 +36,11 @@ class Sleep extends Base
         });
     }
 
+    /**
+     * 通过定时器来模拟异步IO
+     * @param callable $callback 定时器回调函数
+     * @return $this
+     */
     public function send($callback)
     {
         swoole_timer_after($this->__sleepTime, $callback);
