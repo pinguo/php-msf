@@ -17,12 +17,12 @@ class Sleep extends Base
     public $__sleepTime;
 
     /**
-     * @param int $sleepTime 时间，单位为毫秒
+     * @param int $mSec 时间，单位为毫秒
+     * @return $this
      */
-    public function __construct($sleepTime)
+    public function goSleep(int $mSec)
     {
-        $this->__sleepTime = $sleepTime;
-        parent::__construct(0);
+        $this->__sleepTime = $mSec;
         $this->requestId   = $this->getContext()->getLogId();
 
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
@@ -38,6 +38,7 @@ class Sleep extends Base
             $this->ioBack = true;
             $this->nextRun();
         });
+        return $this;
     }
 
     /**
