@@ -8,6 +8,7 @@ e5793aa - 闫帅兵                * 优化inotify，完美支持文件或者目
 76cc105 - xudianyang           + MySQL Proxy（主从结构、读写分离、支持事务）
 0aa72ec - xudianyang           + HTTP SEND FILE 静态文件（支持域名绑定）
 445e2bb - xudianyang           + 完善和优化MySQL同步模式，和异步模式接口一致
+24524b2 - niulingyun           + 新增异步协程毫秒级sleep,功能同php的sleep函数
 
 3.0.1 ==================================================================================================================
 cfdb0b4 - niulingyun           * 修复controller自动重置public属性
