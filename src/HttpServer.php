@@ -155,7 +155,7 @@ abstract class HttpServer extends Server
 
         do {
             if ($this->route->getPath() == '') {
-                $indexFile = $this->config['http']['domain'][$this->route->getHost()]['index'] ?? __DIR__ . '/Views/index.html';
+                $indexFile = $this->config['http']['domain'][$this->route->getHost()]['index'] ?? null;
                 $response->header('X-Ngx-LogId', $PGLog->logId);
                 $httpCode  = $this->sendFile($indexFile, $request, $response);
                 $PGLog->pushLog('http-code', $httpCode);
@@ -362,6 +362,17 @@ abstract class HttpServer extends Server
      */
     public function sendFile($path, $request, $response)
     {
+        if (empty($path)) {
+            $path = __DIR__ . '/Views/index.html';
+            if (!$response->sendfile($path)) {
+                swoole_async_readfile($path, function ($filename, $content) use ($response) {
+                    $response->end($content);
+                });
+            }
+
+            return Marco::SEND_FILE_200;
+        }
+
         $path = realpath(urldecode($path));
         $root = $this->config['http']['domain'][$this->route->getHost()]['root'] ?? null;
 
