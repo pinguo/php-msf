@@ -49,6 +49,7 @@ class NormalRoute implements IRoute
      */
     public function handleHttpRequest($request)
     {
+        $this->routeParams->file  = '';
         $host = $request->header['host'] ?? '';
         if ($host) {
             $host = explode(':', $host)[0] ?? '';
@@ -124,8 +125,6 @@ class NormalRoute implements IRoute
                 $root = getInstance()->config['http']['domain'][$this->getHost()]['root'] ?? ROOT_PATH . '/www/';
                 $this->routeParams->file = $root . $path;
                 return true;
-            } else {
-                $this->routeParams->file  = '';
             }
 
             $route = explode('/', ltrim($path, '/'));
