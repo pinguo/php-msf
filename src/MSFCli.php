@@ -110,9 +110,9 @@ class MSFCli extends MSFServer
 
                         $generator = $instance->$methodName(...$params);
                         if ($generator instanceof \Generator) {
-                            $this->scheduler->taskMap[$instance->context->getLogId()]->resetRoutine($generator);
+                            $this->scheduler->taskMap[$instance->context->getRequestId()]->resetRoutine($generator);
                             $this->scheduler->schedule(
-                                $this->scheduler->taskMap[$instance->context->getLogId()],
+                                $this->scheduler->taskMap[$instance->context->getRequestId()],
                                 function () use ($instance) {
                                     $instance->destroy();
                                 }

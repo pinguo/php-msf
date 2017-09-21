@@ -23,7 +23,7 @@ class Sleep extends Base
     public function goSleep(int $mSec)
     {
         $this->__sleepTime = $mSec;
-        $this->requestId   = $this->getContext()->getLogId();
+        $this->requestId   = $this->getContext()->getRequestId();
         $this->setTimeout($mSec + 1000); //协程超时时间要比睡眠时间更长
 
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;

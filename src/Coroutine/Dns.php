@@ -40,7 +40,7 @@ class Dns extends Base
         $this->client    = $client;
         $this->headers   = $headers;
         $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->client->urlData['host'];
-        $this->requestId = $this->getContext()->getLogId();
+        $this->requestId = $this->getContext()->getRequestId();
 
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $this->getContext()->getLog()->profileStart($profileName);
