@@ -39,7 +39,7 @@ class CTask extends Base
         $this->taskProxyData = $taskProxyData;
         $this->id            = $id;
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];
-        $this->requestId     = $this->getContext()->getLogId();
+        $this->requestId     = $this->getContext()->getRequestId();
 
         $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;

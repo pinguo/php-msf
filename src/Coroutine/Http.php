@@ -53,7 +53,7 @@ class Http extends Base
         $this->method     = $method;
         $this->data       = $data;
         $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->client->urlData['host'] . ':' . $this->client->urlData['port'] . $this->path;
-        $this->requestId  = $this->getContext()->getLogId();
+        $this->requestId  = $this->getContext()->getRequestId();
 
         $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
