@@ -75,7 +75,7 @@ class Pool
 
         if ($pool->count()) {
             $obj = $pool->shift();
-            $obj->isContruct = false;
+            $obj->__isContruct = false;
             return $obj;
         } else {
             $reflector         = new \ReflectionClass($poolName);

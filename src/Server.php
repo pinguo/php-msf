@@ -681,24 +681,34 @@ abstract class Server extends Child
     public function registerTimer($ms, callable $callBack, $params = [])
     {
         swoole_timer_tick($ms, function ($timerId, $params) use ($callBack) {
-            /**
-             * @var \PG\MSF\Controllers\Controller $instance
-             */
-            $instance = $this->objectPool->get(\PG\MSF\Controllers\Controller::class, ['Controller', 'timer']);
-            $instance->__useCount++;
-            if (empty($instance->getObjectPool())) {
-                $instance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $instance));
-            }
+            $instance = new \PG\MSF\Controllers\Controller('Controller', 'timer');
+            $instance->setObjectPool(AOPFactory::getObjectPool($this->objectPool, $instance));
             $instance->context = $this->getTimerContext();
             $instance->context->setObjectPool($instance->getObjectPool());
             $instance->__construct('Controller', 'timer');
             $run = $callBack($instance, $timerId, $params);
             if ($run instanceof \Generator) {
                 $this->scheduler->start($run, $instance, function () use ($instance) {
-                    $instance->destroy();
+                    $instance->getContext()->getLog()->appendNoticeLog();
+                    //销毁对象池
+                    foreach ($instance->objectPoolBuckets as $k => $obj) {
+                        $instance->getObjectPool()->push($obj);
+                        $instance->objectPoolBuckets[$k] = null;
+                        unset($instance->objectPoolBuckets[$k]);
+                    }
+                    $instance->resetProperties();
+                    $instance->__isContruct = false;
                 });
             } else {
-                $instance->destroy();
+                $instance->getContext()->getLog()->appendNoticeLog();
+                //销毁对象池
+                foreach ($instance->objectPoolBuckets as $k => $obj) {
+                    $instance->getObjectPool()->push($obj);
+                    $instance->objectPoolBuckets[$k] = null;
+                    unset($instance->objectPoolBuckets[$k]);
+                }
+                $instance->resetProperties();
+                $instance->__isContruct = false;
             }
         }, $params);
     }

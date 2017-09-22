@@ -100,7 +100,7 @@ class MySql extends Base
      */
     public function __unsleep()
     {
-        return ['context', 'mysqlAsynPool'];
+        return ['mysqlAsynPool'];
     }
 
     /**
