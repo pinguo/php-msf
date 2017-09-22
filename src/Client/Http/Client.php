@@ -142,13 +142,13 @@ class Client extends Core
         if ($ip !== null) {
             $this->dnsLookupCallBack($ip);
         } else {
-            $logId = $this->getContext()->getLogId();
-            swoole_async_dns_lookup($this->urlData['host'], function ($host, $ip) use ($logId) {
+            $requestId = $this->getContext()->getRequestId();
+            swoole_async_dns_lookup($this->urlData['host'], function ($host, $ip) use ($requestId) {
                 if ($ip === '127.0.0.0') { // fix bug
                     $ip = '127.0.0.1';
                 }
 
-                if (empty(getInstance()->scheduler->taskMap[$logId])) {
+                if (empty(getInstance()->scheduler->taskMap[$requestId])) {
                     return;
                 }
 

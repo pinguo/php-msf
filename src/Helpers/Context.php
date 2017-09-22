@@ -54,6 +54,31 @@ class Context extends AbstractContext
     protected $userDefined = [];
 
     /**
+     * @var int 当前请求ID
+     */
+    protected $requestId;
+
+    /**
+     * Context constructor.
+     *
+     * @param $requestId int 请求ID
+     */
+    public function __construct($requestId)
+    {
+        $this->requestId = $requestId;
+    }
+
+    /**
+     * 返回当前请求ID
+     *
+     * @return string
+     */
+    public function getRequestId()
+    {
+        return $this->requestId;
+    }
+
+    /**
      * 获取请求输入对象
      *
      * @return Input
@@ -204,7 +229,7 @@ class Context extends AbstractContext
      */
     public function __sleep()
     {
-        return ['logId', 'input', 'controllerName', 'actionName', 'userDefined'];
+        return ['logId', 'requestId', 'input', 'controllerName', 'actionName', 'userDefined'];
     }
 
     /**
@@ -219,5 +244,6 @@ class Context extends AbstractContext
         $this->controllerName = null;
         $this->actionName     = null;
         $this->userDefined    = [];
+        $this->requestId      = null;
     }
 }

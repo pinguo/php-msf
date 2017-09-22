@@ -136,6 +136,7 @@ abstract class HttpServer extends Server
      */
     public function onRequest($request, $response)
     {
+        $this->requestId++;
         $error              = '';
         $httpCode           = 500;
         $logId              = $this->genLogId($request);
@@ -198,7 +199,7 @@ abstract class HttpServer extends Server
                     break;
                 }
 
-                $instance->context = $instance->getObjectPool()->get(Context::class);
+                $instance->context = $instance->getObjectPool()->get(Context::class, [$this->requestId]);
                 // 初始化控制器
                 $instance->requestStartTime = microtime(true);
 
@@ -232,9 +233,9 @@ abstract class HttpServer extends Server
                         function () use ($instance, $methodName) {
                             $generator = $instance->$methodName(...array_values($this->route->getParams()));
                             if ($generator instanceof \Generator) {
-                                $this->scheduler->taskMap[$instance->context->getLogId()]->resetRoutine($generator);
+                                $this->scheduler->taskMap[$instance->context->getRequestId()]->resetRoutine($generator);
                                 $this->scheduler->schedule(
-                                    $this->scheduler->taskMap[$instance->context->getLogId()],
+                                    $this->scheduler->taskMap[$instance->context->getRequestId()],
                                     function () use ($instance) {
                                         if (!$instance->getContext()->getOutput()->__isEnd) {
                                             $instance->getContext()->getOutput()->output('Not Implemented', 501);

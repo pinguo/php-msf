@@ -42,7 +42,7 @@ class Task
     protected $controller;
 
     /**
-     * @var string 任务ID
+     * @var int 任务ID
      */
     protected $id;
 
@@ -68,7 +68,7 @@ class Task
         $this->routine    = $routine;
         $this->controller = $controller;
         $this->stack      = new \SplStack();
-        $this->id         = $this->getContext()->getLogId();
+        $this->id         = $this->getContext()->getRequestId();
         $this->callBack   = $callBack;
     }
 
@@ -134,6 +134,10 @@ class Task
     public function run()
     {
         try {
+            if (!$this->routine) {
+                return;
+            }
+
             if ($this->exception) {
                 throw $this->exception;
             }

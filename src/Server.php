@@ -30,7 +30,7 @@ abstract class Server extends Child
     /**
      * 版本
      */
-    const version = "3.0.2-dev";
+    const version = "3.0.3";
 
     /**
      * 运行方式（web/console）
@@ -38,9 +38,9 @@ abstract class Server extends Child
     const mode = 'web';
 
     /**
-     * @var int 进程类型，worker,tasker,user
+     * @var int 进程类型
      */
-    public $processType = Marco::PROCESS_USER;
+    public $processType = Marco::PROCESS_WORKER;
 
     /**
      * @var Server 实例
@@ -165,6 +165,16 @@ abstract class Server extends Child
     public $objectPool;
 
     /**
+     * var array 进程内对象容器
+     */
+    public $objectPoolBuckets = [];
+
+    /**
+     * @var int 请求ID
+     */
+    public $requestId = 0;
+
+    /**
      * Server constructor.
      *
      * @throws Exception
@@ -225,7 +235,7 @@ abstract class Server extends Child
      */
     public function getTimerContext()
     {
-        $context = new Context();
+        $context = new Context(++$this->requestId);
         $PGLog   = null;
         $PGLog   = clone getInstance()->log;
         $PGLog->accessRecord['beginTime'] = time();
@@ -239,12 +249,10 @@ abstract class Server extends Child
         // 构造请求上下文成员
         $context->setLogId($PGLog->logId);
         $context->setLog($PGLog);
-        $context->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $this));
         $context->setControllerName('timerTick');
         $context->setActionName('timerTick');
-        $this->setContext($context);
 
-        return $this->getContext();
+        return $context;
     }
     /**
      * 获取运行的Server实例
@@ -545,13 +553,12 @@ abstract class Server extends Child
             opcache_reset();
         }
 
-        file_put_contents(self::$pidFile, ',' . $serv->worker_pid, FILE_APPEND);
-        if (!$serv->taskworker) {//worker进程
+        file_put_contents(self::$pidFile, ',' . getmypid(), FILE_APPEND);
+        if ($this->processType != Marco::PROCESS_TASKER) {
             $this->scheduler = new Scheduler();
-            self::setProcessTitle($this->config['server.process_title'] . '-Worker');
-        } else {
-            self::setProcessTitle($this->config['server.process_title'] . '-Tasker');
         }
+
+        self::setProcessTitle($this->config['server.process_title'] . '-' . Marco::PROCESS_NAME[$this->processType]);
     }
 
     /**
@@ -674,9 +681,25 @@ abstract class Server extends Child
     public function registerTimer($ms, callable $callBack, $params = [])
     {
         swoole_timer_tick($ms, function ($timerId, $params) use ($callBack) {
-            $this->getTimerContext();
-            $callBack($timerId, $params);
-            $this->getContext()->getLog()->appendNoticeLog();
+            /**
+             * @var \PG\MSF\Controllers\Controller $instance
+             */
+            $instance = $this->objectPool->get(\PG\MSF\Controllers\Controller::class, ['Controller', 'timer']);
+            $instance->__useCount++;
+            if (empty($instance->getObjectPool())) {
+                $instance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $instance));
+            }
+            $instance->context = $this->getTimerContext();
+            $instance->context->setObjectPool($instance->getObjectPool());
+            $instance->__construct('Controller', 'timer');
+            $run = $callBack($instance, $timerId, $params);
+            if ($run instanceof \Generator) {
+                $this->scheduler->start($run, $instance, function () use ($instance) {
+                    $instance->destroy();
+                });
+            } else {
+                $instance->destroy();
+            }
         }, $params);
     }
 
@@ -774,7 +797,7 @@ abstract class Server extends Child
      */
     public function isTaskWorker()
     {
-        return !empty($this->server) && $this->server->taskworker;
+        return !empty($this->server) && property_exists($this->server, 'taskworker') && $this->server->taskworker;
     }
 
     /**

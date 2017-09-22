@@ -85,19 +85,46 @@ class Marco
     const DS_STATIC                                 = 1<<3;
 
     /**
-     * 进程为worker
+     * 进程为WORKER
      */
     const PROCESS_WORKER                            = 1;
 
     /**
-     * 进程为tasker
+     * 进程为TASKER
      */
     const PROCESS_TASKER                            = 2;
 
     /**
-     * 进程为user
+     * 进程为RELOAD
      */
-    const PROCESS_USER                              = 3;
+    const PROCESS_RELOAD                            = 3;
+
+    /**
+     * 进程为CONFIG
+     */
+    const PROCESS_CONFIG                            = 4;
+
+    /**
+     * 进程为TIMER
+     */
+    const PROCESS_TIMER                             = 5;
+
+    /**
+     * 进程为USER（默认）
+     */
+    const PROCESS_USER                              = 4096;
+
+    /**
+     * 进程名称
+     */
+    const PROCESS_NAME                              = [
+        self::PROCESS_WORKER                        => 'WORKER',
+        self::PROCESS_TASKER                        => 'TASKER',
+        self::PROCESS_RELOAD                        => 'RELOAD',
+        self::PROCESS_CONFIG                        => 'CONFIG',
+        self::PROCESS_TIMER                         => 'TIMER',
+        self::PROCESS_USER                          => 'USER',
+    ];
 
     /**
      * 发送静态文件404

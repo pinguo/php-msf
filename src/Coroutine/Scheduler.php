@@ -41,15 +41,15 @@ class Scheduler
                 return true;
             }
 
-            foreach ($this->IOCallBack as $logId => $callBacks) {
+            foreach ($this->IOCallBack as $requestId => $callBacks) {
                 foreach ($callBacks as $key => $callBack) {
                     if ($callBack->ioBack) {
                         continue;
                     }
 
                     if ($callBack->isTimeout()) {
-                        if (!empty($this->taskMap[$logId])) {
-                            $this->schedule($this->taskMap[$logId]);
+                        if (!empty($this->taskMap[$requestId])) {
+                            $this->schedule($this->taskMap[$requestId]);
                         }
                     }
                 }
@@ -144,9 +144,9 @@ class Scheduler
     public function start(\Generator $routine, Controller $controller, callable $callBack = null)
     {
         $task  = $controller->getObject(Task::class, [$routine, $controller, $callBack]);
-        $logId = $controller->getContext()->getLogId();
-        $this->IOCallBack[$logId] = [];
-        $this->taskMap[$logId]    = $task;
+        $requestId = $controller->getContext()->getRequestId();
+        $this->IOCallBack[$requestId] = [];
+        $this->taskMap[$requestId]    = $task;
         $this->schedule($task);
     }
 }

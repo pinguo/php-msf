@@ -71,7 +71,7 @@ class Redis extends Base
         $this->name           = $name;
         $this->arguments      = $arguments;
         $this->request        = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) .  '#' . $this->redisAsynPool->getAsynName()  . '.' . $name;
-        $this->requestId      = $this->getContext()->getLogId();
+        $this->requestId      = $this->getContext()->getRequestId();
 
         $this->getContext()->getLog()->profileStart($this->request);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;

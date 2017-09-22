@@ -133,7 +133,7 @@ class CoroutineRedisProxy
             }
         }
 
-        if (getInstance()->isTaskWorker()) {//task进程
+        if (getInstance()->processType == Marco::PROCESS_TASKER) {//task进程
             $commandData = [$context, $script, array_merge($keys, $evalMockArgs), $numKeys];
         } else {
             $commandData = array_merge([$context, $script, $numKeys], $keys, $evalMockArgs);
@@ -248,7 +248,7 @@ class CoroutineRedisProxy
         }
         // value serialize end
 
-        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
+        if (getInstance()->processType == Marco::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
             /**
              * @var Context $context
              */

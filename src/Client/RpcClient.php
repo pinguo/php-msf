@@ -109,15 +109,15 @@ class RpcClient extends Core
              *     'timeout' => 1000, <选填，可被下级覆盖>
              * ]
              */
-            $config = getInstance()->config->get('params.service.' . $service, []);
+            $config = getInstance()->config->get('service.' . $service, []);
             list($root,) = explode('.', $service);
-            $config['host'] = getInstance()->config->get('params.service.' . $root . '.host', '');
+            $config['host'] = getInstance()->config->get('service.' . $root . '.host', '');
             if ($config['host'] === '') {
                 throw new Exception('Host configuration not found.');
             }
 
             if (!isset($config['timeout'])) {
-                $config['timeout'] = getInstance()->config->get('params.service.' . $root . '.timeout', 0);
+                $config['timeout'] = getInstance()->config->get('service.' . $root . '.timeout', 0);
             }
 
             // 赋值到类属性中.
