@@ -42,6 +42,7 @@ class MSFCli extends MSFServer
      */
     public function onConsoleRequest()
     {
+        $this->requestId++;
         parent::run();
         $request = new Request();
         $request->resolve();
@@ -82,7 +83,7 @@ class MSFCli extends MSFServer
                 break;
             }
 
-            $instance->context  = $instance->getObjectPool()->get(Context::class);
+            $instance->context  = $instance->getObjectPool()->get(Context::class, [$this->requestId]);
 
             // 构造请求上下文成员
             $instance->context->setLogId($PGLog->logId);

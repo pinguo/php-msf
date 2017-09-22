@@ -43,6 +43,7 @@ class Config extends ProcessBase
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         parent::__construct($config, $MSFServer);
+        $this->MSFServer->processType = Marco::PROCESS_CONFIG;
         writeln('Config  Manager: Enabled');
         $this->lastMinute = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);

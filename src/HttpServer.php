@@ -41,11 +41,6 @@ abstract class HttpServer extends Server
     public $templateEngine;
 
     /**
-     * @var int 请求ID
-     */
-    public $requestId = 0;
-
-    /**
      * HttpServer constructor.
      */
     public function __construct()
