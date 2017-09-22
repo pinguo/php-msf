@@ -697,6 +697,8 @@ abstract class Server extends Child
                 $this->scheduler->start($run, $instance, function () use ($instance) {
                     $instance->destroy();
                 });
+            } else {
+                $instance->destroy();
             }
         }, $params);
     }
