@@ -35,11 +35,6 @@ abstract class MSFServer extends HttpServer
     const SERVER_NAME = 'SERVER';
 
     /**
-     * var array Tasker进程内对象容器
-     */
-    public $objectPoolBuckets = [];
-
-    /**
      * @var array Redis代理管理器
      */
     protected $redisProxyManager = [];
@@ -126,8 +121,8 @@ abstract class MSFServer extends HttpServer
                 writeln("Inotify  Reload: Failed(未安装inotify扩展)");
             } else {
                 $reloadProcess = new \swoole_process(function ($process) {
-                    $process->name($this->config['server.process_title'] . '-RELOAD');
                     new Inotify($this->config, $this);
+                    $this->onWorkerStart($this->server, 0);
                 }, false, 2);
                 $this->server->addProcess($reloadProcess);
             }
@@ -136,8 +131,8 @@ abstract class MSFServer extends HttpServer
         //配置管理进程
         if ($this->config->get('config_manage_enable', false)) {
             $configProcess = new \swoole_process(function ($process) {
-                $process->name($this->config['server.process_title'] . '-CONFIG');
                 new Config($this->config, $this);
+                $this->onWorkerStart($this->server, 0);
             }, false, 2);
             $this->server->addProcess($configProcess);
         }
@@ -145,8 +140,8 @@ abstract class MSFServer extends HttpServer
         //业务自定义定时器进程
         if ($this->config->get('user_timer_enable', false)) {
             $timerProcess = new \swoole_process(function ($process) {
-                $process->name($this->config['server.process_title'] . '-TIMER');
                 new Timer($this->config, $this);
+                $this->onWorkerStart($this->server, 0);
             }, false, 2);
             $this->server->addProcess($timerProcess);
         }
@@ -358,7 +353,7 @@ abstract class MSFServer extends HttpServer
         }
         $this->asynPools[$name] = $pool;
         if ($isRegister && $this->asynPoolManager) {
-            $pool->workerInit($this->server->worker_id);
+            $pool->workerInit($this->server->worker_id ?? 0);
             $this->asynPoolManager->registerAsyn($pool);
         }
 
@@ -479,46 +474,49 @@ abstract class MSFServer extends HttpServer
      */
     public function onWorkerStart($serv, $workerId)
     {
-        parent::onWorkerStart($serv, $workerId);
-        $this->initAsynPools();
-        $this->initRedisProxies();
-        $this->initMysqlProxies();
-        if (!$serv->taskworker) {
-            //注册
-            $this->asynPoolManager = new AsynPoolManager(null, $this);
-            $this->asynPoolManager->noEventAdd();
-            foreach ($this->asynPools as $pool) {
-                if ($pool) {
-                    $pool->workerInit($workerId);
-                    $this->asynPoolManager->registerAsyn($pool);
-                }
-            }
-        }
-
-        if (!empty($this->redisProxyManager)) {
-            //redis proxy监测
-            getInstance()->sysTimers[] = $this->server->tick(5000, function () {
-                foreach ($this->redisProxyManager as $proxy) {
-                    $proxy->check();
-                }
-            });
-
-            // mysql proxy监测
-            getInstance()->sysTimers[] = $this->server->tick(5000, function () {
-                foreach ($this->mysqlProxyManager as $proxy) {
-                    $proxy->check();
-                }
-            });
-        }
-
         // Worker类型
         if (!$this->isTaskWorker()) {
-            $this->processType = Marco::PROCESS_WORKER;
-            getInstance()->sysTimers[] = swoole_timer_tick(2000, function ($timerId) {
-                $this->statistics();
-            });
+            if ($this->processType == Marco::PROCESS_WORKER) {
+                getInstance()->sysTimers[] = swoole_timer_tick(2000, function ($timerId) {
+                    $this->statistics();
+                });
+            }
         } else {
             $this->processType = Marco::PROCESS_TASKER;
+        }
+
+        parent::onWorkerStart($serv, $workerId);
+        if ($this->processType == Marco::PROCESS_WORKER || $this->processType == Marco::PROCESS_TIMER) {
+            $this->initAsynPools();
+            $this->initRedisProxies();
+            $this->initMysqlProxies();
+            if ($this->processType != Marco::PROCESS_TASKER) {
+                //注册
+                $this->asynPoolManager = new AsynPoolManager(null, $this);
+                $this->asynPoolManager->noEventAdd();
+                foreach ($this->asynPools as $pool) {
+                    if ($pool) {
+                        $pool->workerInit($workerId);
+                        $this->asynPoolManager->registerAsyn($pool);
+                    }
+                }
+            }
+
+            if (!empty($this->redisProxyManager)) {
+                //redis proxy监测
+                getInstance()->sysTimers[] = $this->server->tick(5000, function () {
+                    foreach ($this->redisProxyManager as $proxy) {
+                        $proxy->check();
+                    }
+                });
+
+                // mysql proxy监测
+                getInstance()->sysTimers[] = $this->server->tick(5000, function () {
+                    foreach ($this->mysqlProxyManager as $proxy) {
+                        $proxy->check();
+                    }
+                });
+            }
         }
     }
 

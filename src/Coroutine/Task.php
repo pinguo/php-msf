@@ -134,6 +134,10 @@ class Task
     public function run()
     {
         try {
+            if (!$this->routine) {
+                return;
+            }
+
             if ($this->exception) {
                 throw $this->exception;
             }
