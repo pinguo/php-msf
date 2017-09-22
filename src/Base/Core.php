@@ -224,7 +224,7 @@ class Core extends Child
             getInstance()->addMysqlProxy($proxyName, $proxy);
         }
 
-        $this->mysqlProxies[$proxyName] = AOPFactory::getRedisProxy($proxy, $this);
+        $this->mysqlProxies[$proxyName] = AOPFactory::getMysqlProxy($proxy, $this);
         return $this->mysqlProxies[$proxyName];
     }
 

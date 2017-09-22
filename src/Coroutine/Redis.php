@@ -245,7 +245,7 @@ class Redis extends Base
      */
     public function __unsleep()
     {
-        return ['context', 'redisAsynPool'];
+        return ['redisAsynPool'];
     }
 
     /**
