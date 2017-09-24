@@ -122,7 +122,7 @@ abstract class MSFServer extends HttpServer
             } else {
                 $reloadProcess = new \swoole_process(function ($process) {
                     new Inotify($this->config, $this);
-                    $this->onWorkerStart($this->server, 0);
+                    $this->onWorkerStart($this->server, null);
                 }, false, 2);
                 $this->server->addProcess($reloadProcess);
             }
@@ -132,7 +132,7 @@ abstract class MSFServer extends HttpServer
         if ($this->config->get('config_manage_enable', false)) {
             $configProcess = new \swoole_process(function ($process) {
                 new Config($this->config, $this);
-                $this->onWorkerStart($this->server, 0);
+                $this->onWorkerStart($this->server, null);
             }, false, 2);
             $this->server->addProcess($configProcess);
         }
@@ -141,7 +141,7 @@ abstract class MSFServer extends HttpServer
         if ($this->config->get('user_timer_enable', false)) {
             $timerProcess = new \swoole_process(function ($process) {
                 new Timer($this->config, $this);
-                $this->onWorkerStart($this->server, 0);
+                $this->onWorkerStart($this->server, null);
             }, false, 2);
             $this->server->addProcess($timerProcess);
         }
@@ -476,7 +476,8 @@ abstract class MSFServer extends HttpServer
     {
         // Worker类型
         if (!$this->isTaskWorker()) {
-            if ($this->processType == Marco::PROCESS_WORKER) {
+            if ($workerId !== null) {
+                $this->processType = Marco::PROCESS_WORKER;
                 getInstance()->sysTimers[] = swoole_timer_tick(2000, function ($timerId) {
                     $this->statistics();
                 });

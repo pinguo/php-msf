@@ -110,6 +110,16 @@ class Marco
     const PROCESS_TIMER                             = 5;
 
     /**
+     * 进程为MASTER
+     */
+    const PROCESS_MASTER                            = 4094;
+
+    /**
+     * 进程为MANAGER
+     */
+    const PROCESS_MANAGER                           = 4095;
+
+    /**
      * 进程为USER（默认）
      */
     const PROCESS_USER                              = 4096;
@@ -118,12 +128,14 @@ class Marco
      * 进程名称
      */
     const PROCESS_NAME                              = [
-        self::PROCESS_WORKER                        => 'WORKER',
-        self::PROCESS_TASKER                        => 'TASKER',
-        self::PROCESS_RELOAD                        => 'RELOAD',
-        self::PROCESS_CONFIG                        => 'CONFIG',
-        self::PROCESS_TIMER                         => 'TIMER',
-        self::PROCESS_USER                          => 'USER',
+        self::PROCESS_MASTER                        => 'Master',
+        self::PROCESS_MANAGER                       => 'Manager',
+        self::PROCESS_WORKER                        => 'Worker',
+        self::PROCESS_TASKER                        => 'Tasker',
+        self::PROCESS_RELOAD                        => 'Reload',
+        self::PROCESS_CONFIG                        => 'Config',
+        self::PROCESS_TIMER                         => 'Timer',
+        self::PROCESS_USER                          => 'User',
     ];
 
     /**

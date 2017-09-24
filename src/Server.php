@@ -40,7 +40,7 @@ abstract class Server extends Child
     /**
      * @var int 进程类型
      */
-    public $processType = Marco::PROCESS_WORKER;
+    public $processType = Marco::PROCESS_MASTER;
 
     /**
      * @var Server 实例
@@ -532,9 +532,10 @@ abstract class Server extends Child
     public function onStart($serv)
     {
         self::$_masterPid = $serv->master_pid;
+        $this->processType = Marco::PROCESS_MASTER;
         file_put_contents(self::$pidFile, self::$_masterPid);
         file_put_contents(self::$pidFile, ',' . $serv->manager_pid, FILE_APPEND);
-        self::setProcessTitle($this->config['server.process_title'] . '-Master');
+        self::setProcessTitle($this->config['server.process_title'] . '-' . Marco::PROCESS_NAME[$this->processType]);
     }
 
     /**
@@ -647,7 +648,8 @@ abstract class Server extends Child
      */
     public function onManagerStart($serv)
     {
-        self::setProcessTitle($this->config['server.process_title'] . '-Manager');
+        $this->processType = Marco::PROCESS_MANAGER;
+        self::setProcessTitle($this->config['server.process_title'] . '-' . Marco::PROCESS_NAME[$this->processType]);
     }
 
     /**
