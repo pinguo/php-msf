@@ -191,7 +191,7 @@ class NormalRoute implements IRoute
      */
     public function getControllerName()
     {
-        return $this->routeParams->controllerName;
+        return $this->routeParams->controllerName ?? '';
     }
 
     /**
@@ -201,7 +201,7 @@ class NormalRoute implements IRoute
      */
     public function getControllerClassName()
     {
-        return $this->controllerClassName;
+        return $this->controllerClassName ?? '';
     }
 
     /**
@@ -211,7 +211,7 @@ class NormalRoute implements IRoute
      */
     public function getMethodName()
     {
-        return $this->routeParams->methodName;
+        return $this->routeParams->methodName ?? '';
     }
 
     /**
@@ -221,7 +221,7 @@ class NormalRoute implements IRoute
      */
     public function getPath()
     {
-        return $this->routeParams->path;
+        return $this->routeParams->path ?? '';
     }
 
     /**
@@ -231,7 +231,7 @@ class NormalRoute implements IRoute
      */
     public function getFile()
     {
-        return $this->routeParams->file;
+        return $this->routeParams->file ?? '';
     }
 
     /**
@@ -253,7 +253,7 @@ class NormalRoute implements IRoute
      */
     public function getHost()
     {
-        return $this->routeParams->host;
+        return $this->routeParams->host ?? '';
     }
 
 
