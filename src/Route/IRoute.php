@@ -19,63 +19,63 @@ interface IRoute
      *
      * @param \swoole_http_client $request 请求对象
      */
-    function handleHttpRequest($request);
+    public function handleHttpRequest($request);
 
     /**
      * 获取控制器名称
      *
      * @return string
      */
-    function getControllerName();
+    public function getControllerName();
 
     /**
      * 获取请求对应的控制器完全命名空间类名
      *
      * @return string
      */
-    function getControllerClassName();
+    public function getControllerClassName();
 
     /**
      * 计算Controller Class Name
      *
      * @return bool
      */
-    function findControllerClassName();
+    public function findControllerClassName();
 
     /**
      * 获取方法名称
      *
      * @return string
      */
-    function getMethodName();
+    public function getMethodName();
 
     /**
      * 获取请求的参数
      *
      * @return array
      */
-    function getParams();
+    public function getParams();
 
     /**
      * 获取请求的PATH
      *
      * @return string
      */
-    function getPath();
+    public function getPath();
 
     /**
      * 判断请求是否为RPC请求
      *
      * @return bool
      */
-    function getIsRpc();
+    public function getIsRpc();
 
     /**
      * 获取请求的方法
      *
      * @return string|null
      */
-    function getVerb();
+    public function getVerb();
 
     /**
      * 设置请求的控制器标识
@@ -83,7 +83,7 @@ interface IRoute
      * @param string $name 控制器标识
      * @return $this
      */
-    function setControllerName($name);
+    public function setControllerName($name);
 
     /**
      * 设置请求控制器的方法标识
@@ -91,7 +91,7 @@ interface IRoute
      * @param string $name 控制器的方法标识
      * @return $this
      */
-    function setMethodName($name);
+    public function setMethodName($name);
 
     /**
      * 设置请求的参数
@@ -99,14 +99,14 @@ interface IRoute
      * @param array $params 请求的参数
      * @return $this
      */
-    function setParams($params);
+    public function setParams($params);
 
     /**
      * 获取是否支持路由Cache
      *
      * @return bool
      */
-    function getEnableCache();
+    public function getEnableCache();
 
     /**
      * 缓存路由
@@ -115,7 +115,7 @@ interface IRoute
      * @param array $callable 路由解析结果
      * @return $this
      */
-    function setRouteCache($path, $callable);
+    public function setRouteCache($path, $callable);
 
     /**
      * 获取已缓存的路由信息
@@ -123,5 +123,5 @@ interface IRoute
      * @param string $path URL Path
      * @return mixed|null
      */
-    function getRouteCache($path);
+    public function getRouteCache($path);
 }

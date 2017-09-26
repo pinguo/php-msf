@@ -599,7 +599,6 @@ abstract class MSFServer extends HttpServer
      */
     public function onInitTimer()
     {
-
     }
 
     /**

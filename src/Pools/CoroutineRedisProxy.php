@@ -258,7 +258,7 @@ class CoroutineRedisProxy
             $context->getLog()->profileEnd('redis.' . $name);
             // return value unserialize start
             switch ($name) {
-                case 'mget';
+                case 'mget':
                     $keys = $this->arguments[0];
                     $len = strlen($this->keyPrefix);
                     $value = $this->unSerializeHandler($value, $keys, $len);

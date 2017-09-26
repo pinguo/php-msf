@@ -90,7 +90,7 @@ class Redis extends Base
             $this->getContext()->getLog()->profileEnd($this->request);
 
             switch ($name) {
-                case 'mget';
+                case 'mget':
                     $keys = $this->arguments[0];
                     $len = strlen($this->keyPrefix);
                     $result = $this->unSerializeHandler($result, $keys, $len);

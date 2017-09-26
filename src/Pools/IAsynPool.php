@@ -22,7 +22,7 @@ interface IAsynPool
      *
      * @return string
      */
-    function getAsynName();
+    public function getAsynName();
 
     /**
      * 分发消息
@@ -30,14 +30,14 @@ interface IAsynPool
      * @param array $data 待分发数据
      * @return $this
      */
-    function distribute($data);
+    public function distribute($data);
 
     /**
      * 执行命令
      *
      * @param array $data 命令相关信息
      */
-    function execute($data);
+    public function execute($data);
 
     /**
      * 初始化
@@ -46,7 +46,7 @@ interface IAsynPool
      * @param AsynPoolManager $asynManager 异步连接池管理器
      * @return $this
      */
-    function serverInit($swooleServer, $asynManager);
+    public function serverInit($swooleServer, $asynManager);
 
     /**
      * 初始化workerId
@@ -54,7 +54,7 @@ interface IAsynPool
      * @param int $workerId worker进程ID
      * @return $this
      */
-    function workerInit($workerId);
+    public function workerInit($workerId);
 
     /**
      * 归还连接
@@ -62,12 +62,12 @@ interface IAsynPool
      * @param mixed $client 连接对象
      * @return $this
      */
-    function pushToPool($client);
+    public function pushToPool($client);
 
     /**
      * 创建连接
      */
-    function prepareOne();
+    public function prepareOne();
 
     /**
      * 注册回调
@@ -75,7 +75,7 @@ interface IAsynPool
      * @param callable $callback 回调函数
      * @return int
      */
-    function addTokenCallback($callback);
+    public function addTokenCallback($callback);
 
     /**
      * 获取同步连接
@@ -83,5 +83,5 @@ interface IAsynPool
      * @return mixed
      * @throws Exception
      */
-    function getSync();
+    public function getSync();
 }

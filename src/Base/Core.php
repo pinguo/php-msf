@@ -75,7 +75,6 @@ class Core extends Child
      */
     public function __construct()
     {
-
     }
 
     /**
