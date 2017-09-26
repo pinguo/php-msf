@@ -71,13 +71,13 @@ class RestRoute extends NormalRoute
      */
     public function handleHttpRequest($request)
     {
-        $this->routeParams->path = rtrim($request->server['path_info'], '/');
-        $this->routeParams->verb = $this->parseVerb($request);
+        $this->parseRequestBase($request);
+
         $data = $this->parseRule();
-        // 如果未从rest配置中解析到，则按普通模式解析
         $path = $data[0] ?? $this->routeParams->path;
-        $this->parsePath($path);
-        // 将 path 中含有的参数放入 get 中
+        if ($path) {
+            $this->parsePath($path);
+        }
         if (!empty($data[1])) {
             foreach ($data[1] as $name => $value) {
                 $request->get[$name] = $value;

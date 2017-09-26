@@ -43,11 +43,12 @@ class NormalRoute implements IRoute
     }
 
     /**
-     * HTTP请求解析
+     * 解析HTTP请求的基础信息
      *
-     * @param \swoole_http_request $request 请求对象
+     * @param \swoole_http_request $request
+     * @return $this
      */
-    public function handleHttpRequest($request)
+    public function parseRequestBase($request)
     {
         $this->routeParams->file  = '';
         $host = $request->header['host'] ?? '';
@@ -58,6 +59,18 @@ class NormalRoute implements IRoute
         $this->routeParams->path = rtrim($request->server['path_info'], '/');
         $this->routeParams->verb = $this->parseVerb($request);
         $this->setParams($request->get ?? []);
+
+        return $this;
+    }
+
+    /**
+     * HTTP请求解析
+     *
+     * @param \swoole_http_request $request 请求对象
+     */
+    public function handleHttpRequest($request)
+    {
+        $this->parseRequestBase($request);
 
         if (isset($request->header['x-rpc']) && $request->header['x-rpc'] == 1) {
             $this->routeParams->isRpc          = true;
