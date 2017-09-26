@@ -56,7 +56,7 @@ class Bench extends Controller
         $cli->setHeaders([
             'Host' => 'localhost',
         ]);
-        $cli->get('/', function($client) {
+        $cli->get('/', function ($client) {
             $this->getContext()->getOutput()->end($client->body);
         });
     }

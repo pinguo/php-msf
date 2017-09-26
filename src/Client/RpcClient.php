@@ -110,7 +110,7 @@ class RpcClient extends Core
              * ]
              */
             $config = getInstance()->config->get('service.' . $service, []);
-            list($root,) = explode('.', $service);
+            list($root, ) = explode('.', $service);
             $config['host'] = getInstance()->config->get('service.' . $root . '.host', '');
             if ($config['host'] === '') {
                 throw new Exception('Host configuration not found.');

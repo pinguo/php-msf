@@ -255,7 +255,8 @@ abstract class HttpServer extends Server
                     $generator = $instance->$methodName(...array_values($this->route->getParams()));
                     if ($generator instanceof \Generator) {
                         $this->scheduler->start(
-                            $generator, $instance,
+                            $generator,
+                            $instance,
                             function () use ($instance) {
                                 if (!$instance->getContext()->getOutput()->__isEnd) {
                                     $instance->getContext()->getOutput()->output('Not Implemented', 501);
@@ -342,7 +343,8 @@ abstract class HttpServer extends Server
         $logId = $request->header['x-ngx-logid'] ?? $request->header['log_id'] ?? '' ;
 
         if (!$logId) {
-            $logId = sprintf("%08x%06x%04x%06x",
+            $logId = sprintf(
+                "%08x%06x%04x%06x",
                 time() & 0xFFFFFFFF,
                 crc32(substr((string)gethostname(), 0, 256)) >> 8 & 0xFFFFFF,
                 getmypid() & 0xFFFF,

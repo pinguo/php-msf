@@ -79,13 +79,13 @@ class Inotify extends ProcessBase
             }
         }
 
-        $tempFiles = NULL;
+        $tempFiles = null;
 
         swoole_event_add($this->inotifyFd, function ($inotifyFd) use (&$monitorFiles) {
             $events = inotify_read($inotifyFd);
             $flag = true;
             foreach ($events as $ev) {
-                if (pathinfo($ev['name'] , PATHINFO_EXTENSION) != 'php') {
+                if (pathinfo($ev['name'], PATHINFO_EXTENSION) != 'php') {
                     //创建目录添加监听
                     if ($ev['mask'] == 1073742080) {
                         $path = $monitorFiles[$ev['wd']] .'/'. $ev['name'];

@@ -20,7 +20,7 @@ interface IPack
      * @param $data
      * @return string
      */
-    function pack($data);
+    public function pack($data);
 
     /**
      * 解包
@@ -28,5 +28,5 @@ interface IPack
      * @param $data
      * @return mixed
      */
-    function unPack($data);
+    public function unPack($data);
 }
