@@ -1,3 +1,4 @@
+src/Helpers/Common.php diff
 /test export-ignore
 /vendor export-ignore
 .coveralls.yml export-ignore
