@@ -299,32 +299,29 @@ abstract class HttpServer extends Server
 
     /**
      * 获取远程客户端IP
-     *
+     * 优先获取负载器转发ip
      * @param \swoole_http_request $request 请求对象
      * @return string
      */
     public static function getRemoteAddr($request)
     {
-        $ip = $request->header['http_client_ip']       ??
-              $request->header['x-real-ip']            ??
-              $request->header['remote_addr']          ??
-              $request->server['remote_addr']          ??
-              "";
-
-        if ($ip) {
-            return $ip;
-        }
-
-        $ip = $request->header['x-forwarded-for']      ??
+        $ip = $request->header['x-forwarded-for'] ??
               $request->header['http_x_forwarded_for'] ??
-              $request->header['http_forwarded']       ??
-              $request->header['http_forwarded_for']   ??
-              "";
+              $request->header['http_forwarded'] ??
+              $request->header['http_forwarded_for'] ??
+              '';
 
         if ($ip) {
             $ip = explode(',', $ip);
             $ip = trim($ip[0]);
+            return $ip;
         }
+
+        $ip = $request->header['http_client_ip'] ??
+              $request->header['x-real-ip'] ??
+              $request->header['remote_addr'] ??
+              $request->server['remote_addr'] ??
+              '';
 
         return $ip;
     }
