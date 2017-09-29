@@ -41,16 +41,39 @@ abstract class HttpServer extends Server
     public $templateEngine;
 
     /**
+     * 视图文件存储路径,您可以指定多个路径以便让框架载入.
+     * 数组顺序即加载顺序,当然,框架会自动将msf视图目录放在最后resolve.
+     *
+     * @var array
+     */
+    public $viewResolvePaths;
+
+    /**
      * HttpServer constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $view_dir = APP_DIR . '/Views';
-        if (!is_dir($view_dir)) {
-            writeln('App directory does not exist Views directory, please create.');
-            exit();
+        $this->initViewResolvePaths();
+    }
+
+    /**
+     * 初始化需要检索的视图目录,请在配置中指定http_server.view_paths数组.
+     * 如果未指定,系统默认会尝试加载app/Views目录,任何时候,框架都会加载$MSFSrcDir/Views下的视图.
+     */
+    protected function initViewResolvePaths()
+    {
+        $this->viewResolvePaths = $this->config->get('http_server.view_paths', [
+            APP_DIR.'/Views'
+        ]);
+        foreach ($this->viewResolvePaths as $path) {
+            if (!is_dir($path)) {
+                writeln(sprintf('The view path %s does not exist, please check it again.', $path));
+                exit();
+            }
         }
+        // 框架自带的视图目录.
+        $this->viewResolvePaths[] = $this->MSFSrcDir.'/Views';
     }
 
     /**
