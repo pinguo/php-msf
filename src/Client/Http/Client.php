@@ -47,7 +47,7 @@ class Client extends Core
     /**
      * @var array 解析的URL结果
      */
-    public $urlData;
+    public $urlData = [];
 
     /**
      * @var int DNS解析超时时间
@@ -60,7 +60,10 @@ class Client extends Core
      * @param string $url 如http://domain.com:port，http://domain.com:port/path/
      * @param int $timeout 域名解析超时时间，单位秒
      * @param array $headers 请求报头
-     * @return Client $this
+     *
+     * @return self
+     *
+     * @throws Exception 给定的url解析失败.
      */
     public function __construct($url = '', $timeout = 0, $headers = [])
     {
@@ -69,7 +72,11 @@ class Client extends Core
         }
 
         if (!empty($url)) {
-            $this->urlData = self::parseUrl($url);
+            $data = self::parseUrl($url);
+            if ($data === false) {
+                throw new Exception('url parse error, please check you url.');
+            }
+            $this->urlData = $data;
         }
 
         if ($timeout) {
@@ -596,7 +603,7 @@ class Client extends Core
     /**
      * 清除HOST对应的DNS缓存
      *
-     * @param $host HOST名称
+     * @param string $host HOST名称
      */
     public static function clearDnsCache($host)
     {

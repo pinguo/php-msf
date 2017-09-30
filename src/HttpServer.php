@@ -224,7 +224,7 @@ abstract class HttpServer extends Server
 
                 $instance->context = $instance->getObjectPool()->get(Context::class, [$this->requestId]);
                 // 初始化控制器
-                $instance->requestStartTime = microtime(true);
+                $instance->requestStartTime = (float)microtime(true);
 
                 // 构造请求上下文成员
                 $instance->context->setLogId($PGLog->logId);

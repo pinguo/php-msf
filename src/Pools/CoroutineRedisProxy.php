@@ -9,6 +9,7 @@
 
 namespace PG\MSF\Pools;
 
+use PG\MSF\Coroutine\IPoolCoroutine;
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Marco;
@@ -17,7 +18,7 @@ use PG\MSF\Marco;
  * Class CoroutineRedisProxy
  * @package PG\MSF\Pools
  */
-class CoroutineRedisProxy
+class CoroutineRedisProxy implements IPoolCoroutine
 {
     /**
      * @var RedisAsynPool Redis连接池

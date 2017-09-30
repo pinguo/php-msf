@@ -124,4 +124,19 @@ interface IRoute
      * @return mixed|null
      */
     public function getRouteCache($path);
+
+
+    /**
+     * 获取请求报头的Host.
+     *
+     * @return string
+     */
+    public function getHost();
+
+    /**
+     * 获取文件.
+     *
+     * @return mixed
+     */
+    public function getFile();
 }

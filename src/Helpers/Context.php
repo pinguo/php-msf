@@ -71,7 +71,7 @@ class Context extends AbstractContext
     /**
      * 返回当前请求ID
      *
-     * @return string
+     * @return int
      */
     public function getRequestId()
     {

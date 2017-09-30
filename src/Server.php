@@ -334,6 +334,68 @@ abstract class Server extends Child
     }
 
     /**
+     * 停止当前worker.
+     *
+     * @param        $masterPid
+     * @param string $startFile
+     */
+    protected static function stopWorker($masterPid, $startFile = '')
+    {
+        @unlink(self::$pidFile);
+        writeln("$startFile is stoping ...");
+        // Send stop signal to master process.
+        $masterPid && posix_kill($masterPid, SIGTERM);
+        // Timeout.
+        $timeout = 5;
+        $startTime = time();
+        // Check master process is still alive?
+        while (1) {
+            $masterIsAlive = $masterPid && posix_kill($masterPid, SIG_BLOCK);
+            if ($masterIsAlive) {
+                // Timeout?
+                if (time() - $startTime >= $timeout) {
+                    writeln("{$startFile} stop fail");
+                    exit;
+                }
+                // Waiting amoment.
+                usleep(10000);
+                continue;
+            }
+            // Stop success.
+            writeln("{$startFile} stop success");
+            break;
+        }
+    }
+
+
+    /**
+     * 获取当前服务器的pid数据.包含俩个key:
+     * [
+     *      'masterPid' => 主进程pid.
+     *      'managerPid' => manager进程pid.
+     * ]
+     *
+     * @return array|bool 如果master活着则返回pid信息,否则返回false.
+     */
+    protected static function getServerPidInfo()
+    {
+        $masterPid = $managerPid = null;
+        if (file_exists(self::$pidFile)) {
+            $pids = explode(',', file_get_contents(self::$pidFile));
+            // Get master process PID.
+            $masterPid = $pids[0];
+            $managerPid = $pids[1];
+            $masterIsAlive = $masterPid && @posix_kill($masterPid, SIG_BLOCK);
+        } else {
+            $masterIsAlive = false;
+        }
+        return $masterIsAlive ? [
+            'masterPid' => $masterPid,
+            'managerPid' => $managerPid,
+        ] : false;
+    }
+
+    /**
      * 解析命令行参数
      *
      * @return void
@@ -351,19 +413,10 @@ abstract class Server extends Child
         $command = trim($argv[1]);
         $command2 = isset($argv[2]) ? $argv[2] : '';
 
-        // Start command.
-        $mode = '';
-        if (file_exists(self::$pidFile)) {
-            $pids = explode(',', file_get_contents(self::$pidFile));
-            // Get master process PID.
-            $masterPid = $pids[0];
-            $managerPid = $pids[1];
-            $masterIsAlive = $masterPid && @posix_kill($masterPid, SIG_BLOCK);
-        } else {
-            $masterIsAlive = false;
-        }
+        $pidInfo = static::getServerPidInfo();
+
         // Master is still alive?
-        if ($masterIsAlive) {
+        if ($pidInfo !== false) {
             if ($command === 'start' || $command === 'test') {
                 writeln("{$startFile} already running");
                 exit;
@@ -373,6 +426,9 @@ abstract class Server extends Child
             exit;
         }
 
+        $masterPid = $pidInfo['masterPid'];
+        $managerPid = $pidInfo['managerPid'];
+
         // execute command.
         switch ($command) {
             case 'start':
@@ -381,30 +437,7 @@ abstract class Server extends Child
                 }
                 break;
             case 'stop':
-                @unlink(self::$pidFile);
-                writeln("$startFile is stoping ...");
-                // Send stop signal to master process.
-                $masterPid && posix_kill($masterPid, SIGTERM);
-                // Timeout.
-                $timeout = 5;
-                $startTime = time();
-                // Check master process is still alive?
-                while (1) {
-                    $masterIsAlive = $masterPid && posix_kill($masterPid, SIG_BLOCK);
-                    if ($masterIsAlive) {
-                        // Timeout?
-                        if (time() - $startTime >= $timeout) {
-                            writeln("{$startFile} stop fail");
-                            exit;
-                        }
-                        // Waiting amoment.
-                        usleep(10000);
-                        continue;
-                    }
-                    // Stop success.
-                    writeln("{$startFile} stop success");
-                    break;
-                }
+                self::stopWorker($masterPid, $startFile);
                 exit(0);
                 break;
             case 'reload':
@@ -412,30 +445,7 @@ abstract class Server extends Child
                 writeln("{$startFile} reload");
                 exit;
             case 'restart':
-                @unlink(self::$pidFile);
-                writeln("{$startFile} is stoping ...");
-                // Send stop signal to master process.
-                $masterPid && posix_kill($masterPid, SIGTERM);
-                // Timeout.
-                $timeout = 5;
-                $startTime = time();
-                // Check master process is still alive?
-                while (1) {
-                    $masterIsAlive = $masterPid && posix_kill($masterPid, SIG_BLOCK);
-                    if ($masterIsAlive) {
-                        // Timeout?
-                        if (time() - $startTime >= $timeout) {
-                            writeln("{$startFile} stop fail");
-                            exit;
-                        }
-                        // Waiting amoment.
-                        usleep(10000);
-                        continue;
-                    }
-                    // Stop success.
-                    writeln("{$startFile} stop success");
-                    break;
-                }
+                self::stopWorker($masterPid, $startFile);
                 self::$daemonize = true;
                 break;
             case 'test':

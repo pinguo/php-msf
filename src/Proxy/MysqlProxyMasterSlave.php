@@ -8,6 +8,7 @@
 
 namespace PG\MSF\Proxy;
 
+use PG\AOP\Wrapper;
 use PG\MSF\Helpers\Context;
 use PG\MSF\Pools\Miner;
 use PG\MSF\Pools\MysqlAsynPool;
@@ -37,6 +38,11 @@ class MysqlProxyMasterSlave implements IProxy
      * @var Miner SQL Builder
      */
     private $dbQueryBuilder;
+
+    /**
+     * @var mixed 详情参见PG\AOP\Wrapper::handle()
+     */
+    public $__wrapper;
 
     /**
      * @var array 指令列表
