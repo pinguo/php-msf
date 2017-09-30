@@ -113,7 +113,7 @@ class Rpc extends Controller
     protected function runMethod()
     {
         $handlerClass    = '\\App\\Models\\Handlers\\' . $this->handler;
-        $handlerInstance = $this->getObject($handlerClass, ...$this->construct);
+        $handlerInstance = $this->getObject($handlerClass, $this->construct);
 
         if (!method_exists($handlerInstance, $this->method)) {
             throw new Exception('Rpc method not found.');
