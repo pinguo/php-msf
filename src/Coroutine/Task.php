@@ -224,6 +224,7 @@ class Task
             $this->routine = $this->stack->pop();
             try {
                 $this->routine->throw($e);
+                break;
             } catch (\Throwable $e) {
                 if ($this->stack->isEmpty()) {
                     $noCatchException = $e;
