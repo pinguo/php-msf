@@ -98,32 +98,37 @@ class Scheduler
         /* @var $task Task */
         $task->run();
 
-        do {
-            // 迭代器检查
-            if (!$task->getRoutine() instanceof \Generator) {
-                break;
-            }
+        try {
+            do {
+                // 迭代器检查
+                if (!$task->getRoutine() instanceof \Generator) {
+                    break;
+                }
 
-            // 协程异步IO
-            if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
-                break;
-            }
+                // 协程异步IO
+                if ($task->getRoutine()->valid() && ($task->getRoutine()->current() instanceof IBase)) {
+                    break;
+                }
 
-            // 继续调度
-            if (!$task->isFinished()) {
-                $this->schedule($task);
-                break;
-            }
+                // 继续调度
+                if (!$task->isFinished()) {
+                    $this->schedule($task);
+                    break;
+                }
 
-            // 请求调度结束（考虑是否回调）
-            $task->resetRoutine();
-            if (is_callable($task->getCallBack())) {
-                $func = $task->getCallBack();
-                $task->resetCallBack();
-                $func();
-                break;
-            }
-        } while (0);
+                // 请求调度结束（考虑是否回调）
+                $task->resetRoutine();
+                if (is_callable($task->getCallBack())) {
+                    $func = $task->getCallBack();
+                    $task->resetCallBack();
+                    $func();
+                    break;
+                }
+            } while (0);
+        } catch (\Throwable $e) {
+            $task->handleTaskException($e, null);
+            $this->schedule($task);
+        }
 
         return $this;
     }
