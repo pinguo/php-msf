@@ -219,6 +219,10 @@ class Task
      */
     public function handleTaskException(\Throwable $e, $value)
     {
+        if ($this->stack->isEmpty()) {
+            throw $e;
+        }
+
         $noCatchException = null;
         while (!$this->stack->isEmpty()) {
             $this->routine = $this->stack->pop();
