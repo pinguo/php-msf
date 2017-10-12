@@ -236,8 +236,8 @@ class Task
             }
         }
 
-        if ($this->stack->isEmpty() && $noCatchException !== null) {
-            throw $noCatchException;
+        if ($this->stack->isEmpty() && $noCatchException !== null && $this->controller) {
+            $this->controller->onExceptionHandle($noCatchException);
         }
 
         return true;
