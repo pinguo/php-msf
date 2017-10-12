@@ -231,6 +231,11 @@ abstract class HttpServer extends Server
                         $init,
                         $instance,
                         function () use ($instance, $methodName) {
+                            if ($instance->getContext()->getOutput()->__isEnd) {
+                                $instance->destroy();
+                                return false;
+                            }
+
                             $generator = $instance->$methodName(...array_values($this->route->getParams()));
                             if ($generator instanceof \Generator) {
                                 $this->scheduler->taskMap[$instance->context->getRequestId()]->resetRoutine($generator);
