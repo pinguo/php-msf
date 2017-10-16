@@ -290,7 +290,7 @@ abstract class MSFServer extends HttpServer
                     /**
                      * @var Task $task
                      */
-                    $task          = $objectPool->get($taskName, [$taskConstruct]);
+                    $task          = $objectPool->get($taskName, $taskConstruct);
 
                     // 运行方法
                     if (method_exists($task, $taskFucName)) {
