@@ -163,6 +163,12 @@ class Config extends ProcessBase
                     try {
                         $redis = new \Redis();
                         $redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                        if(isset($redisConfig[$pool]['password'])){
+                            $redis->auth($redisConfig[$pool]['password']);
+                        }
+                        if(isset($redisConfig[$pool]['select'])){
+                            $redis->select($redisConfig[$pool]['select']);
+                        }
                         if ($redis->set('msf_active_cluster_check_' . $host, 1, 3)) {
                             $goodPools[$pool] = $weight;
                         }
@@ -204,6 +210,12 @@ class Config extends ProcessBase
                     try {
                         $redis = new \Redis();
                         $redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                        if(isset($redisConfig[$pool]['password'])){
+                            $redis->auth($redisConfig[$pool]['password']);
+                        }
+                        if(isset($redisConfig[$pool]['select'])){
+                            $redis->select($redisConfig[$pool]['select']);
+                        }
                         if ($redis->set('msf_active_master_slave_check_' . $host, 1, 3)) {
                             $master = $pool;
                         }
@@ -247,6 +259,12 @@ class Config extends ProcessBase
                     try {
                         $redis = new \Redis();
                         $redis->connect($redisConfig[$pool]['ip'], $redisConfig[$pool]['port'], 1.5);
+                        if(isset($redisConfig[$pool]['password'])){
+                            $redis->auth($redisConfig[$pool]['password']);
+                        }
+                        if(isset($redisConfig[$pool]['select'])){
+                            $redis->select($redisConfig[$pool]['select']);
+                        }
                         if ($redis->get('msf_active_master_slave_check_' . $host) == 1) {
                             $slaves[] = $pool;
                         }
