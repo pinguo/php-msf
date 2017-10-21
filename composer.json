@@ -10,7 +10,7 @@
     "pinguo/php-log": "1.0.0",
     "pinguo/php-context": "1.0.0",
     "pinguo/php-aop": "1.0.0",
-    "pinguo/plates": "3.3.1",
+    "league/plates": "3.3.0",
     "hassankhan/config": "~0.10",
     "flexihash/flexihash": "^2.0.0"
   },

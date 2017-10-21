@@ -260,23 +260,23 @@ class Output extends Core
                 str_replace($this->getConfig()->get('http.method_prefix', 'action'), '', $this->getContext()->getActionName());
         }
 
-        try {
-            $viewFile = ROOT_PATH . '/app/Views/' . $view;
-            $template = getInstance()->templateEngine->make($viewFile);
-            $response = $template->render($data);
-        } catch (\Throwable $e) {
-            $template = null;
-            $viewFile = getInstance()->MSFSrcDir . '/Views/' . $view;
+        $responseBody = null;
+        $found = false;
+        foreach (getInstance()->viewResolvePaths as $basePath) {
             try {
-                $template = getInstance()->templateEngine->make($viewFile);
-                $response = $template->render($data);
+                $template = getInstance()->templateEngine->setDirectory($basePath)->make($view);
+                $responseBody = $template->render($data);
+                $found = true;
+                $template = null;
+                break;
             } catch (\Throwable $e) {
-                throw new Exception('app view and server view both not exist, please check again');
+                // pass.
             }
         }
-
-        $template = null;
-        $this->end($response);
+        if (!$found) {
+            throw new Exception(sprintf('A template named %s was not found in any folder, please check again', $view));
+        }
+        $this->end($responseBody);
     }
 
     /**
