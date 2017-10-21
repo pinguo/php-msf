@@ -556,6 +556,10 @@ abstract class MSFServer extends HttpServer
             'dns_cache_http' => [
                 // domain => [ip, time(), times]
             ],
+            // keep alive Cache
+            'keep_alive_cache' => [
+                // domain|ip|port => 10
+            ],
             // exit
             'exit' => 0,
         ];
@@ -582,6 +586,10 @@ abstract class MSFServer extends HttpServer
                 }
                 $data['object_pool'][get_class($task->getController())]++;
             }
+        }
+
+        foreach (\PG\MSF\Client\Http\Client::$keepAliveCache as $k => $items) {
+            $data['keep_alive_cache'][$k] = count($items);
         }
 
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;

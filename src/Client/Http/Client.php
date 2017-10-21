@@ -35,6 +35,21 @@ class Client extends Core
     public static $dnsCache = [];
 
     /**
+     * @var int keep-alive有效时间(秒)
+     */
+    protected static $keepAliveExpire = 120;
+
+    /**
+     * @var int keep-alive有效次数
+     */
+    protected static $keepAliveTimes = 10000;
+
+    /**
+     * @var array http keep-alive cache HTTP Client长连接缓存
+     */
+    public static $keepAliveCache = [];
+
+    /**
      * @var array 请求报头
      */
     public $headers;
@@ -76,8 +91,10 @@ class Client extends Core
             $this->dnsTimeout = $timeout;
         }
 
-        self::$dnsExpire = $this->getConfig()->get('http.dns.expire', 60);
-        self::$dnsTimes  = $this->getConfig()->get('http.dns.times', 10000);
+        self::$dnsExpire       = $this->getConfig()->get('http.dns.expire', 60);
+        self::$dnsTimes        = $this->getConfig()->get('http.dns.times', 10000);
+        self::$keepAliveExpire = $this->getConfig()->get('http.keepAlive.expire', 120);
+        self::$keepAliveTimes  = $this->getConfig()->get('http.keepAlive.times', 10000);
 
         return $this;
     }
@@ -188,9 +205,27 @@ class Client extends Core
         if ($ip !== null) {
             // swoole_http_client手工析构有Segmentation fault，暂时直接new
             //$client     = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
-            $client     = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
-            $client->set(['timeout' => -1]);
-            $this->client = $client;
+            if (self::$keepAliveExpire) {
+                $k = $this->urlData['host'] . '|' . $ip . '|' . $this->urlData['port'];
+                if (isset(self::$keepAliveCache[$k]) && count(self::$keepAliveCache[$k]) > 0) { //队列有cache
+                    $this->client = array_shift(self::$keepAliveCache[$k]);
+                    $this->client->useCount++;
+                } else { //队列无cache
+                    if (!isset(self::$keepAliveCache[$k])) {
+                        self::$keepAliveCache[$k] = [];
+                    }
+                    $this->client = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
+                    $this->client->set(['timeout' => -1, 'keep_alive' => 1]);
+                    $this->client->useCount = 1;
+                    $this->client->genTime  = time();
+                    $this->client->isClose  = false;
+                }
+            } else {
+                $this->client = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
+                $this->client->set(['timeout' => -1]);
+            }
+            $this->client->ioBack = false;
+
             $headers = array_merge($headers, [
                 'Host'        => $this->urlData['host'],
                 'X-Ngx-LogId' => $this->getContext()->getLogId(),
@@ -486,8 +521,27 @@ class Client extends Core
 
         // swoole_http_client手工析构有Segmentation fault，暂时直接new
         //$this->client = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
-        $this->client = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
-        $this->client->set(['timeout' => -1]);
+        if (self::$keepAliveExpire) {
+            $k = $this->urlData['host'] . '|' . $ip . '|' . $this->urlData['port'];
+            if (isset(self::$keepAliveCache[$k]) && count(self::$keepAliveCache[$k]) > 0) { //队列有cache
+                $this->client = array_shift(self::$keepAliveCache[$k]);
+                $this->client->useCount++;
+            } else { //队列无cache
+                if (!isset(self::$keepAliveCache[$k])) {
+                    self::$keepAliveCache[$k] = [];
+                }
+                $this->client = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
+                $this->client->set(['timeout' => -1, 'keep_alive' => 1]);
+                $this->client->useCount = 1;
+                $this->client->genTime  = time();
+                $this->client->isClose  = false;
+            }
+        } else {
+            $this->client = new \swoole_http_client($ip, $this->urlData['port'], $this->urlData['ssl']);
+            $this->client->set(['timeout' => -1]);
+        }
+        $this->client->ioBack = false;
+
         $headers = array_merge($this->urlData['headers'], [
             'Host' => $this->urlData['host'],
             'X-Ngx-LogId' => $this->context->getLogId(),
@@ -634,7 +688,18 @@ class Client extends Core
     {
         parent::destroy();
         if ($this->client instanceof \swoole_http_client) {
-            $this->client->close();
+            if ($this->client->ioBack  == true &&
+                $this->client->isClose == false &&
+                (time() - $this->client->genTime) < self::$keepAliveExpire &&
+                $this->client->useCount < self::$keepAliveTimes
+            ) {
+                //回收长连接
+                $k = $this->client->requestHeaders['Host'] . '|' . $this->client->host . '|' . $this->client->port;
+                array_push(self::$keepAliveCache[$k], $this->client);
+            } else {
+                //关闭连接
+                $this->client->close();
+            }
         }
     }
 }

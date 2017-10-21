@@ -69,16 +69,19 @@ class Http extends Base
                 return;
             }
 
-            $this->result       = (array)$client;
+            $this->result = (array)$client;
             // 发现拒绝建立连接，删除DNS缓存
             if (is_object($client) && ($client->errCode == 111 || $client->statusCode == 404)) {
                 Client::clearDnsCache($this->client->urlData['host']);
+                $client->isClose = true;
             }
 
             if (is_object($client) && $client->errCode != 0) {
                 $this->getContext()->getLog()->warning(dump($client, false, true));
+                $client->isClose = true;
             }
 
+            $client->ioBack     = true;
             $this->responseTime = microtime(true);
             $this->getContext()->getLog()->profileEnd($profileName);
             $this->ioBack = true;
