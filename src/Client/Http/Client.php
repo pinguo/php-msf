@@ -341,13 +341,13 @@ class Client extends Core
      * 单个独立GET请求协程（自动完成DNS查询、获取数据）
      *
      * @param string $url 请求的URL
-     * @param array $query POST的数据
+     * @param array $query GET的数据
      * @param int $timeout 请求超时时间
      * @param array $headers 额外的报头
      * @return Http
      * @throws Exception
      */
-    public function goSingleGet($url = '', $query = null, $timeout = 30000, $headers = [])
+    public function goSingleGet($url = '', $query = [], $timeout = 30000, $headers = [])
     {
         if (empty($this->urlData)) {
             $this->urlData = self::parseUrl($url);
@@ -359,6 +359,12 @@ class Client extends Core
 
         yield $this->goDnsLookup();
         $this->setHeaders($headers);
+
+        //支持直接在url之后带参数形式的GET请求
+        if (!empty($this->urlData['query'])) {
+            parse_str(trim($this->urlData['query'], '?'), $data);
+            $query = array_merge($data, $query);
+        }
 
         return yield $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
     }
