@@ -126,7 +126,7 @@ class Scheduler
                 }
             } while (0);
         } catch (\Throwable $e) {
-            $task->setException($e);
+            $task->handleTaskException($e, null);
             $this->schedule($task);
         }
 

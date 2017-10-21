@@ -47,11 +47,6 @@ class Task
     protected $id;
 
     /**
-     * @var \Throwable 迭代过程中的异常
-     */
-    protected $exception;
-
-    /**
      * @var callable|null 迭代完成时执行回调函数
      */
     protected $callBack;
@@ -119,16 +114,6 @@ class Task
     }
 
     /**
-     * 设置调度时产生的异常
-     *
-     * @param \Throwable $exception 异常实例
-     */
-    public function setException(\Throwable $exception)
-    {
-        $this->exception = $exception;
-    }
-
-    /**
      * 请求的协程调度
      *
      * TODO: method too long to understand.
@@ -138,10 +123,6 @@ class Task
         try {
             if (!$this->routine) {
                 return;
-            }
-
-            if ($this->exception) {
-                throw $this->exception;
             }
 
             $value = $this->routine->current();
@@ -199,20 +180,11 @@ class Task
                 }
             }
         } catch (\Throwable $e) {
-            $this->exception = null;
             if (empty($value)) {
                 $value = '';
             }
-            $runTaskException = $this->handleTaskException($e, $value);
 
-            if ($runTaskException instanceof \Throwable) {
-                if ($this->controller) {
-                    $this->controller->onExceptionHandle($runTaskException);
-                } else {
-                    $this->routine->throw($runTaskException);
-                }
-            }
-
+            $this->handleTaskException($e, $value);
             unset($value);
         }
     }
@@ -245,20 +217,29 @@ class Task
      * @param \Throwable $e 异常实例
      * @param mixed $value 当前迭代的值
      * @return bool|Exception|\Throwable
+     * @throws \Throwable
      */
     public function handleTaskException(\Throwable $e, $value)
     {
-        while (!empty($this->stack) && !$this->stack->isEmpty()) {
+        if ($this->stack->isEmpty()) {
+            throw $e;
+        }
+
+        $noCatchException = null;
+        while (!$this->stack->isEmpty()) {
             $this->routine = $this->stack->pop();
             try {
                 $this->routine->throw($e);
                 break;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                if ($this->stack->isEmpty()) {
+                    $noCatchException = $e;
+                }
             }
         }
 
-        if (!empty($this->stack) && $this->stack->isEmpty()) {
-            return $e;
+        if ($this->stack->isEmpty() && $noCatchException !== null && $this->controller) {
+            $this->controller->onExceptionHandle($noCatchException);
         }
 
         return true;

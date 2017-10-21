@@ -192,7 +192,7 @@ class CoroutineRedisProxy implements IPoolCoroutine
             case 'smove':
             case 'rpoplpush':
             case 'brpoplpush':
-                $arguments[2] = $this->generateUniqueKey(2);
+                $arguments[2] = $this->generateUniqueKey($arguments[2]);
                 break;
         }
         // key end

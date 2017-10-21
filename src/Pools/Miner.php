@@ -1839,7 +1839,7 @@ class Miner
         }
 
         if ($includeText && ($statement || $this->isDeleteTableFrom())) {
-            $statement = "DELETE " . $statement;
+            $statement = "DELETE FROM " . $statement;
 
             // Trim in case the table is specified in FROM.
             $statement = trim($statement);

@@ -160,7 +160,7 @@ class AOPFactory extends Factory
                 if (!empty(MI::$__reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
                     $arguments[0]->resetProperties();
                 } else {
-                    if (!empty(MI::$__reflections[$class])) {
+                    if (!empty(MI::$__reflections[$class]) && !empty(MI::$__reflections[$class][Marco::DS_PUBLIC])) {
                         foreach (MI::$__reflections[$class][Marco::DS_PUBLIC] as $prop => $val) {
                             $arguments[0]->{$prop} = $val;
                         }
