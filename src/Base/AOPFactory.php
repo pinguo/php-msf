@@ -67,28 +67,6 @@ class AOPFactory extends Factory
     }
 
     /**
-     * 获取数据库Mysql/Redis池的协程.
-     *
-     * @param IPoolCoroutine $coroutine
-     * @param Core           $coreBase
-     *
-     * @return Wrapper
-     */
-    protected static function getDBPoolCoroutine(IPoolCoroutine $coroutine, $coreBase)
-    {
-        $coroutineWrapper = new Wrapper($coroutine);
-        $coroutineWrapper->registerOnBefore(function($method, $arguments) use ($coreBase) {
-            $context = $coreBase->getContext();
-            array_unshift($arguments, $context);
-            return [
-                'method' => $method,
-                'arguments' => $arguments,
-            ];
-        });
-        return $coroutineWrapper;
-    }
-
-    /**
      * 获取协程redis
      *
      * @param CoroutineRedisProxy $redisPoolCoroutine Redis协程辅助类实例
@@ -98,7 +76,17 @@ class AOPFactory extends Factory
      */
     public static function getRedisPoolCoroutine(CoroutineRedisProxy $redisPoolCoroutine, $coreBase)
     {
-        return static::getDBPoolCoroutine($redisPoolCoroutine, $coreBase);
+        $aopRedisPoolCoroutine = new Wrapper($redisPoolCoroutine);
+        $aopRedisPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
+            $context = $coreBase->getContext();
+            array_unshift($arguments, $context);
+            $data = [
+                'method' => $method,
+                'arguments' => $arguments,
+            ];
+            return $data;
+        });
+        return $aopRedisPoolCoroutine;
     }
 
     /**
@@ -111,7 +99,17 @@ class AOPFactory extends Factory
      */
     public static function getMysqlPoolCoroutine(MysqlAsynPool $mysqlPoolCoroutine, $coreBase)
     {
-        return static::getDBPoolCoroutine($mysqlPoolCoroutine, $coreBase);
+        $aopMysqlPoolCoroutine = new Wrapper($mysqlPoolCoroutine);
+        $aopMysqlPoolCoroutine->registerOnBefore(function ($method, $arguments) use ($coreBase) {
+            $context = $coreBase->getContext();
+            $arguments[] = $context;
+            $data = [
+                'method' => $method,
+                'arguments' => $arguments,
+            ];
+            return $data;
+        });
+        return $aopMysqlPoolCoroutine;
     }
 
     /**

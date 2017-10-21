@@ -115,8 +115,6 @@ class Task
 
     /**
      * 请求的协程调度
-     *
-     * TODO: method too long to understand.
      */
     public function run()
     {

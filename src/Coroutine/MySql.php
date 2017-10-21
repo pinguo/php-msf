@@ -22,7 +22,7 @@ class MySql extends Base
     public $mysqlAsynPool;
 
     /**
-     * @var mixed 绑定ID
+     * @var string|null 绑定ID
      */
     public $bindId;
 
