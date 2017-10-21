@@ -701,8 +701,8 @@ class Client extends Core
     {
         parent::destroy();
         if ($this->client instanceof \swoole_http_client) {
-            if ($this->client->ioBack  == true &&
-                $this->client->isClose == false &&
+            if ($this->client->ioBack  == true && $this->client->isClose == false &&
+                isset($this->client->headers['connection']) && $this->client->headers['connection'] == 'Keep-Alive' &&
                 (time() - $this->client->genTime) < self::$keepAliveExpire &&
                 $this->client->useCount < self::$keepAliveTimes
             ) {
