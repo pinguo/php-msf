@@ -10,7 +10,6 @@
 namespace PG\MSF\Pools;
 
 use Noodlehaus\Config;
-use PG\MSF\Coroutine\IPoolCoroutine;
 use PG\MSF\Coroutine\Mysql;
 use PG\AOP\MI;
 use PG\MSF\Helpers\Context;
@@ -19,7 +18,7 @@ use PG\MSF\Helpers\Context;
  * Class MysqlAsynPool
  * @package PG\MSF\Pools
  */
-class MysqlAsynPool extends AsynPool implements IPoolCoroutine
+class MysqlAsynPool extends AsynPool
 {
     // use property and method insert
     use MI;

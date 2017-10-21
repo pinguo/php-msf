@@ -10,7 +10,6 @@
 
 namespace PG\MSF\Base;
 
-use PG\MSF\Coroutine\IPoolCoroutine;
 use PG\MSF\Marco;
 use PG\AOP\MI;
 use PG\AOP\Factory;
