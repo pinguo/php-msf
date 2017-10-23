@@ -689,6 +689,8 @@ class Client extends Core
                         $client->useCount++;
                         $isCreate = false;
                         break;
+                    } else {
+                        $client = null;
                     }
                 }
             } else {
