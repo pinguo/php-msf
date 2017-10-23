@@ -328,6 +328,39 @@ class Miner
     }
 
     /**
+     * Quotes a column name for use in a query.
+     *
+     * @param string $column The column name.
+     *
+     * @return string
+     */
+    public function columnQuote($column)
+    {
+        if (empty($column)) {
+            return null;
+        }
+        preg_match('/^(?:(?<table>\w+)\.)?(?<column>\w+)$/iu', $column, $match);
+        if (isset($match['table'], $match['column'])) {
+            $table = $this->tableQuote($match['table']);
+            $column = "`{$match['column']}`";
+            return $table ? $table . '.' . $column : $column;
+        }
+        return $column;
+    }
+
+    /**
+     * Quotes the table name for use in a query.
+     *
+     * @param string $table
+     *
+     * @return string
+     */
+    public function tableQuote($table)
+    {
+        return $table ? "`{$table}`" : $table;
+    }
+
+    /**
      * Add an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.
      *
      * @param  string $option execution option to add
@@ -377,7 +410,7 @@ class Miner
             }
         } else {
             $this->set[] = array(
-                'column' => $column,
+                'column' => $this->columnQuote($column),
                 'value' => $value,
                 'quote' => $quote
             );
@@ -436,6 +469,7 @@ class Miner
      */
     public function join($table, $criteria = null, $type = self::INNER_JOIN, $alias = null)
     {
+        $table = $this->tableQuote($table);
         if (!$this->isJoinUnique($table, $alias)) {
             return $this;
         }
@@ -532,7 +566,7 @@ class Miner
         $quote = null
     ) {
         $criteria[] = array(
-            'column' => $column,
+            'column' => $this->columnQuote($column),
             'value' => $value,
             'operator' => $operator,
             'connector' => $connector,
@@ -1124,6 +1158,7 @@ class Miner
         $joinCriteria = "";
         $previousJoinIndex = $joinIndex - 1;
 
+        $column = $this->columnQuote($column);
         // If the previous table is from a JOIN, use that. Otherwise, use the
         // FROM table.
         if (array_key_exists($previousJoinIndex, $this->join)) {
@@ -1280,7 +1315,7 @@ class Miner
                         break;
                 }
 
-                $statement .= $criterion['column'] . " " . $criterion['operator'] . " " . $value;
+                $statement .= $this->columnQuote($criterion['column']) . " " . $criterion['operator'] . " " . $value;
             }
         }
 
@@ -2000,7 +2035,7 @@ class Miner
      */
     public function select($column, $alias = null)
     {
-        $this->select[$column] = $alias;
+        $this->select[$this->columnQuote($column)] = $this->columnQuote($alias);
 
         return $this;
     }
@@ -2029,8 +2064,8 @@ class Miner
      */
     public function from($table, $alias = null)
     {
-        $this->from['table'] = $table;
-        $this->from['alias'] = $alias;
+        $this->from['table'] = $this->tableQuote($table);
+        $this->from['alias'] = $this->tableQuote($alias);
 
         return $this;
     }
@@ -2274,7 +2309,7 @@ class Miner
     public function orderBy($column, $order = self::ORDER_BY_ASC)
     {
         $this->orderBy[] = array(
-            'column' => $column,
+            'column' => $this->columnQuote($column),
             'order' => $order
         );
 
