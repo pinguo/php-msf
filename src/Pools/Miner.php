@@ -290,11 +290,6 @@ class Miner
     private $intoValues;
 
     /**
-     * @var bool 是否启用debug模式,启用之后会在getStatement中输出创建好的SQL.
-     */
-    private $debugMode = false;
-
-    /**
      * Miner constructor.
      * @param $mysqlPool
      */
@@ -421,16 +416,6 @@ class Miner
             );
         }
 
-        return $this;
-    }
-
-    /**
-     * @param bool $debug 是否启用调试.
-     *
-     * @return $this
-     */
-    public function setDebug($debug = false) {
-        $this->debugMode = $debug;
         return $this;
     }
 
@@ -949,9 +934,6 @@ class Miner
             $statement = $this->getUpdateStatement($usePlaceholders);
         } elseif ($this->isDelete()) {
             $statement = $this->getDeleteStatement($usePlaceholders);
-        }
-        if ($this->debugMode) {
-            echo $statement . PHP_EOL;
         }
         return $statement;
     }
