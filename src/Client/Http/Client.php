@@ -318,7 +318,7 @@ class Client extends Core
         if (!empty($this->urlData['query'])) {
             return yield $this->getObject(
                 Http::class,
-                [$this, 'POST', $this->urlData['path'] . '?' . $this->urlData['query'], $data, $timeout]
+                [$this, 'POST', $this->urlData['path'] . $this->urlData['query'], $data, $timeout]
             );
         } else {
             return yield $this->getObject(
