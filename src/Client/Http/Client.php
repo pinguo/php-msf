@@ -217,6 +217,7 @@ class Client extends Core
             $headers = array_merge($headers, [
                 'Host'        => $this->urlData['host'],
                 'X-Ngx-LogId' => $this->getContext()->getLogId(),
+                'Accept-Encoding' => 'gzip,deflate'
             ]);
             $this->setHeaders($headers);
             return $this;
@@ -530,6 +531,7 @@ class Client extends Core
         $headers = array_merge($this->urlData['headers'], [
             'Host' => $this->urlData['host'],
             'X-Ngx-LogId' => $this->context->getLogId(),
+            'Accept-Encoding' => 'gzip,deflate'
         ]);
 
         $this->setHeaders($headers);

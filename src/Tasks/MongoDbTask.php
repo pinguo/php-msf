@@ -15,8 +15,6 @@ namespace PG\MSF\Tasks;
 class MongoDbTask extends Task
 {
     /**
-     *
-     *
      * @var array 当前要使用的MongoDB配置, [配置名，db名，collection名]
      */
     protected $mongoConf = [];
