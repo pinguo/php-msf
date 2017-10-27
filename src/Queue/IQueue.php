@@ -14,15 +14,15 @@ interface IQueue
     /**
      * 入队
      * @param string $queue
-     * @param $data
+     * @param string $data
      * @return mixed
      */
-    public function set(string $queue, $data);
+    public function set(string $data, string $queue = 'default');
 
     /**
      * 出队
      * @param string $queue
      * @return mixed
      */
-    public function get(string $queue);
+    public function get(string $queue = 'default');
 }

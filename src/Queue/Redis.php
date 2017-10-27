@@ -28,10 +28,10 @@ class Redis extends Core implements IQueue
     /**
      * 入队
      * @param string $queue 队列名称
-     * @param $data
+     * @param string $data
      * @return int
      */
-    public function set(string $queue, $data)
+    public function set(string $data, string $queue = 'default')
     {
         return $this->redis->rPush($queue, $data);
     }
@@ -41,7 +41,7 @@ class Redis extends Core implements IQueue
      * @param string $queue 队列名称
      * @return string
      */
-    public function get(string $queue)
+    public function get(string $queue = 'default')
     {
         return $this->redis->lPop($queue);
     }
@@ -51,7 +51,7 @@ class Redis extends Core implements IQueue
      * @param string $queue
      * @return int
      */
-    public function len(string $queue)
+    public function len(string $queue = 'default')
     {
         return $this->redis->lLen($queue);
     }
