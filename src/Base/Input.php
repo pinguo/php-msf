@@ -124,6 +124,9 @@ class Input extends Core
      */
     public function getAllPostGet()
     {
+        if (isset($this->request->post, $this->request->get)) {
+            return array_merge($this->request->get, $this->request->post);
+        }
         return $this->request->post ?? $this->request->get ?? [];
     }
 
