@@ -11,7 +11,7 @@ namespace PG\MSF\Tasks;
 class AMQPTask extends Task
 {
     /**
-     * @var array 当前要使用的amqp配置, [配置名, exchange名, routing_key名]
+     * @var array 当前要使用的amqp配置, [配置名, routing_key名]
      */
     protected $amqpConf = [];
     /**
@@ -46,7 +46,7 @@ class AMQPTask extends Task
         }
 
         if (!is_object($this->amqpConnection) || !$this->amqpConnection->isConnected()) {
-            $this->prepare($this->amqpConf[0], $this->amqpConf[1] ?? 'default', $this->amqpConf[2] ?? 'default');
+            $this->prepare($this->amqpConf[0], $this->amqpConf[1] ?? 'default');
         }
 
         parent::__construct();
@@ -55,13 +55,11 @@ class AMQPTask extends Task
     /**
      * 长连接
      * @param string $confKey
-     * @param string $exchange
      * @param string $routing_key
      * @throws \AMQPException
      */
-    public function prepare(string $confKey, string $exchange, string $routing_key)
+    public function prepare(string $confKey, string $routing_key)
     {
-        $this->profileName = 'amqp.' . $exchange . '.';
         $this->config = getInstance()->config['amqp'] ?? [];
         if (!isset($this->config[$confKey])) {
             throw new \AMQPException('No such a amqpMQ config ' . $confKey);
@@ -93,10 +91,6 @@ class AMQPTask extends Task
 
         //AMQP Exchange is the publishing mechanism
         $this->amqpExchange = new \AMQPExchange($this->amqpChannel);
-        //Declare Exchange
-//        $this->amqpExchange->setType(AMQP_EX_TYPE_DIRECT);
-//        $this->amqpExchange->setName($exchange);
-//        $this->amqpExchange->declareExchange();
 
         //Declare Queue
         $this->amqpQueue = new \AMQPQueue($this->amqpChannel);
@@ -141,6 +135,30 @@ class AMQPTask extends Task
             $this->amqpQueue->consume($callback, AMQP_AUTOACK);
         } else {
             $this->amqpQueue->consume($callback);
+        }
+    }
+
+    /**
+     * 告知MQ如何处理消息
+     * 在消费未开启 autoAck 时，需要调用此方法。
+     * @param $delivery_tag
+     * @param int $type 1表示消费成功可以删除消息 2表示消费失败，重新放回队列  3表示消费失败，放弃处理
+     * @return bool
+     * @throws \AMQPQueueException
+     */
+    public function acknowledge($delivery_tag, $type = 1)
+    {
+        if ($type == 1) {
+            //确认消息
+            return $this->amqpQueue->ack($delivery_tag);
+        } elseif ($type == 2) {
+            //恢复消息
+            return $this->amqpQueue->nack($delivery_tag);
+        } elseif ($type == 3) {
+            //确认取消
+            return $this->amqpQueue->reject($delivery_tag);
+        } else {
+            throw new \AMQPQueueException('Undefined Acknowledge type');
         }
     }
 }
