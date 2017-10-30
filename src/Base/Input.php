@@ -118,12 +118,15 @@ class Input extends Core
     }
 
     /**
-     * 先获取所有的POST参数，如果POST为空则获取所有的Get参数
+     * 获取所有的POST参数和Get参数
      *
      * @return array
      */
     public function getAllPostGet()
     {
+        if (isset($this->request->post, $this->request->get)) {
+            return array_merge($this->request->get, $this->request->post);
+        }
         return $this->request->post ?? $this->request->get ?? [];
     }
 

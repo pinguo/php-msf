@@ -262,16 +262,17 @@ class Output extends Core
 
         $responseBody = null;
         $found = false;
-        foreach (getInstance()->viewResolvePaths as $basePath) {
-            try {
-                $template = getInstance()->templateEngine->setDirectory($basePath)->make($view);
-                $responseBody = $template->render($data);
-                $found = true;
-                $template = null;
-                break;
-            } catch (\Throwable $e) {
-                // pass.
+        $engine = getInstance()->templateEngine;
+        $viewResolvePaths = getInstance()->viewResolvePaths;
+
+        foreach ($viewResolvePaths as $basePath) {
+            $template = $engine->setDirectory($basePath)->make($view);
+            if (!$template->exists()) {
+                continue;
             }
+            $responseBody = $template->render($data);
+            $found = true;
+            break;
         }
         if (!$found) {
             throw new Exception(sprintf('A template named %s was not found in any folder, please check again', $view));
