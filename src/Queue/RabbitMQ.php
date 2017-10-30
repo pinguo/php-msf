@@ -16,7 +16,7 @@ class RabbitMQ extends Core implements IQueue
     /** @var mixed|AMQPTask|\stdClass */
     public $rabbit;
 
-    public function __construct($configKey, $routing_key = 'default')
+    public function __construct(string $configKey, $routing_key = 'default')
     {
         $this->rabbit = $this->getObject(AMQPTask::class, [$configKey, $routing_key]);
     }
