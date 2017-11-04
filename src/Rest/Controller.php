@@ -121,10 +121,6 @@ class Controller extends \PG\MSF\Controllers\Controller
      */
     public function outputJson($data = null, $message = '', $status = 200)
     {
-        // set status in header
-        if (!isset(Output::$codes[$status])) {
-            throw new \Exception('Http code invalid', 500);
-        }
         // 错误信息返回格式可参考：[https://developer.github.com/v3/]
         if ($status != 200 && $message !== '') {
             $data = [
