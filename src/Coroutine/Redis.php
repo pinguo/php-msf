@@ -72,13 +72,17 @@ class Redis extends Base
         $this->arguments      = $arguments;
         $this->request        = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) .  '#' . $this->redisAsynPool->getAsynName()  . '.' . $name;
         $this->requestId      = $this->getContext()->getRequestId();
+        $requestId            = $this->requestId;
 
         $this->getContext()->getLog()->profileStart($this->request);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $keys            = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function ($result) use ($name) {
+        $this->send(function ($result) use ($name, $requestId) {
+            if (empty($this->getContext()) || ($requestId != $this->getContext()->getRequestId())) {
+                return;
+            }
             if ($this->isBreak) {
                 return;
             }

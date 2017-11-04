@@ -54,13 +54,18 @@ class Http extends Base
         $this->data       = $data;
         $profileName      = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#api-http://' . $this->client->urlData['host'] . ':' . $this->client->urlData['port'] . $this->path;
         $this->requestId  = $this->getContext()->getRequestId();
+        $requestId        = $this->requestId;
 
         $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $keys = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function ($client) use ($profileName) {
+        $this->send(function ($client) use ($profileName, $requestId) {
+            if (empty($this->getContext()) || ($requestId != $this->getContext()->getRequestId())) {
+                return;
+            }
+
             if ($this->isBreak) {
                 return;
             }
