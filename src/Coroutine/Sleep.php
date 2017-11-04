@@ -24,13 +24,18 @@ class Sleep extends Base
     {
         $this->__sleepTime = $mSec;
         $this->requestId   = $this->getContext()->getRequestId();
+        $requestId         = $this->requestId;
         $this->setTimeout($mSec + 1000); //协程超时时间要比睡眠时间更长
 
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $keys = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function () {
+        $this->send(function () use ($requestId) {
+            if (empty($this->getContext()) || ($requestId != $this->getContext()->getRequestId())) {
+                return;
+            }
+
             if (empty(getInstance()->scheduler->taskMap[$this->requestId])) {
                 return;
             }
@@ -39,6 +44,7 @@ class Sleep extends Base
             $this->ioBack = true;
             $this->nextRun();
         });
+
         return $this;
     }
 

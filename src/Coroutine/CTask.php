@@ -40,13 +40,18 @@ class CTask extends Base
         $this->id            = $id;
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];
         $this->requestId     = $this->getContext()->getRequestId();
+        $requestId           = $this->requestId;
 
         $this->getContext()->getLog()->profileStart($profileName);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $keys = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function ($serv, $taskId, $data) use ($profileName) {
+        $this->send(function ($serv, $taskId, $data) use ($profileName, $requestId) {
+            if (empty($this->getContext()) || ($requestId != $this->getContext()->getRequestId())) {
+                return;
+            }
+
             if ($this->isBreak) {
                 return;
             }
