@@ -220,7 +220,17 @@ class Task
     public function handleTaskException(\Throwable $e, $value)
     {
         if ($this->stack->isEmpty()) {
-            throw $e;
+            try {
+                throw $e;
+            } catch (\Throwable $noCatch) {
+                if ($this->controller) {
+                    $this->controller->onExceptionHandle($noCatch);
+                } else {
+                    throw $noCatch;
+                }
+            }
+
+            return true;
         }
 
         $noCatchException = null;
