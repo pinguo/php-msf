@@ -46,13 +46,18 @@ class MySql extends Base
         $this->sql           = $_sql;
         $this->request       = $this->mysqlAsynPool->getAsynName() . '(' . str_replace("\n", " ", $_sql) . ')';
         $this->requestId     = $this->getContext()->getRequestId();
+        $requestId           = $this->requestId;
 
         $this->getContext()->getLog()->profileStart($this->request);
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $keys            = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function ($result) {
+        $this->send(function ($result) use ($requestId) {
+            if (empty($this->getContext()) || ($requestId != $this->getContext()->getRequestId())) {
+                return;
+            }
+
             if ($this->isBreak) {
                 return;
             }

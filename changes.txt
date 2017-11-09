@@ -1,3 +1,21 @@
+3.0.4 ==================================================================================================================
+3cb4d61 - niulingyun           + 增加队列支持，目前支持redis、rabbitMQ、kafka
+32fc570 - niulingyun           + http client 支持keep-alive缓存
+7a37e9d - niulingyun           + http client 支持gzip
+b6bcbfd - shellvon             + 增加对MySQL字段和表名的转义
+009477c - xudianyang           * 路由路径问题修复
+10024c7 - xudianyang           * 修复打印数组的bug，同时去掉只打印100个元素的限制
+2e02052 - niulingyun           * 调整获取ip的顺序,修复负载器后获取ip的bug
+095b746 - shellvon             * 模版渲染引擎调整为使用官方
+1b50d2f - niulingyun           * 修复RPC重复unpack参数bug
+1575443 - xudianyang           * 优化协程异常捕获逻辑
+5e9ac71 - niulingyun           * 修复两处redis的bug
+bf743cc - niulingyun           * 修复 task 构造函数传参问题和mysql删除操作的bug
+f5d3068 - zhangguangjia        * checkRedisProxy新增redis密码授权
+d93e727 - xudianyang           * 修复Post传递Query参数的问题
+43dffd1 - niulingyun           * 支持直接在url之后带参数形式的GET请求
+7bc5bbb - zhanglu              * 修改input:getAllPostGet返回get+post的参数
+
 3.0.3 ==================================================================================================================
 9a31436 - xudianyang           * 调整processType标识
 4b7df57 - niulingyun           * 异步redis set过期时间增加EX标识

@@ -41,13 +41,18 @@ class Dns extends Base
         $this->headers   = $headers;
         $profileName     = mt_rand(1, 9) . mt_rand(1, 9) . mt_rand(1, 9) . '#dns-' . $this->client->urlData['host'];
         $this->requestId = $this->getContext()->getRequestId();
+        $requestId       = $this->requestId;
 
         getInstance()->scheduler->IOCallBack[$this->requestId][] = $this;
         $this->getContext()->getLog()->profileStart($profileName);
         $keys = array_keys(getInstance()->scheduler->IOCallBack[$this->requestId]);
         $this->ioBackKey = array_pop($keys);
 
-        $this->send(function (Client $client) use ($profileName) {
+        $this->send(function (Client $client) use ($profileName, $requestId) {
+            if (empty($this->getContext()) || ($requestId != $this->getContext()->getRequestId())) {
+                return;
+            }
+
             if ($this->isBreak) {
                 return;
             }
