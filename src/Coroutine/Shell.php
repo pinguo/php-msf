@@ -51,13 +51,16 @@ class Shell extends Base
     }
 
     /**
-     * 异步执行shell，并执行回调
-     * @param callable $callback 回调函数
+     * 通过定时器来模拟异步IO
+     * @param callable $callback 定时器回调函数
      * @return $this
+     * @throws Exception
      */
     public function send($callback)
     {
-        //在此处Swoole不会提供函数方式调用
+        if (version_compare(SWOOLE_VERSION, '1.9.22', '<')) {
+            throw new Exception('Swoole version must >= 1.9.22');
+        }
         \Swoole\Async::exec($this->__command, $callback);
         return $this;
     }
