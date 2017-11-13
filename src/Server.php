@@ -30,7 +30,7 @@ abstract class Server extends Child
     /**
      * 版本
      */
-    const version = "3.0.4";
+    const version = "3.0.5";
 
     /**
      * 运行方式（web/console）
