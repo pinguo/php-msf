@@ -4,6 +4,7 @@
  * 异步执行Shell命令。相当于shell_exec函数，执行后底层会fork一个子进程，并执行对应的command命令
  * 在Swoole1.9.22或更高版本可用
  * fork创建子进程的操作代价是非常昂贵的，系统无法支撑过大的并发量
+ *
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
  */
@@ -50,13 +51,13 @@ class Shell extends Base
     }
 
     /**
-     * 通过定时器来模拟异步IO
-     * @param callable $callback 定时器回调函数
+     * 异步执行shell，并执行回调
+     * @param callable $callback 回调函数
      * @return $this
      */
     public function send($callback)
     {
-        //在此处Swoole暂未提供函数方式调用
+        //在此处Swoole不会提供函数方式调用
         \Swoole\Async::exec($this->__command, $callback);
         return $this;
     }
