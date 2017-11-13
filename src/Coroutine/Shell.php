@@ -25,7 +25,7 @@ class Shell extends Base
      */
     public function goExec(string $command)
     {
-        $this->__command = $command;
+        $this->__command   = $command;
         $this->requestId   = $this->getContext()->getRequestId();
         $requestId         = $this->requestId;
 
