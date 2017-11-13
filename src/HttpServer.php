@@ -341,9 +341,9 @@ abstract class HttpServer extends Server
     public static function getRemoteAddr($request)
     {
         $ip = $request->header['x-forwarded-for']       ??
-            $request->header['http_x_forwarded_for']  ??
-            $request->header['http_forwarded']        ??
-            $request->header['http_forwarded_for']    ??
+            $request->header['http_x_forwarded_for']    ??
+            $request->header['http_forwarded']          ??
+            $request->header['http_forwarded_for']      ??
             '';
 
         if ($ip) {
@@ -353,9 +353,9 @@ abstract class HttpServer extends Server
         }
 
         $ip = $request->header['http_client_ip']        ??
-            $request->header['x-real-ip']             ??
-            $request->header['remote_addr']           ??
-            $request->server['remote_addr']           ??
+            $request->header['x-real-ip']               ??
+            $request->header['remote_addr']             ??
+            $request->server['remote_addr']             ??
             '';
 
         return $ip;
