@@ -199,6 +199,7 @@ class CoroutineRedisProxy
         // value serialize start
         switch (strtolower($name)) {
             case 'set':
+            case 'setnx':
                 $arguments[2] = $this->serializeHandler($arguments[2], true);
                 if (isset($arguments[3]) && is_int($arguments[3]) && getInstance()->processType == Marco::PROCESS_WORKER) {
                     //当设置了过期时间时，需要追加EX前缀 SET key value [EX seconds]
