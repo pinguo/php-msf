@@ -51,8 +51,8 @@ class Shell extends Base
     }
 
     /**
-     * 通过定时器来模拟异步IO
-     * @param callable $callback 定时器回调函数
+     * 异步执行shell，并执行回调
+     * @param callable $callback 回调函数
      * @return $this
      * @throws Exception
      */
