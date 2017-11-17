@@ -221,7 +221,11 @@ class Task
     {
         if ($this->stack->isEmpty()) {
             try {
-                throw $e;
+                if (!empty($this->routine) && $this->routine instanceof \Generator) {
+                    $this->routine->throw($e);
+                } else {
+                    throw $e;
+                }
             } catch (\Throwable $noCatch) {
                 if ($this->controller) {
                     $this->controller->onExceptionHandle($noCatch);
