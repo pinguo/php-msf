@@ -157,4 +157,14 @@ class Marco
      * 发送静态文件403
      */
     const SEND_FILE_403                             = 403;
+
+    /**
+     * Timer TICK
+     */
+    const SWOOLE_TIME_TICK                          = 'swoole_timer_tick';
+
+    /**
+     * Timer AFTER
+     */
+    const SWOOLE_TIME_AFTER                         = 'swoole_timer_after';
 }

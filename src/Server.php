@@ -672,10 +672,10 @@ abstract class Server extends Child
      * @param int $ms 定时器间隔毫秒
      * @param callable $callBack 定时器执行的回调
      * @param array $params 定时器其他参数
-     * @param string|callable $tickType 定时器类型，可选swoole_timer_tick，swoole_timer_after
+     * @param string|callable $tickType 定时器类型，可选Marco::SWOOLE_TIME_TICK，Marco::SWOOLE_TIME_AFTER
      * @throws Exception
      */
-    public function registerTimer($ms, callable $callBack, $params = [], $tickType = 'swoole_timer_tick')
+    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Marco::SWOOLE_TIME_TICK)
     {
         if (!in_array($tickType, ['swoole_timer_tick', 'swoole_timer_after'])) {
             throw new Exception("not support $tickType tick type");
