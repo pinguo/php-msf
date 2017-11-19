@@ -229,32 +229,6 @@ abstract class Server extends Child
     }
 
     /**
-     * 创建用户自定义定时进程的上下文对象
-     *
-     * @return NULL|Context
-     */
-    public function getTimerContext()
-    {
-        $context = new Context(++$this->requestId);
-        $PGLog   = null;
-        $PGLog   = clone getInstance()->log;
-        $PGLog->accessRecord['beginTime'] = time();
-        $PGLog->accessRecord['uri']       = '/timerTick';
-        $PGLog->logId = $this->genLogId(null);
-        defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
-        $PGLog->init();
-        $PGLog->pushLog('controller', 'timerTick');
-        $PGLog->pushLog('method', 'timerTick');
-
-        // 构造请求上下文成员
-        $context->setLogId($PGLog->logId);
-        $context->setLog($PGLog);
-        $context->setControllerName('timerTick');
-        $context->setActionName('timerTick');
-
-        return $context;
-    }
-    /**
      * 获取运行的Server实例
      *
      * @return Server|MSFServer
@@ -672,15 +646,6 @@ abstract class Server extends Child
     }
 
     /**
-     * 关闭服务
-     *
-     * @param $serv
-     */
-    public function onShutdown($serv)
-    {
-    }
-
-    /**
      * __call魔术方法
      *
      * @param $name
@@ -708,34 +673,54 @@ abstract class Server extends Child
         }
 
         $tickType($ms, function ($timerId) use ($callBack, $params) {
-            $instance = new \PG\MSF\Controllers\Controller('Controller', 'timer');
-            $instance->setObjectPool(AOPFactory::getObjectPool($this->objectPool, $instance));
-            $instance->context = $this->getTimerContext();
-            $instance->context->setObjectPool($instance->getObjectPool());
-            $instance->__construct('Controller', 'timer');
-            $run = $callBack($instance, $timerId, $params);
-            if ($run instanceof \Generator) {
-                $this->scheduler->start($run, $instance, function () use ($instance) {
-                    $instance->getContext()->getLog()->appendNoticeLog();
-                    //销毁对象池
-                    foreach ($instance->objectPoolBuckets as $k => $obj) {
-                        $instance->getObjectPool()->push($obj);
-                        $instance->objectPoolBuckets[$k] = null;
-                        unset($instance->objectPoolBuckets[$k]);
-                    }
-                    $instance->resetProperties();
-                    $instance->__isContruct = false;
-                });
-            } else {
-                $instance->getContext()->getLog()->appendNoticeLog();
-                //销毁对象池
-                foreach ($instance->objectPoolBuckets as $k => $obj) {
-                    $instance->getObjectPool()->push($obj);
-                    $instance->objectPoolBuckets[$k] = null;
-                    unset($instance->objectPoolBuckets[$k]);
+            $instance = false;
+            try {
+                $this->requestId++;
+                $methodName = $params['name'] ?? 'TimerTick';
+                $controllerName = 'TimerTick';
+                // 构造请求日志对象
+                $PGLog = clone getInstance()->log;
+                $PGLog->accessRecord['beginTime'] = microtime(true);
+                $PGLog->accessRecord['uri'] = '/' . $controllerName . '/' . $methodName;
+                $PGLog->logId = $this->genLogId(null);;
+                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+                $PGLog->init();
+                $PGLog->pushLog('controller', $controllerName);
+                $PGLog->pushLog('method', $methodName);
+
+                /**
+                 * @var \PG\MSF\Controllers\Controller $instance
+                 */
+                $instance = $this->objectPool->get(\PG\MSF\Controllers\Controller::class,
+                    [$controllerName, $methodName]);
+                $instance->__useCount++;
+                if (empty($instance->getObjectPool())) {
+                    $instance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $instance));
                 }
-                $instance->resetProperties();
-                $instance->__isContruct = false;
+
+                $instance->context = $instance->getObjectPool()->get(Context::class, [$this->requestId]);
+                // 初始化控制器
+                $instance->requestStartTime = microtime(true);
+                $instance->context->setLogId($PGLog->logId);
+                $instance->context->setLog($PGLog);
+                $instance->context->setObjectPool($instance->getObjectPool());
+                $instance->context->setControllerName($controllerName);
+                $instance->context->setActionName($methodName);
+                $instance->__construct($controllerName, $methodName);
+
+                // 执行定时请求
+                $run = $callBack($instance, $timerId, $params);
+                if ($run instanceof \Generator) {
+                    $this->scheduler->start($run, $instance, function () use ($instance) {
+                        $instance->destroy();
+                    });
+                } else {
+                    $instance->destroy();
+                }
+            } catch (\Throwable $e) {
+                if ($instance) {
+                    $instance->destroy();
+                }
             }
         }, $params);
     }
