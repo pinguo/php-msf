@@ -38,9 +38,10 @@ interface IRoute
     /**
      * 计算Controller Class Name
      *
+     * @param bool $loadDefault 是否加载默认的控制器
      * @return bool
      */
-    public function findControllerClassName();
+    public function findControllerClassName($loadDefault);
 
     /**
      * 获取方法名称

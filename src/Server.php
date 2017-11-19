@@ -229,32 +229,6 @@ abstract class Server extends Child
     }
 
     /**
-     * 创建用户自定义定时进程的上下文对象
-     *
-     * @return NULL|Context
-     */
-    public function getTimerContext()
-    {
-        $context = new Context(++$this->requestId);
-        $PGLog   = null;
-        $PGLog   = clone getInstance()->log;
-        $PGLog->accessRecord['beginTime'] = time();
-        $PGLog->accessRecord['uri']       = '/timerTick';
-        $PGLog->logId = $this->genLogId(null);
-        defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
-        $PGLog->init();
-        $PGLog->pushLog('controller', 'timerTick');
-        $PGLog->pushLog('method', 'timerTick');
-
-        // 构造请求上下文成员
-        $context->setLogId($PGLog->logId);
-        $context->setLog($PGLog);
-        $context->setControllerName('timerTick');
-        $context->setActionName('timerTick');
-
-        return $context;
-    }
-    /**
      * 获取运行的Server实例
      *
      * @return Server|MSFServer
@@ -502,8 +476,8 @@ abstract class Server extends Child
         writeln('Swoole  Version: ' . SWOOLE_VERSION);
         writeln('PHP     Version: ' . PHP_VERSION);
         writeln('Application ENV: ' . APPLICATION_ENV);
-        writeln('Worker   Number: ' . $setConfig['worker_num']);
-        writeln('Task     Number: ' . $setConfig['task_worker_num'] ?? 0);
+        writeln('Worker   Number: ' . ($setConfig['worker_num'] ?? 0));
+        writeln('Task     Number: ' . ($setConfig['task_worker_num'] ?? 0));
         writeln("Listen     Addr: " . self::$_worker->config->get('http_server.socket'));
         writeln("Listen     Port: " . self::$_worker->config->get('http_server.port'));
     }
@@ -672,6 +646,15 @@ abstract class Server extends Child
     }
 
     /**
+     * 关闭服务
+     *
+     * @param $serv
+     */
+    public function onShutdown($serv)
+    {
+    }
+
+    /**
      * __call魔术方法
      *
      * @param $name
@@ -689,38 +672,64 @@ abstract class Server extends Child
      * @param int $ms 定时器间隔毫秒
      * @param callable $callBack 定时器执行的回调
      * @param array $params 定时器其他参数
+     * @param string|callable $tickType 定时器类型，可选Marco::SWOOLE_TIMER_TICK，Marco::SWOOLE_TIMER_AFTER
+     * @throws Exception
      */
-    public function registerTimer($ms, callable $callBack, $params = [])
+    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Marco::SWOOLE_TIMER_TICK)
     {
-        swoole_timer_tick($ms, function ($timerId, $params) use ($callBack) {
-            $instance = new \PG\MSF\Controllers\Controller('Controller', 'timer');
-            $instance->setObjectPool(AOPFactory::getObjectPool($this->objectPool, $instance));
-            $instance->context = $this->getTimerContext();
-            $instance->context->setObjectPool($instance->getObjectPool());
-            $instance->__construct('Controller', 'timer');
-            $run = $callBack($instance, $timerId, $params);
-            if ($run instanceof \Generator) {
-                $this->scheduler->start($run, $instance, function () use ($instance) {
-                    $instance->getContext()->getLog()->appendNoticeLog();
-                    //销毁对象池
-                    foreach ($instance->objectPoolBuckets as $k => $obj) {
-                        $instance->getObjectPool()->push($obj);
-                        $instance->objectPoolBuckets[$k] = null;
-                        unset($instance->objectPoolBuckets[$k]);
-                    }
-                    $instance->resetProperties();
-                    $instance->__isContruct = false;
-                });
-            } else {
-                $instance->getContext()->getLog()->appendNoticeLog();
-                //销毁对象池
-                foreach ($instance->objectPoolBuckets as $k => $obj) {
-                    $instance->getObjectPool()->push($obj);
-                    $instance->objectPoolBuckets[$k] = null;
-                    unset($instance->objectPoolBuckets[$k]);
+        if (!in_array($tickType, ['swoole_timer_tick', 'swoole_timer_after'])) {
+            throw new Exception("not support $tickType tick type");
+        }
+
+        $tickType($ms, function ($timerId) use ($callBack, $params) {
+            $instance = false;
+            try {
+                $this->requestId++;
+                $methodName = $params['name'] ?? 'TimerTick';
+                $controllerName = 'TimerTick';
+                // 构造请求日志对象
+                $PGLog = clone getInstance()->log;
+                $PGLog->accessRecord['beginTime'] = microtime(true);
+                $PGLog->accessRecord['uri'] = '/' . $controllerName . '/' . $methodName;
+                $PGLog->logId = $this->genLogId(null);;
+                defined('SYSTEM_NAME') && $PGLog->channel = SYSTEM_NAME;
+                $PGLog->init();
+                $PGLog->pushLog('controller', $controllerName);
+                $PGLog->pushLog('method', $methodName);
+
+                /**
+                 * @var \PG\MSF\Controllers\Controller $instance
+                 */
+                $instance = $this->objectPool->get(\PG\MSF\Controllers\Controller::class,
+                    [$controllerName, $methodName]);
+                $instance->__useCount++;
+                if (empty($instance->getObjectPool())) {
+                    $instance->setObjectPool(AOPFactory::getObjectPool(getInstance()->objectPool, $instance));
                 }
-                $instance->resetProperties();
-                $instance->__isContruct = false;
+
+                $instance->context = $instance->getObjectPool()->get(Context::class, [$this->requestId]);
+                // 初始化控制器
+                $instance->requestStartTime = microtime(true);
+                $instance->context->setLogId($PGLog->logId);
+                $instance->context->setLog($PGLog);
+                $instance->context->setObjectPool($instance->getObjectPool());
+                $instance->context->setControllerName($controllerName);
+                $instance->context->setActionName($methodName);
+                $instance->__construct($controllerName, $methodName);
+
+                // 执行定时请求
+                $run = $callBack($instance, $timerId, $params);
+                if ($run instanceof \Generator) {
+                    $this->scheduler->start($run, $instance, function () use ($instance) {
+                        $instance->destroy();
+                    });
+                } else {
+                    $instance->destroy();
+                }
+            } catch (\Throwable $e) {
+                if ($instance) {
+                    $instance->destroy();
+                }
             }
         }, $params);
     }

@@ -74,7 +74,6 @@ class Http extends Base
                 return;
             }
 
-            $this->result = (array)$client;
             // 发现拒绝建立连接，删除DNS缓存
             if (is_object($client) && ($client->errCode == 111 || $client->statusCode == 404)) {
                 Client::clearDnsCache($this->client->urlData['host']);
@@ -87,6 +86,7 @@ class Http extends Base
             }
 
             $client->ioBack     = true;
+            $this->result       = (array)$client;
             $this->responseTime = microtime(true);
             $this->getContext()->getLog()->profileEnd($profileName);
             $this->ioBack = true;
@@ -107,6 +107,12 @@ class Http extends Base
                 break;
             case 'GET':
                 $this->client->get($this->path, $this->data, $callback);
+                break;
+            case 'EXECUTE':
+                if (!empty($this->data)) {
+                    $this->client->setData($this->data);
+                }
+                $this->client->execute($this->path, $callback);
                 break;
         }
     }
