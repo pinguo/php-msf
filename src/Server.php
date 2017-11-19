@@ -646,6 +646,15 @@ abstract class Server extends Child
     }
 
     /**
+     * 关闭服务
+     *
+     * @param $serv
+     */
+    public function onShutdown($serv)
+    {
+    }
+
+    /**
      * __call魔术方法
      *
      * @param $name
