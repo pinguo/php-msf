@@ -89,9 +89,10 @@ class NormalRoute implements IRoute
     /**
      * 计算Controller Class Name
      *
+     * @param bool $loadDefault 是否加载默认的控制器
      * @return bool
      */
-    public function findControllerClassName()
+    public function findControllerClassName($loadDefault = false)
     {
         $this->controllerClassName = '';
         do {
@@ -111,6 +112,18 @@ class NormalRoute implements IRoute
             if (class_exists($className)) {
                 $this->controllerClassName = $className;
                 break;
+            }
+
+            if ($loadDefault) {
+                $notFoundDefault = getInstance()->config->get('http.not_found_default', false);
+                $defaultController = getInstance()->config->get("http.default_controller", '');
+                if ($notFoundDefault && $defaultController) {
+                    $className = "\\App\\Controllers\\" . $defaultController;
+                    if (class_exists($className)) {
+                        $this->controllerClassName = $className;
+                        break;
+                    }
+                }
             }
         } while (0);
 
@@ -171,7 +184,7 @@ class NormalRoute implements IRoute
             $this->setControllerName($controllerName);
             $this->setMethodName($methodDefault);
 
-            if ($this->findControllerClassName()) {
+            if ($this->findControllerClassName(true)) {
                 return true;
             }
 

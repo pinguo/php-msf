@@ -73,7 +73,7 @@ class Client extends Core
      * Client constructor.
      *
      * @param string $url 如http://domain.com:port，http://domain.com:port/path/
-     * @param int $timeout 域名解析超时时间，单位秒
+     * @param int $timeout 域名解析超时时间，单位毫秒
      * @param array $headers 请求报头
      *
      * @return self
@@ -104,6 +104,17 @@ class Client extends Core
         self::$keepAliveTimes  = $this->getConfig()->get('http.keepAlive.times', 10000);
 
         return $this;
+    }
+
+    /**
+     * __call魔术方法
+     *
+     * @param $name
+     * @param $arguments
+     */
+    public function __call($name, $arguments)
+    {
+        return $this->client->{$name}(...$arguments);
     }
 
     /**
@@ -210,8 +221,6 @@ class Client extends Core
 
         $ip = Client::getDnsCache($this->urlData['host']);
         if ($ip !== null) {
-            // swoole_http_client手工析构有Segmentation fault，暂时直接new
-            //$client     = $this->getObject(\swoole_http_client::class, [$ip, $this->urlData['port'], $this->urlData['ssl']]);
             $this->client = $this->getHttpClient($this->urlData['host'], $ip, $this->urlData['port'], $this->urlData['ssl']);
 
             $headers = array_merge($headers, [
@@ -260,6 +269,35 @@ class Client extends Core
     }
 
     /**
+     * 在完成DNS查询的基础上，运行请求协程
+     *
+     * @param string $url 请求的URL
+     * @param array $data 请求数据
+     * @param int $timeout 请求超时时间
+     * @param array $headers 额外的报头
+     * @return Http
+     * @throws Exception
+     */
+    public function goExecute($url = '', $data = [], $timeout = 30000, $headers = [])
+    {
+        if (!($this->client instanceof \swoole_http_client)) {
+            throw new Exception('You must complete the DNS query first, Such as $client->goDnsLookup()');
+        }
+
+        if (empty($this->urlData)) {
+            $this->urlData = self::parseUrl($url);
+        } else {
+            if (!empty($url)) {
+                $this->urlData['path'] = $url;
+            }
+        }
+        $this->setHeaders($headers);
+        $sendPostReq  = $this->getObject(Http::class, [$this, 'EXECUTE', $this->urlData['path'], $data, $timeout]);
+
+        return $sendPostReq;
+    }
+
+    /**
      * 在完成DNS查询的基础上，运行GET请求协程
      *
      * @param string $url 请求的URL
@@ -287,6 +325,42 @@ class Client extends Core
         $sendGetReq  = $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
 
         return $sendGetReq;
+    }
+
+    /**
+     * 单个独立请求协程（自动完成DNS查询、获取数据）
+     *
+     * @param string $url 请求的URL
+     * @param array $data 请求数据
+     * @param int $timeout 请求超时时间
+     * @param array $headers 额外的报头
+     * @return Http
+     * @throws Exception
+     */
+    public function goSingleExecute($url = '', $data = [], $timeout = 30000, $headers = [])
+    {
+        if (empty($this->urlData)) {
+            $this->urlData = self::parseUrl($url);
+        } else {
+            if (!empty($url)) {
+                $this->urlData['path'] = $url;
+            }
+        }
+
+        yield $this->goDnsLookup();
+        $this->setHeaders($headers);
+
+        if (!empty($this->urlData['query'])) {
+            return yield $this->getObject(
+                Http::class,
+                [$this, 'EXECUTE', $this->urlData['path'] . $this->urlData['query'], $data, $timeout]
+            );
+        } else {
+            return yield $this->getObject(
+                Http::class,
+                [$this, 'EXECUTE', $this->urlData['path'], $data, $timeout]
+            );
+        }
     }
 
     /**
@@ -619,6 +693,18 @@ class Client extends Core
             $data = '';
         }
         $this->client->post($path, $data, $callback);
+    }
+
+
+    /**
+     * 发起异步请求
+     *
+     * @param string $path 待请求的URL Path
+     * @param $callback
+     */
+    public function execute($path, $callback)
+    {
+        $this->client->execute($path, $callback);
     }
 
     /**

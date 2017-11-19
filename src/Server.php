@@ -502,8 +502,8 @@ abstract class Server extends Child
         writeln('Swoole  Version: ' . SWOOLE_VERSION);
         writeln('PHP     Version: ' . PHP_VERSION);
         writeln('Application ENV: ' . APPLICATION_ENV);
-        writeln('Worker   Number: ' . $setConfig['worker_num']);
-        writeln('Task     Number: ' . $setConfig['task_worker_num'] ?? 0);
+        writeln('Worker   Number: ' . ($setConfig['worker_num'] ?? 0));
+        writeln('Task     Number: ' . ($setConfig['task_worker_num'] ?? 0));
         writeln("Listen     Addr: " . self::$_worker->config->get('http_server.socket'));
         writeln("Listen     Port: " . self::$_worker->config->get('http_server.port'));
     }
@@ -689,10 +689,16 @@ abstract class Server extends Child
      * @param int $ms 定时器间隔毫秒
      * @param callable $callBack 定时器执行的回调
      * @param array $params 定时器其他参数
+     * @param string|callable $tickType 定时器类型，可选swoole_timer_tick，swoole_timer_after
+     * @throws Exception
      */
-    public function registerTimer($ms, callable $callBack, $params = [])
+    public function registerTimer($ms, callable $callBack, $params = [], $tickType = 'swoole_timer_tick')
     {
-        swoole_timer_tick($ms, function ($timerId, $params) use ($callBack) {
+        if (!in_array($tickType, ['swoole_timer_tick', 'swoole_timer_after'])) {
+            throw new Exception("not support $tickType tick type");
+        }
+
+        $tickType($ms, function ($timerId) use ($callBack, $params) {
             $instance = new \PG\MSF\Controllers\Controller('Controller', 'timer');
             $instance->setObjectPool(AOPFactory::getObjectPool($this->objectPool, $instance));
             $instance->context = $this->getTimerContext();

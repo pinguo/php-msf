@@ -66,12 +66,7 @@ abstract class HttpServer extends Server
         $this->viewResolvePaths = $this->config->get('http_server.view_paths', [
             APP_DIR.'/Views'
         ]);
-        foreach ($this->viewResolvePaths as $path) {
-            if (!is_dir($path)) {
-                writeln(sprintf('The view path %s does not exist, please check it again.', $path));
-                exit();
-            }
-        }
+
         // 框架自带的视图目录.
         $this->viewResolvePaths[] = $this->MSFSrcDir.'/Views';
     }
@@ -107,7 +102,8 @@ abstract class HttpServer extends Server
             $this->onWorkerStart(null, null);
         } else {
             //开启一个http服务器
-            $this->server = new \swoole_http_server($this->httpSocketName, $this->httpPort);
+            $mode = $this->config->get('server.mode', SWOOLE_PROCESS);
+            $this->server = new \swoole_http_server($this->httpSocketName, $this->httpPort, $mode);
             $this->server->on('Start', [$this, 'onStart']);
             $this->server->on('WorkerStart', [$this, 'onWorkerStart']);
             $this->server->on('WorkerStop', [$this, 'onWorkerStop']);
@@ -118,6 +114,7 @@ abstract class HttpServer extends Server
             $this->server->on('ManagerStart', [$this, 'onManagerStart']);
             $this->server->on('ManagerStop', [$this, 'onManagerStop']);
             $this->server->on('request', [$this, 'onRequest']);
+            $this->server->on('Shutdown', [$this, 'onShutdown']);
             $set = $this->setServerSet();
             $set['daemonize'] = self::$daemonize ? 1 : 0;
             $this->server->set($set);
