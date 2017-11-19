@@ -35,11 +35,35 @@ class NormalRoute implements IRoute
     public $controllerClassName;
 
     /**
+     * @var string 默认控制器
+     */
+    public $defaultController = '';
+
+    /**
+     * @var string 默认控制器方法
+     */
+    public $defaultMethod = '';
+
+    /**
+     * @var string 网站根目录
+     */
+    public $domainRoot = '';
+
+    /**
+     * @var string 方法前缀
+     */
+    public $methodPrefix;
+
+    /**
      * NormalRoute constructor.
      */
     public function __construct()
     {
-        $this->routeParams = new \stdClass();
+        $this->routeParams       = new \stdClass();
+        $this->defaultController = getInstance()->config->get("http.default_controller", '');
+        $this->defaultMethod     = getInstance()->config->get('http.default_method', 'Index');
+        $this->domainRoot        = getInstance()->config->get('http.domain', []);
+        $this->methodPrefix      = getInstance()->config->get('http.method_prefix', 'action');
     }
 
     /**
@@ -56,7 +80,7 @@ class NormalRoute implements IRoute
             $host = explode(':', $host)[0] ?? '';
         }
         $this->routeParams->host = $host;
-        $this->routeParams->path = rtrim($request->server['path_info'], '/');
+        $this->routeParams->path = $this->defaultController ? $request->server['path_info'] : rtrim($request->server['path_info'], '/');
         $this->routeParams->verb = $this->parseVerb($request);
         $this->setParams($request->get ?? []);
 
@@ -115,10 +139,8 @@ class NormalRoute implements IRoute
             }
 
             if ($loadDefault) {
-                $notFoundDefault = getInstance()->config->get('http.not_found_default', false);
-                $defaultController = getInstance()->config->get("http.default_controller", '');
-                if ($notFoundDefault && $defaultController) {
-                    $className = "\\App\\Controllers\\" . $defaultController;
+                if ($this->defaultController) {
+                    $className = "\\App\\Controllers\\" . $this->defaultController;
                     if (class_exists($className)) {
                         $this->controllerClassName = $className;
                         break;
@@ -148,8 +170,7 @@ class NormalRoute implements IRoute
             $this->controllerClassName         = $this->routeCache[$path][2];
         } else {
             if (stristr($path, '.')) {
-                $root = getInstance()->config['http']['domain'][$this->getHost()]['root'] ?? ROOT_PATH . '/www/';
-                $this->routeParams->file = $root . $path;
+                $this->routeParams->file = $this->domainRoot[$this->getHost()]['root'] ?? ROOT_PATH . '/www/' . $path;
                 return true;
             }
 
@@ -169,7 +190,7 @@ class NormalRoute implements IRoute
             if (count($route) > 1) {
                 $methodName = array_pop($route);
             } else {
-                $methodName = getInstance()->config->get('http.default_method', 'Index');
+                $methodName = $this->defaultMethod;
             }
             $this->routeParams->controllerName = ltrim(implode("\\", $route), "\\") ?? null;
             $this->routeParams->methodName     = $methodName;
@@ -179,10 +200,9 @@ class NormalRoute implements IRoute
                 return true;
             }
 
-            $methodDefault  = getInstance()->config->get('http.default_method', 'Index');
             $controllerName = $this->routeParams->controllerName  . "\\" . $this->getMethodName();
             $this->setControllerName($controllerName);
-            $this->setMethodName($methodDefault);
+            $this->setMethodName($this->defaultMethod);
 
             if ($this->findControllerClassName(true)) {
                 return true;

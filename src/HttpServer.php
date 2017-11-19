@@ -176,7 +176,7 @@ abstract class HttpServer extends Server
 
         do {
             if ($this->route->getPath() == '') {
-                $indexFile = $this->config['http']['domain'][$this->route->getHost()]['index'] ?? null;
+                $indexFile = $this->route->domainRoot[$this->route->getHost()]['index'] ?? null;
                 $response->header('X-Ngx-LogId', $PGLog->logId);
                 $httpCode  = $this->sendFile($indexFile, $request, $response);
                 $PGLog->pushLog('http-code', $httpCode);
@@ -200,7 +200,7 @@ abstract class HttpServer extends Server
                 break;
             }
 
-            $methodPrefix = $this->config->get('http.method_prefix', 'action');
+            $methodPrefix = $this->route->methodPrefix;
             $methodName   = $methodPrefix . $this->route->getMethodName();
 
             try {
