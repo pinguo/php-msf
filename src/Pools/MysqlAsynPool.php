@@ -135,11 +135,13 @@ class MysqlAsynPool extends AsynPool
                         $this->commands->unshift($data);
                     }
                     return;
-                } else {//发生错误
-                    if (isset($data['bind_id'])) {//事务的话要rollback
-                        $data['sql'] = 'rollback';
-                        $this->commands->push($data);
-                    }
+                    //发生错误
+                } else {
+                    // 事务出错不需要自动回滚，否则会带来新问题，调整为手工回滚（modified by xudianyang）
+                    //if (isset($data['bind_id'])) {
+                    //    $data['sql'] = 'rollback';
+                    //    $this->commands->push($data);
+                    //}
                     //设置错误信息
                     $data['result']['error'] = "[mysql]:" . $client->error . "[sql]:" . $data['sql'];
                 }
