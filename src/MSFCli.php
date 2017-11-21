@@ -160,7 +160,7 @@ class MSFCli extends MSFServer
         //创建task用的id->pid共享内存表不至于同时超过1024个任务
         $this->tidPidTable = new \swoole_table(1024);
         $this->tidPidTable->column('pid', \swoole_table::TYPE_INT, 8);
-        $this->tidPidTable->column('des', \swoole_table::TYPE_STRING, 50);
+        $this->tidPidTable->column('des', \swoole_table::TYPE_STRING, 512);
         $this->tidPidTable->column('start_time', \swoole_table::TYPE_INT, 8);
         $this->tidPidTable->create();
 
