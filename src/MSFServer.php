@@ -227,8 +227,8 @@ abstract class MSFServer extends HttpServer
     public function setServerSet()
     {
         $set = $this->config->get('server.set', []);
-        $this->workerNum = $set['worker_num'];
-        $this->taskNum = $set['task_worker_num'];
+        $this->workerNum = $set['worker_num'] ?? 0;
+        $this->taskNum = $set['task_worker_num'] ?? 0;
         return $set;
     }
 
