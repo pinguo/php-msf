@@ -45,16 +45,6 @@ abstract class MSFServer extends HttpServer
     protected $mysqlProxyManager = [];
 
     /**
-     * @var \swoole_atomic task_id的原子
-     */
-    public $taskAtomic;
-
-    /**
-     * @var array task_id和pid的映射
-     */
-    public $tidPidTable;
-
-    /**
      * @var array 连接池
      */
     protected $asynPools = [];
@@ -104,16 +94,6 @@ abstract class MSFServer extends HttpServer
 
         // 初始化Yac共享内存
         $this->sysCache  = new \Yac('sys_cache_');
-
-        //创建task用的Atomic
-        $this->taskAtomic = new \swoole_atomic(0);
-
-        //创建task用的id->pid共享内存表，进程最多可以同时处理8096个任务
-        $this->tidPidTable = new \swoole_table(8096);
-        $this->tidPidTable->column('pid', \swoole_table::TYPE_INT, 8);
-        $this->tidPidTable->column('des', \swoole_table::TYPE_STRING, 512);
-        $this->tidPidTable->column('start_time', \swoole_table::TYPE_INT, 8);
-        $this->tidPidTable->create();
 
         //reload监控进程
         if ($this->config->get('auto_reload_enable', false)) {
@@ -259,7 +239,6 @@ abstract class MSFServer extends HttpServer
                     $taskName      = $message['task_name'];
                     $taskFucName   = $message['task_fuc_name'];
                     $taskData      = $message['task_fuc_data'];
-                    $taskId        = $message['task_id'];
                     /**
                      * @var Context $taskContext
                      */
@@ -627,14 +606,6 @@ abstract class MSFServer extends HttpServer
      */
     public function getAllTaskMessage()
     {
-        $tasks = [];
-        foreach ($this->tidPidTable as $id => $row) {
-            if ($id != 0) {
-                $row['task_id'] = $id;
-                $row['run_time'] = time() - $row['start_time'];
-                $tasks[] = $row;
-            }
-        }
-        return $tasks;
+        return [];
     }
 }

@@ -40,10 +40,7 @@ class Task extends TaskProxy
     public function __initialization($taskId, $workerPid, $taskName, $methodName, $context, $objectPool)
     {
         $this->taskId = $taskId;
-        getInstance()->tidPidTable->set(
-            $this->taskId,
-            ['pid' => $workerPid, 'des' => "$taskName::$methodName", 'start_time' => time()]
-        );
+
         if ($context) {
             // 构造请求上下文成员
             $context->setObjectPool($objectPool);
@@ -56,7 +53,6 @@ class Task extends TaskProxy
      */
     public function destroy()
     {
-        $this->taskId && getInstance()->tidPidTable->del($this->taskId);
         parent::destroy();
         $this->taskId = 0;
     }
