@@ -25,14 +25,14 @@ class TaskProxy extends Core
     protected $timeout = 0;
 
     /**
-     * @var int 任务ID
-     */
-    protected $taskId;
-
-    /**
      * @var mixed task执行数据
      */
     private $taskProxyData;
+
+    /**
+     * @var int 任务ID
+     */
+    public $taskId;
 
     /**
      * @var string 执行的Task Name
@@ -63,27 +63,18 @@ class TaskProxy extends Core
      */
     public function __call($name, $arguments)
     {
-        $this->taskId = getInstance()->taskAtomic->add();
-        //这里设置重置标识，id=65536,便设置回1
-        $reset        = getInstance()->taskAtomic->cmpset(65536, 1);
-
-        if ($reset) {
-            $this->taskId = 1;
-        }
-
         $this->taskProxyData = [
             'type'    => Marco::SERVER_TYPE_TASK,
             'message' => [
                 'task_name'      => $this->taskName,
                 'task_fuc_name'  => $name,
                 'task_fuc_data'  => $arguments,
-                'task_id'        => $this->taskId,
                 'task_context'   => $this->getContext(),
                 'task_construct' => $this->taskConstruct,
             ]
         ];
 
-        return $this->getObject(CTask::class, [$this->taskProxyData, -1, $this->timeout]);
+        return $this->getObject(CTask::class, [$this->taskProxyData, $this->timeout]);
     }
 
     /**
@@ -123,7 +114,6 @@ class TaskProxy extends Core
      */
     public function destroy()
     {
-        $this->taskId        = null;
         $this->taskProxyData = null;
         parent::destroy();
     }

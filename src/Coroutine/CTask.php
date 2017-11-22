@@ -30,14 +30,12 @@ class CTask extends Base
      * 初始化Task协程对象
      *
      * @param array $taskProxyData 待执行的Task信息
-     * @param int $id Task ID
      * @param int $timeout 超时时间，单位秒
      */
-    public function __construct($taskProxyData, $id, $timeout)
+    public function __construct($taskProxyData, $timeout)
     {
         parent::__construct($timeout);
         $this->taskProxyData = $taskProxyData;
-        $this->id            = $id;
         $profileName         = $taskProxyData['message']['task_name'] . '::' . $taskProxyData['message']['task_fuc_name'];
         $this->requestId     = $this->getContext()->getRequestId();
         $requestId           = $this->requestId;
@@ -72,10 +70,15 @@ class CTask extends Base
      *
      * @param callable $callback 任务完成后的回调函数
      * @return $this
+     * @throws Exception
      */
     public function send($callback)
     {
-        getInstance()->server->task($this->taskProxyData, $this->id, $callback);
+        $this->id = getInstance()->server->task($this->taskProxyData, -1, $callback);
+        if ($this->id === false) {
+            throw new Exception("worker->tasker send async task failed, data: " . dump($this->taskProxyData, false, true));
+        }
+
         return $this;
     }
 
