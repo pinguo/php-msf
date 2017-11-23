@@ -170,7 +170,7 @@ class NormalRoute implements IRoute
             $this->controllerClassName         = $this->routeCache[$path][2];
         } else {
             if (stristr($path, '.')) {
-                $this->routeParams->file = $this->domainRoot[$this->getHost()]['root'] ?? ROOT_PATH . '/www' . $path;
+                $this->routeParams->file = ($this->domainRoot[$this->getHost()]['root'] ?? ROOT_PATH . '/www') . $path;
                 return true;
             }
 
