@@ -42,7 +42,7 @@ class File extends Core implements ISession
      */
     public function unset(string $sessionId)
     {
-        $file = "{$this->savePath}/{$this->sessionName}_$sessionId";
+        $file = "{$this->savePath}/{$this->sessionName}_{$sessionId}";
         if (file_exists($file)) {
             unlink($file);
         }
@@ -60,7 +60,7 @@ class File extends Core implements ISession
     public function gc(int $maxLifeTime, $sessionId = '')
     {
         if ($sessionId) {
-            $file = "{$this->savePath}/{$this->sessionName}_$sessionId";
+            $file = "{$this->savePath}/{$this->sessionName}_{$sessionId}";
             if (file_exists($file) && (filemtime($file) + $maxLifeTime < time())) {
                 unlink($file);
             }
@@ -99,7 +99,7 @@ class File extends Core implements ISession
      */
     public function read(string $sessionId)
     {
-        $file = "{$this->savePath}/{$this->sessionName}_$sessionId";
+        $file = "{$this->savePath}/{$this->sessionName}_{$sessionId}";
         if (!is_file($file)) {
             return false;
         }
@@ -115,6 +115,6 @@ class File extends Core implements ISession
      */
     public function write(string $sessionId, string $sessionData)
     {
-        return file_put_contents("{$this->savePath}/{$this->sessionName}_$sessionId", $sessionData) !== false;
+        return file_put_contents("{$this->savePath}/{$this->sessionName}_{$sessionId}", $sessionData) !== false;
     }
 }
