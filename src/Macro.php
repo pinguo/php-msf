@@ -12,7 +12,10 @@ namespace PG\MSF;
  * Class Macro
  * @package PG\MSF
  */
-class_alias(__NAMESPACE__ . '\\Macro', __NAMESPACE__ . '\\Macro');
+
+//修复单词错误，但是要兼容错误的单词
+class_alias(__NAMESPACE__ . '\\Macro', __NAMESPACE__ . '\\Marco');
+
 class Macro
 {
     /**
