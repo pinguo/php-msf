@@ -11,7 +11,7 @@ namespace PG\MSF\Pools;
 
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class CoroutineRedisProxy
@@ -133,7 +133,7 @@ class CoroutineRedisProxy
             }
         }
 
-        if (getInstance()->processType == Marco::PROCESS_TASKER) {//task进程
+        if (getInstance()->processType == Macro::PROCESS_TASKER) {//task进程
             $commandData = [$context, $script, array_merge($keys, $evalMockArgs), $numKeys];
         } else {
             $commandData = array_merge([$context, $script, $numKeys], $keys, $evalMockArgs);
@@ -201,7 +201,7 @@ class CoroutineRedisProxy
             case 'set':
             case 'setnx':
                 $arguments[2] = $this->serializeHandler($arguments[2], true);
-                if (isset($arguments[3]) && is_int($arguments[3]) && getInstance()->processType == Marco::PROCESS_WORKER) {
+                if (isset($arguments[3]) && is_int($arguments[3]) && getInstance()->processType == Macro::PROCESS_WORKER) {
                     //当设置了过期时间时，需要追加EX前缀 SET key value [EX seconds]
                     array_splice($arguments, 3, 0, 'EX');
                 }
@@ -249,7 +249,7 @@ class CoroutineRedisProxy
         }
         // value serialize end
 
-        if (getInstance()->processType == Marco::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
+        if (getInstance()->processType == Macro::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
             /**
              * @var Context $context
              */
@@ -308,20 +308,20 @@ class CoroutineRedisProxy
             if ($this->phpSerialize && $phpSerialize) {
                 $data = [$data, null];
                 switch ($this->phpSerialize) {
-                    case Marco::SERIALIZE_PHP:
+                    case Macro::SERIALIZE_PHP:
                         $data = serialize($data);
                         break;
-                    case Marco::SERIALIZE_IGBINARY:
+                    case Macro::SERIALIZE_IGBINARY:
                         $data = @igbinary_serialize($data);
                         break;
                 }
             }
 
             switch ($this->redisSerialize) {
-                case Marco::SERIALIZE_PHP:
+                case Macro::SERIALIZE_PHP:
                     $data = serialize($data);
                     break;
-                case Marco::SERIALIZE_IGBINARY:
+                case Macro::SERIALIZE_IGBINARY:
                     $data = @igbinary_serialize($data);
                     break;
             }
@@ -413,12 +413,12 @@ class CoroutineRedisProxy
         //get
         if (is_string($data) && $this->redisSerialize) {
             switch ($this->redisSerialize) {
-                case Marco::SERIALIZE_PHP:
+                case Macro::SERIALIZE_PHP:
                     if ($this->canUnserialize($data)) {
                         $data = unserialize($data);
                     }
                     break;
-                case Marco::SERIALIZE_IGBINARY:
+                case Macro::SERIALIZE_IGBINARY:
                     $data = @igbinary_unserialize($data);
                     break;
             }
@@ -426,12 +426,12 @@ class CoroutineRedisProxy
 
         if (is_string($data) && $this->phpSerialize) {
             switch ($this->phpSerialize) {
-                case Marco::SERIALIZE_PHP:
+                case Macro::SERIALIZE_PHP:
                     if ($this->canUnserialize($data)) {
                         $data = unserialize($data);
                     }
                     break;
-                case Marco::SERIALIZE_IGBINARY:
+                case Macro::SERIALIZE_IGBINARY:
                     $data = @igbinary_unserialize($data);
                     break;
             }

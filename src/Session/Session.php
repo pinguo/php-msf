@@ -9,7 +9,7 @@
 namespace PG\MSF\Session;
 
 use PG\MSF\Base\Core;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\MSF\Session\Adapters\File;
 use PG\MSF\Session\Adapters\Redis;
 
@@ -55,17 +55,17 @@ class Session extends Core
      */
     public function __construct()
     {
-        $handler = $this->getConfig()->get('session.handler', Marco::SESSION_FILE);
+        $handler = $this->getConfig()->get('session.handler', Macro::SESSION_FILE);
         $this->savePath = $this->getConfig()->get('session.savePath', '/tmp/msf');
         $this->sessionName = $this->getConfig()->get('session.sessionName', 'msf_session');
         $this->maxLifeTime = $this->getConfig()->get('session.maxLifeTime', 1440);
 
         if ($this->sessionHandler == null) {
-            if ($handler == Marco::SESSION_FILE) {
+            if ($handler == Macro::SESSION_FILE) {
                 $this->sessionHandler = $this->getObject(File::class);
-            } elseif ($handler == Marco::SESSION_REDIS) {
+            } elseif ($handler == Macro::SESSION_REDIS) {
                 $this->sessionHandler = $this->getObject(Redis::class);
-            } elseif ($handler == Marco::SESSION_REDIS_PROXY) {
+            } elseif ($handler == Macro::SESSION_REDIS_PROXY) {
                 $this->sessionHandler = $this->getObject(Redis::class, [1]);
             } else {
                 throw new Exception('不支持的Session存储类型');

@@ -9,7 +9,7 @@
 namespace PG\MSF\Base;
 
 use PG\AOP\Wrapper;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class Pool
@@ -83,7 +83,7 @@ class Pool
             $obj->__useCount   = 0;
             $obj->__genTime    = time();
             $obj->__isContruct = false;
-            $obj->__DSLevel    = Marco::DS_PUBLIC;
+            $obj->__DSLevel    = Macro::DS_PUBLIC;
             unset($reflector);
             return $obj;
         }
