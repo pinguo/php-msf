@@ -12,6 +12,7 @@ namespace PG\MSF;
  * Class Macro
  * @package PG\MSF
  */
+class_alias(__NAMESPACE__ . '\\Macro', __NAMESPACE__ . '\\Macro');
 class Macro
 {
     /**
