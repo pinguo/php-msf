@@ -19,8 +19,10 @@
     "ext-amqp": ">=1.8.0"
   },
   "autoload": {
+    "classmap": [
+      "src/Macro.php"
+    ],
     "psr-4": {
-      "PG\\MSF\\Marco\\": "src/Marco.php",
       "PG\\MSF\\": "src/"
     },
     "files": [
