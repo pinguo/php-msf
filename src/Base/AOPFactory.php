@@ -163,7 +163,7 @@ class AOPFactory extends Factory
                         }
                     }
                 }
-                $arguments[0]->__isContruct = false;
+                $arguments[0]->__isConstruct = false;
             }
 
             if ($method === 'get') {
@@ -224,11 +224,11 @@ class AOPFactory extends Factory
                     $result->taskName = $arguments[0];
                 }
                 // 自动调用构造方法
-                if (method_exists($result, '__construct') && $result->__isContruct == false) {
+                if (method_exists($result, '__construct') && $result->__isConstruct == false) {
                     if (!isset($arguments[1])) {
                         $arguments[1] = [];
                     }
-                    $result->__isContruct = true;
+                    $result->__isConstruct = true;
                     $result->__construct(...$arguments[1]);
                 }
                 // 支持自动销毁成员变量

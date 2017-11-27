@@ -75,14 +75,14 @@ class Pool
 
         if ($pool->count()) {
             $obj = $pool->shift();
-            $obj->__isContruct = false;
+            $obj->__isConstruct = false;
             return $obj;
         } else {
             $reflector         = new \ReflectionClass($poolName);
             $obj               = $reflector->newInstanceWithoutConstructor();
             $obj->__useCount   = 0;
             $obj->__genTime    = time();
-            $obj->__isContruct = false;
+            $obj->__isConstruct = false;
             $obj->__DSLevel    = Macro::DS_PUBLIC;
             unset($reflector);
             return $obj;

@@ -136,7 +136,7 @@ class Controller extends Core
                 unset($this->objectPoolBuckets[$k]);
             }
             $this->resetProperties();
-            $this->__isContruct = false;
+            $this->__isConstruct = false;
             getInstance()->objectPool->push($this);
             parent::destroy();
         }

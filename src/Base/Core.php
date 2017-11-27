@@ -38,7 +38,7 @@ class Core extends Child
     /**
      * @var bool 是否执行构造方法
      */
-    public $__isContruct = false;
+    public $__isConstruct = false;
 
     /**
      * @var bool 销毁标志
