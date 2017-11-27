@@ -234,7 +234,7 @@ abstract class MSFServer extends HttpServer
         $result  = false;
         $status  = 200;
         switch ($type) {
-            case Marco::SERVER_TYPE_TASK:
+            case Macro::SERVER_TYPE_TASK:
                 try {
                     $taskName      = $message['task_name'];
                     $taskFucName   = $message['task_fuc_name'];
@@ -310,7 +310,7 @@ abstract class MSFServer extends HttpServer
         parent::onPipeMessage($serv, $fromWorkerId, $message);
         $data = unserialize($message);
         switch ($data['type']) {
-            case Marco::MSG_TYPR_ASYN:
+            case Macro::MSG_TYPR_ASYN:
                 $this->asynPoolManager->distribute($data['message']);
                 break;
         }
@@ -456,21 +456,21 @@ abstract class MSFServer extends HttpServer
         // Worker类型
         if (!$this->isTaskWorker()) {
             if ($workerId !== null) {
-                $this->processType = Marco::PROCESS_WORKER;
+                $this->processType = Macro::PROCESS_WORKER;
                 getInstance()->sysTimers[] = swoole_timer_tick(2000, function ($timerId) {
                     $this->statistics();
                 });
             }
         } else {
-            $this->processType = Marco::PROCESS_TASKER;
+            $this->processType = Macro::PROCESS_TASKER;
         }
 
         parent::onWorkerStart($serv, $workerId);
-        if ($this->processType == Marco::PROCESS_WORKER || $this->processType == Marco::PROCESS_TIMER) {
+        if ($this->processType == Macro::PROCESS_WORKER || $this->processType == Macro::PROCESS_TIMER) {
             $this->initAsynPools();
             $this->initRedisProxies();
             $this->initMysqlProxies();
-            if ($this->processType != Marco::PROCESS_TASKER) {
+            if ($this->processType != Macro::PROCESS_TASKER) {
                 //注册
                 $this->asynPoolManager = new AsynPoolManager(null, $this);
                 $this->asynPoolManager->noEventAdd();
@@ -572,9 +572,9 @@ abstract class MSFServer extends HttpServer
         }
 
         $data['dns_cache_http'] = \PG\MSF\Client\Http\Client::$dnsCache;
-        $key  = Marco::SERVER_STATS . getInstance()->server->worker_id . '_exit';
+        $key  = Macro::SERVER_STATS . getInstance()->server->worker_id . '_exit';
         $data['exit'] = (int)$this->sysCache->get($key);
-        $this->sysCache->set(Marco::SERVER_STATS . $this->server->worker_id, $data);
+        $this->sysCache->set(Macro::SERVER_STATS . $this->server->worker_id, $data);
 
         return $data;
     }

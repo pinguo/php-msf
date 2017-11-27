@@ -9,7 +9,7 @@
 namespace PG\MSF\Process;
 
 use Noodlehaus\Config as Conf;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\MSF\MSFServer;
 
 /**
@@ -43,7 +43,7 @@ class Config extends ProcessBase
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         parent::__construct($config, $MSFServer);
-        $this->MSFServer->processType = Marco::PROCESS_CONFIG;
+        $this->MSFServer->processType = Macro::PROCESS_CONFIG;
         writeln('Config  Manager: Enabled');
         $this->lastMinute = ceil(time() / 60);
         swoole_timer_tick(3000, [$this, 'checkRedisProxy']);
@@ -99,7 +99,7 @@ class Config extends ProcessBase
 
         $workerIds = range(0, $this->MSFServer->server->setting['worker_num'] - 1);
         foreach ($workerIds as $workerId) {
-            $workerInfo = @$this->MSFServer->sysCache->get(Marco::SERVER_STATS . $workerId);
+            $workerInfo = @$this->MSFServer->sysCache->get(Macro::SERVER_STATS . $workerId);
             if ($workerInfo) {
                 $data['worker']['worker' . $workerId] = $workerInfo;
             } else {
@@ -107,7 +107,7 @@ class Config extends ProcessBase
             }
         }
 
-        $lastStats = $this->MSFServer->sysCache->get(Marco::SERVER_STATS);
+        $lastStats = $this->MSFServer->sysCache->get(Macro::SERVER_STATS);
         $data['tcp'] = $this->MSFServer->server->stats();
         $data['running']['qps'] = $data['tcp']['request_count'] - $lastStats['tcp']['request_count'];
 
@@ -132,7 +132,7 @@ class Config extends ProcessBase
         }
 
         unset($data['tcp']['worker_request_count']);
-        $this->MSFServer->sysCache->set(Marco::SERVER_STATS, $data);
+        $this->MSFServer->sysCache->set(Macro::SERVER_STATS, $data);
     }
 
     /**
@@ -156,7 +156,7 @@ class Config extends ProcessBase
             }
 
             //分布式
-            if ($proxyConfig['mode'] == Marco::CLUSTER) {
+            if ($proxyConfig['mode'] == Macro::CLUSTER) {
                 $pools     = $proxyConfig['pools'];
                 $goodPools = [];
                 foreach ($pools as $pool => $weight) {
@@ -196,7 +196,7 @@ class Config extends ProcessBase
             }
 
             //主从
-            if ($proxyConfig['mode'] == Marco::MASTER_SLAVE) {
+            if ($proxyConfig['mode'] == Macro::MASTER_SLAVE) {
                 $oldConfig = $this->MSFServer->sysCache->get($proxyName);
                 $pools     = $proxyConfig['pools'];
                 $master    = '';

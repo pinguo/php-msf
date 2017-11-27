@@ -10,7 +10,7 @@ namespace PG\MSF\Process;
 
 use Noodlehaus\Config as Conf;
 use PG\MSF\MSFServer;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class Inotify
@@ -37,7 +37,7 @@ class Inotify extends ProcessBase
     public function __construct(Conf $config, MSFServer $MSFServer)
     {
         parent::__construct($config, $MSFServer);
-        $this->MSFServer->processType = Marco::PROCESS_RELOAD;
+        $this->MSFServer->processType = Macro::PROCESS_RELOAD;
         $notice = 'Inotify  Reload: ';
         $this->monitorDir = realpath(ROOT_PATH . '/');
         if (!extension_loaded('inotify')) {

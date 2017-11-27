@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Controllers;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\MSF\Client\Http\Client;
 
 /**

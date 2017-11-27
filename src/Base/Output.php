@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Base;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\MSF\Controllers\Controller;
 
 /**
@@ -250,7 +250,7 @@ class Output extends Core
      */
     public function outputView(array $data, $view = null)
     {
-        if ($this->controller->requestType !== Marco::HTTP_REQUEST) {
+        if ($this->controller->requestType !== Macro::HTTP_REQUEST) {
             throw new Exception('$this->outputView not support '. $this->controller->requestType);
         }
 

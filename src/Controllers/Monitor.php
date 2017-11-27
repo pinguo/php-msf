@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Controllers;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class Monitor
@@ -21,7 +21,7 @@ class Monitor extends Controller
      */
     public function actionIndex()
     {
-        $data  = getInstance()->sysCache->get(Marco::SERVER_STATS);
+        $data  = getInstance()->sysCache->get(Macro::SERVER_STATS);
 
         if ($data) {
             $concurrency = 0;

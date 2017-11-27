@@ -1905,7 +1905,7 @@ class Miner
         if ($sql == null) {
             $sql = $this->getStatement(false);
         }
-        if (getInstance()->processType == \PG\MSF\Marco::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
+        if (getInstance()->processType == \PG\MSF\Macro::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
             $profileName = $this->mysqlPool->getAsynName() . '(' . str_replace("\n", " ", $sql) . ')';
             $this->getContext()->getLog()->profileStart($profileName);
 

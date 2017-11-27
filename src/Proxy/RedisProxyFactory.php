@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Proxy;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class RedisProxyFactory
@@ -31,9 +31,9 @@ class RedisProxyFactory
     public static function makeProxy(string $name, array $config)
     {
         $mode = $config['mode'];
-        if ($mode == Marco::CLUSTER) {
+        if ($mode == Macro::CLUSTER) {
             return new RedisProxyCluster($name, $config);
-        } elseif ($mode == Marco::MASTER_SLAVE) {
+        } elseif ($mode == Macro::MASTER_SLAVE) {
             return new RedisProxyMasterSlave($name, $config);
         } else {
             return false;

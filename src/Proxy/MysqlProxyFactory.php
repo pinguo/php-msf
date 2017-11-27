@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Proxy;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class MysqlProxyFactory
@@ -26,7 +26,7 @@ class MysqlProxyFactory
     public static function makeProxy(string $name, array $config)
     {
         $mode = $config['mode'];
-        if ($mode == Marco::MASTER_SLAVE) {
+        if ($mode == Macro::MASTER_SLAVE) {
             return new MysqlProxyMasterSlave($name, $config);
         } else {
             return false;

@@ -9,7 +9,7 @@
 namespace PG\MSF\Coroutine;
 
 use PG\MSF\Pools\RedisAsynPool;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 
 /**
  * Class Redis
@@ -211,12 +211,12 @@ class Redis extends Base
         //get
         if (is_string($data) && $this->redisSerialize) {
             switch ($this->redisSerialize) {
-                case Marco::SERIALIZE_PHP:
+                case Macro::SERIALIZE_PHP:
                     if ($this->canUnserialize($data)) {
                         $data = unserialize($data);
                     }
                     break;
-                case Marco::SERIALIZE_IGBINARY:
+                case Macro::SERIALIZE_IGBINARY:
                     $data = @igbinary_unserialize($data);
                     break;
             }
@@ -224,12 +224,12 @@ class Redis extends Base
 
         if (is_string($data) && $this->phpSerialize) {
             switch ($this->phpSerialize) {
-                case Marco::SERIALIZE_PHP:
+                case Macro::SERIALIZE_PHP:
                     if ($this->canUnserialize($data)) {
                         $data = unserialize($data);
                     }
                     break;
-                case Marco::SERIALIZE_IGBINARY:
+                case Macro::SERIALIZE_IGBINARY:
                     $data = @igbinary_unserialize($data);
                     break;
             }

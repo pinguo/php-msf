@@ -10,7 +10,7 @@
 
 namespace PG\MSF\Base;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\AOP\MI;
 use PG\AOP\Factory;
 use PG\AOP\Wrapper;
@@ -157,13 +157,13 @@ class AOPFactory extends Factory
                 if (!empty(MI::$__reflections[$class]) && method_exists($arguments[0], 'resetProperties')) {
                     $arguments[0]->resetProperties();
                 } else {
-                    if (!empty(MI::$__reflections[$class]) && !empty(MI::$__reflections[$class][Marco::DS_PUBLIC])) {
-                        foreach (MI::$__reflections[$class][Marco::DS_PUBLIC] as $prop => $val) {
+                    if (!empty(MI::$__reflections[$class]) && !empty(MI::$__reflections[$class][Macro::DS_PUBLIC])) {
+                        foreach (MI::$__reflections[$class][Macro::DS_PUBLIC] as $prop => $val) {
                             $arguments[0]->{$prop} = $val;
                         }
                     }
                 }
-                $arguments[0]->__isContruct = false;
+                $arguments[0]->__isConstruct = false;
             }
 
             if ($method === 'get') {
@@ -198,7 +198,7 @@ class AOPFactory extends Factory
 
                 if (self::$taskClasses[$className]) {
                     // worker进程
-                    if (getInstance()->processType == Marco::PROCESS_WORKER) {
+                    if (getInstance()->processType == Macro::PROCESS_WORKER) {
                         array_unshift($arguments, TaskProxy::class);
                     }
                 }
@@ -224,17 +224,17 @@ class AOPFactory extends Factory
                     $result->taskName = $arguments[0];
                 }
                 // 自动调用构造方法
-                if (method_exists($result, '__construct') && $result->__isContruct == false) {
+                if (method_exists($result, '__construct') && $result->__isConstruct == false) {
                     if (!isset($arguments[1])) {
                         $arguments[1] = [];
                     }
-                    $result->__isContruct = true;
+                    $result->__isConstruct = true;
                     $result->__construct(...$arguments[1]);
                 }
                 // 支持自动销毁成员变量
                 MI::__supportAutoDestroy($class);
                 // 对象资源销毁级别
-                $result->__DSLevel = $arguments[2] ?? Marco::DS_PUBLIC;
+                $result->__DSLevel = $arguments[2] ?? Macro::DS_PUBLIC;
             }
             $data = [];
             $data['method'] = $method;

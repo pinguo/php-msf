@@ -23,7 +23,8 @@
       "PG\\MSF\\": "src/"
     },
     "files": [
-      "src/Helpers/Common.php"
+      "src/Helpers/Common.php",
+      "src/Macro.php"
     ]
   },
   "minimum-stability": "dev",

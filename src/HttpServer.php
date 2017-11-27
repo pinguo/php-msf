@@ -243,7 +243,7 @@ abstract class HttpServer extends Server
                 $instance->context->setOutput($output);
                 $instance->context->setControllerName($controllerName);
                 $instance->context->setActionName($methodName);
-                $instance->setRequestType(Marco::HTTP_REQUEST);
+                $instance->setRequestType(Macro::HTTP_REQUEST);
                 $init = $instance->__construct($controllerName, $methodName);
 
                 if ($init instanceof \Generator) {
@@ -402,7 +402,7 @@ abstract class HttpServer extends Server
                 });
             }
 
-            return Marco::SEND_FILE_200;
+            return Macro::SEND_FILE_200;
         }
 
         $path = realpath(urldecode($path));
@@ -412,14 +412,14 @@ abstract class HttpServer extends Server
         if (!file_exists($path)) {
             $response->status(404);
             $response->end('');
-            return Marco::SEND_FILE_404;
+            return Macro::SEND_FILE_404;
         }
 
         // 判断文件是否有权限（非root目录不能访问）
         if (empty($root) || strpos($path, $root) === false) {
             $response->status(403);
             $response->end('');
-            return Marco::SEND_FILE_403;
+            return Macro::SEND_FILE_403;
         }
 
         $info      = pathinfo($path);
@@ -430,7 +430,7 @@ abstract class HttpServer extends Server
         if (isset($request->header['if-modified-since']) && $request->header['if-modified-since'] == $lastModified) {
             $response->status(304);
             $response->end('');
-            return Marco::SEND_FILE_304;
+            return Macro::SEND_FILE_304;
         }
 
         $normalHeaders = getInstance()->config->get("fileHeader.normal", ['Content-Type: application/octet-stream']);
@@ -448,6 +448,6 @@ abstract class HttpServer extends Server
             });
         }
 
-        return Marco::SEND_FILE_200;
+        return Macro::SEND_FILE_200;
     }
 }

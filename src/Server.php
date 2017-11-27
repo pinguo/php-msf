@@ -40,7 +40,7 @@ abstract class Server extends Child
     /**
      * @var int 进程类型
      */
-    public $processType = Marco::PROCESS_MASTER;
+    public $processType = Macro::PROCESS_MASTER;
 
     /**
      * @var Server 实例
@@ -516,10 +516,10 @@ abstract class Server extends Child
     public function onStart($serv)
     {
         self::$_masterPid = $serv->master_pid;
-        $this->processType = Marco::PROCESS_MASTER;
+        $this->processType = Macro::PROCESS_MASTER;
         file_put_contents(self::$pidFile, self::$_masterPid);
         file_put_contents(self::$pidFile, ',' . $serv->manager_pid, FILE_APPEND);
-        self::setProcessTitle($this->config['server.process_title'] . '-' . Marco::PROCESS_NAME[$this->processType]);
+        self::setProcessTitle($this->config['server.process_title'] . '-' . Macro::PROCESS_NAME[$this->processType]);
     }
 
     /**
@@ -539,11 +539,11 @@ abstract class Server extends Child
         }
 
         file_put_contents(self::$pidFile, ',' . getmypid(), FILE_APPEND);
-        if ($this->processType != Marco::PROCESS_TASKER) {
+        if ($this->processType != Macro::PROCESS_TASKER) {
             $this->scheduler = new Scheduler();
         }
 
-        self::setProcessTitle($this->config['server.process_title'] . '-' . Marco::PROCESS_NAME[$this->processType]);
+        self::setProcessTitle($this->config['server.process_title'] . '-' . Macro::PROCESS_NAME[$this->processType]);
     }
 
     /**
@@ -632,8 +632,8 @@ abstract class Server extends Child
      */
     public function onManagerStart($serv)
     {
-        $this->processType = Marco::PROCESS_MANAGER;
-        self::setProcessTitle($this->config['server.process_title'] . '-' . Marco::PROCESS_NAME[$this->processType]);
+        $this->processType = Macro::PROCESS_MANAGER;
+        self::setProcessTitle($this->config['server.process_title'] . '-' . Macro::PROCESS_NAME[$this->processType]);
     }
 
     /**
@@ -672,10 +672,10 @@ abstract class Server extends Child
      * @param int $ms 定时器间隔毫秒
      * @param callable $callBack 定时器执行的回调
      * @param array $params 定时器其他参数
-     * @param string|callable $tickType 定时器类型，可选Marco::SWOOLE_TIMER_TICK，Marco::SWOOLE_TIMER_AFTER
+     * @param string|callable $tickType 定时器类型，可选Macro::SWOOLE_TIMER_TICK，Macro::SWOOLE_TIMER_AFTER
      * @throws Exception
      */
-    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Marco::SWOOLE_TIMER_TICK)
+    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
     {
         if (!in_array($tickType, ['swoole_timer_tick', 'swoole_timer_after'])) {
             throw new Exception("not support $tickType tick type");
@@ -765,9 +765,9 @@ abstract class Server extends Child
      */
     public function checkErrors()
     {
-        if ($this->processType == Marco::PROCESS_WORKER) {
+        if ($this->processType == Macro::PROCESS_WORKER) {
             // exit统计
-            $key = Marco::SERVER_STATS . getInstance()->server->worker_id . '_exit';
+            $key = Macro::SERVER_STATS . getInstance()->server->worker_id . '_exit';
             $exitStat = $this->sysCache->get($key);
             if (!$exitStat) {
                 $exitStat = 1;

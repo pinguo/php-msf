@@ -8,7 +8,7 @@
 
 namespace PG\MSF\Tasks;
 
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\MSF\Base\Core;
 use PG\MSF\Coroutine\CTask;
 
@@ -64,7 +64,7 @@ class TaskProxy extends Core
     public function __call($name, $arguments)
     {
         $this->taskProxyData = [
-            'type'    => Marco::SERVER_TYPE_TASK,
+            'type'    => Macro::SERVER_TYPE_TASK,
             'message' => [
                 'task_name'      => $this->taskName,
                 'task_fuc_name'  => $name,

@@ -12,7 +12,7 @@ namespace PG\MSF\Pools;
 use Noodlehaus\Config;
 use PG\MSF\Coroutine\Redis;
 use PG\MSF\Helpers\Context;
-use PG\MSF\Marco;
+use PG\MSF\Macro;
 use PG\MSF\MSFServer;
 
 /**
@@ -146,7 +146,7 @@ class RedisAsynPool extends AsynPool
      */
     public function go($context, $name, ...$arg)
     {
-        if (getInstance()->processType == Marco::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
+        if (getInstance()->processType == Macro::PROCESS_TASKER) {//如果是task进程自动转换为同步模式
             return $this->getSync()->$name(...$arg);
         } else {
             return $context->getObjectPool()->get(Redis::class, [$this, $name, $arg]);
