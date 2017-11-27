@@ -167,4 +167,17 @@ class Marco
      * Timer AFTER
      */
     const SWOOLE_TIMER_AFTER                         = 'swoole_timer_after';
+
+    /**
+     * 文件Session
+     */
+    const SESSION_FILE                               = 1;
+    /**
+     * redis Session
+     */
+    const SESSION_REDIS                              = 2;
+    /**
+     * redis proxy Session
+     */
+    const SESSION_REDIS_PROXY                        = 3;
 }
