@@ -66,9 +66,6 @@ class Session extends Core
         if ($this->isOpen == false) {
             $this->sessionHandler->open($this->savePath, $this->sessionName);
         }
-
-        //初始化会话
-        $this->start();
     }
 
     /**
@@ -93,6 +90,9 @@ class Session extends Core
             $this->sessionHandler->gc($this->maxLifeTime, $this->sessionId);
         }
 
+        //设定session的访问和修改时间
+        yield $this->sessionHandler->touch($this->sessionId);
+
         //设置上下文内的sessionId
         $this->getContext()->setUserDefined('sessionId', $this->sessionId);
 
@@ -107,8 +107,11 @@ class Session extends Core
      */
     public function set($key, $value)
     {
-        $data = $this->sessionHandler->read($this->sessionId);
-        if ($data === false) {
+        //初始化会话
+        yield $this->start();
+
+        $data = yield $this->sessionHandler->read($this->sessionId);
+        if (!$data) {
             $data = [];
         } else {
             $data = json_decode($data, true);
@@ -120,7 +123,7 @@ class Session extends Core
             $data[$key] = $value;
         }
 
-        return $this->sessionHandler->write($this->sessionId, json_encode($data));
+        return yield $this->sessionHandler->write($this->sessionId, json_encode($data));
     }
 
     /**
@@ -131,8 +134,11 @@ class Session extends Core
      */
     public function get(string $key, $default = null)
     {
-        $data = $this->sessionHandler->read($this->sessionId);
-        if ($data === false) {
+        //初始化会话
+        yield $this->start();
+
+        $data = yield $this->sessionHandler->read($this->sessionId);
+        if (!$data) {
             return $default;
         }
 
@@ -151,8 +157,11 @@ class Session extends Core
      */
     public function has(string $key)
     {
-        $data = $this->sessionHandler->read($this->sessionId);
-        if ($data === false) {
+        //初始化会话
+        yield $this->start();
+
+        $data = yield $this->sessionHandler->read($this->sessionId);
+        if (!$data) {
             return false;
         }
 
@@ -171,8 +180,11 @@ class Session extends Core
      */
     public function delete(string $key)
     {
-        $data = $this->sessionHandler->read($this->sessionId);
-        if ($data === false) {
+        //初始化会话
+        yield $this->start();
+
+        $data = yield $this->sessionHandler->read($this->sessionId);
+        if (!$data) {
             return true;
         }
 
@@ -182,7 +194,7 @@ class Session extends Core
         }
 
         unset($data[$key]);
-        return $this->sessionHandler->write($this->sessionId, json_encode($data));
+        return yield $this->sessionHandler->write($this->sessionId, json_encode($data));
     }
 
     /**
@@ -191,6 +203,9 @@ class Session extends Core
      */
     public function clear()
     {
-        return $this->sessionHandler->unset($this->sessionId);
+        //初始化会话
+        yield $this->start();
+
+        return yield $this->sessionHandler->unset($this->sessionId);
     }
 }

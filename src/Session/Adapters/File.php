@@ -57,7 +57,7 @@ class File extends Core implements ISession
      * @param string $sessionId
      * @return mixed
      */
-    public function gc(int $maxLifeTime, $sessionId = '')
+    public function gc(int $maxLifeTime, string $sessionId = '')
     {
         if ($sessionId) {
             $file = "{$this->savePath}/{$this->sessionName}_{$sessionId}";
@@ -104,7 +104,7 @@ class File extends Core implements ISession
             return false;
         }
 
-        return file_get_contents($file);
+        return $this->getObject(\PG\MSF\Coroutine\File::class)->goReadFile($file);
     }
 
     /**
@@ -115,6 +115,27 @@ class File extends Core implements ISession
      */
     public function write(string $sessionId, string $sessionData)
     {
-        return file_put_contents("{$this->savePath}/{$this->sessionName}_{$sessionId}", $sessionData) !== false;
+        return $this->getObject(\PG\MSF\Coroutine\File::class)->goWriteFile(
+            "{$this->savePath}/{$this->sessionName}_{$sessionId}",
+            $sessionData
+        );
+    }
+
+    /**
+     * 设定session的访问和修改时间
+     * @param string $sessionId
+     * @return bool
+     */
+    public function touch(string $sessionId)
+    {
+        $file = "{$this->savePath}/{$this->sessionName}_{$sessionId}";
+        if (file_exists($file)) {
+            return touch($file, time());
+        } else {
+            return $this->getObject(\PG\MSF\Coroutine\File::class)->goWriteFile(
+                "{$this->savePath}/{$this->sessionName}_{$sessionId}",
+                '{}'
+            );
+        }
     }
 }

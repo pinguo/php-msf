@@ -59,4 +59,11 @@ interface ISession
      * @return mixed
      */
     public function write(string $sessionId, string $sessionData);
+
+    /**
+     * 设定session的访问和修改时间
+     * @param string $sessionId
+     * @return mixed
+     */
+    public function touch(string $sessionId);
 }
