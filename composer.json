@@ -19,14 +19,12 @@
     "ext-amqp": ">=1.8.0"
   },
   "autoload": {
-    "classmap": [
-      "src/Macro.php"
-    ],
     "psr-4": {
       "PG\\MSF\\": "src/"
     },
     "files": [
-      "src/Helpers/Common.php"
+      "src/Helpers/Common.php",
+      "src/Macro.php"
     ]
   },
   "minimum-stability": "dev",
