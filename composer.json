@@ -20,7 +20,7 @@
   },
   "autoload": {
     "psr-4": {
-      "PG\\MSF\\Marco": "src/Marco.php",
+      "PG\\MSF\\Marco\\": "src/Marco.php",
       "PG\\MSF\\": "src/"
     },
     "files": [
