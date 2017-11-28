@@ -200,7 +200,7 @@ class NormalRoute implements IRoute
                 return true;
             }
 
-            $controllerName = $this->routeParams->controllerName  . "\\" . $this->getMethodName();
+            $controllerName = empty($this->routeParams->controllerName) ? $this->getMethodName() : "\\" . $this->getMethodName();
             $this->setControllerName($controllerName);
             $this->setMethodName($this->defaultMethod);
 
