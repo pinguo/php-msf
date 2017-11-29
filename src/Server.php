@@ -472,7 +472,7 @@ abstract class Server extends Child
         global $argv;
         $setConfig = self::$_worker->setServerSet();
         $ascii     = file_get_contents(__DIR__ . '/../ascii.ui');
-        writeln("Start   Command: " . $argv[0] . "\n "  . $ascii);
+        writeln("Start   Command: " . implode(" ", $argv) . "\n "  . $ascii);
         writeln('MSF     Version: ' . self::version);
         writeln('Swoole  Version: ' . SWOOLE_VERSION);
         writeln('PHP     Version: ' . PHP_VERSION);
