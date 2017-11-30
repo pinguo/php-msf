@@ -3,7 +3,6 @@
  * Queue Beanstalk
  * @author    camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
- * Date: 28/11/2017
  */
 
 namespace PG\MSF\Tasks;

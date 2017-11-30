@@ -3,7 +3,6 @@
  * Queue Beanstalk
  * @author    camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
- * Date: 28/11/2017
  */
 
 namespace PG\MSF\Queue;
@@ -55,15 +54,15 @@ class Beanstalk extends Core implements IQueue
     }
 
     /**
-     * 从队列中获取一个job,需要主要的是获取Job之后不会从队列中删除Job,需
+     * 从队列中获取一个job,需要注意的是获取Job之后不会从队列中删除Job,需
      * 明确指定`$isAck=true`才会自动删除.
      *
      * @param string  $queue Tube名字.
-     * @param boolean $isAck 是否从队列中删除,默认否.
+     * @param boolean $isAck 是否从队列中删除,默认是.
      *
      * @return Job
      */
-    public function get(string $queue = 'default', $isAck = false)
+    public function get(string $queue = 'default', $isAck = true)
     {
         yield $this->beanstalkTask->useTube($queue);
         $job = yield $this->beanstalkTask->reserve();

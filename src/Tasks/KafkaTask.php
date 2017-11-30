@@ -3,7 +3,6 @@
  * Queue Kafka Task
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
- * Date: 28/10/2017
  */
 
 namespace PG\MSF\Tasks;
