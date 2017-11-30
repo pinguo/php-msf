@@ -7,6 +7,7 @@
 
 namespace PG\MSF\Tasks;
 
+use Pheanstalk\Command\PeekCommand;
 use Pheanstalk\Connection;
 use Pheanstalk\Exception\ClientException;
 use Pheanstalk\Job;
@@ -130,10 +131,14 @@ class BeanstalkTask extends Task
      * @return int
      */
     public function put($data,
-                        $priority = PheanstalkInterface::DEFAULT_PRIORITY,
-                        $delay = PheanstalkInterface::DEFAULT_DELAY,
-                        $ttr = PheanstalkInterface::DEFAULT_TTR)
+                        $priority = null,
+                        $delay = null,
+                        $ttr = null)
     {
+        $priority = $priority ?? PheanstalkInterface::DEFAULT_PRIORITY;
+        $delay = $delay ?? PheanstalkInterface::DEFAULT_DELAY;
+        $ttr = $ttr ?? PheanstalkInterface::DEFAULT_TTR;
+
         return $this->client->put($data, $priority, $delay, $ttr);
     }
 
@@ -155,12 +160,15 @@ class BeanstalkTask extends Task
     public function putInTube(
         $tube,
         $data,
-        $priority = PheanstalkInterface::DEFAULT_PRIORITY,
-        $delay = PheanstalkInterface::DEFAULT_DELAY,
-        $ttr = PheanstalkInterface::DEFAULT_TTR
+        $priority = null,
+        $delay = null,
+        $ttr = null
     )
     {
         $this->useTube($tube);
+        $priority = $priority ?? PheanstalkInterface::DEFAULT_PRIORITY;
+        $delay = $delay ?? PheanstalkInterface::DEFAULT_DELAY;
+        $ttr = $ttr ?? PheanstalkInterface::DEFAULT_TTR;
 
         return $this->put($data, $priority, $delay, $ttr);
     }
@@ -176,10 +184,13 @@ class BeanstalkTask extends Task
      */
     public function release(
         Job $job,
-        $priority = PheanstalkInterface::DEFAULT_PRIORITY,
-        $delay = PheanstalkInterface::DEFAULT_DELAY
+        $priority = null,
+        $delay = null
     )
     {
+        $priority = $priority ?? PheanstalkInterface::DEFAULT_PRIORITY;
+        $delay = $delay ?? PheanstalkInterface::DEFAULT_DELAY;
+
         return $this->client->release($job, $priority, $delay);
     }
 
@@ -275,9 +286,50 @@ class BeanstalkTask extends Task
     }
 
     /**
-     * 让client在系统中检查job.
+     * 让client在系统中检查job.分成四种:
+     *  1. peek 返回id对应的job
+     *  2. peekReady 返回下一个ready job
+     *  3. peekDelayed 返回下一个延迟剩余时间最短的job
+     *  4. peekBuried  返回下一个在buried列表中的job
+     *  即参数`type`可指定为id,ready,delayed,buried
+     *  可选参数`tubeOrId`可以tube名或者jobId.
+     *  当type为除开id外的其他三种情况,tubeOrId表示`jobId`,否则表示`tube`.
      *
-     * @param int $jobId
+     * @see peek
+     *
+     * @param string     $type     需要peek的类型
+     * @param string|int $tubeOrId Tube名或jobId,受参数`type`影响.
+     *
+     * @return Job
+     */
+    public function peekJobByType($type = null, $tubeOrId = null)
+    {
+        switch (true) {
+            case $type === PeekCommand::TYPE_BURIED:
+                $job = $this->client->peekBuried($tubeOrId);
+                break;
+            case $type === PeekCommand::TYPE_DELAYED:
+                $job = $this->client->peekDelayed($tubeOrId);
+                break;
+            case $type === PeekCommand::TYPE_READY:
+                $job = $this->client->peekReady($tubeOrId);
+                break;
+            case $type === PeekCommand::TYPE_ID:
+                $job = $this->client->peek($tubeOrId);
+                break;
+            default:
+                $job = $this->client->peek($tubeOrId);
+        }
+
+        return $job;
+    }
+
+    /**
+     * 返回id对应的job.
+     *
+     * @see peekJobByType
+     *
+     * @param int $jobId Job的Id.
      *
      * @return Job
      */
@@ -328,6 +380,68 @@ class BeanstalkTask extends Task
     public function listTubes()
     {
         return $this->client->listTubes();
+    }
+
+    /**
+     * @param bool $askServer
+     *
+     * @return array
+     */
+    public function listTubesWatched($askServer = false)
+    {
+        return $this->client->listTubesWatched($askServer);
+    }
+
+    /**
+     * @param bool $askServer
+     *
+     * @return string
+     */
+    public function listTubeUsed($askServer = false)
+    {
+        return $this->client->listTubeUsed($askServer);
+    }
+
+    /**
+     * 恢复tube.
+     *
+     * @see pauseTube
+     *
+     * @param string $tube
+     *
+     * @return true
+     */
+    public function resumeTube($tube)
+    {
+        $this->client->resumeTube($tube);
+
+        return true;
+    }
+
+    /**
+     * 临时暂停从给定的tube中reserve出job.
+     *
+     * @param string $tube  Tube名字.
+     * @param int    $delay 延迟时间.0表示恢复.
+     *
+     * @return true
+     */
+    public function pauseTube($tube, $delay)
+    {
+        $this->client->pauseTube($tube, $delay);
+
+        return true;
+    }
+
+    /**
+     * @param string $tube
+     * @param int    $timeout
+     *
+     * @return false|Job
+     */
+    public function reserveFromTube($tube, $timeout = null)
+    {
+        return $this->client->reserveFromTube($tube, $timeout);
     }
 
 }
