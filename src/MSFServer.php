@@ -118,12 +118,14 @@ abstract class MSFServer extends HttpServer
         }
 
         //业务自定义定时器进程
-        if ($this->config->get('user_timer_enable', false)) {
-            $timerProcess = new \swoole_process(function ($process) {
-                new Timer($this->config, $this);
-                $this->onWorkerStart($this->server, null);
-            }, false, 2);
-            $this->server->addProcess($timerProcess);
+        if ($num = intval($this->config->get('user_timer_enable', 0))) {
+            for ($i = 0; $i < $num; $i++) {
+                $timerProcess = new \swoole_process(function ($process) {
+                    new Timer($this->config, $this);
+                    $this->onWorkerStart($this->server, null);
+                }, false, 2);
+                $this->server->addProcess($timerProcess);
+            }
         }
     }
 
