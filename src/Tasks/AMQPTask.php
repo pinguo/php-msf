@@ -3,7 +3,6 @@
  * Queue amqpMQ Task
  * @author camera360_server@camera360.com
  * @copyright Chengdu pinguo Technology Co.,Ltd.
- * Date: 26/10/2017
  */
 
 namespace PG\MSF\Tasks;
@@ -112,7 +111,7 @@ class AMQPTask extends Task
 
     /**
      * 读取消息
-     * @param int $autoAck 自否在MQ中清除
+     * @param int $autoAck 是否在MQ中清除
      * @return \AMQPEnvelope|bool
      */
     public function get($autoAck = 1)
@@ -127,7 +126,7 @@ class AMQPTask extends Task
     /**
      * 消费消息
      * @param callable $callback 回调函数
-     * @param int $autoAck 自否在MQ中清除
+     * @param int $autoAck 是否在MQ中清除
      */
     public function consume(callable $callback, $autoAck = 1)
     {

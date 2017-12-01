@@ -7,7 +7,7 @@
   "require": {
     "php": ">=7.0",
     "ext-swoole": ">=1.9.15",
-    "pinguo/php-log": "1.0.0",
+    "pinguo/php-log": "1.0.1",
     "pinguo/php-context": "1.0.0",
     "pinguo/php-aop": "1.0.0",
     "league/plates": "3.3.0",
@@ -16,7 +16,9 @@
   },
   "suggest": {
     "alcaeus/mongo-php-adapter": "^1.0",
-    "ext-amqp": ">=1.8.0"
+    "ext-amqp": ">=1.8.0",
+    "pda/pheanstalk": "PHP client for beanstalkd queue",
+    "kwn/php-rdkafka-stubs": "for kafka support"
   },
   "autoload": {
     "psr-4": {
