@@ -119,7 +119,7 @@ abstract class MSFServer extends HttpServer
 
         //业务自定义定时器进程
         $num = intval($this->config->get('user_timer_enable', 0));
-        if ($num > 0) { // 多进程多任务
+        if ($num > 0) { // 多进程多任务，每个进程的任务相同
             for ($i = 0; $i < $num; $i++) {
                 $timerProcess = new \swoole_process(function ($process) {
                     new Timer($this->config, $this);
@@ -127,7 +127,7 @@ abstract class MSFServer extends HttpServer
                 }, false, 2);
                 $this->server->addProcess($timerProcess);
             }
-        } elseif ($num == -1) {//多进程单任务
+        } elseif ($num == -1) {//多进程，每个进程独立任务
             $this->onInitTimerProcess();
         }
     }
