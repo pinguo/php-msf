@@ -118,7 +118,8 @@ abstract class MSFServer extends HttpServer
         }
 
         //业务自定义定时器进程
-        if ($num = intval($this->config->get('user_timer_enable', 0))) {
+        $num = intval($this->config->get('user_timer_enable', 0));
+        if ($num > 0) { // 多进程多任务
             for ($i = 0; $i < $num; $i++) {
                 $timerProcess = new \swoole_process(function ($process) {
                     new Timer($this->config, $this);
@@ -126,6 +127,8 @@ abstract class MSFServer extends HttpServer
                 }, false, 2);
                 $this->server->addProcess($timerProcess);
             }
+        } elseif ($num == -1) {//多进程单任务
+            $this->onInitTimerProcess();
         }
     }
 
@@ -591,6 +594,14 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
+     * 添加自定义业务定时器进程(独立的process进程)
+     */
+    public function onInitTimerProcess()
+    {
+
+    }
+
+    /**
      * 连接断开
      *
      * @param \swoole_server $serv
@@ -609,5 +620,23 @@ abstract class MSFServer extends HttpServer
     public function getAllTaskMessage()
     {
         return [];
+    }
+
+    /**
+     * 添加并注册自定义的Timer进程和任务
+     * 通常是一个进程一个任务
+     * @param int $ms 定时器间隔
+     * @param callable $callBack 回调函数
+     * @param array $params 参数
+     * @param string $tickType
+     */
+    public function addTimerProcess(int $ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
+    {
+        $timerProcess = new \swoole_process(function ($process) use ($ms, $callBack, $params, $tickType) {
+            new Timer($this->config, $this, true);
+            $this->registerTimer($ms, $callBack, $params, $tickType);
+            $this->onWorkerStart($this->server, null);
+        }, false, 2);
+        $this->server->addProcess($timerProcess);
     }
 }

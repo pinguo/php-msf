@@ -26,12 +26,15 @@ class Timer extends ProcessBase
      *
      * @param Conf $config 配置对象
      * @param MSFServer $MSFServer Server运行实例
+     * @param bool $isInit 是否已经初始化了Timer
      */
-    public function __construct(Conf $config, MSFServer $MSFServer)
+    public function __construct(Conf $config, MSFServer $MSFServer, $isInit = false)
     {
         parent::__construct($config, $MSFServer);
         $this->MSFServer->processType = Macro::PROCESS_TIMER;
         writeln('User      Timer: Enabled');
-        $MSFServer->onInitTimer();
+        if (!$isInit) {
+            $MSFServer->onInitTimer();
+        }
     }
 }
