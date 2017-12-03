@@ -494,7 +494,9 @@ abstract class MSFServer extends HttpServer
                         $proxy->check();
                     }
                 });
+            }
 
+            if (!empty($this->mysqlProxyManager)) {
                 // mysql proxy监测
                 getInstance()->sysTimers[] = $this->server->tick(5000, function () {
                     foreach ($this->mysqlProxyManager as $proxy) {
