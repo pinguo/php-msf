@@ -475,15 +475,14 @@ abstract class MSFServer extends HttpServer
             $this->initAsynPools();
             $this->initRedisProxies();
             $this->initMysqlProxies();
-            if ($this->processType != Macro::PROCESS_TASKER) {
-                //注册
-                $this->asynPoolManager = new AsynPoolManager(null, $this);
-                $this->asynPoolManager->noEventAdd();
-                foreach ($this->asynPools as $pool) {
-                    if ($pool) {
-                        $pool->workerInit($workerId);
-                        $this->asynPoolManager->registerAsyn($pool);
-                    }
+
+            //注册
+            $this->asynPoolManager = new AsynPoolManager(null, $this);
+            $this->asynPoolManager->noEventAdd();
+            foreach ($this->asynPools as $pool) {
+                if ($pool) {
+                    $pool->workerInit($workerId);
+                    $this->asynPoolManager->registerAsyn($pool);
                 }
             }
 
