@@ -33,8 +33,5 @@ class Timer extends ProcessBase
         parent::__construct($config, $MSFServer);
         $this->MSFServer->processType = Macro::PROCESS_TIMER;
         writeln('User      Timer: Enabled');
-        if (!$isInit) {
-            $MSFServer->onInitTimer();
-        }
     }
 }

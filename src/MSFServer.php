@@ -55,6 +55,16 @@ abstract class MSFServer extends HttpServer
     protected $asynPoolManager;
 
     /**
+     * @var array 自定义timer进程
+     */
+    protected $userTimerProcess = [];
+
+    /**
+     * @var array 自定义的timer任务
+     */
+    protected $userRegisterTimer = [];
+
+    /**
      * MSFServer constructor.
      */
     public function __construct()
@@ -119,16 +129,34 @@ abstract class MSFServer extends HttpServer
 
         //业务自定义定时器进程
         $num = intval($this->config->get('user_timer_enable', 0));
-        if ($num > 0) { // 多进程多任务，每个进程的任务相同
-            for ($i = 0; $i < $num; $i++) {
-                $timerProcess = new \swoole_process(function ($process) {
-                    new Timer($this->config, $this);
-                    $this->onWorkerStart($this->server, null);
-                }, false, 2);
-                $this->server->addProcess($timerProcess);
+        if ($num > 0) {
+            $this->onInitTimer();
+            //自定义多个定时器进程，但每个进程只有一个任务，且任务不同
+            if (!empty($this->userTimerProcess)) {
+                foreach ($this->userTimerProcess as $info) {
+                    list($ms, $callBack, $params, $tickType) = $info;
+                    $timerProcess = new \swoole_process(function ($process) use ($ms, $callBack, $params, $tickType) {
+                        new Timer($this->config, $this);
+                        $this->addTimer($ms, $callBack, $params, $tickType);
+                        $this->onWorkerStart($this->server, null);
+                    }, false, 2);
+                    $this->server->addProcess($timerProcess);
+                }
             }
-        } elseif ($num == -1) {//多进程，每个进程独立任务
-            $this->onInitTimerProcess();
+            //自定义多个任务，也可以多进程，但每个进程的任务都相同
+            if (!empty($this->userRegisterTimer)) {
+                for ($i = 0; $i < $num; $i++) {
+                    $timerProcess = new \swoole_process(function ($process) {
+                        new Timer($this->config, $this);
+                        foreach ($this->userRegisterTimer as $info) {
+                            list($ms, $callBack, $params, $tickType) = $info;
+                            $this->addTimer($ms, $callBack, $params, $tickType);
+                        }
+                        $this->onWorkerStart($this->server, null);
+                    }, false, 2);
+                    $this->server->addProcess($timerProcess);
+                }
+            }
         }
     }
 
@@ -631,13 +659,21 @@ abstract class MSFServer extends HttpServer
      * @param array $params 参数
      * @param string $tickType
      */
-    public function addTimerProcess(int $ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
+    public function addTimerProcess($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
     {
-        $timerProcess = new \swoole_process(function ($process) use ($ms, $callBack, $params, $tickType) {
-            new Timer($this->config, $this, true);
-            $this->registerTimer($ms, $callBack, $params, $tickType);
-            $this->onWorkerStart($this->server, null);
-        }, false, 2);
-        $this->server->addProcess($timerProcess);
+        $this->userTimerProcess[] = [$ms, $callBack, $params, $tickType];
+    }
+
+    /**
+     * 添加定时器
+     * 通常是一个进程多个任务
+     * @param int $ms
+     * @param callable $callBack
+     * @param array $params
+     * @param callable|string $tickType
+     */
+    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
+    {
+        $this->userRegisterTimer[] = [$ms, $callBack, $params, $tickType];
     }
 }

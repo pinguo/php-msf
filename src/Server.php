@@ -668,6 +668,7 @@ abstract class Server extends Child
     }
 
     /**
+     * 添加定时器
      * 定时器包装（用于业务Timer进程）
      *
      * @param int $ms 定时器间隔毫秒
@@ -676,7 +677,7 @@ abstract class Server extends Child
      * @param string|callable $tickType 定时器类型，可选Macro::SWOOLE_TIMER_TICK，Macro::SWOOLE_TIMER_AFTER
      * @throws Exception
      */
-    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
+    public function addTimer($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
     {
         if (!in_array($tickType, ['swoole_timer_tick', 'swoole_timer_after'])) {
             throw new Exception("not support $tickType tick type");
