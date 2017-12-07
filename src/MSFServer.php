@@ -623,14 +623,6 @@ abstract class MSFServer extends HttpServer
     }
 
     /**
-     * 添加自定义业务定时器进程(独立的process进程)
-     */
-    public function onInitTimerProcess()
-    {
-
-    }
-
-    /**
      * 连接断开
      *
      * @param \swoole_server $serv
