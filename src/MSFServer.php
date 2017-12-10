@@ -55,6 +55,16 @@ abstract class MSFServer extends HttpServer
     protected $asynPoolManager;
 
     /**
+     * @var array 自定义timer进程
+     */
+    protected $userTimerProcess = [];
+
+    /**
+     * @var array 自定义的timer任务
+     */
+    protected $userRegisterTimer = [];
+
+    /**
      * MSFServer constructor.
      */
     public function __construct()
@@ -118,12 +128,35 @@ abstract class MSFServer extends HttpServer
         }
 
         //业务自定义定时器进程
-        if ($this->config->get('user_timer_enable', false)) {
-            $timerProcess = new \swoole_process(function ($process) {
-                new Timer($this->config, $this);
-                $this->onWorkerStart($this->server, null);
-            }, false, 2);
-            $this->server->addProcess($timerProcess);
+        $num = intval($this->config->get('user_timer_enable', 0));
+        if ($num > 0) {
+            $this->onInitTimer();
+            //自定义多个定时器进程，但每个进程只有一个任务，且任务不同
+            if (!empty($this->userTimerProcess)) {
+                foreach ($this->userTimerProcess as $info) {
+                    list($ms, $callBack, $params, $tickType) = $info;
+                    $timerProcess = new \swoole_process(function ($process) use ($ms, $callBack, $params, $tickType) {
+                        new Timer($this->config, $this);
+                        $this->addTimer($ms, $callBack, $params, $tickType);
+                        $this->onWorkerStart($this->server, null);
+                    }, false, 2);
+                    $this->server->addProcess($timerProcess);
+                }
+            }
+            //自定义多个任务，也可以多进程，但每个进程的任务都相同
+            if (!empty($this->userRegisterTimer)) {
+                for ($i = 0; $i < $num; $i++) {
+                    $timerProcess = new \swoole_process(function ($process) {
+                        new Timer($this->config, $this);
+                        foreach ($this->userRegisterTimer as $info) {
+                            list($ms, $callBack, $params, $tickType) = $info;
+                            $this->addTimer($ms, $callBack, $params, $tickType);
+                        }
+                        $this->onWorkerStart($this->server, null);
+                    }, false, 2);
+                    $this->server->addProcess($timerProcess);
+                }
+            }
         }
     }
 
@@ -470,15 +503,14 @@ abstract class MSFServer extends HttpServer
             $this->initAsynPools();
             $this->initRedisProxies();
             $this->initMysqlProxies();
-            if ($this->processType != Macro::PROCESS_TASKER) {
-                //注册
-                $this->asynPoolManager = new AsynPoolManager(null, $this);
-                $this->asynPoolManager->noEventAdd();
-                foreach ($this->asynPools as $pool) {
-                    if ($pool) {
-                        $pool->workerInit($workerId);
-                        $this->asynPoolManager->registerAsyn($pool);
-                    }
+
+            //注册
+            $this->asynPoolManager = new AsynPoolManager(null, $this);
+            $this->asynPoolManager->noEventAdd();
+            foreach ($this->asynPools as $pool) {
+                if ($pool) {
+                    $pool->workerInit($workerId);
+                    $this->asynPoolManager->registerAsyn($pool);
                 }
             }
 
@@ -489,7 +521,9 @@ abstract class MSFServer extends HttpServer
                         $proxy->check();
                     }
                 });
+            }
 
+            if (!empty($this->mysqlProxyManager)) {
                 // mysql proxy监测
                 getInstance()->sysTimers[] = $this->server->tick(5000, function () {
                     foreach ($this->mysqlProxyManager as $proxy) {
@@ -607,5 +641,31 @@ abstract class MSFServer extends HttpServer
     public function getAllTaskMessage()
     {
         return [];
+    }
+
+    /**
+     * 添加并注册自定义的Timer进程和任务
+     * 通常是一个进程一个任务
+     * @param int $ms 定时器间隔
+     * @param callable $callBack 回调函数
+     * @param array $params 参数
+     * @param string $tickType
+     */
+    public function addTimerProcess($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
+    {
+        $this->userTimerProcess[] = [$ms, $callBack, $params, $tickType];
+    }
+
+    /**
+     * 添加定时器
+     * 通常是一个进程多个任务
+     * @param int $ms
+     * @param callable $callBack
+     * @param array $params
+     * @param callable|string $tickType
+     */
+    public function registerTimer($ms, callable $callBack, $params = [], $tickType = Macro::SWOOLE_TIMER_TICK)
+    {
+        $this->userRegisterTimer[] = [$ms, $callBack, $params, $tickType];
     }
 }
