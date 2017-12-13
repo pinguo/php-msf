@@ -317,7 +317,15 @@ abstract class MSFServer extends HttpServer
                     $PGLog->error(dump($e, false, true));
                 } finally {
                     $PGLog->pushLog('status', $status);
-                    $PGLog->appendNoticeLog();
+
+                    if ($status === 200) {
+                        //可配置task日志的写入比例 0表示不写，100表示全写，50表示50%的比例
+                        $logRate = $this->config->get('task_log_rate', 100);
+                        (rand(1, 100) < $logRate) && $PGLog->appendNoticeLog();
+                    } else {
+                        $PGLog->appendNoticeLog();
+                    }
+
                     //销毁对象
                     foreach ($this->objectPoolBuckets as $k => $obj) {
                         $objectPool->push($obj);
