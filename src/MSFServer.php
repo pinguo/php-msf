@@ -78,7 +78,7 @@ abstract class MSFServer extends HttpServer
         $this->name = self::SERVER_NAME;
         parent::__construct();
         //可配置task日志的写入比例 0表示不写，100表示全写，50表示50%的比例
-        $this->taskLogRate = $this->config->get('task_log_rate', 100);
+        $this->taskLogRate = $this->config->get('server.log.task_log_rate', 100);
     }
 
     /**
@@ -326,7 +326,7 @@ abstract class MSFServer extends HttpServer
                     $PGLog->pushLog('status', $status);
 
                     if ($status === 200) {
-                        (mt_rand(1, 100) < $this->taskLogRate) && $PGLog->appendNoticeLog();
+                        (mt_rand(0, 99) < $this->taskLogRate) && $PGLog->appendNoticeLog();
                     } else {
                         $PGLog->appendNoticeLog();
                     }
