@@ -65,6 +65,11 @@ abstract class MSFServer extends HttpServer
     protected $userRegisterTimer = [];
 
     /**
+     * @var int $taskLogRate task日志写入比例
+     */
+    private $taskLogRate = 100;
+
+    /**
      * MSFServer constructor.
      */
     public function __construct()
@@ -72,6 +77,8 @@ abstract class MSFServer extends HttpServer
         self::$instance = $this;
         $this->name = self::SERVER_NAME;
         parent::__construct();
+        //可配置task日志的写入比例 0表示不写，100表示全写，50表示50%的比例
+        $this->taskLogRate = $this->config->get('task_log_rate', 100);
     }
 
     /**
@@ -319,9 +326,7 @@ abstract class MSFServer extends HttpServer
                     $PGLog->pushLog('status', $status);
 
                     if ($status === 200) {
-                        //可配置task日志的写入比例 0表示不写，100表示全写，50表示50%的比例
-                        $logRate = $this->config->get('task_log_rate', 100);
-                        (rand(1, 100) < $logRate) && $PGLog->appendNoticeLog();
+                        (mt_rand(1, 100) < $this->taskLogRate) && $PGLog->appendNoticeLog();
                     } else {
                         $PGLog->appendNoticeLog();
                     }
