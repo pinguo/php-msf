@@ -8,8 +8,6 @@
 
 namespace PG\MSF\Rest;
 
-use PG\MSF\Base\Output;
-
 /**
  * Class Controller
  * @package PG\MSF\Rest
@@ -137,7 +135,7 @@ class Controller extends \PG\MSF\Controllers\Controller
      */
     public function outputOptions(array $options)
     {
-        /* @var $output Output */
+        /* @var $output \PG\MSF\Base\Output */
         $output = $this->getContext()->getOutput();
         $status = 200;
         if ($this->verb !== 'OPTIONS') {
