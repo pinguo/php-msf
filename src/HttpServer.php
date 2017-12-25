@@ -111,7 +111,13 @@ abstract class HttpServer extends Server
         $this->httpSocketName = $this->config['http_server']['socket'];
         $this->httpPort       = $this->config['http_server']['port'];
         $this->input          = $this->config->get('http.input', Input::class);
+        if (is_array($this->input)) {
+            $this->input = $this->input['class'] ?? Input::class;
+        }
         $this->output         = $this->config->get('http.output', Output::class);
+        if (is_array($this->output)) {
+            $this->output = $this->output['class'] ?? Output::class;
+        }
         return $this;
     }
 
