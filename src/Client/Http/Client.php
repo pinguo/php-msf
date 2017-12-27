@@ -322,7 +322,17 @@ class Client extends Core
         }
         $this->setHeaders($headers);
 
-        $sendGetReq  = $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
+        //支持直接在url之后带参数形式的GET请求
+        $q = '';
+        if (!empty($this->urlData['query'])) {
+            $q = ltrim($this->urlData['query'], '?');
+        }
+
+        if (!empty($query)) {
+            $q .= empty($q) ? '' : '&' . http_build_query($query) ;
+        }
+
+        $sendGetReq  = $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $q, $timeout]);
 
         return $sendGetReq;
     }
@@ -427,12 +437,16 @@ class Client extends Core
         $this->setHeaders($headers);
 
         //支持直接在url之后带参数形式的GET请求
+        $q = '';
         if (!empty($this->urlData['query'])) {
-            parse_str(trim($this->urlData['query'], '?'), $data);
-            $query = array_merge($data, $query);
+            $q = ltrim($this->urlData['query'], '?');
         }
 
-        return yield $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $query, $timeout]);
+        if (!empty($query)) {
+            $q .= empty($q) ? '' : '&' . http_build_query($query) ;
+        }
+
+        return yield $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $q, $timeout]);
     }
 
     /**
@@ -668,13 +682,13 @@ class Client extends Core
      * 发起异步GET请求
      *
      * @param string $path 待请求的URL Path
-     * @param array $query 查询参数
+     * @param string $query 查询参数
      * @param $callback
      */
-    public function get($path, $query, $callback)
+    public function get($path, string $query, $callback)
     {
         if (!empty($query)) {
-            $path = $path . "?" . http_build_query($query);
+            $path = $path . '?' . $query;
         }
         $this->client->get($path, $callback);
     }
