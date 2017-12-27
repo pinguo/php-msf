@@ -329,7 +329,7 @@ class Client extends Core
         }
 
         if (!empty($query)) {
-            $q .= empty($q) ? '' : '&' . http_build_query($query) ;
+            $q .= (empty($q) ? '' : '&') . http_build_query($query) ;
         }
 
         $sendGetReq  = $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $q, $timeout]);
@@ -443,7 +443,7 @@ class Client extends Core
         }
 
         if (!empty($query)) {
-            $q .= empty($q) ? '' : '&' . http_build_query($query) ;
+            $q .= (empty($q) ? '' : '&') . http_build_query($query) ;
         }
 
         return yield $this->getObject(Http::class, [$this, 'GET', $this->urlData['path'], $q, $timeout]);
