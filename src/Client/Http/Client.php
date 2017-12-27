@@ -674,7 +674,12 @@ class Client extends Core
     public function get($path, $query, $callback)
     {
         if (!empty($query)) {
-            $path = $path . "?" . http_build_query($query);
+            //解决 ?avinfo= 的问题，理论上 ?a=&b= 和 ?a&b 是一样的，但是七牛并不兼容 ?avinfo= 的格式
+            $query = implode('&', array_map(function ($item) {
+                return rtrim($item, '=');
+            }, explode('&', http_build_query($query))));
+
+            $path = $path."?".$query;
         }
         $this->client->get($path, $callback);
     }
