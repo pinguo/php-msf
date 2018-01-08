@@ -47,6 +47,34 @@ abstract class HttpServer extends Server
      * @var array
      */
     public $viewResolvePaths;
+    
+    /**
+     * Input类
+     * 通过继承 PG\MSF\Base\Input 来自定义，默认是 PG\MSF\Base\Input
+     * 可以在配置文件中修改，例如：
+     * 
+     * ```php
+     * 'http' => [
+     *     'input' => PG\MSF\Base\Input::class,
+     * ]
+     * ```
+     * @var Input
+     */
+    public $input;
+    
+    /**
+     * Output类
+     * 通过继承 PG\MSF\Base\Output 来自定义，默认是 PG\MSF\Base\Output
+     * 可以在配置文件中修改，例如：
+     * 
+     * ```php
+     * 'http' => [
+     *     'output' => PG\MSF\Base\Output::class,
+     * ]
+     * ```
+     * @var Output
+     */
+    public $output;
 
     /**
      * HttpServer constructor.
@@ -82,6 +110,14 @@ abstract class HttpServer extends Server
         $this->httpEnable     = $this->config->get('http_server.enable', true);
         $this->httpSocketName = $this->config['http_server']['socket'];
         $this->httpPort       = $this->config['http_server']['port'];
+        $this->input          = $this->config->get('http.input', Input::class);
+        if (is_array($this->input)) {
+            $this->input = $this->input['class'] ?? Input::class;
+        }
+        $this->output         = $this->config->get('http.output', Output::class);
+        if (is_array($this->output)) {
+            $this->output = $this->output['class'] ?? Output::class;
+        }
         return $this;
     }
 
@@ -231,12 +267,12 @@ abstract class HttpServer extends Server
                 /**
                  * @var $input Input
                  */
-                $input    = $instance->context->getObjectPool()->get(Input::class);
+                $input    = $instance->context->getObjectPool()->get($this->input);
                 $input->set($request);
                 /**
                  * @var $output Output
                  */
-                $output   = $instance->context->getObjectPool()->get(Output::class, [$instance]);
+                $output   = $instance->context->getObjectPool()->get($this->output, [$instance]);
                 $output->set($request, $response);
 
                 $instance->context->setInput($input);

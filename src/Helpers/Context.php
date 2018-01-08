@@ -9,7 +9,6 @@
 namespace PG\MSF\Helpers;
 
 use PG\Context\AbstractContext;
-use PG\Log\PGLog;
 use PG\MSF\Base\Input;
 use PG\MSF\Base\Output;
 use PG\MSF\Base\Pool;
