@@ -58,17 +58,17 @@ class Beanstalk extends Core implements IQueue
      * 从队列中获取一个job,需要注意的是获取Job之后不会从队列中删除Job,需
      * 明确指定`$isAck=true`才会自动删除.
      *
-     * @param string   $queue   Tube名字.
+     * @param string   $queue   Tube名字(默认会watch此tube).
      * @param boolean  $isAck   是否从队列中删除,默认是.
      * @param int|null $timeout 取Job的超时时间,即`reserve-with-timeout`.
      *
-     * @return Job
+     * @return false|Job
      */
     public function get(string $queue = 'default', $isAck = true, $timeout = null)
     {
-        yield $this->beanstalkTask->useTube($queue);
+        yield $this->beanstalkTask->watch($queue);
         $job = yield $this->beanstalkTask->reserve($timeout);
-        if ($isAck) {
+        if ($job && $isAck) {
             yield $this->beanstalkTask->delete($job);
         }
 
