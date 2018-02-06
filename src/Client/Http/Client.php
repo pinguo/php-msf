@@ -584,6 +584,9 @@ class Client extends Core
             }
 
             if ($requests[$key]['method'] == 'GET') {
+                if (is_array($requests[$key]['data'])) {
+                    $requests[$key]['data'] = http_build_query($requests[$key]['data']);
+                }
                 $sendHttpRequests[$key] = $this->getObject(Http::class, [$client, 'GET', $client->urlData['path'], $requests[$key]['data'], $requests[$key]['timeout']]);
             }
 
