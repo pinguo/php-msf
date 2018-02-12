@@ -176,7 +176,7 @@ abstract class AsynPool implements IAsynPool
     public function pushToPool($client)
     {
         $maxTime = $this->config[static::ASYN_NAME][$this->active]['max_time'] ?? 3600;
-        $minConn = $this->config[static::ASYN_NAME][$this->active]['min_conn'] ?? 10;
+        $minConn = $this->config[static::ASYN_NAME][$this->active]['min_conn'] ?? 0;
 
         //回归连接
         if (((time() - $client->genTime) < $maxTime)
