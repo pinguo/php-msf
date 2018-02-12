@@ -201,7 +201,7 @@ abstract class AsynPool implements IAsynPool
     {
         $maxConn = $this->config[static::ASYN_NAME][$this->active]['max_conn'] ?? null;
         if ($maxConn) {
-            if ($maxConn >= ($this->waitConnectNum + $this->establishedConn)) {
+            if ($maxConn > ($this->waitConnectNum + $this->establishedConn)) {
                 $this->reconnect();
             }
         } else {
