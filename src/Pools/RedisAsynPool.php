@@ -24,22 +24,12 @@ class RedisAsynPool extends AsynPool
     /**
      * 连接池类型名称
      */
-    const ASYN_NAME = 'redis.';
+    const ASYN_NAME = 'redis';
 
     /**
      * @var array 连接配置信息
      */
     public $connect;
-
-    /**
-     * @var int 连接峰值
-     */
-    protected $redisMaxCount = 0;
-
-    /**
-     * @var string 连接池标识
-     */
-    private $active;
 
     /**
      * @var CoroutineRedisProxy 连接池辅助类
@@ -80,8 +70,7 @@ class RedisAsynPool extends AsynPool
      */
     public function __construct($config, string $active)
     {
-        parent::__construct($config);
-        $this->active = $active;
+        parent::__construct($config, $active);
 
         $config = $this->config->get('redis.' . $this->active, null);
         if (!$config) {
@@ -456,25 +445,10 @@ class RedisAsynPool extends AsynPool
                 //给worker发消息
                 $this->asynManager->sendMessageToWorker($this, $data);
                 //回归连接
-                if (((time() - $client->genTime) < 3600)
-                    || (($this->redisMaxCount + $this->waitConnectNum) <= 30)
-                ) {
-                    $this->pushToPool($client);
-                } else {
-                    $client->close();
-                    $this->redisMaxCount--;
-                }
+                $this->pushToPool($client);
             };
             $client->__call($data['name'], array_values($arguments));
         }
-    }
-
-    /**
-     * 创建一个Redis连接
-     */
-    public function prepareOne()
-    {
-        $this->reconnect();
     }
 
     /**
@@ -512,8 +486,8 @@ class RedisAsynPool extends AsynPool
 
             $client->isClose = false;
             if (!isset($client->client_id)) {
-                $client->client_id = $this->redisMaxCount;
-                $this->redisMaxCount++;
+                $client->client_id = $this->establishedConn;
+                $this->establishedConn++;
             }
             $this->pushToPool($client);
         });
@@ -527,15 +501,6 @@ class RedisAsynPool extends AsynPool
     public function onClose($client)
     {
         $client->isClose = true;
-    }
-
-    /**
-     * 返回唯一的连接池名称
-     *
-     * @return string
-     */
-    public function getAsynName()
-    {
-        return self::ASYN_NAME . $this->active;
+        $this->establishedConn--;
     }
 }

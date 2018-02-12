@@ -26,7 +26,7 @@ class MysqlAsynPool extends AsynPool
     /**
      * 连接池类型名称
      */
-    const ASYN_NAME = 'mysql.';
+    const ASYN_NAME = 'mysql';
 
     /**
      * @var Miner SQL Builder
@@ -39,16 +39,6 @@ class MysqlAsynPool extends AsynPool
     public $bindPool;
 
     /**
-     * @var int 连接峰值
-     */
-    protected $mysqlMaxCount = 0;
-
-    /**
-     * @var string 连接池标识
-     */
-    private $active;
-
-    /**
      * MysqlAsynPool constructor.
      *
      * @param Config $config 配置对象
@@ -56,8 +46,7 @@ class MysqlAsynPool extends AsynPool
      */
     public function __construct($config, $active)
     {
-        parent::__construct($config);
-        $this->active         = $active;
+        parent::__construct($config, $active);
         $this->bindPool       = [];
     }
 
@@ -161,15 +150,7 @@ class MysqlAsynPool extends AsynPool
 
             //不是绑定的连接就回归连接
             if (!isset($data['bind_id'])) {
-                //回归连接
-                if (((time() - $client->genTime) < 3600)
-                    || (($this->mysqlMaxCount + $this->waitConnectNum) <= 30)
-                ) {
-                    $this->pushToPool($client);
-                } else {
-                    $client->close();
-                    $this->mysqlMaxCount--;
-                }
+                $this->pushToPool($client);
             } else {//事务
                 $bindId = $data['bind_id'];
                 if ($sql == 'commit' || $sql == 'rollback') {//结束事务
@@ -177,14 +158,6 @@ class MysqlAsynPool extends AsynPool
                 }
             }
         });
-    }
-
-    /**
-     * 创建一个Mysql连接
-     */
-    public function prepareOne()
-    {
-        $this->reconnect();
     }
 
     /**
@@ -207,8 +180,8 @@ class MysqlAsynPool extends AsynPool
             } else {
                 $client->isClose = false;
                 if (!isset($client->client_id)) {
-                    $client->client_id = $this->mysqlMaxCount;
-                    $this->mysqlMaxCount++;
+                    $client->client_id = $this->establishedConn;
+                    $this->establishedConn++;
                 }
                 $this->pushToPool($client);
             }
@@ -239,17 +212,8 @@ class MysqlAsynPool extends AsynPool
      */
     public function onClose($client)
     {
+        $this->establishedConn--;
         $client->isClose = true;
-    }
-
-    /**
-     * 返回唯一的连接池名称
-     *
-     * @return string
-     */
-    public function getAsynName()
-    {
-        return self::ASYN_NAME . $this->active;
     }
 
     /**
