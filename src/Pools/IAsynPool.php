@@ -84,4 +84,12 @@ interface IAsynPool
      * @throws Exception
      */
     public function getSync();
+
+    /**
+     * 建立连接
+     *
+     * @param null $client
+     * @return mixed
+     */
+    public function reconnect($client = null);
 }

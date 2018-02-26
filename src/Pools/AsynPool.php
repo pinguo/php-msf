@@ -24,6 +24,11 @@ abstract class AsynPool implements IAsynPool
     const MAX_TOKEN = 655360;
 
     /**
+     * 连接池类型名称
+     */
+    const ASYN_NAME = '';
+
+    /**
      * @var Config 配置对象
      */
     public $config;
@@ -69,21 +74,33 @@ abstract class AsynPool implements IAsynPool
     protected $waitConnectNum = 0;
 
     /**
+     * @var int 连接峰值
+     */
+    protected $establishedConn = 0;
+
+    /**
      * @var AsynPoolManager 连接池管理器
      */
     protected $asynManager;
 
     /**
+     * @var string 连接池标识
+     */
+    protected $active;
+
+    /**
      * AsynPool constructor.
      *
      * @param Config $config 配置对象
+     * @param string $active 连接池名称
      */
-    public function __construct($config)
+    public function __construct($config, $active)
     {
         $this->callBacks = [];
         $this->commands  = new \SplQueue();
         $this->pool      = new \SplQueue();
         $this->config    = $config;
+        $this->active    = $active;
     }
 
     /**
@@ -158,13 +175,57 @@ abstract class AsynPool implements IAsynPool
      */
     public function pushToPool($client)
     {
-        $this->pool->push($client);
-        if (count($this->commands) > 0) {//有残留的任务
-            $command = $this->commands->shift();
-            $this->execute($command);
+        $maxTime = $this->config[static::ASYN_NAME][$this->active]['max_time'] ?? 3600;
+        $minConn = $this->config[static::ASYN_NAME][$this->active]['min_conn'] ?? 0;
+
+        //回归连接
+        if (((time() - $client->genTime) < $maxTime)
+            || (($this->establishedConn + $this->waitConnectNum) <= $minConn)
+        ) {
+            $this->pool->push($client);
+            if (count($this->commands) > 0) {//有残留的任务
+                $command = $this->commands->shift();
+                $this->execute($command);
+            }
+        } else {
+            $client->close();
         }
+
         return $this;
     }
+
+    /**
+     * 创建一个连接
+     */
+    public function prepareOne()
+    {
+        $maxConn = $this->config[static::ASYN_NAME][$this->active]['max_conn'] ?? null;
+        if ($maxConn) {
+            if ($maxConn > ($this->waitConnectNum + $this->establishedConn)) {
+                $this->reconnect();
+            }
+        } else {
+            $this->reconnect();
+        }
+    }
+
+    /**
+     * 返回唯一的连接池名称
+     *
+     * @return string
+     */
+    public function getAsynName()
+    {
+        return self::ASYN_NAME  . '.' . $this->active;
+    }
+
+    /**
+     * 建立连接
+     *
+     * @param null $client
+     * @return mixed
+     */
+    abstract public function reconnect($client = null);
 
     /**
      * 获取同步
