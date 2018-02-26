@@ -1,3 +1,28 @@
+3.0.5 ==================================================================================================================
+bd01803 - xudianyang           * 修复break()方法，协程调度返回值错乱的问题
+9dd01ac - xudianyang           * 修复协程异常捕获逻辑漏洞
+40a03f0 - niulingyun           * redis cluster random模式不支持eval的bug修复
+f8f0fd7 - zhanglu              + add setnx in redis proxy
+96fd14c - niulingyun           + 异步协程shell_exec
+73b210a - xudianyang           * 修复yield $cor场景，当$cor抛出异常未能正常捕获的问题
+321161e - xudianyang           + 支持Not Found Controller To Default Controller/Action, Http/Client Support All HTTP METHOD
+16c1735 - xudianyang           + 关闭服务onShutdown事件支持
+bc20c6a - xudianyang           * 修复Timer进程内存泄露的问题
+643f011 - xudianyang           * 修复事务sql出错时的bug
+9064491 - xudianyang           - 移出tidPidTable
+252675c - niulingyun           + session support,but only support file adapter now
+22b7d76 - niulingyun           + 添加Redis Session支持
+d174e4b - xudianyang           * 修复默认路由的bug（Cannot declare class App\Controllers\Index, because the
+622b0e0 - shellvon             + 支持beanstalkd
+1ca5344 - xudianyang           * 日志时间精度提升
+a00a90e - niulingyun           + timer支持多进程模式
+b750744 - niulingyun           + task日志的写入比例可控
+bcde590 - zhanglu              + 通过配置自定义Input类和Output类
+061359f - niulingyun           * 重构GET参数兼容逻辑
+780681a - xudianyang           * 修复goConcurrent Get请求的查询参数为string的报错
+ff9b8a8 - xudianyang           * 优化连接池，提供max_conn,max_time,min_conn选项
+8b4acc9 - xudianyang           * fixed dump array value null
+
 3.0.4 ==================================================================================================================
 3cb4d61 - niulingyun           + 增加队列支持，目前支持redis、rabbitMQ、kafka
 32fc570 - niulingyun           + http client 支持keep-alive缓存
