@@ -7,7 +7,7 @@
   "require": {
     "php": ">=7.0",
     "ext-swoole": ">=1.9.15",
-    "pinguo/php-log": "1.0.1",
+    "pinguo/php-log": "dev-master",
     "pinguo/php-context": "1.0.1",
     "pinguo/php-aop": "1.0.0",
     "league/plates": "3.3.0",
