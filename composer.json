@@ -8,7 +8,7 @@
     "php": ">=7.0",
     "ext-swoole": ">=1.9.15",
     "pinguo/php-log": ">=1.0.2",
-    "pinguo/php-context": "1.0.1",
+    "pinguo/php-context": ">=1.0.2",
     "pinguo/php-aop": "1.0.0",
     "league/plates": "3.3.0",
     "hassankhan/config": "~0.10",
