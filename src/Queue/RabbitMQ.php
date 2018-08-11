@@ -14,6 +14,11 @@ class RabbitMQ extends Core implements IQueue
 {
     /** @var mixed|AMQPTask|\stdClass */
     public $rabbit;
+    
+    /**
+     * @var int delivery_tag
+     */
+    public $deliveryTag;
 
     public function __construct(string $configKey, $routing_key = 'default')
     {
@@ -41,9 +46,12 @@ class RabbitMQ extends Core implements IQueue
     {
         /** @var \AMQPEnvelope $AMQPEnvelope */
         $AMQPEnvelope = yield $this->rabbit->get($isAck);
-        if (!is_object($AMQPEnvelope)) {
-            return $AMQPEnvelope;
+        if ($AMQPEnvelope !== false) {
+            if ($isAck == false) {
+                $this->deliveryTag = $AMQPEnvelope->getDeliveryTag();
+            }
+            return $AMQPEnvelope->getBody();
         }
-        return $AMQPEnvelope->getBody();
+        return false;
     }
 }
