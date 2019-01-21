@@ -288,6 +288,11 @@ class Miner
      * @var array
      */
     private $intoValues;
+    /**
+     * escapes
+     * @var bool
+     */
+    private $escapes = true;
 
     /**
      * Miner constructor.
@@ -318,6 +323,22 @@ class Miner
     }
 
     /**
+     * @return the $escapes
+     */
+    public function getEscapes()
+    {
+        return $this->escapes;
+    }
+
+    /**
+     * @param boolean $escapes
+     */
+    public function setEscapes($escapes)
+    {
+        $this->escapes = $escapes;
+    }
+
+    /**
      * Add SQL_CALC_FOUND_ROWS execution option.
      *
      * @return Miner
@@ -342,7 +363,8 @@ class Miner
         preg_match('/^(?:(?<table>\w+)\.)?(?<column>\w+)$/iu', $column, $match);
         if (isset($match['table'], $match['column'])) {
             $table = $this->tableQuote($match['table']);
-            $column = "`{$match['column']}`";
+            $match['column'] = str_replace('`', '', $match['column']);  
+            $column = $this->escapes?"`{$match['column']}`":"{$match['column']}";
             return $table ? $table . '.' . $column : $column;
         }
         return $column;
@@ -357,7 +379,8 @@ class Miner
      */
     public function tableQuote($table)
     {
-        return $table ? "`{$table}`" : $table;
+        $table = str_replace('`', '', $table);       
+        return ($this->escapes && $table) ? "`{$table}`" : $table;
     }
 
     /**
