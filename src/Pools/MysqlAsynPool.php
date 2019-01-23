@@ -72,7 +72,7 @@ class MysqlAsynPool extends AsynPool
     {
         if ($this->dbQueryBuilder == null) {
             $this->dbQueryBuilder            = new Miner();
-            $this->dbQueryBuilder->setEscapes(isset($this->config['mysql'][$this->active]['escapes'])?$this->config['mysql'][$this->active]['escapes']:true);
+            $this->dbQueryBuilder->setEscapes($this->config['mysql'][$this->active]['escapes']??true);
             $this->dbQueryBuilder->mysqlPool = $this;
         }
         $this->dbQueryBuilder->context = $context;
