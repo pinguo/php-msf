@@ -364,7 +364,7 @@ class Miner
         if (isset($match['table'], $match['column'])) {
             $table = $this->tableQuote($match['table']);
             $match['column'] = str_replace('`', '', $match['column']);  
-            $column = $this->escapes? "`{$match['column']}`" : "{$match['column']}";
+            $column = $this->escapes ? "`{$match['column']}`" : "{$match['column']}";
             return $table ? $table . '.' . $column : $column;
         }
         return $column;
